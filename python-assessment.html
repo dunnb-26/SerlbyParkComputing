@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Y9 Python Assessment</title>
+    <title>Interactive Python IDE</title>
     <link rel="stylesheet" href="style.css">
     
-    <!-- Skulpt Libraries for running Python in-browser -->
+    <!-- CodeMirror for Interactive Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+    
+    <!-- Skulpt for In-Browser Python Execution -->
     <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
 
@@ -20,12 +24,18 @@
             padding: 0 20px;
         }
 
+        @media (max-width: 768px) {
+            .ide-container { grid-template-columns: 1fr; }
+        }
+
         .ide-panel {
             background: white;
             border-radius: 8px;
             padding: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             border-top: 5px solid var(--navy);
+            display: flex;
+            flex-direction: column;
         }
         
         .output-panel { border-top-color: var(--maroon); }
@@ -34,29 +44,34 @@
             margin-top: 0;
             color: var(--navy);
             text-transform: uppercase;
+            font-size: 1.2em;
         }
 
-        textarea.code-editor {
+        select {
             width: 100%;
-            height: 300px;
-            background-color: #1e1e1e;
-            color: #d4d4d4;
-            font-family: 'Courier New', Courier, monospace;
+            padding: 10px;
+            margin-bottom: 15px;
             font-size: 16px;
-            padding: 15px;
-            border: none;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        /* CodeMirror Editor Customization */
+        .CodeMirror {
+            height: 350px !important;
             border-radius: 5px;
-            resize: vertical;
-            box-sizing: border-box;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 15px;
         }
 
         pre.terminal-output {
             width: 100%;
-            height: 200px;
+            height: 350px;
             background-color: #000000;
-            color: #00ff00;
+            color: #4af626;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 16px;
+            font-size: 15px;
             padding: 15px;
             border: none;
             border-radius: 5px;
@@ -78,18 +93,10 @@
             font-size: 1.1em;
             font-weight: bold;
             cursor: pointer;
+            transition: background-color 0.2s;
         }
         
         .btn-run:hover { background-color: #2e7d32; }
-
-        select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
 
         .feedback-box {
             margin-top: 15px;
@@ -98,6 +105,8 @@
             border-radius: 4px;
             text-align: center;
             min-height: 50px;
+            background-color: #f5f5f5;
+            color: var(--navy);
         }
     </style>
 </head>
@@ -108,7 +117,7 @@
         </div>
         
         <div class="header-center">
-            <h1>Python Coding Assessment</h1>
+            <h1>Interactive Python IDE</h1>
         </div>
         
         <div class="header-right">
@@ -118,18 +127,20 @@
 
     <main>
         <div class="ide-container">
-            <!-- Left Side: Editor -->
+            <!-- Left Side: Interactive Editor -->
             <div class="ide-panel">
                 <h3>1. Select Challenge & Write Code</h3>
                 
-                <select id="task-selector" onchange="resetIDE()">
+                <select id="task-selector" onchange="loadTask()">
                     <option value="t1">Task 1 (Sequence): Fix the jumbled code</option>
                     <option value="t2">Task 2 (Selection): Rollercoaster height check</option>
                     <option value="t3">Task 3 (Iteration): FOR loop greeting</option>
                     <option value="t4">Task 4 (Iteration): WHILE loop countdown</option>
                 </select>
 
-                <textarea id="python-code" class="code-editor" spellcheck="false"></textarea>
+                <!-- The raw textarea is hidden and replaced by CodeMirror -->
+                <textarea id="python-code"></textarea>
+                
                 <button class="btn-run" onclick="runPython()">▶ Run Code & Mark</button>
             </div>
 
@@ -149,39 +160,52 @@
         &copy; 2026 Delta Serlby Park - Computing Department
     </footer>
 
-    <script>
-        // Load the first task's starter code automatically when the page opens
-        window.onload = resetIDE;
+    <!-- CodeMirror JavaScript Files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
 
+    <script>
+        // Initialize CodeMirror on the textarea to create the interactive IDE
+        var editor = CodeMirror.fromTextArea(document.getElementById("python-code"), {
+            mode: "python",
+            theme: "dracula",
+            lineNumbers: true,
+            indentUnit: 4,
+            matchBrackets: true
+        });
+
+        // Task content repository
+        const tasks = {
+            "t1": 'print("Pour water")\nprint("Drink tea")\nprint("Boil kettle")\nprint("Put teabag in cup")\n\n# TASK: Reorder the lines above into the correct logical sequence!',
+            "t2": '# TASK: Create a variable called height and set it to 150.\n# Write an IF statement checking if height is greater than 140.\n# If it is, print "You can ride!"\n\n',
+            "t3": '# TASK: Write a FOR loop that repeats exactly 5 times.\n# Inside the loop, print the word "Hello".\n\n',
+            "t4": '# TASK: Create a variable called timer and set it to 3.\n# Write a WHILE loop that runs as long as timer is greater than 0.\n# Inside the loop, print the timer and decrease it by 1.\n\n'
+        };
+
+        // Load the selected task into the CodeMirror editor
+        function loadTask() {
+            var currentTask = document.getElementById("task-selector").value;
+            editor.setValue(tasks[currentTask]);
+            
+            document.getElementById("output").innerHTML = "";
+            document.getElementById("feedback").innerHTML = "Awaiting code execution...";
+            document.getElementById("feedback").style.backgroundColor = "#f5f5f5";
+            document.getElementById("feedback").style.color = "var(--navy)";
+        }
+
+        // Initialize first task on load
+        window.onload = loadTask;
+
+        // Skulpt file reader configuration
         function builtinRead(x) {
             if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
                 throw "File not found: '" + x + "'";
             return Sk.builtinFiles["files"][x];
         }
 
-        // This function changes the starter text based on the dropdown selection
-        function resetIDE() {
-            var currentTask = document.getElementById("task-selector").value;
-            var editor = document.getElementById("python-code");
-            
-            if (currentTask === "t1") {
-                editor.value = 'print("Pour water")\nprint("Drink tea")\nprint("Boil kettle")\nprint("Put teabag in cup")\n\n# TASK: Reorder the lines above into the correct logical sequence!';
-            } else if (currentTask === "t2") {
-                editor.value = '# TASK: Create a variable called height and set it to 150.\n# Write an IF statement checking if height is greater than 140.\n# If it is, print "You can ride!"\n\n';
-            } else if (currentTask === "t3") {
-                editor.value = '# TASK: Write a FOR loop that repeats exactly 5 times.\n# Inside the loop, print the word "Hello".\n\n';
-            } else if (currentTask === "t4") {
-                editor.value = '# TASK: Create a variable called timer and set it to 3.\n# Write a WHILE loop that runs as long as timer is greater than 0.\n# Inside the loop, print the timer and decrease it by 1.\n\n';
-            }
-
-            document.getElementById("output").innerHTML = "";
-            document.getElementById("feedback").innerHTML = "Awaiting code execution...";
-            document.getElementById("feedback").style.backgroundColor = "transparent";
-            document.getElementById("feedback").style.color = "var(--navy)";
-        }
-
+        // Execute the Python code using Skulpt
         function runPython() {
-            var code = document.getElementById("python-code").value;
+            var code = editor.getValue(); // Get the colored code directly from CodeMirror
             var outputBox = document.getElementById("output");
             var feedbackBox = document.getElementById("feedback");
             var currentTask = document.getElementById("task-selector").value;
@@ -207,14 +231,14 @@
             myPromise.then(function(mod) {
                 checkAnswers(currentTask, outputText, code, feedbackBox);
             }, function(err) {
-                outputBox.innerHTML += '<span style="color: red;">' + err.toString() + '</span>';
+                outputBox.innerHTML += '<span style="color: #ff5555;">' + err.toString() + '</span>';
                 feedbackBox.innerHTML = "⚠️ Syntax Error! Check your spelling, capitalization, and indentation.";
                 feedbackBox.style.backgroundColor = "#ffebee";
                 feedbackBox.style.color = "#d32f2f";
             });
         }
 
-        // TEACHER MARKING LOGIC
+        // Teacher Auto-Marking Logic
         function checkAnswers(task, output, code, feedbackBox) {
             let cleanOutput = output.trim().toLowerCase();
             let lowerCode = code.toLowerCase();
@@ -222,21 +246,18 @@
             let successMsg = "";
 
             if (task === "t1") {
-                // Checks if the output matches the logical sequence of making tea
                 if (cleanOutput === "boil kettle\nput teabag in cup\npour water\ndrink tea") {
                     isCorrect = true;
                     successMsg = "✅ SEQUENCE PASSED: You placed the commands in the right order!";
                 }
             } 
             else if (task === "t2") {
-                // Checks for IF statement syntax and the correct output phrase
                 if (lowerCode.includes("if") && lowerCode.includes(">") && lowerCode.includes("140") && cleanOutput.includes("you can ride")) {
                     isCorrect = true;
                     successMsg = "✅ SELECTION PASSED: Your IF statement worked perfectly!";
                 }
             }
             else if (task === "t3") {
-                // Checks for FOR loop syntax and ensures "hello" printed 5 times
                 let helloCount = (cleanOutput.match(/hello/g) || []).length;
                 if (lowerCode.includes("for") && lowerCode.includes("range") && helloCount === 5) {
                     isCorrect = true;
@@ -244,14 +265,12 @@
                 }
             }
             else if (task === "t4") {
-                // Checks for WHILE loop syntax, a condition, and a decrement
                 if (lowerCode.includes("while") && lowerCode.includes(">") && lowerCode.includes("0") && (lowerCode.includes("- 1") || lowerCode.includes("-= 1"))) {
                     isCorrect = true;
                     successMsg = "✅ ITERATION PASSED: Your WHILE loop countdown worked!";
                 }
             }
 
-            // Display Results
             if (isCorrect) {
                 feedbackBox.innerHTML = successMsg;
                 feedbackBox.style.backgroundColor = "#e8f5e9";
