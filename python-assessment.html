@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Python Assessment</title>
+    <title>Python Assessment</title>
     <link rel="stylesheet" href="style.css">
     
     <!-- CodeMirror for Interactive Syntax Highlighting -->
@@ -252,10 +252,10 @@
                 <h3>1. Instructions</h3>
                 
                 <select id="task-selector" onchange="switchTask()">
-                    <option value="t1">Task 1 (Sequence): Delta Adventure Park</option>
-                    <option value="t2">Task 2 (Selection): Theme Park Age Checker</option>
-                    <option value="t3">Task 3 (Iteration): Process 5 Visitors</option>
-                    <option value="t4">Task 4 (Challenge): The Complete Ticket System</option>
+                    <option value="t1">Task 1 (Sequence with Blocks)</option>
+                    <option value="t2">Task 2 (Sequence from Scratch)</option>
+                    <option value="t3">Task 3 (Selection / IF Statements)</option>
+                    <option value="t4">Task 4 (Iteration & Loops)</option>
                 </select>
 
                 <div id="instruction-panel"></div>
@@ -303,10 +303,10 @@
         });
 
         let taskCodes = {
-            "t1": "# Type your code here:\n\n",
-            "t2": "# Type your Task 2 selection code here:\n\n",
-            "t3": "# Type your Task 3 iteration code here:\n\n",
-            "t4": "# Type your Task 4 complete program here:\n\n"
+            "t1": "# Task 1: Use the block bank on the left.\n\n",
+            "t2": "# Task 2: Write a sequence program from scratch.\n# Ask for the user's name and age, then print a greeting.\n\n",
+            "t3": "# Task 3: Test your IF statement knowledge.\n# Write an if statement to check a condition and print a result.\n\n",
+            "t4": "# Task 4: Write a loop (Iteration).\n\n"
         };
 
         let currentTask = "t1";
@@ -334,23 +334,17 @@
             } else {
                 let textInstr = "";
                 if (currentTask === "t2") {
-                    textInstr = `<strong>Refactor your program so it makes a decision.</strong><br><br>
-                                 1. Age <strong>16 or above</strong>: display that they can ride without an adult.<br><br>
-                                 2. Age <strong>12–15</strong>: display that they can ride with an adult.<br><br>
-                                 3. Age <strong>under 12</strong>: display that they cannot ride.<br><br>
-                                 <em>Use <code>if</code>, <code>elif</code> and <code>else</code>.</em>`;
+                    textInstr = `<strong>TASK 2: Sequence from Scratch</strong><br><br>
+                                 Write a Python program from scratch that:<br>
+                                 1. Asks for the user's name using <code>input()</code>.<br>
+                                 2. Asks for the user's age using <code>int(input())</code>.<br>
+                                 3. Prints a clear personalized greeting and summary message using your variables.`;
                 } else if (currentTask === "t3") {
-                    textInstr = `<strong>The park needs to process 5 visitors.</strong><br><br>
-                                 1. Refactor your program using a <strong>for loop</strong>.<br><br>
-                                 2. The loop should repeat 5 times.<br><br>
-                                 3. Ask for each visitor's name and age inside the loop.<br><br>
-                                 4. Apply the Thunderbolt decision to every visitor.`;
+                    textInstr = `<strong>TASK 3: IF Statement Knowledge (Selection)</strong><br><br>
+                                 Write a program that uses an <code>if</code> statement to check a condition (e.g. checking if a test score or age meets a threshold) and prints an appropriate message.`;
                 } else if (currentTask === "t4") {
-                    textInstr = `<strong>Bring everything together.</strong><br><br>
-                                 1. Your program should use <strong>sequence</strong>, <strong>selection</strong> and <strong>iteration</strong>.<br><br>
-                                 2. It should run without syntax errors.<br><br>
-                                 3. Keep your output clear and easy to understand.<br><br>
-                                 4. <strong>Challenge:</strong> add a sensible extra feature of your own.`;
+                    textInstr = `<strong>TASK 4: Iteration & Loops</strong><br><br>
+                                 Write a program using a <code>for</code> or <code>while</code> loop to repeat a set of instructions multiple times.`;
                 }
                 document.getElementById("instruction-panel").innerHTML = textInstr;
             }
@@ -506,16 +500,16 @@
             localStorage.setItem('delta_python_total', total);
         }
 
-        // PRECISE MARKING LOGIC FOR TASKS 1 & 2
+        // MARKING LOGIC
         function checkAnswers(task, output, code, feedbackBox) {
             let lowerCode = code.toLowerCase();
             let earnedMarks = 0;
             let feedbackDetails = [];
+            let cleanOutput = output.trim().toLowerCase();
 
             if (task === "t1") {
-                // Task 1: Sequence ordering check (1 to 5 marks)
+                // Task 1: Block sequence ordering check (1 to 5 marks)
                 let lines = code.split('\n').map(l => l.trim()).filter(l => l.length > 0 && !l.startsWith('#'));
-                
                 let p1 = lines.findIndex(l => l.toLowerCase().includes('print') && l.toLowerCase().includes('welcome'));
                 let p2 = lines.findIndex(l => l.toLowerCase().includes('name') && l.toLowerCase().includes('input'));
                 let p3 = lines.findIndex(l => l.toLowerCase().includes('price') && l.toLowerCase().includes('='));
@@ -536,76 +530,54 @@
                     }
                 }
 
-                // Map ordered count (2 to 6) to 1 to 5 marks
-                if (orderedCount >= 6) {
-                    earnedMarks = 5;
-                } else if (orderedCount >= 5) {
-                    earnedMarks = 4;
-                } else if (orderedCount >= 4) {
-                    earnedMarks = 3;
-                } else if (orderedCount >= 3) {
-                    earnedMarks = 2;
-                } else if (orderedCount >= 2) {
-                    earnedMarks = 1;
-                } else {
-                    earnedMarks = 0;
-                }
+                if (orderedCount >= 6) earnedMarks = 5;
+                else if (orderedCount >= 5) earnedMarks = 4;
+                else if (orderedCount >= 4) earnedMarks = 3;
+                else if (orderedCount >= 3) earnedMarks = 2;
+                else if (orderedCount >= 2) earnedMarks = 1;
+                else earnedMarks = 0;
 
-                if (earnedMarks < 5) {
-                    feedbackDetails.push("Make sure your commands are in the correct logical sequence.");
-                }
+                if (earnedMarks < 5) feedbackDetails.push("Ensure your blocks are placed in the correct logical sequence.");
             } 
             else if (task === "t2") {
-                // Task 2: Selection step-by-step check (1 to 5 marks)
+                // Task 2: Sequence from scratch (No blocks)
                 let hasAttempt = code.trim().length > 0;
-                let hasAgeVar = lowerCode.includes("age");
-                let hasIf = lowerCode.includes("if");
-                let hasElif = lowerCode.includes("elif");
-                let hasElse = lowerCode.includes("else");
+                let hasInput = lowerCode.includes("input");
+                let hasVar = lowerCode.includes("=");
+                let hasPrint = lowerCode.includes("print");
 
-                if (hasElse && hasElif && hasIf && hasAgeVar) {
-                    earnedMarks = 5;
-                } else if (hasElif && hasIf && hasAgeVar) {
-                    earnedMarks = 4;
-                    feedbackDetails.push("Missing 'else' statement (+1 mark).");
-                } else if (hasIf && hasAgeVar) {
-                    earnedMarks = 3;
-                    feedbackDetails.push("Missing 'elif' statement (+1 mark).");
-                } else if (hasAgeVar) {
-                    earnedMarks = 2;
-                    feedbackDetails.push("Missing 'if' statement (+1 mark).");
-                } else if (hasAttempt) {
-                    earnedMarks = 1;
-                    feedbackDetails.push("Attempt made, but define your 'age' variable correctly (+1 mark).");
-                } else {
-                    earnedMarks = 0;
-                    feedbackDetails.push("No code entered.");
-                }
+                if (hasAttempt) earnedMarks += 1; // Attempted
+                if (hasVar) earnedMarks += 1; // Defined variable
+                if (hasInput) earnedMarks += 2; // Included input collection
+                if (hasPrint) earnedMarks += 1; // Included print statement
+
+                if (earnedMarks < 5) feedbackDetails.push("Make sure to define variables, use input(), and print your results.");
             }
             else if (task === "t3") {
-                // Task 3: Iteration
-                if (lowerCode.includes("for") && lowerCode.includes("range") && lowerCode.includes("input")) {
-                    earnedMarks = 5;
-                } else if (lowerCode.includes("for") || lowerCode.includes("input")) {
-                    earnedMarks = 3;
-                    feedbackDetails.push("Ensure your loop repeats 5 times and collects input.");
-                } else {
-                    earnedMarks = 0;
-                    feedbackDetails.push("Include a for loop.");
-                }
+                // Task 3: IF Statement Knowledge (Selection)
+                let hasAttempt = code.trim().length > 0;
+                let hasIf = lowerCode.includes("if");
+                let hasCondition = lowerCode.includes(">") || lowerCode.includes("<") || lowerCode.includes("==") || lowerCode.includes(">=") || lowerCode.includes("<=");
+                let hasPrint = lowerCode.includes("print");
+
+                if (hasAttempt) earnedMarks += 1;
+                if (hasIf) earnedMarks += 2;
+                if (hasCondition) earnedMarks += 1;
+                if (hasPrint) earnedMarks += 1;
+
+                if (earnedMarks < 5) feedbackDetails.push("Ensure you include an 'if' statement with a comparison operator and a print action.");
             }
             else if (task === "t4") {
-                // Task 4: Challenge
-                let cleanOutput = output.trim().toLowerCase();
-                if (cleanOutput.length > 0 && lowerCode.includes("if") && (lowerCode.includes("for") || lowerCode.includes("while"))) {
-                    earnedMarks = 5;
-                } else if (cleanOutput.length > 0) {
-                    earnedMarks = 3;
-                    feedbackDetails.push("Combine sequence, selection, and iteration.");
-                } else {
-                    earnedMarks = 0;
-                    feedbackDetails.push("Run your complete program successfully.");
-                }
+                // Task 4: Iteration & Loops
+                let hasAttempt = code.trim().length > 0;
+                let hasLoop = lowerCode.includes("for") || lowerCode.includes("while");
+                let hasPrint = lowerCode.includes("print");
+
+                if (hasAttempt) earnedMarks += 1;
+                if (hasLoop) earnedMarks += 3;
+                if (hasPrint) earnedMarks += 1;
+
+                if (earnedMarks < 5) feedbackDetails.push("Include a valid 'for' or 'while' loop in your program.");
             }
 
             updateScore(task, earnedMarks);
