@@ -506,87 +506,120 @@
             localStorage.setItem('delta_python_total', total);
         }
 
-        // PARTIAL MARKING LOGIC
+        // PRECISE MARKING LOGIC FOR TASKS 1 & 2
         function checkAnswers(task, output, code, feedbackBox) {
-            let cleanOutput = output.trim().toLowerCase();
             let lowerCode = code.toLowerCase();
-            let stripped = lowerCode.replace(/\s+/g, '');
             let earnedMarks = 0;
             let feedbackDetails = [];
 
             if (task === "t1") {
-                // Task 1: Sequence (5 components = 5 marks)
-                if (stripped.includes('print("welcometodelta') || stripped.includes("print('welcometodelta")) {
-                    earnedMarks += 1;
-                } else {
-                    feedbackDetails.push("Missing welcome print statement.");
+                // Task 1: Sequence ordering check (1 to 5 marks)
+                let lines = code.split('\n').map(l => l.trim()).filter(l => l.length > 0 && !l.startsWith('#'));
+                
+                let p1 = lines.findIndex(l => l.toLowerCase().includes('print') && l.toLowerCase().includes('welcome'));
+                let p2 = lines.findIndex(l => l.toLowerCase().includes('name') && l.toLowerCase().includes('input'));
+                let p3 = lines.findIndex(l => l.toLowerCase().includes('price') && l.toLowerCase().includes('='));
+                let p4 = lines.findIndex(l => l.toLowerCase().includes('tickets') && l.toLowerCase().includes('int(input'));
+                let p5 = lines.findIndex(l => l.toLowerCase().includes('total') && l.toLowerCase().includes('*'));
+                let p6 = lines.findIndex(l => l.toLowerCase().includes('print') && (l.toLowerCase().includes('total') || l.toLowerCase().includes('£')));
+
+                let keyIndices = [p1, p2, p3, p4, p5, p6];
+                let orderedCount = 0;
+                let lastIdx = -1;
+
+                for (let idx of keyIndices) {
+                    if (idx !== -1 && idx > lastIdx) {
+                        orderedCount++;
+                        lastIdx = idx;
+                    } else {
+                        break;
+                    }
                 }
 
-                if (stripped.includes("price=8")) {
-                    earnedMarks += 1;
+                // Map ordered count (2 to 6) to 1 to 5 marks
+                if (orderedCount >= 6) {
+                    earnedMarks = 5;
+                } else if (orderedCount >= 5) {
+                    earnedMarks = 4;
+                } else if (orderedCount >= 4) {
+                    earnedMarks = 3;
+                } else if (orderedCount >= 3) {
+                    earnedMarks = 2;
+                } else if (orderedCount >= 2) {
+                    earnedMarks = 1;
                 } else {
-                    feedbackDetails.push("Missing price variable definition.");
+                    earnedMarks = 0;
                 }
 
-                if (stripped.includes("tickets=int(input")) {
-                    earnedMarks += 1;
-                } else {
-                    feedbackDetails.push("Tickets input must cast to int()");
-                }
-
-                if (stripped.includes("total=tickets*price") && !stripped.includes("total=tickets+price")) {
-                    earnedMarks += 1;
-                } else {
-                    feedbackDetails.push("Calculation should use multiplication (*).");
-                }
-
-                let priceIdx = stripped.indexOf("price=8");
-                let ticketIdx = stripped.indexOf("tickets=int(input");
-                let mathIdx = stripped.indexOf("total=tickets*price");
-                let printIdx = stripped.indexOf("yourtotalis");
-
-                if ((priceIdx !== -1 && priceIdx < mathIdx) && (ticketIdx !== -1 && ticketIdx < mathIdx) && (mathIdx !== -1 && mathIdx < printIdx)) {
-                    earnedMarks += 1;
-                } else {
-                    feedbackDetails.push("Check statement ordering (variables & math before print).");
+                if (earnedMarks < 5) {
+                    feedbackDetails.push("Make sure your commands are in the correct logical sequence.");
                 }
             } 
             else if (task === "t2") {
-                // Task 2: Selection (5 components = 5 marks)
-                if (lowerCode.includes("if")) { earnedMarks += 1; } else { feedbackDetails.push("Missing 'if' statement."); }
-                if (lowerCode.includes("elif")) { earnedMarks += 1; } else { feedbackDetails.push("Missing 'elif' statement."); }
-                if (lowerCode.includes("else")) { earnedMarks += 1; } else { feedbackDetails.push("Missing 'else' statement."); }
-                if (lowerCode.includes("16")) { earnedMarks += 1; } else { feedbackDetails.push("Missing age 16 threshold."); }
-                if (lowerCode.includes("12")) { earnedMarks += 1; } else { feedbackDetails.push("Missing age 12 threshold."); }
+                // Task 2: Selection step-by-step check (1 to 5 marks)
+                let hasAttempt = code.trim().length > 0;
+                let hasAgeVar = lowerCode.includes("age");
+                let hasIf = lowerCode.includes("if");
+                let hasElif = lowerCode.includes("elif");
+                let hasElse = lowerCode.includes("else");
+
+                if (hasElse && hasElif && hasIf && hasAgeVar) {
+                    earnedMarks = 5;
+                } else if (hasElif && hasIf && hasAgeVar) {
+                    earnedMarks = 4;
+                    feedbackDetails.push("Missing 'else' statement (+1 mark).");
+                } else if (hasIf && hasAgeVar) {
+                    earnedMarks = 3;
+                    feedbackDetails.push("Missing 'elif' statement (+1 mark).");
+                } else if (hasAgeVar) {
+                    earnedMarks = 2;
+                    feedbackDetails.push("Missing 'if' statement (+1 mark).");
+                } else if (hasAttempt) {
+                    earnedMarks = 1;
+                    feedbackDetails.push("Attempt made, but define your 'age' variable correctly (+1 mark).");
+                } else {
+                    earnedMarks = 0;
+                    feedbackDetails.push("No code entered.");
+                }
             }
             else if (task === "t3") {
-                // Task 3: Iteration (5 components = 5 marks)
-                if (lowerCode.includes("for")) { earnedMarks += 1; } else { feedbackDetails.push("Missing 'for' loop."); }
-                if (lowerCode.includes("range")) { earnedMarks += 1; } else { feedbackDetails.push("Missing 'range()' function."); }
-                if (lowerCode.includes("5")) { earnedMarks += 1; } else { feedbackDetails.push("Loop must repeat 5 times."); }
-                if (lowerCode.includes("input")) { earnedMarks += 2; } else { feedbackDetails.push("Missing visitor input inside the loop (+2 marks)."); }
+                // Task 3: Iteration
+                if (lowerCode.includes("for") && lowerCode.includes("range") && lowerCode.includes("input")) {
+                    earnedMarks = 5;
+                } else if (lowerCode.includes("for") || lowerCode.includes("input")) {
+                    earnedMarks = 3;
+                    feedbackDetails.push("Ensure your loop repeats 5 times and collects input.");
+                } else {
+                    earnedMarks = 0;
+                    feedbackDetails.push("Include a for loop.");
+                }
             }
             else if (task === "t4") {
-                // Task 4: Challenge (5 components = 5 marks)
-                if (cleanOutput.length > 0) { earnedMarks += 1; } else { feedbackDetails.push("Code did not produce output."); }
-                if (lowerCode.includes("if")) { earnedMarks += 1; } else { feedbackDetails.push("Missing selection."); }
-                if (lowerCode.includes("elif") || lowerCode.includes("else")) { earnedMarks += 1; } else { feedbackDetails.push("Expand your decision logic."); }
-                if (lowerCode.includes("for") || lowerCode.includes("while")) { earnedMarks += 1; } else { feedbackDetails.push("Missing iteration (loop)."); }
-                if (lowerCode.includes("input")) { earnedMarks += 1; } else { feedbackDetails.push("Missing user input collection."); }
+                // Task 4: Challenge
+                let cleanOutput = output.trim().toLowerCase();
+                if (cleanOutput.length > 0 && lowerCode.includes("if") && (lowerCode.includes("for") || lowerCode.includes("while"))) {
+                    earnedMarks = 5;
+                } else if (cleanOutput.length > 0) {
+                    earnedMarks = 3;
+                    feedbackDetails.push("Combine sequence, selection, and iteration.");
+                } else {
+                    earnedMarks = 0;
+                    feedbackDetails.push("Run your complete program successfully.");
+                }
             }
 
             updateScore(task, earnedMarks);
 
             if (earnedMarks === 5) {
-                feedbackBox.innerHTML = `✅ FULL MARKS (5/5): Excellent work on this task!`;
+                feedbackBox.innerHTML = `✅ FULL MARKS (5/5): Excellent work!`;
                 feedbackBox.style.backgroundColor = "#e8f5e9";
                 feedbackBox.style.color = "#2e7d32";
             } else if (earnedMarks > 0) {
-                feedbackBox.innerHTML = `⚠️ PARTIAL MARKS (${earnedMarks}/5): Good effort!<br><span style="font-size:11px; font-weight:normal;">To improve: ${feedbackDetails.join(" ")}</span>`;
+                feedbackBox.innerHTML = `⚠️ PARTIAL MARKS (${earnedMarks}/5): Good progress!<br><span style="font-size:11px; font-weight:normal;">Tip: ${feedbackDetails.join(" ")}</span>`;
                 feedbackBox.style.backgroundColor = "#fff3e0";
                 feedbackBox.style.color = "#ef6c00";
             } else {
-                feedbackBox.innerHTML = `❌ 0/5 Marks. Check the instructions and try again!<br><span style="font-size:11px; font-weight:normal;">Tips: ${feedbackDetails.join(" ")}</span>`;
+                feedbackBox.innerHTML = `❌ 0/5 Marks. Check the instructions and try again!<br><span style="font-size:11px; font-weight:normal;">Tip: ${feedbackDetails.join(" ")}</span>`;
                 feedbackBox.style.backgroundColor = "#ffebee";
                 feedbackBox.style.color = "#d32f2f";
             }
