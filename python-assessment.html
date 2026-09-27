@@ -59,7 +59,7 @@
 
         /* CodeMirror Editor Customization */
         .CodeMirror {
-            height: 350px !important;
+            height: 420px !important;
             border-radius: 5px;
             font-family: 'Courier New', Courier, monospace;
             font-size: 15px;
@@ -67,7 +67,7 @@
 
         pre.terminal-output {
             width: 100%;
-            height: 350px;
+            height: 420px;
             background-color: #000000;
             color: #4af626;
             font-family: 'Courier New', Courier, monospace;
@@ -132,7 +132,7 @@
                 <h3>1. Select Challenge & Write Code</h3>
                 
                 <select id="task-selector" onchange="loadTask()">
-                    <option value="t1">Task 1 (Sequence): Fix the jumbled code</option>
+                    <option value="t1">Task 1 (Sequence): Delta Adventure Park</option>
                     <option value="t2">Task 2 (Selection): Rollercoaster height check</option>
                     <option value="t3">Task 3 (Iteration): FOR loop greeting</option>
                     <option value="t4">Task 4 (Iteration): WHILE loop countdown</option>
@@ -176,7 +176,7 @@
 
         // Task content repository
         const tasks = {
-            "t1": '# TASK: Read the jumbled commands below.\n# Write them out in the correct logical sequence to make a cup of tea!\n#\n# print("Pour water")\n# print("Drink tea")\n# print("Boil kettle")\n# print("Put teabag in cup")\n\n# Type your code below:\n',
+            "t1": '# TASK: Read the block bank below. Some are incorrect distractors!\n# Write the correct blocks in the right logical sequence to create a working ticket system.\n#\n# total = tickets + price\n# age = int(input("What is your age? "))\n# print("Welcome to Delta Adventure Park")\n# total = tickets * price\n# name = input("What is your name? ")\n# tickets = input("How many tickets? ")\n# tickets = int(input("How many tickets? "))\n# print(name, "your total is £", total)\n# price = 8\n\n# Type your code below:\n',
             "t2": '# TASK: Create a variable called height and set it to 150.\n# Write an IF statement checking if height is greater than 140.\n# If it is, print "You can ride!"\n\n',
             "t3": '# TASK: Write a FOR loop that repeats exactly 5 times.\n# Inside the loop, print the word "Hello".\n\n',
             "t4": '# TASK: Create a variable called timer and set it to 3.\n# Write a WHILE loop that runs as long as timer is greater than 0.\n# Inside the loop, print the timer and decrease it by 1.\n\n'
@@ -205,7 +205,7 @@
 
         // Execute the Python code using Skulpt
         function runPython() {
-            var code = editor.getValue(); // Get the colored code directly from CodeMirror
+            var code = editor.getValue(); 
             var outputBox = document.getElementById("output");
             var feedbackBox = document.getElementById("feedback");
             var currentTask = document.getElementById("task-selector").value;
@@ -246,9 +246,28 @@
             let successMsg = "";
 
             if (task === "t1") {
-                if (cleanOutput === "boil kettle\nput teabag in cup\npour water\ndrink tea") {
+                // Remove all spaces to make checking robust against student formatting
+                let stripped = lowerCode.replace(/\s+/g, '');
+                
+                let hasWelcome = stripped.includes('print("welcometodelta') || stripped.includes("print('welcometodelta");
+                let hasCorrectTickets = stripped.includes("tickets=int(input");
+                let hasCorrectTotal = stripped.includes("total=tickets*price");
+                let hasWrongTotal = stripped.includes("total=tickets+price");
+                let hasFinalPrint = stripped.includes('"yourtotalis') || stripped.includes("'yourtotalis");
+                
+                // Verify variables are declared before they are used in the math/print
+                let priceIdx = stripped.indexOf("price=8");
+                let ticketIdx = stripped.indexOf("tickets=int(input");
+                let mathIdx = stripped.indexOf("total=tickets*price");
+                let printIdx = stripped.indexOf("yourtotalis");
+
+                let orderCorrect = (priceIdx !== -1 && priceIdx < mathIdx) && 
+                                   (ticketIdx !== -1 && ticketIdx < mathIdx) &&
+                                   (mathIdx !== -1 && mathIdx < printIdx);
+
+                if (hasWelcome && hasCorrectTickets && hasCorrectTotal && !hasWrongTotal && hasFinalPrint && orderCorrect) {
                     isCorrect = true;
-                    successMsg = "✅ SEQUENCE PASSED: You placed the commands in the right order!";
+                    successMsg = "✅ SEQUENCE PASSED: You selected the correct blocks and built the ticket system!";
                 }
             } 
             else if (task === "t2") {
@@ -276,7 +295,7 @@
                 feedbackBox.style.backgroundColor = "#e8f5e9";
                 feedbackBox.style.color = "#2e7d32";
             } else {
-                feedbackBox.innerHTML = "❌ Incorrect or incomplete. Read the # TASK instructions carefully and try again!";
+                feedbackBox.innerHTML = "❌ Incorrect or incomplete. Read the instructions carefully and try again!";
                 feedbackBox.style.backgroundColor = "#ffebee";
                 feedbackBox.style.color = "#d32f2f";
             }
