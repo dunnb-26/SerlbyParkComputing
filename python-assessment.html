@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Assessment</title>
+    <title>Interactive Python Assessment</title>
     <link rel="stylesheet" href="style.css">
     
     <!-- CodeMirror for Interactive Syntax Highlighting -->
@@ -40,6 +40,17 @@
             color: #388e3c;
             margin-top: 3px;
         }
+        .btn-clear-scores {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        .btn-clear-scores:hover { background-color: #b71c1c; }
 
         /* 3-Column Layout */
         .ide-container {
@@ -228,6 +239,9 @@
         <div class="score-item">Task 3: <span id="score-t3">0</span>/5</div>
         <div class="score-item">Task 4: <span id="score-t4">0</span>/5</div>
         <div class="score-item" style="color: var(--maroon);">TOTAL SCORE: <span id="total-score" style="color: var(--maroon);">0</span>/20</div>
+        <div>
+            <button class="btn-clear-scores" onclick="clearScores()">Reset Student Progress</button>
+        </div>
     </div>
 
     <main>
@@ -287,7 +301,6 @@
             matchBrackets: true
         });
 
-        // Store code persistently for each task
         let taskCodes = {
             "t1": "# Type your code here:\n\n",
             "t2": "# Type your Task 2 selection code here:\n\n",
@@ -297,7 +310,6 @@
 
         let currentTask = "t1";
 
-        // Master list of blocks for Task 1
         const originalBlocks = [
             { id: 'b1', text: 'total = tickets + price' },
             { id: 'b2', text: 'age = int(input("What is your age? "))' },
@@ -313,13 +325,9 @@
         let currentBlocks = JSON.parse(JSON.stringify(originalBlocks));
 
         function switchTask() {
-            // 1. Save current editor state before switching
             taskCodes[currentTask] = editor.getValue();
-
-            // 2. Get new task
             currentTask = document.getElementById("task-selector").value;
 
-            // 3. Render appropriate instruction panel
             if (currentTask === "t1") {
                 renderBlockBank();
             } else {
@@ -346,9 +354,7 @@
                 document.getElementById("instruction-panel").innerHTML = textInstr;
             }
 
-            // 4. Load saved code for the newly selected task into the editor
             editor.setValue(taskCodes[currentTask]);
-            
             document.getElementById("output").innerHTML = "";
             document.getElementById("feedback").innerHTML = "Awaiting code execution...";
             document.getElementById("feedback").style.backgroundColor = "#f5f5f5";
@@ -388,9 +394,32 @@
         }
 
         window.onload = function() {
+            ['t1', 't2', 't3', 't4'].forEach(taskKey => {
+                let savedScore = localStorage.getItem('delta_python_score_' + taskKey);
+                if (savedScore !== null) {
+                    document.getElementById(`score-${taskKey}`).innerText = savedScore;
+                }
+            });
+            let savedTotal = localStorage.getItem('delta_python_total');
+            if (savedTotal !== null) {
+                document.getElementById("total-score").innerText = savedTotal;
+            }
+
             currentBlocks = JSON.parse(JSON.stringify(originalBlocks));
             switchTask();
         };
+
+        function clearScores() {
+            if (confirm("Are you sure you want to clear all scores for this student?")) {
+                ['t1', 't2', 't3', 't4'].forEach(taskKey => {
+                    localStorage.removeItem('delta_python_score_' + taskKey);
+                    document.getElementById(`score-${taskKey}`).innerText = "0";
+                });
+                localStorage.removeItem('delta_python_total');
+                document.getElementById("total-score").innerText = "0";
+                alert("Scores have been reset.");
+            }
+        }
 
         function builtinRead(x) {
             if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
@@ -399,7 +428,6 @@
         }
 
         function runPython() {
-            // Save current code to memory first
             taskCodes[currentTask] = editor.getValue();
             var code = taskCodes[currentTask];
             
@@ -465,13 +493,16 @@
 
         function updateScore(taskKey, points) {
             document.getElementById(`score-${taskKey}`).innerText = points;
+            localStorage.setItem('delta_python_score_' + taskKey, points);
             
             let p1 = parseInt(document.getElementById("score-t1").innerText);
             let p2 = parseInt(document.getElementById("score-t2").innerText);
             let p3 = parseInt(document.getElementById("score-t3").innerText);
             let p4 = parseInt(document.getElementById("score-t4").innerText);
             
-            document.getElementById("total-score").innerText = p1 + p2 + p3 + p4;
+            let total = p1 + p2 + p3 + p4;
+            document.getElementById("total-score").innerText = total;
+            localStorage.setItem('delta_python_total', total);
         }
 
         function checkAnswers(task, output, code, feedbackBox) {
