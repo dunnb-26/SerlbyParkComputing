@@ -123,13 +123,13 @@
                 <h3>1. Select Challenge & Write Code</h3>
                 
                 <select id="task-selector" onchange="resetIDE()">
-                    <option value="q1">Question 1: Print your favorite color</option>
-                    <option value="q2">Question 2: Create a variable 'x' and set it to 50</option>
-                    <option value="q3">Question 3: Write an IF statement that prints "Pass" if score > 50</option>
+                    <option value="t1">Task 1 (Sequence): Fix the jumbled code</option>
+                    <option value="t2">Task 2 (Selection): Rollercoaster height check</option>
+                    <option value="t3">Task 3 (Iteration): FOR loop greeting</option>
+                    <option value="t4">Task 4 (Iteration): WHILE loop countdown</option>
                 </select>
 
-                <textarea id="python-code" class="code-editor" spellcheck="false"># Write your Python code here...
-</textarea>
+                <textarea id="python-code" class="code-editor" spellcheck="false"></textarea>
                 <button class="btn-run" onclick="runPython()">▶ Run Code & Mark</button>
             </div>
 
@@ -150,18 +150,34 @@
     </footer>
 
     <script>
+        // Load the first task's starter code automatically when the page opens
+        window.onload = resetIDE;
+
         function builtinRead(x) {
             if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
                 throw "File not found: '" + x + "'";
             return Sk.builtinFiles["files"][x];
         }
 
+        // This function changes the starter text based on the dropdown selection
         function resetIDE() {
+            var currentTask = document.getElementById("task-selector").value;
+            var editor = document.getElementById("python-code");
+            
+            if (currentTask === "t1") {
+                editor.value = 'print("Pour water")\nprint("Drink tea")\nprint("Boil kettle")\nprint("Put teabag in cup")\n\n# TASK: Reorder the lines above into the correct logical sequence!';
+            } else if (currentTask === "t2") {
+                editor.value = '# TASK: Create a variable called height and set it to 150.\n# Write an IF statement checking if height is greater than 140.\n# If it is, print "You can ride!"\n\n';
+            } else if (currentTask === "t3") {
+                editor.value = '# TASK: Write a FOR loop that repeats exactly 5 times.\n# Inside the loop, print the word "Hello".\n\n';
+            } else if (currentTask === "t4") {
+                editor.value = '# TASK: Create a variable called timer and set it to 3.\n# Write a WHILE loop that runs as long as timer is greater than 0.\n# Inside the loop, print the timer and decrease it by 1.\n\n';
+            }
+
             document.getElementById("output").innerHTML = "";
             document.getElementById("feedback").innerHTML = "Awaiting code execution...";
             document.getElementById("feedback").style.backgroundColor = "transparent";
             document.getElementById("feedback").style.color = "var(--navy)";
-            document.getElementById("python-code").value = "# Write your Python code here...\n";
         }
 
         function runPython() {
@@ -192,7 +208,7 @@
                 checkAnswers(currentTask, outputText, code, feedbackBox);
             }, function(err) {
                 outputBox.innerHTML += '<span style="color: red;">' + err.toString() + '</span>';
-                feedbackBox.innerHTML = "⚠️ Syntax Error! Check your spelling and indentation.";
+                feedbackBox.innerHTML = "⚠️ Syntax Error! Check your spelling, capitalization, and indentation.";
                 feedbackBox.style.backgroundColor = "#ffebee";
                 feedbackBox.style.color = "#d32f2f";
             });
@@ -201,34 +217,47 @@
         // TEACHER MARKING LOGIC
         function checkAnswers(task, output, code, feedbackBox) {
             let cleanOutput = output.trim().toLowerCase();
+            let lowerCode = code.toLowerCase();
             let isCorrect = false;
+            let successMsg = "";
 
-            if (task === "q1") {
-                // Check if they used a print statement and outputted anything
-                if (code.includes("print") && cleanOutput.length > 0) {
+            if (task === "t1") {
+                // Checks if the output matches the logical sequence of making tea
+                if (cleanOutput === "boil kettle\nput teabag in cup\npour water\ndrink tea") {
                     isCorrect = true;
+                    successMsg = "✅ SEQUENCE PASSED: You placed the commands in the right order!";
                 }
             } 
-            else if (task === "q2") {
-                // Check if they created variable x and set it to 50
-                if ((code.includes("x = 50") || code.includes("x=50")) && !code.includes("==")) {
+            else if (task === "t2") {
+                // Checks for IF statement syntax and the correct output phrase
+                if (lowerCode.includes("if") && lowerCode.includes(">") && lowerCode.includes("140") && cleanOutput.includes("you can ride")) {
                     isCorrect = true;
+                    successMsg = "✅ SELECTION PASSED: Your IF statement worked perfectly!";
                 }
             }
-            else if (task === "q3") {
-                // Check if they used 'if', '>', and '50'
-                if (code.includes("if") && code.includes(">") && code.includes("50") && code.includes("print")) {
+            else if (task === "t3") {
+                // Checks for FOR loop syntax and ensures "hello" printed 5 times
+                let helloCount = (cleanOutput.match(/hello/g) || []).length;
+                if (lowerCode.includes("for") && lowerCode.includes("range") && helloCount === 5) {
                     isCorrect = true;
+                    successMsg = "✅ ITERATION PASSED: Your FOR loop successfully ran 5 times!";
+                }
+            }
+            else if (task === "t4") {
+                // Checks for WHILE loop syntax, a condition, and a decrement
+                if (lowerCode.includes("while") && lowerCode.includes(">") && lowerCode.includes("0") && (lowerCode.includes("- 1") || lowerCode.includes("-= 1"))) {
+                    isCorrect = true;
+                    successMsg = "✅ ITERATION PASSED: Your WHILE loop countdown worked!";
                 }
             }
 
             // Display Results
             if (isCorrect) {
-                feedbackBox.innerHTML = "✅ CORRECT! Great job.";
+                feedbackBox.innerHTML = successMsg;
                 feedbackBox.style.backgroundColor = "#e8f5e9";
                 feedbackBox.style.color = "#2e7d32";
             } else {
-                feedbackBox.innerHTML = "❌ Incorrect. Read the question carefully and try again!";
+                feedbackBox.innerHTML = "❌ Incorrect or incomplete. Read the # TASK instructions carefully and try again!";
                 feedbackBox.style.backgroundColor = "#ffebee";
                 feedbackBox.style.color = "#d32f2f";
             }
