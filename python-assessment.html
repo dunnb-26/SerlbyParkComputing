@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Assessment</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Skulpt Libraries: These run Python directly in the web browser -->
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+
+    <style>
+        .ragb-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .task-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-top: 5px solid;
+        }
+        
+        /* Task Colors */
+        .red-task { border-top-color: #d32f2f; }
+        .amber-task { border-top-color: #f57c00; }
+        .green-task { border-top-color: #388e3c; }
+        .blue-task { border-top-color: #1976d2; }
+        .code-task { border-top-color: var(--navy); }
+        .output-task { border-top-color: var(--maroon); }
+
+        .task-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        /* IDE Styling */
+        .ide-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto 40px auto;
+            padding: 0 20px;
+        }
+
+        @media (max-width: 768px) {
+            .ide-container { grid-template-columns: 1fr; }
+        }
+
+        textarea.code-editor {
+            width: 100%;
+            height: 250px;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        pre.terminal-output {
+            width: 100%;
+            height: 250px;
+            background-color: #000000;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            overflow-y: auto;
+            box-sizing: border-box;
+            margin: 0;
+        }
+
+        .btn-run {
+            display: block;
+            width: 100%;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #388e3c;
+            color: white;
+            text-align: center;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .btn-run:hover { background-color: #2e7d32; }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #feedback {
+            margin-top: 15px;
+            padding: 10px;
+            font-weight: bold;
+            border-radius: 4px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <img src="logo.jpg" alt="Delta Serlby Park Logo">
+        </div>
+        
+        <div class="header-center">
+            <h1>Python Coding Assessment</h1>
+        </div>
+        
+        <div class="header-right">
+            <a href="index.html" class="back-btn">&larr; Back to Curriculum</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Instructions Row -->
+        <div class="ragb-grid">
+            <div class="task-card blue-task" style="grid-column: 1 / -1;">
+                <div class="task-title" style="color: #1976d2;">Instructions</div>
+                <p>Select a task from the drop-down menu below. Write your Python code in the dark editor box on the left, then click <strong>Run Code & Check</strong>. Your output will appear in the black terminal on the right!</p>
+            </div>
+        </div>
+
+        <!-- Python IDE Row -->
+        <div class="ide-container">
+            <!-- Left Side: Editor -->
+            <div class="task-card code-task">
+                <div class="task-title" style="color: var(--navy);">Code Editor</div>
+                
+                <label for="task-selector"><strong>Select your current task:</strong></label>
+                <select id="task-selector" onchange="resetIDE()">
+                    <option value="red">🔴 RED TASK: Print "Hello World"</option>
+                    <option value="amber">🟠 AMBER TASK: Print the answer to 5 + 7</option>
+                    <option value="green">🟢 GREEN TASK: Create a variable called 'name' and print it</option>
+                </select>
+
+                <textarea id="python-code" class="code-editor" spellcheck="false">print("Hello World")</textarea>
+                <button class="btn-run" onclick="runPython()">▶ Run Code & Check</button>
+            </div>
+
+            <!-- Right Side: Terminal Output -->
+            <div class="task-card output-task">
+                <div class="task-title" style="color: var(--maroon);">Terminal Output</div>
+                <pre id="output" class="terminal-output"></pre>
+                <div id="feedback"></div>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        &copy; 2026 Delta Serlby Park - Computing Department
+    </footer>
+
+    <script>
+        // Required for Skulpt to read internal files
+        function builtinRead(x) {
+            if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+                throw "File not found: '" + x + "'";
+            return Sk.builtinFiles["files"][x];
+        }
+
+        // Clears the output when a student changes the task
+        function resetIDE() {
+            document.getElementById("output").innerHTML = "";
+            document.getElementById("feedback").innerHTML = "";
+            document.getElementById("feedback").style.backgroundColor = "transparent";
+        }
+
+        // Main function that runs the Python code
+        function runPython() {
+            var code = document.getElementById("python-code").value;
+            var outputBox = document.getElementById("output");
+            var feedbackBox = document.getElementById("feedback");
+            var currentTask = document.getElementById("task-selector").value;
+            
+            outputBox.innerHTML = ''; 
+            feedbackBox.innerHTML = 'Running code...';
+            feedbackBox.style.backgroundColor = "transparent";
+            feedbackBox.style.color = "var(--navy)";
+            
+            let outputText = "";
+
+            // Configure Skulpt to capture print() statements
+            Sk.pre = "output";
+            Sk.configure({
+                output: function(text) { 
+                    outputBox.innerHTML += text; 
+                    outputText += text; // Save output to check answers
+                },
+                read: builtinRead
+            });
+            
+            var myPromise = Sk.misceval.asyncToPromise(function() {
+                return Sk.importMainWithBody("<stdin>", false, code, true);
+            });
+            
+            myPromise.then(function(mod) {
+                // If code runs without errors, check the answers
+                checkAnswers(currentTask, outputText, code, feedbackBox);
+            }, function(err) {
+                // If there is a Python syntax error, print it in red
+                outputBox.innerHTML += '<span style="color: red;">' + err.toString() + '</span>';
+                feedbackBox.innerHTML = "⚠️ You have a syntax error. Check your code carefully!";
+                feedbackBox.style.backgroundColor = "#ffebee";
+                feedbackBox.style.color = "#d32f2f";
+            });
+        }
+
+        // Auto-Marking Logic
+        function checkAnswers(task, output, code, feedbackBox) {
+            let cleanOutput = output.trim().toLowerCase();
+            let isCorrect = false;
+            let successMessage = "";
+
+            if (task === "red") {
+                if (cleanOutput === "hello world") {
+                    isCorrect = true;
+                    successMessage = "✅ RED TASK PASSED: You printed Hello World!";
+                }
+            } 
+            else if (task === "amber") {
+                if (cleanOutput === "12") {
+                    isCorrect = true;
+                    successMessage = "✅ AMBER TASK PASSED: You correctly calculated 5 + 7!";
+                }
+            }
+            else if (task === "green") {
+                // Checks if output exists AND they used the word 'name' and '=' in their code
+                if (cleanOutput !== "" && code.includes("name") && code.includes("=")) {
+                    isCorrect = true;
+                    successMessage = "✅ GREEN TASK PASSED: You created and printed a variable!";
+                }
+            }
+
+            // Display Results
+            if (isCorrect) {
+                feedbackBox.innerHTML = successMessage;
+                feedbackBox.style.backgroundColor = "#e8f5e9";
+                feedbackBox.style.color = "#2e7d32";
+            } else {
+                feedbackBox.innerHTML = "❌ Not quite right. Read the task instructions again!";
+                feedbackBox.style.backgroundColor = "#ffebee";
+                feedbackBox.style.color = "#d32f2f";
+            }
+        }
+    </script>
+</body>
+</html>
