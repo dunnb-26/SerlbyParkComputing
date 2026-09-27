@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Typing Test - Assessment</title>
-    <!-- Links to the external CSS file -->
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Specific override for the typing test text box height */
+        .text-display {
+            min-height: 120px; 
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -67,9 +72,10 @@
             "Cyber security protects networks, devices, and data from unauthorized access."
         ];
         
-        let currentChunk = [];
+        let chunk1 = [];
+        let chunk2 = [];
+        let currentText = [];
         let currentLetterIndex = 0;
-        let mistakes = 0;
         let totalCorrectKeystrokes = 0;
         let totalKeystrokes = 0;
         let isTyping = false;
@@ -83,34 +89,48 @@
         const wpmDisplay = document.getElementById('wpm');
         const accuracyDisplay = document.getElementById('accuracy');
 
-        // Generates a chunk of ~15 words
+        // Generates a chunk of ~15 words and leaves a trailing space
         function generateChunk() {
             let chunkText = "";
             while (chunkText.split(' ').length < 15) {
                 const randomPhrase = computingPhrases[Math.floor(Math.random() * computingPhrases.length)];
-                chunkText += randomPhrase + " ";
+                chunkText += randomPhrase + " "; 
             }
-            return chunkText.trim().split('');
+            return chunkText.split('');
         }
 
-        function loadNextChunk() {
-            currentChunk = generateChunk();
+        // Draws the text on the screen
+        function renderText() {
             displayArea.innerHTML = '';
-            currentLetterIndex = 0;
-            
-            currentChunk.forEach(char => {
+            currentText.forEach(char => {
                 let span = document.createElement('span');
                 span.innerText = char;
                 displayArea.appendChild(span);
             });
-            displayArea.firstChild.classList.add('active');
+            if(currentText.length > 0) {
+                displayArea.childNodes[currentLetterIndex].classList.add('active');
+            }
+        }
+
+        // Slides the text up when the first chunk is finished
+        function shiftChunks() {
+            chunk1 = chunk2;
+            chunk2 = generateChunk();
+            currentText = [...chunk1, ...chunk2];
+            currentLetterIndex = 0;
+            renderText();
         }
 
         function initTest() {
-            loadNextChunk();
+            chunk1 = generateChunk();
+            chunk2 = generateChunk();
+            currentText = [...chunk1, ...chunk2];
+            currentLetterIndex = 0;
+            
+            renderText();
+            
             inputField.value = '';
             inputField.disabled = false;
-            mistakes = 0;
             totalCorrectKeystrokes = 0;
             totalKeystrokes = 0;
             isTyping = false;
@@ -160,7 +180,7 @@
             }
 
             let typedChar = inputField.value;
-            inputField.value = ''; // Instantly clear input
+            inputField.value = ''; 
             
             if (timeLeft > 0) {
                 let span = displayArea.childNodes[currentLetterIndex];
@@ -176,12 +196,13 @@
                 span.classList.remove('active');
                 currentLetterIndex++;
                 
-                if (currentLetterIndex < currentChunk.length) {
-                    displayArea.childNodes[currentLetterIndex].classList.add('active');
+                // If they have typed all of chunk 1, shift everything!
+                if (currentLetterIndex === chunk1.length) {
+                    shiftChunks();
                 } else {
-                    // Reached end of chunk, load next instantly
-                    loadNextChunk();
+                    displayArea.childNodes[currentLetterIndex].classList.add('active');
                 }
+                
                 updateStats();
             }
         });
