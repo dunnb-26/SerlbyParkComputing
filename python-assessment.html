@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Python IDE</title>
+    <title>Interactive Python Assessment</title>
     <link rel="stylesheet" href="style.css">
     
     <!-- CodeMirror for Interactive Syntax Highlighting -->
@@ -15,7 +15,33 @@
     <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
 
     <style>
-        /* 3-Column Layout for wide screens */
+        /* Scoreboard Banner */
+        .scoreboard {
+            max-width: 1450px;
+            margin: 20px auto 0 auto;
+            padding: 15px 25px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 5px solid var(--maroon);
+            font-weight: bold;
+            color: var(--navy);
+        }
+        .score-item {
+            text-align: center;
+            font-size: 0.95em;
+        }
+        .score-item span {
+            display: block;
+            font-size: 1.3em;
+            color: #388e3c;
+            margin-top: 3px;
+        }
+
+        /* 3-Column Layout */
         .ide-container {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -187,7 +213,7 @@
         </div>
         
         <div class="header-center">
-            <h1>Interactive Python IDE</h1>
+            <h1>Interactive Python Assessment</h1>
         </div>
         
         <div class="header-right">
@@ -195,13 +221,22 @@
         </div>
     </header>
 
+    <!-- Scoreboard Banner -->
+    <div class="scoreboard">
+        <div class="score-item">Task 1: <span id="score-t1">0</span>/5</div>
+        <div class="score-item">Task 2: <span id="score-t2">0</span>/5</div>
+        <div class="score-item">Task 3: <span id="score-t3">0</span>/5</div>
+        <div class="score-item">Task 4: <span id="score-t4">0</span>/5</div>
+        <div class="score-item" style="color: var(--maroon);">TOTAL SCORE: <span id="total-score" style="color: var(--maroon);">0</span>/20</div>
+    </div>
+
     <main>
         <div class="ide-container">
             <!-- COLUMN 1: Task Selection & Instructions / Block Bank -->
             <div class="ide-panel">
                 <h3>1. Instructions</h3>
                 
-                <select id="task-selector" onchange="loadTask()">
+                <select id="task-selector" onchange="switchTask()">
                     <option value="t1">Task 1 (Sequence): Delta Adventure Park</option>
                     <option value="t2">Task 2 (Selection): Theme Park Age Checker</option>
                     <option value="t3">Task 3 (Iteration): Process 5 Visitors</option>
@@ -252,6 +287,16 @@
             matchBrackets: true
         });
 
+        // Store code persistently for each task
+        let taskCodes = {
+            "t1": "# Type your code here:\n\n",
+            "t2": "# Type your Task 2 selection code here:\n\n",
+            "t3": "# Type your Task 3 iteration code here:\n\n",
+            "t4": "# Type your Task 4 complete program here:\n\n"
+        };
+
+        let currentTask = "t1";
+
         // Master list of blocks for Task 1
         const originalBlocks = [
             { id: 'b1', text: 'total = tickets + price' },
@@ -265,13 +310,17 @@
             { id: 'b9', text: 'price = 8' }
         ];
 
-        let currentBlocks = [];
+        let currentBlocks = JSON.parse(JSON.stringify(originalBlocks));
 
-        function loadTask() {
-            var currentTask = document.getElementById("task-selector").value;
-            
+        function switchTask() {
+            // 1. Save current editor state before switching
+            taskCodes[currentTask] = editor.getValue();
+
+            // 2. Get new task
+            currentTask = document.getElementById("task-selector").value;
+
+            // 3. Render appropriate instruction panel
             if (currentTask === "t1") {
-                currentBlocks = JSON.parse(JSON.stringify(originalBlocks));
                 renderBlockBank();
             } else {
                 let textInstr = "";
@@ -296,8 +345,10 @@
                 }
                 document.getElementById("instruction-panel").innerHTML = textInstr;
             }
+
+            // 4. Load saved code for the newly selected task into the editor
+            editor.setValue(taskCodes[currentTask]);
             
-            editor.setValue("# Type your code here:\n\n");
             document.getElementById("output").innerHTML = "";
             document.getElementById("feedback").innerHTML = "Awaiting code execution...";
             document.getElementById("feedback").style.backgroundColor = "#f5f5f5";
@@ -321,7 +372,7 @@
 
         function addBlock(id, codeText) {
             currentBlocks = currentBlocks.filter(b => b.id !== id);
-            renderBlockBank();
+            if (currentTask === "t1") renderBlockBank();
 
             var doc = editor.getDoc();
             var cursor = doc.getCursor();
@@ -331,11 +382,15 @@
 
         function resetBlocks() {
             currentBlocks = JSON.parse(JSON.stringify(originalBlocks));
-            renderBlockBank();
+            if (currentTask === "t1") renderBlockBank();
             editor.setValue("# Type your code here:\n\n");
+            taskCodes["t1"] = editor.getValue();
         }
 
-        window.onload = loadTask;
+        window.onload = function() {
+            currentBlocks = JSON.parse(JSON.stringify(originalBlocks));
+            switchTask();
+        };
 
         function builtinRead(x) {
             if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
@@ -344,10 +399,12 @@
         }
 
         function runPython() {
-            var code = editor.getValue(); 
+            // Save current code to memory first
+            taskCodes[currentTask] = editor.getValue();
+            var code = taskCodes[currentTask];
+            
             var outputBox = document.getElementById("output");
             var feedbackBox = document.getElementById("feedback");
-            var currentTask = document.getElementById("task-selector").value;
             
             outputBox.innerHTML = ''; 
             feedbackBox.innerHTML = 'Running...';
@@ -359,7 +416,6 @@
                     outputBox.scrollTop = outputBox.scrollHeight;
                 },
                 read: builtinRead,
-                // Custom In-Terminal Input Handler (No browser popup boxes!)
                 inputfun: function (promptMsg) {
                     return new Promise(function(resolve, reject) {
                         outputBox.innerHTML += promptMsg;
@@ -407,6 +463,17 @@
             });
         }
 
+        function updateScore(taskKey, points) {
+            document.getElementById(`score-${taskKey}`).innerText = points;
+            
+            let p1 = parseInt(document.getElementById("score-t1").innerText);
+            let p2 = parseInt(document.getElementById("score-t2").innerText);
+            let p3 = parseInt(document.getElementById("score-t3").innerText);
+            let p4 = parseInt(document.getElementById("score-t4").innerText);
+            
+            document.getElementById("total-score").innerText = p1 + p2 + p3 + p4;
+        }
+
         function checkAnswers(task, output, code, feedbackBox) {
             let cleanOutput = output.trim().toLowerCase();
             let lowerCode = code.toLowerCase();
@@ -433,24 +500,28 @@
                 if (hasWelcome && hasCorrectTickets && hasCorrectTotal && !hasWrongTotal && hasFinalPrint && orderCorrect) {
                     isCorrect = true;
                     successMsg = "✅ SEQUENCE PASSED: Ticket system built successfully!";
+                    updateScore("t1", 5);
                 }
             } 
             else if (task === "t2") {
                 if (lowerCode.includes("if") && lowerCode.includes("elif") && lowerCode.includes("else") && lowerCode.includes("16") && lowerCode.includes("12")) {
                     isCorrect = true;
                     successMsg = "✅ SELECTION PASSED: Decision logic covers all age boundaries!";
+                    updateScore("t2", 5);
                 }
             }
             else if (task === "t3") {
                 if (lowerCode.includes("for") && lowerCode.includes("range") && lowerCode.includes("input") && (lowerCode.includes("5") || lowerCode.includes("range(5)"))) {
                     isCorrect = true;
                     successMsg = "✅ ITERATION PASSED: Loop correctly configured for 5 visitors!";
+                    updateScore("t3", 5);
                 }
             }
             else if (task === "t4") {
                 if (lowerCode.includes("if") && (lowerCode.includes("for") || lowerCode.includes("while")) && cleanOutput.length > 0) {
                     isCorrect = true;
                     successMsg = "🎉 ASSESSMENT COMPLETE: Sequence, selection, and iteration combined successfully!";
+                    updateScore("t4", 5);
                 }
             }
 
