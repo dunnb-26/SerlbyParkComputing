@@ -133,7 +133,7 @@
             font-size: 14px;
         }
 
-        pre.terminal-output {
+        #output {
             width: 100%;
             height: 350px;
             background-color: #000000;
@@ -146,6 +146,7 @@
             overflow-y: auto;
             box-sizing: border-box;
             margin: 0;
+            white-space: pre-wrap;
         }
 
         .btn-run {
@@ -225,7 +226,7 @@
                 <h3 style="color: var(--maroon);">3. Terminal Output</h3>
                 <p style="font-size: 13px; color: #666; margin-top: 0;">View program feedback and results:</p>
                 
-                <pre id="output" class="terminal-output"></pre>
+                <div id="output"></div>
                 
                 <div id="feedback" class="feedback-box">
                     Awaiting code execution...
@@ -303,9 +304,8 @@
             document.getElementById("feedback").style.color = "var(--navy)";
         }
 
-        // Renders the block bank, removing items that have already been clicked
         function renderBlockBank() {
-            let html = `<strong>TASK 1:</strong> Click '+ Add' to place the correct blocks in order. Distractors are included!<br><div class="block-bank-container">`;
+            let html = `<strong>TASK 1:</strong> Click '+ Add' to place correct blocks in order. Distractors included!<br><div class="block-bank-container">`;
             
             if (currentBlocks.length === 0) {
                 html += `<p style="text-align:center; color:#666; font-size:13px; margin:5px 0;">All blocks added!</p>`;
@@ -320,11 +320,9 @@
         }
 
         function addBlock(id, codeText) {
-            // Remove from current blocks array
             currentBlocks = currentBlocks.filter(b => b.id !== id);
             renderBlockBank();
 
-            // Insert into editor
             var doc = editor.getDoc();
             var cursor = doc.getCursor();
             doc.replaceRange(codeText + "\n", cursor);
@@ -354,19 +352,42 @@
             outputBox.innerHTML = ''; 
             feedbackBox.innerHTML = 'Running...';
             
-            let outputText = "";
-
             Sk.pre = "output";
             Sk.configure({
                 output: function(text) { 
                     outputBox.innerHTML += text; 
-                    outputText += text; 
+                    outputBox.scrollTop = outputBox.scrollHeight;
                 },
                 read: builtinRead,
+                // Custom In-Terminal Input Handler (No browser popup boxes!)
                 inputfun: function (promptMsg) {
-                    return new Promise(function(resolve, reject){
-                        let userInput = window.prompt(promptMsg);
-                        resolve(userInput !== null ? userInput : "");
+                    return new Promise(function(resolve, reject) {
+                        outputBox.innerHTML += promptMsg;
+                        
+                        let inputField = document.createElement("input");
+                        inputField.type = "text";
+                        inputField.style.background = "transparent";
+                        inputField.style.border = "none";
+                        inputField.style.borderBottom = "1px solid #4af626";
+                        inputField.style.color = "#4af626";
+                        inputField.style.fontFamily = "inherit";
+                        inputField.style.fontSize = "inherit";
+                        inputField.style.outline = "none";
+                        inputField.style.width = "150px";
+                        inputField.style.marginLeft = "5px";
+                        
+                        outputBox.appendChild(inputField);
+                        outputBox.scrollTop = outputBox.scrollHeight;
+                        inputField.focus();
+                        
+                        inputField.addEventListener("keydown", function(e) {
+                            if (e.key === "Enter") {
+                                let val = inputField.value;
+                                outputBox.removeChild(inputField);
+                                outputBox.innerHTML += val + "\n";
+                                resolve(val);
+                            }
+                        });
                     });
                 }
             });
@@ -376,6 +397,7 @@
             });
             
             myPromise.then(function(mod) {
+                let outputText = outputBox.innerText;
                 checkAnswers(currentTask, outputText, code, feedbackBox);
             }, function(err) {
                 outputBox.innerHTML += '<span style="color: #ff5555;">' + err.toString() + '</span>';
