@@ -13,8 +13,8 @@
             --bg-color: #f4f6f8;
             --text-color: #333;
             --light-gray: #e2e8f0;
-            --correct-color: #1B1464; /* Navy for correct to keep it on-brand */
-            --incorrect-color: #822433; /* Maroon for incorrect */
+            --correct-color: #1B1464;
+            --incorrect-color: #822433;
             --untyped-color: #94a3b8;
         }
 
@@ -111,7 +111,7 @@
             transition: all 0.2s;
         }
 
-        .mode-btn.active {
+        .mode-btn.active, .mode-btn:hover {
             background-color: var(--yellow);
             color: var(--navy);
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -135,19 +135,20 @@
             margin-left: 8px;
         }
 
+        /* Fixed height, scroll-hidden typing area */
         .typing-area {
             position: relative;
             font-size: 22px;
-            line-height: 1.6;
+            line-height: 1.8;
             font-family: 'Consolas', 'Courier New', monospace;
             padding: 20px;
             background-color: #f8fafc;
             border: 2px solid var(--light-gray);
             border-radius: 8px;
             cursor: text;
-            min-height: 200px;
-            user-select: none; /* Prevents selecting text accidentally */
-            overflow: hidden;
+            height: 180px; 
+            overflow-y: hidden; /* Hide scrollbar for smooth visual */
+            user-select: none;
         }
 
         .typing-area:focus-within {
@@ -155,7 +156,7 @@
             box-shadow: 0 0 0 3px rgba(247, 147, 29, 0.2);
         }
 
-        /* Hidden textarea to capture mobile and desktop typing accurately */
+        /* Hidden input element ensures mobile keyboard appears */
         #hidden-input {
             position: absolute;
             top: 0;
@@ -171,7 +172,7 @@
         #text-display {
             position: relative;
             z-index: 2;
-            pointer-events: none; /* Lets clicks pass through to the textarea */
+            pointer-events: none;
         }
 
         .char { color: var(--untyped-color); }
@@ -182,7 +183,7 @@
             border-radius: 2px;
         }
         
-        /* Blinking cursor effect */
+        /* The active blinking cursor */
         .char.cursor {
             border-left: 3px solid var(--yellow);
             animation: blink 1s infinite;
@@ -215,7 +216,6 @@
             background-color: #2a208c;
         }
 
-        /* Modal for test completion */
         .modal {
             display: none;
             position: fixed;
@@ -233,11 +233,6 @@
             text-align: center;
             max-width: 400px;
             border-top: 6px solid var(--yellow);
-        }
-
-        .modal-content h2 {
-            color: var(--navy);
-            margin-top: 0;
         }
 
         .modal-score {
@@ -258,7 +253,7 @@
 
         @media (max-width: 600px) {
             .stats-bar { flex-direction: column; gap: 10px; align-items: center; }
-            .typing-area { font-size: 18px; }
+            .typing-area { font-size: 18px; height: 160px; }
             header { flex-direction: column; text-align: center; justify-content: center; }
             .header-left { flex-direction: column; }
             header img { margin: 0 0 10px 0; }
@@ -271,8 +266,8 @@
         <div class="header-left">
             <img src="Logo.jpg" alt="Delta Serlby Park Logo" onerror="this.src='https://placehold.co/100x60/ffffff/1B1464?text=DSP'">
             <div>
-                <h1>Lesson 5: Assessment</h1>
-                <p style="margin: 5px 0 0 0; color: #e0e0e0; font-size: 14px;">Year 7 Computing - Typing Test</p>
+                <h1>Typing Assessment</h1>
+                <p style="margin: 5px 0 0 0; color: #e0e0e0; font-size: 14px;">Year 7 Unit</p>
             </div>
         </div>
         <a href="index.html" class="back-btn">&larr; Back to Curriculum</a>
@@ -281,14 +276,13 @@
     <main>
         <div class="test-container">
             <div class="controls">
-                <button class="mode-btn active" data-time="0">Practice (No Timer)</button>
-                <button class="mode-btn" data-time="60">1 Minute</button>
-                <button class="mode-btn" data-time="180">3 Minutes</button>
-                <button class="mode-btn" data-time="300">5 Minutes</button>
+                <button class="mode-btn active" onclick="selectTime(60, this)">1 Minute Test</button>
+                <button class="mode-btn" onclick="selectTime(180, this)">3 Minute Test</button>
+                <button class="mode-btn" onclick="selectTime(300, this)">5 Minute Test</button>
             </div>
 
             <div class="stats-bar">
-                <div class="stat-box">Time: <span id="time-display">0:00</span></div>
+                <div class="stat-box">Time Left: <span id="time-display">1:00</span></div>
                 <div class="stat-box">WPM: <span id="wpm-display">0</span></div>
                 <div class="stat-box">Accuracy: <span id="acc-display">100%</span></div>
             </div>
@@ -299,18 +293,18 @@
             </div>
 
             <div class="bottom-controls">
-                <button class="reset-btn" onclick="resetTest()">Restart Test</button>
+                <button class="reset-btn" onclick="initTest()">Restart Test</button>
             </div>
         </div>
     </main>
 
+    <!-- Modal strictly for showing final results (no submission form) -->
     <div class="modal" id="result-modal">
         <div class="modal-content">
-            <h2>Test Complete!</h2>
-            <p>Great effort! Here is your final score:</p>
+            <h2 style="color: var(--navy); margin-top: 0;">Test Complete!</h2>
             <div class="modal-score"><span id="final-wpm">0</span> WPM</div>
-            <p style="font-size: 18px; font-weight: bold;">Accuracy: <span id="final-acc">0</span>%</p>
-            <button class="reset-btn" style="margin-top: 20px;" onclick="closeModal(); resetTest();">Try Again</button>
+            <p style="font-size: 18px; font-weight: bold; color: var(--navy);">Accuracy: <span id="final-acc">0</span>%</p>
+            <button class="reset-btn" style="margin-top: 20px;" onclick="closeModal()">Close</button>
         </div>
     </div>
 
@@ -319,8 +313,28 @@
     </footer>
 
     <script>
-        // The text for the Year 7 assessment (Approx 230 words)
-        const testText = "Welcome to your Year 7 Computing assessment! A computer system is made up of hardware and software. Hardware consists of the physical parts you can touch, like the keyboard, mouse, monitor, and the central processing unit. Software refers to the invisible programs, applications, and operating systems that make the hardware work. When working online, e-safety is extremely important. Always keep your personal information secure, use strong passwords, and never share them with anyone, even your friends. Treat others online with the same respect you would in the real world. If you ever see something on a website or in a message that makes you feel uncomfortable, report it to a trusted adult immediately. Data inside a computer is processed using binary code. Binary only uses two numbers: zero and one. These represent the on and off states of millions of tiny switches inside the computer's processor. Every document, image, video, and game is eventually converted into binary so the computer can understand it. Understanding how computers work and how to use them safely is the first step to becoming a great digital citizen. Keep practicing your typing skills, as they will help you communicate faster and work more efficiently in all of your school subjects. Good luck!";
+        // Computing-specific sentences for infinite generation
+        const sentenceBank = [
+            "A computer system is made up of hardware and software.",
+            "Hardware consists of the physical parts you can touch like the keyboard and monitor.",
+            "Software refers to the invisible programs and operating systems that make the hardware work.",
+            "When working online e-safety is extremely important to protect your identity.",
+            "Always keep your personal information secure and use strong passwords.",
+            "Never share your login details with anyone even your friends.",
+            "Data inside a computer is processed using a special language called binary code.",
+            "Binary code only uses two numbers which are zero and one.",
+            "These numbers represent the on and off states of tiny switches inside the processor.",
+            "Every document and image is eventually converted into binary format.",
+            "A local area network connects computers within a single building or site.",
+            "The internet is an example of a wide area network that spans the globe.",
+            "An algorithm is a step-by-step set of instructions used to solve a specific problem.",
+            "Decomposition involves breaking down a complex problem into smaller manageable parts.",
+            "Pattern recognition helps us find similarities to solve problems more efficiently.",
+            "Phishing is a cyber attack that tries to trick you into revealing personal information.",
+            "It is important to back up your files regularly to prevent data loss.",
+            "A central processing unit acts as the main brain of the computer system.",
+            "Random access memory is volatile and loses its data when the power is turned off."
+        ];
 
         // DOM Elements
         const textDisplay = document.getElementById('text-display');
@@ -328,44 +342,81 @@
         const timeDisplay = document.getElementById('time-display');
         const wpmDisplay = document.getElementById('wpm-display');
         const accDisplay = document.getElementById('acc-display');
-        const modeBtns = document.querySelectorAll('.mode-btn');
         const modal = document.getElementById('result-modal');
 
-        // Game State Variables
-        let timeLimit = 0; // 0 = Practice mode
-        let timeLeft = 0;
+        // State Variables
+        let maxTime = 60; // Default 1 Minute
+        let timeLeft = 60;
         let timeElapsed = 0;
         let timerInterval = null;
         let isTyping = false;
+        let targetText = "";
         let characterSpans = [];
 
+        function selectTime(seconds, btnElement) {
+            // Update active styling
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+            maxTime = seconds;
+            initTest();
+        }
+
         function initTest() {
-            // Split the text into individual characters and wrap in <span> tags
+            clearInterval(timerInterval);
+            isTyping = false;
+            timeLeft = maxTime;
+            timeElapsed = 0;
+            
+            hiddenInput.value = '';
+            targetText = "";
             textDisplay.innerHTML = '';
             characterSpans = [];
             
-            testText.split('').forEach((char, index) => {
+            // Add initial block of text
+            addMoreText(5); 
+            
+            updateTimeDisplay();
+            wpmDisplay.innerText = '0';
+            accDisplay.innerText = '100%';
+            
+            // Focus input to start
+            hiddenInput.disabled = false;
+            hiddenInput.focus();
+        }
+
+        function addMoreText(sentenceCount = 2) {
+            let newSentences = [];
+            for(let i = 0; i < sentenceCount; i++) {
+                let randomIndex = Math.floor(Math.random() * sentenceBank.length);
+                newSentences.push(sentenceBank[randomIndex]);
+            }
+            
+            let stringToAdd = newSentences.join(" ");
+            // Add a leading space if we already have text
+            if (targetText.length > 0) {
+                stringToAdd = " " + stringToAdd;
+            }
+            
+            targetText += stringToAdd;
+
+            // Generate spans for new text
+            stringToAdd.split('').forEach((char) => {
                 const span = document.createElement('span');
                 span.innerText = char;
                 span.classList.add('char');
-                if(index === 0) span.classList.add('cursor'); // Set initial cursor
                 textDisplay.appendChild(span);
                 characterSpans.push(span);
             });
 
-            // Reset input and stats
-            hiddenInput.value = '';
-            hiddenInput.maxLength = testText.length;
-            timeElapsed = 0;
-            wpmDisplay.innerText = '0';
-            accDisplay.innerText = '100%';
-            isTyping = false;
-            clearInterval(timerInterval);
-            
-            updateTimeDisplay();
+            // Re-apply cursor if needed
+            if (!isTyping || hiddenInput.value.length === 0) {
+                characterSpans[0].classList.add('cursor');
+            }
         }
 
         hiddenInput.addEventListener('input', () => {
+            if (timeLeft <= 0) return; // Ignore typing if test is over
+
             if (!isTyping) {
                 startTimer();
                 isTyping = true;
@@ -374,118 +425,100 @@
             const typedText = hiddenInput.value;
             let correctChars = 0;
 
-            // Loop through all spans to update their classes based on typed input
-            characterSpans.forEach((span, index) => {
-                const typedChar = typedText[index];
-                
-                // Clear existing classes
-                span.classList.remove('correct', 'incorrect', 'cursor');
+            // Check if we are nearing the end of the generated text (within 100 characters)
+            if (targetText.length - typedText.length < 100) {
+                addMoreText(3); // Inject more text dynamically
+            }
 
-                if (typedChar == null) {
-                    // Not typed yet
-                    if (index === typedText.length) {
-                        span.classList.add('cursor');
+            // Loop through and update character spans based on input
+            characterSpans.forEach((span, index) => {
+                span.classList.remove('correct', 'incorrect', 'cursor');
+                
+                if (index < typedText.length) {
+                    // Character has been typed
+                    if (typedText[index] === span.innerText) {
+                        span.classList.add('correct');
+                        correctChars++;
+                    } else {
+                        span.classList.add('incorrect');
                     }
-                } else if (typedChar === span.innerText) {
-                    // Typed correctly
-                    span.classList.add('correct');
-                    correctChars++;
-                } else {
-                    // Typed incorrectly
-                    span.classList.add('incorrect');
+                } else if (index === typedText.length) {
+                    // Current cursor position
+                    span.classList.add('cursor');
                 }
             });
 
-            // Calculate Accuracy
+            // Auto-scroll the view to the current cursor position smoothly
+            const cursorSpan = document.querySelector('.char.cursor');
+            if (cursorSpan) {
+                cursorSpan.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            // Calculate live Accuracy
             let accuracy = 100;
             if (typedText.length > 0) {
                 accuracy = Math.round((correctChars / typedText.length) * 100);
             }
             accDisplay.innerText = `${accuracy}%`;
 
-            // Calculate WPM (Standard: 5 characters = 1 word)
+            // Calculate live WPM
             if (timeElapsed > 0) {
                 const minutesElapsed = timeElapsed / 60;
                 const wpm = Math.round((correctChars / 5) / minutesElapsed);
-                wpmDisplay.innerText = Math.max(0, wpm); // Ensure it doesn't go below 0
-            }
-
-            // Check if user has finished the entire text
-            if (typedText.length >= testText.length) {
-                endTest();
+                wpmDisplay.innerText = Math.max(0, wpm);
             }
         });
 
         function startTimer() {
             timerInterval = setInterval(() => {
-                timeElapsed++;
-                
-                if (timeLimit > 0) {
+                if (timeLeft > 0) {
                     timeLeft--;
-                    if (timeLeft <= 0) {
-                        endTest();
-                    }
-                }
+                    timeElapsed++;
+                    updateTimeDisplay();
+                    
+                    // Force WPM recalculation every second to degrade if they stop typing
+                    const typedText = hiddenInput.value;
+                    let correctChars = document.querySelectorAll('.char.correct').length;
+                    const minutesElapsed = timeElapsed / 60;
+                    const wpm = Math.round((correctChars / 5) / minutesElapsed);
+                    wpmDisplay.innerText = Math.max(0, wpm);
+                } 
                 
-                // Update WPM in real-time even if not typing
-                const typedText = hiddenInput.value;
-                let correctChars = document.querySelectorAll('.char.correct').length;
-                const minutesElapsed = timeElapsed / 60;
-                const wpm = Math.round((correctChars / 5) / minutesElapsed);
-                wpmDisplay.innerText = Math.max(0, wpm);
-
-                updateTimeDisplay();
+                // End test if time runs out
+                if (timeLeft <= 0) {
+                    endTest();
+                }
             }, 1000);
         }
 
         function updateTimeDisplay() {
-            let displayTime = timeLimit > 0 ? timeLeft : timeElapsed;
-            const minutes = Math.floor(displayTime / 60);
-            const seconds = displayTime % 60;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
             timeDisplay.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
         }
 
         function endTest() {
             clearInterval(timerInterval);
-            hiddenInput.blur(); // Remove focus so keyboard drops on mobile
+            hiddenInput.blur();
+            hiddenInput.disabled = true; // Prevent further typing
             isTyping = false;
             
-            // Show modal with results
+            // Remove cursor visually
+            const cursorSpan = document.querySelector('.char.cursor');
+            if (cursorSpan) cursorSpan.classList.remove('cursor');
+
+            // Show results modal
             document.getElementById('final-wpm').innerText = wpmDisplay.innerText;
             document.getElementById('final-acc').innerText = accDisplay.innerText.replace('%', '');
             modal.style.display = 'flex';
-        }
-
-        function resetTest() {
-            timeLeft = timeLimit;
-            initTest();
-            hiddenInput.focus();
         }
 
         function closeModal() {
             modal.style.display = 'none';
         }
 
-        // Mode Selection Event Listeners
-        modeBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                // Update active class
-                modeBtns.forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                
-                // Update time limit
-                timeLimit = parseInt(e.target.getAttribute('data-time'));
-                timeLeft = timeLimit;
-                
-                resetTest();
-            });
-        });
-
-        // Initialize on page load
-        window.onload = () => {
-            timeLeft = timeLimit;
-            initTest();
-        };
+        // Initialize on load
+        window.onload = initTest;
     </script>
 </body>
 </html>
