@@ -256,7 +256,7 @@
                     <option value="t1">Task 1 (Sequence Blocks)</option>
                     <option value="t2">Task 2 (Cinema Snack Bar)</option>
                     <option value="t3">Task 3 (Arcade Score Checker)</option>
-                    <option value="t4">Task 4 (Canteen Queue Loop)</option>
+                    <option value="t4">Task 4 (Canteen Queue Processor)</option>
                 </select>
 
                 <div id="instruction-panel"></div>
@@ -513,18 +513,19 @@
             localStorage.setItem('delta_python_total', total);
         }
 
-        // STRICT INTERNAL 5-POINT MARKING RUBRIC (Hidden from student view)
+        // STRICT INTERNAL 5-POINT MARKING RUBRIC (Case-Insensitive & Flexible)
         function checkAnswers(task, output, code, feedbackBox) {
             let lowerCode = code.toLowerCase();
             let earnedMarks = 0;
             let feedbackDetails = [];
 
             if (task === "t1") {
-                let lines = code.split('\n').map(l => l.trim()).filter(l => l.length > 0 && !l.startsWith('#'));
+                let lines = code.split('\n').map(l => l.trim().toLowerCase()).filter(l => l.length > 0 && !l.startsWith('#'));
+                
                 let hasWelcome = lines.some(l => l.includes('print') && l.includes('welcome'));
                 let hasNameInput = lines.some(l => l.includes('name') && l.includes('input'));
-                let hasPrice = lines.some(l => l.includes('price') && l.includes('=8'));
-                let hasTickets = lines.some(l => l.includes('tickets') && l.includes('int(input'));
+                let hasPrice = lines.some(l => l.replace(/\s+/g, '').includes('price=8'));
+                let hasTickets = lines.some(l => l.includes('tickets') && l.includes('int(') && l.includes('input'));
                 let hasMathAndPrint = lines.some(l => l.includes('total') && l.includes('*')) && lines.some(l => l.includes('print') && l.includes('total'));
 
                 if (hasWelcome) earnedMarks++; else feedbackDetails.push("Missing welcome print statement.");
@@ -534,7 +535,6 @@
                 if (hasMathAndPrint) earnedMarks++; else feedbackDetails.push("Missing multiplication math or summary print.");
             } 
             else if (task === "t2") {
-                // Task 2: Cinema Snack Bar Scenario
                 let hasSnackInput = lowerCode.includes("input") && (lowerCode.includes("snack") || lowerCode.includes("item") || lowerCode.includes("name"));
                 let hasPriceVar = lowerCode.includes("price") && lowerCode.includes("=");
                 let hasIntInput = lowerCode.includes("int(input");
@@ -548,7 +548,6 @@
                 if (hasPrint) earnedMarks++; else feedbackDetails.push("Missing receipt print statement.");
             }
             else if (task === "t3") {
-                // Task 3: Arcade Game Score Checker Scenario
                 let hasScoreVar = lowerCode.includes("score") || (lowerCode.includes("=") && !lowerCode.includes("=="));
                 let hasIf = lowerCode.includes("if ");
                 let hasOperator = lowerCode.includes(">") || lowerCode.includes("<") || lowerCode.includes("==") || lowerCode.includes(">=") || lowerCode.includes("<=");
@@ -562,7 +561,6 @@
                 if (hasPrint) earnedMarks++; else feedbackDetails.push("Missing prize print action inside conditions.");
             }
             else if (task === "t4") {
-                // Task 4: Canteen Queue Processor Scenario
                 let hasSetup = lowerCode.includes("=") || lowerCode.includes("range");
                 let hasKeyword = lowerCode.includes("for ") || lowerCode.includes("while ");
                 let hasCondition = lowerCode.includes("in ") || lowerCode.includes(">") || lowerCode.includes("<") || lowerCode.includes("range");
