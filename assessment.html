@@ -6,10 +6,7 @@
     <title>Typing Test - Assessment</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Specific override for the typing test text box height */
-        .text-display {
-            min-height: 120px; 
-        }
+        .text-display { min-height: 120px; }
     </style>
 </head>
 <body>
@@ -36,9 +33,10 @@
         </div>
 
         <div class="controls">
-            <button class="time-btn active" onclick="setTimer(60, this)">1 Minute Test</button>
-            <button class="time-btn" onclick="setTimer(180, this)">3 Minute Test</button>
-            <button class="time-btn" onclick="setTimer(300, this)">5 Minute Test</button>
+            <button class="time-btn active" onclick="setTimer(60, this)">1 Minute</button>
+            <button class="time-btn" onclick="setTimer(180, this)">3 Minutes</button>
+            <button class="time-btn" onclick="setTimer(300, this)">5 Minutes</button>
+            <button class="btn-restart" onclick="initTest()">Restart Test</button>
         </div>
 
         <div style="text-align: left; padding: 0 20px;">
@@ -51,6 +49,16 @@
         <div class="text-display" id="text-display" onclick="document.getElementById('hidden-input').focus()"></div>
         <input type="text" id="hidden-input" autocomplete="off">
     </main>
+
+    <!-- Score Pop-up Modal -->
+    <div class="modal" id="result-modal">
+        <div class="modal-content">
+            <h2>Time's Up!</h2>
+            <p style="font-size: 20px;"><strong>Final WPM:</strong> <span id="final-wpm">0</span></p>
+            <p style="font-size: 20px;"><strong>Final Accuracy:</strong> <span id="final-accuracy">100</span>%</p>
+            <button onclick="closeModal()">Try Again</button>
+        </div>
+    </div>
     
     <footer>
         &copy; 2026 Delta Serlby Park - Computing Department
@@ -88,8 +96,8 @@
         const timeDisplay = document.getElementById('time');
         const wpmDisplay = document.getElementById('wpm');
         const accuracyDisplay = document.getElementById('accuracy');
+        const modal = document.getElementById('result-modal');
 
-        // Generates a chunk of ~15 words and leaves a trailing space
         function generateChunk() {
             let chunkText = "";
             while (chunkText.split(' ').length < 15) {
@@ -99,7 +107,6 @@
             return chunkText.split('');
         }
 
-        // Draws the text on the screen
         function renderText() {
             displayArea.innerHTML = '';
             currentText.forEach(char => {
@@ -112,7 +119,6 @@
             }
         }
 
-        // Slides the text up when the first chunk is finished
         function shiftChunks() {
             chunk1 = chunk2;
             chunk2 = generateChunk();
@@ -139,6 +145,7 @@
             timeDisplay.innerText = timeLeft;
             wpmDisplay.innerText = '0';
             accuracyDisplay.innerText = '100';
+            modal.style.display = 'none';
         }
 
         function setTimer(seconds, btn) {
@@ -150,7 +157,16 @@
 
         function endTest() {
             clearInterval(timer);
-            inputField.disabled = true; // Locks the input when time is up
+            inputField.disabled = true; 
+            
+            document.getElementById('final-wpm').innerText = wpmDisplay.innerText;
+            document.getElementById('final-accuracy').innerText = accuracyDisplay.innerText;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+            initTest();
         }
 
         function updateStats() {
@@ -196,7 +212,6 @@
                 span.classList.remove('active');
                 currentLetterIndex++;
                 
-                // If they have typed all of chunk 1, shift everything!
                 if (currentLetterIndex === chunk1.length) {
                     shiftChunks();
                 } else {
@@ -207,7 +222,6 @@
             }
         });
 
-        // Focus input when clicking anywhere on the typing area
         document.addEventListener('click', (e) => {
             if(e.target.closest('#text-display') || e.target.tagName === 'BODY') {
                 if(timeLeft > 0) inputField.focus();
