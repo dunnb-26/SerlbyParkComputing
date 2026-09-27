@@ -97,7 +97,9 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
             overflow: hidden; 
             border-top: 5px solid var(--navy); 
-            transition: transform 0.2s, border-color 0.3s; 
+            transition: transform 0.2s, border-color 0.3s;
+            cursor: pointer; /* Makes the mouse a pointer finger so users know it's clickable */
+            position: relative;
         }
 
         .card:hover { 
@@ -118,7 +120,6 @@
             padding: 20px; 
         }
 
-        /* Essential formatting for easy-to-read lists */
         .card-body ul { 
             margin: 0; 
             padding-left: 20px; 
@@ -127,6 +128,16 @@
 
         .card-body li { 
             margin-bottom: 8px; 
+        }
+        
+        /* Adds a little "Click to open" hint at the bottom of each card */
+        .card-footer-hint {
+            text-align: right;
+            padding: 10px 20px;
+            font-size: 12px;
+            color: var(--yellow);
+            font-weight: bold;
+            background-color: var(--navy);
         }
 
         footer { 
@@ -142,7 +153,6 @@
 <body>
 
     <header>
-        <!-- Ensure this image file is uploaded to the same folder as this index.html on GitHub -->
         <img src="Logo.jpg" alt="Delta Serlby Park Logo">
         <div>
             <h1>Serlby Park Computing</h1>
@@ -167,7 +177,6 @@
     </footer>
 
     <script>
-        // Data structure containing the half-termly topics
         const curriculumData = {
           year7: [
             { title: "Delta Welcome", description: "<ul><li>Introduction & Computational Thinking</li><li>Keyboard & Mouse Skills</li><li>File Management & Researching</li><li>E-Safety</li><li>Assessment</li></ul>" },
@@ -197,34 +206,39 @@
           ]
         };
 
-        // Function to load the appropriate cards when a button is clicked
         function loadYear(year) {
-            // Update the navigation button styles
             document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
             document.getElementById('btn-' + year).classList.add('active');
 
-            // Update the main heading
             const titles = { year7: 'Year 7 Curriculum', year8: 'Year 8 Curriculum', year9: 'Year 9 Curriculum' };
             document.getElementById('year-title').innerText = titles[year];
 
-            // Render the curriculum cards
             const grid = document.getElementById('content-grid');
-            grid.innerHTML = ''; // Clear out the old cards
+            grid.innerHTML = ''; 
             
             curriculumData[year].forEach(unit => {
                 const card = document.createElement('div');
                 card.className = 'card';
+                
+                // This converts the title (e.g. "Microsoft Tools") into a file name (e.g. "microsoft-tools.html")
+                const fileName = unit.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.html';
+                
+                // Makes the card clickable
+                card.onclick = () => {
+                    window.location.href = fileName;
+                };
+
                 card.innerHTML = `
                     <div class="card-header">${unit.title}</div>
                     <div class="card-body">
                         ${unit.description}
                     </div>
+                    <div class="card-footer-hint">Click to view lessons &rarr;</div>
                 `;
                 grid.appendChild(card);
             });
         }
 
-        // Initialize the page with Year 7 loaded by default
         window.onload = () => loadYear('year7');
     </script>
 </body>
