@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Assessment</title>
+    <title>Interactive Python Assessment</title>
     <link rel="stylesheet" href="style.css">
     
     <!-- CodeMirror for Interactive Syntax Highlighting -->
@@ -226,7 +226,7 @@
         </div>
         
         <div class="header-center">
-            <h1>Python Assessment</h1>
+            <h1>Interactive Python Assessment</h1>
         </div>
         
         <div class="header-right">
@@ -254,9 +254,9 @@
                 
                 <select id="task-selector" onchange="switchTask()">
                     <option value="t1">Task 1 (Sequence Blocks)</option>
-                    <option value="t2">Task 2 (Sequence from Scratch)</option>
-                    <option value="t3">Task 3 (Selection / IF Statements)</option>
-                    <option value="t4">Task 4 (Iteration / Loops)</option>
+                    <option value="t2">Task 2 (Cinema Snack Bar)</option>
+                    <option value="t3">Task 3 (Arcade Score Checker)</option>
+                    <option value="t4">Task 4 (Canteen Queue Loop)</option>
                 </select>
 
                 <div id="instruction-panel"></div>
@@ -305,9 +305,9 @@
 
         let taskCodes = {
             "t1": "# Task 1: Use the block bank on the left.\n\n",
-            "t2": "# Task 2: Write a sequence program from scratch.\n\n",
-            "t3": "# Task 3: Write an IF statement program.\n\n",
-            "t4": "# Task 4: Write a loop program.\n\n"
+            "t2": "# Task 2: Cinema Snack Bar Calculator\n\n",
+            "t3": "# Task 3: Arcade Game Score Checker\n\n",
+            "t4": "# Task 4: Canteen Queue Processor\n\n"
         };
 
         let currentTask = "t1";
@@ -335,29 +335,29 @@
             } else {
                 let textInstr = "";
                 if (currentTask === "t2") {
-                    textInstr = `<strong>TASK 2: Sequence from Scratch</strong><br><br>
-                                 Build a complete ticket program without blocks. Ensure your code does the following:<br><br>
-                                 &bull; Asks for the user's name using <code>input()</code>.<br>
-                                 &bull; Defines a price variable (e.g. <code>price = 8</code>).<br>
-                                 &bull; Asks for ticket quantity using integer casting <code>int(input())</code>.<br>
-                                 &bull; Calculates the math correctly using multiplication (<code>*</code>).<br>
-                                 &bull; Prints a summary statement displaying the total cost.`;
+                    textInstr = `<strong>TASK 2: Cinema Snack Bar</strong><br><br>
+                                 The local cinema wants a Python program to calculate the cost of snacks for customers. Write a program from scratch that:<br><br>
+                                 &bull; Asks the customer for their snack item name using <code>input()</code>.<br>
+                                 &bull; Sets a fixed price variable for the snack (e.g. <code>price = 3</code>).<br>
+                                 &bull; Asks how many items they want using integer casting <code>int(input())</code>.<br>
+                                 &bull; Calculates the total cost using multiplication (<code>*</code>).<br>
+                                 &bull; Prints a clean receipt message showing the final total cost.`;
                 } else if (currentTask === "t3") {
-                    textInstr = `<strong>TASK 3: IF Statement Knowledge (Selection)</strong><br><br>
-                                 Write an IF statement program from scratch. Ensure your code includes:<br><br>
-                                 &bull; A defined variable to test (e.g., <code>score</code> or <code>age</code>).<br>
-                                 &bull; An <code>if</code> statement keyword.<br>
-                                 &bull; A comparison operator (<code>></code>, <code><</code>, or <code>==</code>).<br>
-                                 &bull; An <code>elif</code> or <code>else</code> branch.<br>
-                                 &bull; Indented <code>print()</code> actions inside your conditions.`;
+                    textInstr = `<strong>TASK 3: Arcade Game Score Checker</strong><br><br>
+                                 An arcade game needs to evaluate a player's final score to award prizes. Write a program from scratch that:<br><br>
+                                 &bull; Asks the player to enter their game score.<br>
+                                 &bull; Uses an <code>if</code> statement to check if the score is high (e.g. greater than 100).<br>
+                                 &bull; Uses an <code>elif</code> branch to check for a medium score (e.g. greater than 50).<br>
+                                 &bull; Uses an <code>else</code> branch for any lower score.<br>
+                                 &bull; Prints an appropriate prize message for each scenario.`;
                 } else if (currentTask === "t4") {
-                    textInstr = `<strong>TASK 4: Iteration & Loops</strong><br><br>
-                                 Write a loop program from scratch. Ensure your code includes:<br><br>
-                                 &bull; A loop counter variable or setup.<br>
-                                 &bull; A loop keyword (<code>for</code> or <code>while</code>).<br>
-                                 &bull; A valid range or logical condition.<br>
-                                 &bull; Indented code actions inside the loop body.<br>
-                                 &bull; Clean execution producing expected output.`;
+                    textInstr = `<strong>TASK 4: Canteen Queue Processor</strong><br><br>
+                                 The school canteen needs to process multiple students in a lunch queue. Write a program from scratch that:<br><br>
+                                 &bull; Sets up a loop counter or range.<br>
+                                 &bull; Uses a <code>for</code> or <code>while</code> loop to repeat for multiple students (e.g. 3 students).<br>
+                                 &bull; Asks for each student's meal choice inside the loop.<br>
+                                 &bull; Prints a confirmation message for each order.<br>
+                                 &bull; Runs cleanly from start to finish without syntax errors.`;
                 }
                 document.getElementById("instruction-panel").innerHTML = textInstr;
             }
@@ -513,7 +513,7 @@
             localStorage.setItem('delta_python_total', total);
         }
 
-        // STRICT INTERNAL 5-POINT MARKING RUBRIC
+        // STRICT INTERNAL 5-POINT MARKING RUBRIC (Hidden from student view)
         function checkAnswers(task, output, code, feedbackBox) {
             let lowerCode = code.toLowerCase();
             let earnedMarks = 0;
@@ -534,43 +534,46 @@
                 if (hasMathAndPrint) earnedMarks++; else feedbackDetails.push("Missing multiplication math or summary print.");
             } 
             else if (task === "t2") {
-                let hasNameInput = lowerCode.includes("input") && lowerCode.includes("name");
+                // Task 2: Cinema Snack Bar Scenario
+                let hasSnackInput = lowerCode.includes("input") && (lowerCode.includes("snack") || lowerCode.includes("item") || lowerCode.includes("name"));
                 let hasPriceVar = lowerCode.includes("price") && lowerCode.includes("=");
                 let hasIntInput = lowerCode.includes("int(input");
-                let hasMath = lowerCode.includes("*") || lowerCode.includes("+");
+                let hasMath = lowerCode.includes("*");
                 let hasPrint = lowerCode.includes("print");
 
-                if (hasNameInput) earnedMarks++; else feedbackDetails.push("Missing name input.");
-                if (hasPriceVar) earnedMarks++; else feedbackDetails.push("Missing price variable.");
-                if (hasIntInput) earnedMarks++; else feedbackDetails.push("Missing int(input()) for numbers.");
-                if (hasMath) earnedMarks++; else feedbackDetails.push("Missing calculation (math).");
-                if (hasPrint) earnedMarks++; else feedbackDetails.push("Missing print statement.");
+                if (hasSnackInput) earnedMarks++; else feedbackDetails.push("Missing snack item input collection.");
+                if (hasPriceVar) earnedMarks++; else feedbackDetails.push("Missing snack price variable.");
+                if (hasIntInput) earnedMarks++; else feedbackDetails.push("Missing quantity integer casting int(input()).");
+                if (hasMath) earnedMarks++; else feedbackDetails.push("Missing total calculation using multiplication (*).");
+                if (hasPrint) earnedMarks++; else feedbackDetails.push("Missing receipt print statement.");
             }
             else if (task === "t3") {
-                let hasVar = lowerCode.includes("=") && !lowerCode.includes("==");
+                // Task 3: Arcade Game Score Checker Scenario
+                let hasScoreVar = lowerCode.includes("score") || (lowerCode.includes("=") && !lowerCode.includes("=="));
                 let hasIf = lowerCode.includes("if ");
                 let hasOperator = lowerCode.includes(">") || lowerCode.includes("<") || lowerCode.includes("==") || lowerCode.includes(">=") || lowerCode.includes("<=");
                 let hasBranch = lowerCode.includes("elif") || lowerCode.includes("else");
                 let hasPrint = lowerCode.includes("print");
 
-                if (hasVar) earnedMarks++; else feedbackDetails.push("Missing variable definition.");
+                if (hasScoreVar) earnedMarks++; else feedbackDetails.push("Missing score variable definition.");
                 if (hasIf) earnedMarks++; else feedbackDetails.push("Missing 'if' statement.");
                 if (hasOperator) earnedMarks++; else feedbackDetails.push("Missing comparison operator (>, <, ==).");
                 if (hasBranch) earnedMarks++; else feedbackDetails.push("Missing 'elif' or 'else' branch.");
-                if (hasPrint) earnedMarks++; else feedbackDetails.push("Missing indented print action.");
+                if (hasPrint) earnedMarks++; else feedbackDetails.push("Missing prize print action inside conditions.");
             }
             else if (task === "t4") {
+                // Task 4: Canteen Queue Processor Scenario
                 let hasSetup = lowerCode.includes("=") || lowerCode.includes("range");
                 let hasKeyword = lowerCode.includes("for ") || lowerCode.includes("while ");
                 let hasCondition = lowerCode.includes("in ") || lowerCode.includes(">") || lowerCode.includes("<") || lowerCode.includes("range");
                 let hasBodyAction = lowerCode.includes("print") || lowerCode.includes("input");
                 let hasRun = output.trim().length > 0;
 
-                if (hasSetup) earnedMarks++; else feedbackDetails.push("Missing loop counter/setup.");
-                if (hasKeyword) earnedMarks++; else feedbackDetails.push("Missing 'for' or 'while' keyword.");
+                if (hasSetup) earnedMarks++; else feedbackDetails.push("Missing queue loop counter/setup.");
+                if (hasKeyword) earnedMarks++; else feedbackDetails.push("Missing 'for' or 'while' loop keyword.");
                 if (hasCondition) earnedMarks++; else feedbackDetails.push("Missing loop range or condition.");
-                if (hasBodyAction) earnedMarks++; else feedbackDetails.push("Missing loop body action (print/input).");
-                if (hasRun) earnedMarks++; else feedbackDetails.push("Program must run and produce output.");
+                if (hasBodyAction) earnedMarks++; else feedbackDetails.push("Missing loop body action (print/input for orders).");
+                if (hasRun) earnedMarks++; else feedbackDetails.push("Program must run and produce order output.");
             }
 
             updateScore(task, earnedMarks);
@@ -584,7 +587,7 @@
                 feedbackBox.style.backgroundColor = "#fff3e0";
                 feedbackBox.style.color = "#ef6c00";
             } else {
-                feedbackBox.innerHTML = `❌ 0/5 Marks. Review the checklist and try again!<br><span style="font-size:11px; font-weight:normal;">Missing: ${feedbackDetails.join(" | ")}</span>`;
+                feedbackBox.innerHTML = `❌ 0/5 Marks. Review the scenario brief and try again!<br><span style="font-size:11px; font-weight:normal;">Missing: ${feedbackDetails.join(" | ")}</span>`;
                 feedbackBox.style.backgroundColor = "#ffebee";
                 feedbackBox.style.color = "#d32f2f";
             }
