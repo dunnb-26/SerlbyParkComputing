@@ -3,61 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Assessment</title>
+    <title>Y9 Python Assessment</title>
     <link rel="stylesheet" href="style.css">
     
-    <!-- Skulpt Libraries: These run Python directly in the web browser -->
+    <!-- Skulpt Libraries for running Python in-browser -->
     <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
 
     <style>
-        .ragb-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .task-card {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border-top: 5px solid;
-        }
-        
-        /* Task Colors */
-        .red-task { border-top-color: #d32f2f; }
-        .amber-task { border-top-color: #f57c00; }
-        .green-task { border-top-color: #388e3c; }
-        .blue-task { border-top-color: #1976d2; }
-        .code-task { border-top-color: var(--navy); }
-        .output-task { border-top-color: var(--maroon); }
-
-        .task-title {
-            font-weight: bold;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-        }
-
-        /* IDE Styling */
         .ide-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
             max-width: 1200px;
-            margin: 0 auto 40px auto;
+            margin: 20px auto;
             padding: 0 20px;
         }
 
-        @media (max-width: 768px) {
-            .ide-container { grid-template-columns: 1fr; }
+        .ide-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-top: 5px solid var(--navy);
+        }
+        
+        .output-panel { border-top-color: var(--maroon); }
+
+        .ide-panel h3 {
+            margin-top: 0;
+            color: var(--navy);
+            text-transform: uppercase;
         }
 
         textarea.code-editor {
             width: 100%;
-            height: 250px;
+            height: 300px;
             background-color: #1e1e1e;
             color: #d4d4d4;
             font-family: 'Courier New', Courier, monospace;
@@ -71,7 +52,7 @@
 
         pre.terminal-output {
             width: 100%;
-            height: 250px;
+            height: 200px;
             background-color: #000000;
             color: #00ff00;
             font-family: 'Courier New', Courier, monospace;
@@ -110,12 +91,13 @@
             border-radius: 4px;
         }
 
-        #feedback {
+        .feedback-box {
             margin-top: 15px;
-            padding: 10px;
+            padding: 15px;
             font-weight: bold;
             border-radius: 4px;
             text-align: center;
+            min-height: 50px;
         }
     </style>
 </head>
@@ -130,41 +112,35 @@
         </div>
         
         <div class="header-right">
-            <a href="index.html" class="back-btn">&larr; Back to Curriculum</a>
+            <a href="y9-python.html" class="back-btn">&larr; Back to Unit</a>
         </div>
     </header>
 
     <main>
-        <!-- Instructions Row -->
-        <div class="ragb-grid">
-            <div class="task-card blue-task" style="grid-column: 1 / -1;">
-                <div class="task-title" style="color: #1976d2;">Instructions</div>
-                <p>Select a task from the drop-down menu below. Write your Python code in the dark editor box on the left, then click <strong>Run Code & Check</strong>. Your output will appear in the black terminal on the right!</p>
-            </div>
-        </div>
-
-        <!-- Python IDE Row -->
         <div class="ide-container">
             <!-- Left Side: Editor -->
-            <div class="task-card code-task">
-                <div class="task-title" style="color: var(--navy);">Code Editor</div>
+            <div class="ide-panel">
+                <h3>1. Select Challenge & Write Code</h3>
                 
-                <label for="task-selector"><strong>Select your current task:</strong></label>
                 <select id="task-selector" onchange="resetIDE()">
-                    <option value="red">🔴 RED TASK: Print "Hello World"</option>
-                    <option value="amber">🟠 AMBER TASK: Print the answer to 5 + 7</option>
-                    <option value="green">🟢 GREEN TASK: Create a variable called 'name' and print it</option>
+                    <option value="q1">Question 1: Print your favorite color</option>
+                    <option value="q2">Question 2: Create a variable 'x' and set it to 50</option>
+                    <option value="q3">Question 3: Write an IF statement that prints "Pass" if score > 50</option>
                 </select>
 
-                <textarea id="python-code" class="code-editor" spellcheck="false">print("Hello World")</textarea>
-                <button class="btn-run" onclick="runPython()">▶ Run Code & Check</button>
+                <textarea id="python-code" class="code-editor" spellcheck="false"># Write your Python code here...
+</textarea>
+                <button class="btn-run" onclick="runPython()">▶ Run Code & Mark</button>
             </div>
 
-            <!-- Right Side: Terminal Output -->
-            <div class="task-card output-task">
-                <div class="task-title" style="color: var(--maroon);">Terminal Output</div>
+            <!-- Right Side: Terminal & Feedback -->
+            <div class="ide-panel output-panel">
+                <h3 style="color: var(--maroon);">2. Terminal Output</h3>
                 <pre id="output" class="terminal-output"></pre>
-                <div id="feedback"></div>
+                
+                <div id="feedback" class="feedback-box">
+                    Awaiting code execution...
+                </div>
             </div>
         </div>
     </main>
@@ -174,21 +150,20 @@
     </footer>
 
     <script>
-        // Required for Skulpt to read internal files
         function builtinRead(x) {
             if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
                 throw "File not found: '" + x + "'";
             return Sk.builtinFiles["files"][x];
         }
 
-        // Clears the output when a student changes the task
         function resetIDE() {
             document.getElementById("output").innerHTML = "";
-            document.getElementById("feedback").innerHTML = "";
+            document.getElementById("feedback").innerHTML = "Awaiting code execution...";
             document.getElementById("feedback").style.backgroundColor = "transparent";
+            document.getElementById("feedback").style.color = "var(--navy)";
+            document.getElementById("python-code").value = "# Write your Python code here...\n";
         }
 
-        // Main function that runs the Python code
         function runPython() {
             var code = document.getElementById("python-code").value;
             var outputBox = document.getElementById("output");
@@ -196,18 +171,15 @@
             var currentTask = document.getElementById("task-selector").value;
             
             outputBox.innerHTML = ''; 
-            feedbackBox.innerHTML = 'Running code...';
-            feedbackBox.style.backgroundColor = "transparent";
-            feedbackBox.style.color = "var(--navy)";
+            feedbackBox.innerHTML = 'Running...';
             
             let outputText = "";
 
-            // Configure Skulpt to capture print() statements
             Sk.pre = "output";
             Sk.configure({
                 output: function(text) { 
                     outputBox.innerHTML += text; 
-                    outputText += text; // Save output to check answers
+                    outputText += text; 
                 },
                 read: builtinRead
             });
@@ -217,50 +189,46 @@
             });
             
             myPromise.then(function(mod) {
-                // If code runs without errors, check the answers
                 checkAnswers(currentTask, outputText, code, feedbackBox);
             }, function(err) {
-                // If there is a Python syntax error, print it in red
                 outputBox.innerHTML += '<span style="color: red;">' + err.toString() + '</span>';
-                feedbackBox.innerHTML = "⚠️ You have a syntax error. Check your code carefully!";
+                feedbackBox.innerHTML = "⚠️ Syntax Error! Check your spelling and indentation.";
                 feedbackBox.style.backgroundColor = "#ffebee";
                 feedbackBox.style.color = "#d32f2f";
             });
         }
 
-        // Auto-Marking Logic
+        // TEACHER MARKING LOGIC
         function checkAnswers(task, output, code, feedbackBox) {
             let cleanOutput = output.trim().toLowerCase();
             let isCorrect = false;
-            let successMessage = "";
 
-            if (task === "red") {
-                if (cleanOutput === "hello world") {
+            if (task === "q1") {
+                // Check if they used a print statement and outputted anything
+                if (code.includes("print") && cleanOutput.length > 0) {
                     isCorrect = true;
-                    successMessage = "✅ RED TASK PASSED: You printed Hello World!";
                 }
             } 
-            else if (task === "amber") {
-                if (cleanOutput === "12") {
+            else if (task === "q2") {
+                // Check if they created variable x and set it to 50
+                if ((code.includes("x = 50") || code.includes("x=50")) && !code.includes("==")) {
                     isCorrect = true;
-                    successMessage = "✅ AMBER TASK PASSED: You correctly calculated 5 + 7!";
                 }
             }
-            else if (task === "green") {
-                // Checks if output exists AND they used the word 'name' and '=' in their code
-                if (cleanOutput !== "" && code.includes("name") && code.includes("=")) {
+            else if (task === "q3") {
+                // Check if they used 'if', '>', and '50'
+                if (code.includes("if") && code.includes(">") && code.includes("50") && code.includes("print")) {
                     isCorrect = true;
-                    successMessage = "✅ GREEN TASK PASSED: You created and printed a variable!";
                 }
             }
 
             // Display Results
             if (isCorrect) {
-                feedbackBox.innerHTML = successMessage;
+                feedbackBox.innerHTML = "✅ CORRECT! Great job.";
                 feedbackBox.style.backgroundColor = "#e8f5e9";
                 feedbackBox.style.color = "#2e7d32";
             } else {
-                feedbackBox.innerHTML = "❌ Not quite right. Read the task instructions again!";
+                feedbackBox.innerHTML = "❌ Incorrect. Read the question carefully and try again!";
                 feedbackBox.style.backgroundColor = "#ffebee";
                 feedbackBox.style.color = "#d32f2f";
             }
