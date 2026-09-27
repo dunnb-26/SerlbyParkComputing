@@ -57,9 +57,60 @@
             font-family: inherit;
         }
 
+        /* Instructions & Block Bank Styling */
+        #instruction-panel {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--navy);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 4px 4px 0;
+            font-family: inherit;
+            font-size: 14.5px;
+            color: #333;
+        }
+
+        .block-bank-container {
+            border: 2px dashed #b0bec5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        .code-block {
+            background-color: #1a1a24;
+            color: #e0e0e0;
+            padding: 10px 15px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+        }
+
+        .add-btn {
+            background-color: #ffb703;
+            color: #000000;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: background-color 0.2s;
+        }
+        
+        .add-btn:hover { background-color: #fb8500; }
+
         /* CodeMirror Editor Customization */
         .CodeMirror {
-            height: 420px !important;
+            height: 280px !important;
             border-radius: 5px;
             font-family: 'Courier New', Courier, monospace;
             font-size: 15px;
@@ -67,7 +118,7 @@
 
         pre.terminal-output {
             width: 100%;
-            height: 420px;
+            height: 350px;
             background-color: #000000;
             color: #4af626;
             font-family: 'Courier New', Courier, monospace;
@@ -129,7 +180,7 @@
         <div class="ide-container">
             <!-- Left Side: Interactive Editor -->
             <div class="ide-panel">
-                <h3>1. Select Challenge & Write Code</h3>
+                <h3>1. Select Challenge</h3>
                 
                 <select id="task-selector" onchange="loadTask()">
                     <option value="t1">Task 1 (Sequence): Delta Adventure Park</option>
@@ -137,6 +188,9 @@
                     <option value="t3">Task 3 (Iteration): FOR loop greeting</option>
                     <option value="t4">Task 4 (Iteration): WHILE loop countdown</option>
                 </select>
+
+                <!-- Dynamic Instructions Panel -->
+                <div id="instruction-panel"></div>
 
                 <!-- The raw textarea is hidden and replaced by CodeMirror -->
                 <textarea id="python-code"></textarea>
@@ -174,18 +228,42 @@
             matchBrackets: true
         });
 
-        // Task content repository
-        const tasks = {
-            "t1": '# TASK: Read the block bank below. Some are incorrect distractors!\n# Write the correct blocks in the right logical sequence to create a working ticket system.\n#\n# total = tickets + price\n# age = int(input("What is your age? "))\n# print("Welcome to Delta Adventure Park")\n# total = tickets * price\n# name = input("What is your name? ")\n# tickets = input("How many tickets? ")\n# tickets = int(input("How many tickets? "))\n# print(name, "your total is £", total)\n# price = 8\n\n# Type your code below:\n',
-            "t2": '# TASK: Create a variable called height and set it to 150.\n# Write an IF statement checking if height is greater than 140.\n# If it is, print "You can ride!"\n\n',
-            "t3": '# TASK: Write a FOR loop that repeats exactly 5 times.\n# Inside the loop, print the word "Hello".\n\n',
-            "t4": '# TASK: Create a variable called timer and set it to 3.\n# Write a WHILE loop that runs as long as timer is greater than 0.\n# Inside the loop, print the timer and decrease it by 1.\n\n'
+        // Instruction content repository
+        const instructions = {
+            "t1": `<strong>TASK 1:</strong> Read the block bank below. Some are incorrect distractors! Click '+ Add' to place the correct blocks in the right logical sequence to create a working ticket system.
+                   <div class="block-bank-container">
+                       <div class="code-block"><span>total = tickets + price</span><button class="add-btn" onclick="addBlock('total = tickets + price')">+ Add</button></div>
+                       <div class="code-block"><span>age = int(input("What is your age? "))</span><button class="add-btn" onclick='addBlock("age = int(input(\\"What is your age? \\"))")'>+ Add</button></div>
+                       <div class="code-block"><span>print("Welcome to Delta Adventure Park")</span><button class="add-btn" onclick='addBlock("print(\\"Welcome to Delta Adventure Park\\")")'>+ Add</button></div>
+                       <div class="code-block"><span>total = tickets * price</span><button class="add-btn" onclick="addBlock('total = tickets * price')">+ Add</button></div>
+                       <div class="code-block"><span>name = input("What is your name? ")</span><button class="add-btn" onclick='addBlock("name = input(\\"What is your name? \\")")'>+ Add</button></div>
+                       <div class="code-block"><span>tickets = input("How many tickets? ")</span><button class="add-btn" onclick='addBlock("tickets = input(\\"How many tickets? \\")")'>+ Add</button></div>
+                       <div class="code-block"><span>tickets = int(input("How many tickets? "))</span><button class="add-btn" onclick='addBlock("tickets = int(input(\\"How many tickets? \\"))")'>+ Add</button></div>
+                       <div class="code-block"><span>print(name, "your total is £", total)</span><button class="add-btn" onclick='addBlock("print(name, \\"your total is £\\", total)")'>+ Add</button></div>
+                       <div class="code-block"><span>price = 8</span><button class="add-btn" onclick="addBlock('price = 8')">+ Add</button></div>
+                   </div>`,
+            "t2": `<strong>TASK 2:</strong> Create a variable called <code>height</code> and set it to 150.<br><br>Write an <code>if</code> statement checking if height is greater than 140. If it is, print "You can ride!"`,
+            "t3": `<strong>TASK 3:</strong> Write a <code>for</code> loop that repeats exactly 5 times.<br><br>Inside the loop, print the word "Hello".`,
+            "t4": `<strong>TASK 4:</strong> Create a variable called <code>timer</code> and set it to 3.<br><br>Write a <code>while</code> loop that runs as long as timer is greater than 0. Inside the loop, print the timer and decrease it by 1.`
         };
 
-        // Load the selected task into the CodeMirror editor
+        // Inject the block into the CodeMirror editor when the + Add button is clicked
+        function addBlock(codeText) {
+            var doc = editor.getDoc();
+            var cursor = doc.getCursor();
+            doc.replaceRange(codeText + "\n", cursor);
+            editor.focus();
+        }
+
+        // Load the selected task instructions and clear the IDE
         function loadTask() {
             var currentTask = document.getElementById("task-selector").value;
-            editor.setValue(tasks[currentTask]);
+            
+            // Set the instructions outside the IDE
+            document.getElementById("instruction-panel").innerHTML = instructions[currentTask];
+            
+            // Clear the IDE for the student
+            editor.setValue("# Type your code here:\n\n");
             
             document.getElementById("output").innerHTML = "";
             document.getElementById("feedback").innerHTML = "Awaiting code execution...";
@@ -246,7 +324,6 @@
             let successMsg = "";
 
             if (task === "t1") {
-                // Remove all spaces to make checking robust against student formatting
                 let stripped = lowerCode.replace(/\s+/g, '');
                 
                 let hasWelcome = stripped.includes('print("welcometodelta') || stripped.includes("print('welcometodelta");
@@ -255,7 +332,6 @@
                 let hasWrongTotal = stripped.includes("total=tickets+price");
                 let hasFinalPrint = stripped.includes('"yourtotalis') || stripped.includes("'yourtotalis");
                 
-                // Verify variables are declared before they are used in the math/print
                 let priceIdx = stripped.indexOf("price=8");
                 let ticketIdx = stripped.indexOf("tickets=int(input");
                 let mathIdx = stripped.indexOf("total=tickets*price");
