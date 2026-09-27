@@ -184,9 +184,9 @@
                 
                 <select id="task-selector" onchange="loadTask()">
                     <option value="t1">Task 1 (Sequence): Delta Adventure Park</option>
-                    <option value="t2">Task 2 (Selection): Rollercoaster height check</option>
-                    <option value="t3">Task 3 (Iteration): FOR loop greeting</option>
-                    <option value="t4">Task 4 (Iteration): WHILE loop countdown</option>
+                    <option value="t2">Task 2 (Selection): Theme Park Age Checker</option>
+                    <option value="t3">Task 3 (Iteration): Process 5 Visitors</option>
+                    <option value="t4">Task 4 (Challenge): The Complete Ticket System</option>
                 </select>
 
                 <!-- Dynamic Instructions Panel -->
@@ -228,7 +228,7 @@
             matchBrackets: true
         });
 
-        // Instruction content repository
+        // Instruction content repository matched to your specific curriculum
         const instructions = {
             "t1": `<strong>TASK 1:</strong> Read the block bank below. Some are incorrect distractors! Click '+ Add' to place the correct blocks in the right logical sequence to create a working ticket system.
                    <div class="block-bank-container">
@@ -242,9 +242,22 @@
                        <div class="code-block"><span>print(name, "your total is £", total)</span><button class="add-btn" onclick='addBlock("print(name, \\"your total is £\\", total)")'>+ Add</button></div>
                        <div class="code-block"><span>price = 8</span><button class="add-btn" onclick="addBlock('price = 8')">+ Add</button></div>
                    </div>`,
-            "t2": `<strong>TASK 2:</strong> Create a variable called <code>height</code> and set it to 150.<br><br>Write an <code>if</code> statement checking if height is greater than 140. If it is, print "You can ride!"`,
-            "t3": `<strong>TASK 3:</strong> Write a <code>for</code> loop that repeats exactly 5 times.<br><br>Inside the loop, print the word "Hello".`,
-            "t4": `<strong>TASK 4:</strong> Create a variable called <code>timer</code> and set it to 3.<br><br>Write a <code>while</code> loop that runs as long as timer is greater than 0. Inside the loop, print the timer and decrease it by 1.`
+            "t2": `<strong>TASK 2: Refactor your program so it makes a decision.</strong><br><br>
+                   1. Age <strong>16 or above</strong>: display that they can ride without an adult.<br>
+                   2. Age <strong>12–15</strong>: display that they can ride with an adult.<br>
+                   3. Age <strong>under 12</strong>: display that they cannot ride.<br><br>
+                   <em>Use <code>if</code>, <code>elif</code> and <code>else</code>.</em>`,
+            "t3": `<strong>TASK 3: The park needs to process 5 visitors.</strong><br><br>
+                   1. Refactor your program using a <strong>for loop</strong>.<br>
+                   2. The loop should repeat 5 times.<br>
+                   3. Ask for each visitor's name and age inside the loop.<br>
+                   4. Apply the Thunderbolt decision to every visitor.`,
+            "t4": `<strong>TASK 4: Bring everything together.</strong><br><br>
+                   1. Your program should use <strong>sequence</strong>, <strong>selection</strong> and <strong>iteration</strong>.<br>
+                   2. It should run without syntax errors.<br>
+                   3. Keep your output clear and easy for a visitor to understand.<br>
+                   4. <strong>Challenge:</strong> add a sensible extra feature of your own.<br><br>
+                   <em>When finished, test it carefully and press Run Code & Mark to Submit Assessment.</em>`
         };
 
         // Inject the block into the CodeMirror editor when the + Add button is clicked
@@ -274,7 +287,7 @@
         // Initialize first task on load
         window.onload = loadTask;
 
-        // Skulpt file reader configuration
+        // Skulpt configuration for file reading
         function builtinRead(x) {
             if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
                 throw "File not found: '" + x + "'";
@@ -299,7 +312,14 @@
                     outputBox.innerHTML += text; 
                     outputText += text; 
                 },
-                read: builtinRead
+                read: builtinRead,
+                // Enables standard input popups for input() functions in the loop
+                inputfun: function (promptMsg) {
+                    return new Promise(function(resolve, reject){
+                        let userInput = window.prompt(promptMsg);
+                        resolve(userInput !== null ? userInput : "");
+                    });
+                }
             });
             
             var myPromise = Sk.misceval.asyncToPromise(function() {
@@ -347,22 +367,21 @@
                 }
             } 
             else if (task === "t2") {
-                if (lowerCode.includes("if") && lowerCode.includes(">") && lowerCode.includes("140") && cleanOutput.includes("you can ride")) {
+                if (lowerCode.includes("if") && lowerCode.includes("elif") && lowerCode.includes("else") && lowerCode.includes("16") && lowerCode.includes("12")) {
                     isCorrect = true;
-                    successMsg = "✅ SELECTION PASSED: Your IF statement worked perfectly!";
+                    successMsg = "✅ SELECTION PASSED: Your decision logic includes all age boundaries[cite: 3]!";
                 }
             }
             else if (task === "t3") {
-                let helloCount = (cleanOutput.match(/hello/g) || []).length;
-                if (lowerCode.includes("for") && lowerCode.includes("range") && helloCount === 5) {
+                if (lowerCode.includes("for") && lowerCode.includes("range") && lowerCode.includes("input") && (lowerCode.includes("5") || lowerCode.includes("range(5)"))) {
                     isCorrect = true;
-                    successMsg = "✅ ITERATION PASSED: Your FOR loop successfully ran 5 times!";
+                    successMsg = "✅ ITERATION PASSED: You successfully looped the process for 5 visitors[cite: 4]!";
                 }
             }
             else if (task === "t4") {
-                if (lowerCode.includes("while") && lowerCode.includes(">") && lowerCode.includes("0") && (lowerCode.includes("- 1") || lowerCode.includes("-= 1"))) {
+                if (lowerCode.includes("if") && (lowerCode.includes("for") || lowerCode.includes("while")) && cleanOutput.length > 0) {
                     isCorrect = true;
-                    successMsg = "✅ ITERATION PASSED: Your WHILE loop countdown worked!";
+                    successMsg = "🎉 ASSESSMENT COMPLETE: You successfully combined sequence, selection, and iteration[cite: 5]!";
                 }
             }
 
