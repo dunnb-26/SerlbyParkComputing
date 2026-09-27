@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 5 Assessment - Typing Test</title>
+    <style>
+        :root {
+            /* Delta Serlby Park Color Scheme */
+            --navy: #1B1464; 
+            --yellow: #F7931D;
+            --maroon: #822433;
+            --bg-color: #f4f6f8;
+            --text-color: #333;
+            --light-gray: #e2e8f0;
+            --correct-color: #1B1464; /* Navy for correct to keep it on-brand */
+            --incorrect-color: #822433; /* Maroon for incorrect */
+            --untyped-color: #94a3b8;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header { 
+            background-color: var(--navy); 
+            color: white; 
+            padding: 20px; 
+            display: flex; 
+            align-items: center; 
+            border-bottom: 6px solid var(--maroon); 
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        header img { 
+            height: 60px; 
+            margin-right: 20px; 
+            background-color: white; 
+            border-radius: 8px; 
+            padding: 5px;
+        }
+
+        h1 { 
+            margin: 0; 
+            font-size: 24px; 
+        }
+
+        .back-btn {
+            background-color: var(--yellow);
+            color: var(--navy);
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: transform 0.2s, background-color 0.2s;
+            font-size: 14px;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.05);
+            background-color: #ff9d2a;
+        }
+
+        main { 
+            padding: 30px 20px; 
+            max-width: 900px; 
+            margin: 0 auto; 
+            width: 100%;
+            box-sizing: border-box;
+            flex: 1;
+        }
+
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-top: 5px solid var(--navy);
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .mode-btn {
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background-color: var(--yellow);
+            color: var(--navy);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--navy);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .stat-box span {
+            color: var(--yellow);
+            font-size: 24px;
+            margin-left: 8px;
+        }
+
+        .typing-area {
+            position: relative;
+            font-size: 22px;
+            line-height: 1.6;
+            font-family: 'Consolas', 'Courier New', monospace;
+            padding: 20px;
+            background-color: #f8fafc;
+            border: 2px solid var(--light-gray);
+            border-radius: 8px;
+            cursor: text;
+            min-height: 200px;
+            user-select: none; /* Prevents selecting text accidentally */
+            overflow: hidden;
+        }
+
+        .typing-area:focus-within {
+            border-color: var(--yellow);
+            box-shadow: 0 0 0 3px rgba(247, 147, 29, 0.2);
+        }
+
+        /* Hidden textarea to capture mobile and desktop typing accurately */
+        #hidden-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            z-index: 1;
+            cursor: text;
+            resize: none;
+        }
+
+        #text-display {
+            position: relative;
+            z-index: 2;
+            pointer-events: none; /* Lets clicks pass through to the textarea */
+        }
+
+        .char { color: var(--untyped-color); }
+        .char.correct { color: var(--correct-color); font-weight: bold; }
+        .char.incorrect { 
+            color: white; 
+            background-color: var(--maroon); 
+            border-radius: 2px;
+        }
+        
+        /* Blinking cursor effect */
+        .char.cursor {
+            border-left: 3px solid var(--yellow);
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { border-color: var(--yellow); }
+            50% { border-color: transparent; }
+        }
+
+        .bottom-controls {
+            margin-top: 25px;
+            text-align: center;
+        }
+
+        .reset-btn {
+            background-color: var(--navy);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            background-color: #2a208c;
+        }
+
+        /* Modal for test completion */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(27, 20, 100, 0.8);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 400px;
+            border-top: 6px solid var(--yellow);
+        }
+
+        .modal-content h2 {
+            color: var(--navy);
+            margin-top: 0;
+        }
+
+        .modal-score {
+            font-size: 40px;
+            color: var(--maroon);
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        footer { 
+            text-align: center; 
+            padding: 20px; 
+            color: #666; 
+            border-top: 1px solid #ddd; 
+            background-color: white;
+            margin-top: auto;
+        }
+
+        @media (max-width: 600px) {
+            .stats-bar { flex-direction: column; gap: 10px; align-items: center; }
+            .typing-area { font-size: 18px; }
+            header { flex-direction: column; text-align: center; justify-content: center; }
+            .header-left { flex-direction: column; }
+            header img { margin: 0 0 10px 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <img src="Logo.jpg" alt="Delta Serlby Park Logo" onerror="this.src='https://placehold.co/100x60/ffffff/1B1464?text=DSP'">
+            <div>
+                <h1>Lesson 5: Assessment</h1>
+                <p style="margin: 5px 0 0 0; color: #e0e0e0; font-size: 14px;">Year 7 Computing - Typing Test</p>
+            </div>
+        </div>
+        <a href="index.html" class="back-btn">&larr; Back to Curriculum</a>
+    </header>
+
+    <main>
+        <div class="test-container">
+            <div class="controls">
+                <button class="mode-btn active" data-time="0">Practice (No Timer)</button>
+                <button class="mode-btn" data-time="60">1 Minute</button>
+                <button class="mode-btn" data-time="180">3 Minutes</button>
+                <button class="mode-btn" data-time="300">5 Minutes</button>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat-box">Time: <span id="time-display">0:00</span></div>
+                <div class="stat-box">WPM: <span id="wpm-display">0</span></div>
+                <div class="stat-box">Accuracy: <span id="acc-display">100%</span></div>
+            </div>
+
+            <div class="typing-area" onclick="document.getElementById('hidden-input').focus()">
+                <textarea id="hidden-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+                <div id="text-display"></div>
+            </div>
+
+            <div class="bottom-controls">
+                <button class="reset-btn" onclick="resetTest()">Restart Test</button>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal" id="result-modal">
+        <div class="modal-content">
+            <h2>Test Complete!</h2>
+            <p>Great effort! Here is your final score:</p>
+            <div class="modal-score"><span id="final-wpm">0</span> WPM</div>
+            <p style="font-size: 18px; font-weight: bold;">Accuracy: <span id="final-acc">0</span>%</p>
+            <button class="reset-btn" style="margin-top: 20px;" onclick="closeModal(); resetTest();">Try Again</button>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 Delta Serlby Park - Computing Department
+    </footer>
+
+    <script>
+        // The text for the Year 7 assessment (Approx 230 words)
+        const testText = "Welcome to your Year 7 Computing assessment! A computer system is made up of hardware and software. Hardware consists of the physical parts you can touch, like the keyboard, mouse, monitor, and the central processing unit. Software refers to the invisible programs, applications, and operating systems that make the hardware work. When working online, e-safety is extremely important. Always keep your personal information secure, use strong passwords, and never share them with anyone, even your friends. Treat others online with the same respect you would in the real world. If you ever see something on a website or in a message that makes you feel uncomfortable, report it to a trusted adult immediately. Data inside a computer is processed using binary code. Binary only uses two numbers: zero and one. These represent the on and off states of millions of tiny switches inside the computer's processor. Every document, image, video, and game is eventually converted into binary so the computer can understand it. Understanding how computers work and how to use them safely is the first step to becoming a great digital citizen. Keep practicing your typing skills, as they will help you communicate faster and work more efficiently in all of your school subjects. Good luck!";
+
+        // DOM Elements
+        const textDisplay = document.getElementById('text-display');
+        const hiddenInput = document.getElementById('hidden-input');
+        const timeDisplay = document.getElementById('time-display');
+        const wpmDisplay = document.getElementById('wpm-display');
+        const accDisplay = document.getElementById('acc-display');
+        const modeBtns = document.querySelectorAll('.mode-btn');
+        const modal = document.getElementById('result-modal');
+
+        // Game State Variables
+        let timeLimit = 0; // 0 = Practice mode
+        let timeLeft = 0;
+        let timeElapsed = 0;
+        let timerInterval = null;
+        let isTyping = false;
+        let characterSpans = [];
+
+        function initTest() {
+            // Split the text into individual characters and wrap in <span> tags
+            textDisplay.innerHTML = '';
+            characterSpans = [];
+            
+            testText.split('').forEach((char, index) => {
+                const span = document.createElement('span');
+                span.innerText = char;
+                span.classList.add('char');
+                if(index === 0) span.classList.add('cursor'); // Set initial cursor
+                textDisplay.appendChild(span);
+                characterSpans.push(span);
+            });
+
+            // Reset input and stats
+            hiddenInput.value = '';
+            hiddenInput.maxLength = testText.length;
+            timeElapsed = 0;
+            wpmDisplay.innerText = '0';
+            accDisplay.innerText = '100%';
+            isTyping = false;
+            clearInterval(timerInterval);
+            
+            updateTimeDisplay();
+        }
+
+        hiddenInput.addEventListener('input', () => {
+            if (!isTyping) {
+                startTimer();
+                isTyping = true;
+            }
+
+            const typedText = hiddenInput.value;
+            let correctChars = 0;
+
+            // Loop through all spans to update their classes based on typed input
+            characterSpans.forEach((span, index) => {
+                const typedChar = typedText[index];
+                
+                // Clear existing classes
+                span.classList.remove('correct', 'incorrect', 'cursor');
+
+                if (typedChar == null) {
+                    // Not typed yet
+                    if (index === typedText.length) {
+                        span.classList.add('cursor');
+                    }
+                } else if (typedChar === span.innerText) {
+                    // Typed correctly
+                    span.classList.add('correct');
+                    correctChars++;
+                } else {
+                    // Typed incorrectly
+                    span.classList.add('incorrect');
+                }
+            });
+
+            // Calculate Accuracy
+            let accuracy = 100;
+            if (typedText.length > 0) {
+                accuracy = Math.round((correctChars / typedText.length) * 100);
+            }
+            accDisplay.innerText = `${accuracy}%`;
+
+            // Calculate WPM (Standard: 5 characters = 1 word)
+            if (timeElapsed > 0) {
+                const minutesElapsed = timeElapsed / 60;
+                const wpm = Math.round((correctChars / 5) / minutesElapsed);
+                wpmDisplay.innerText = Math.max(0, wpm); // Ensure it doesn't go below 0
+            }
+
+            // Check if user has finished the entire text
+            if (typedText.length >= testText.length) {
+                endTest();
+            }
+        });
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeElapsed++;
+                
+                if (timeLimit > 0) {
+                    timeLeft--;
+                    if (timeLeft <= 0) {
+                        endTest();
+                    }
+                }
+                
+                // Update WPM in real-time even if not typing
+                const typedText = hiddenInput.value;
+                let correctChars = document.querySelectorAll('.char.correct').length;
+                const minutesElapsed = timeElapsed / 60;
+                const wpm = Math.round((correctChars / 5) / minutesElapsed);
+                wpmDisplay.innerText = Math.max(0, wpm);
+
+                updateTimeDisplay();
+            }, 1000);
+        }
+
+        function updateTimeDisplay() {
+            let displayTime = timeLimit > 0 ? timeLeft : timeElapsed;
+            const minutes = Math.floor(displayTime / 60);
+            const seconds = displayTime % 60;
+            timeDisplay.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+
+        function endTest() {
+            clearInterval(timerInterval);
+            hiddenInput.blur(); // Remove focus so keyboard drops on mobile
+            isTyping = false;
+            
+            // Show modal with results
+            document.getElementById('final-wpm').innerText = wpmDisplay.innerText;
+            document.getElementById('final-acc').innerText = accDisplay.innerText.replace('%', '');
+            modal.style.display = 'flex';
+        }
+
+        function resetTest() {
+            timeLeft = timeLimit;
+            initTest();
+            hiddenInput.focus();
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        // Mode Selection Event Listeners
+        modeBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Update active class
+                modeBtns.forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                // Update time limit
+                timeLimit = parseInt(e.target.getAttribute('data-time'));
+                timeLeft = timeLimit;
+                
+                resetTest();
+            });
+        });
+
+        // Initialize on page load
+        window.onload = () => {
+            timeLeft = timeLimit;
+            initTest();
+        };
+    </script>
+</body>
+</html>
