@@ -13,8 +13,10 @@
             --bg-color: #f4f6f8;
             --text-color: #333;
             --light-gray: #e2e8f0;
-            --correct-color: #1B1464;
-            --incorrect-color: #822433;
+            
+            /* Typing Colors */
+            --correct-color: #16a34a; /* Green */
+            --incorrect-color: #dc2626; /* Red */
             --untyped-color: #94a3b8;
         }
 
@@ -54,10 +56,7 @@
             padding: 5px;
         }
 
-        h1 { 
-            margin: 0; 
-            font-size: 24px; 
-        }
+        h1 { margin: 0; font-size: 24px; }
 
         .back-btn {
             background-color: var(--yellow);
@@ -135,20 +134,19 @@
             margin-left: 8px;
         }
 
-        /* Fixed height, scroll-hidden typing area */
         .typing-area {
             position: relative;
-            font-size: 22px;
-            line-height: 1.8;
+            font-size: 28px; /* Larger text for easier reading */
+            line-height: 1.6;
             font-family: 'Consolas', 'Courier New', monospace;
-            padding: 20px;
+            padding: 30px;
             background-color: #f8fafc;
             border: 2px solid var(--light-gray);
             border-radius: 8px;
             cursor: text;
-            height: 180px; 
-            overflow-y: hidden; /* Hide scrollbar for smooth visual */
+            min-height: 120px;
             user-select: none;
+            text-align: center; /* Center the chunk visually */
         }
 
         .typing-area:focus-within {
@@ -175,23 +173,21 @@
             pointer-events: none;
         }
 
-        .char { color: var(--untyped-color); }
-        .char.correct { color: var(--correct-color); font-weight: bold; }
+        .char { 
+            color: var(--untyped-color); 
+            transition: color 0.1s;
+        }
+        .char.correct { color: var(--correct-color); }
         .char.incorrect { 
             color: white; 
-            background-color: var(--maroon); 
-            border-radius: 2px;
+            background-color: var(--incorrect-color); 
+            border-radius: 3px;
         }
         
-        /* The active blinking cursor */
+        /* The active underline cursor */
         .char.cursor {
-            border-left: 3px solid var(--yellow);
-            animation: blink 1s infinite;
-        }
-        
-        @keyframes blink {
-            0%, 100% { border-color: var(--yellow); }
-            50% { border-color: transparent; }
+            border-bottom: 4px solid var(--yellow);
+            color: var(--navy);
         }
 
         .bottom-controls {
@@ -253,7 +249,7 @@
 
         @media (max-width: 600px) {
             .stats-bar { flex-direction: column; gap: 10px; align-items: center; }
-            .typing-area { font-size: 18px; height: 160px; }
+            .typing-area { font-size: 20px; padding: 20px; }
             header { flex-direction: column; text-align: center; justify-content: center; }
             .header-left { flex-direction: column; }
             header img { margin: 0 0 10px 0; }
@@ -287,6 +283,7 @@
                 <div class="stat-box">Accuracy: <span id="acc-display">100%</span></div>
             </div>
 
+            <!-- The container for our chunks -->
             <div class="typing-area" onclick="document.getElementById('hidden-input').focus()">
                 <textarea id="hidden-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
                 <div id="text-display"></div>
@@ -298,13 +295,14 @@
         </div>
     </main>
 
-    <!-- Modal strictly for showing final results (no submission form) -->
+    <!-- Modal for final results -->
     <div class="modal" id="result-modal">
         <div class="modal-content">
             <h2 style="color: var(--navy); margin-top: 0;">Test Complete!</h2>
             <div class="modal-score"><span id="final-wpm">0</span> WPM</div>
             <p style="font-size: 18px; font-weight: bold; color: var(--navy);">Accuracy: <span id="final-acc">0</span>%</p>
-            <button class="reset-btn" style="margin-top: 20px;" onclick="closeModal()">Close</button>
+            <p style="color: #666; font-size: 14px; margin-top: 10px;">Show this screen to your teacher.</p>
+            <button class="reset-btn" style="margin-top: 20px;" onclick="closeModal()">Close & Restart</button>
         </div>
     </div>
 
@@ -345,16 +343,60 @@
         const modal = document.getElementById('result-modal');
 
         // State Variables
-        let maxTime = 60; // Default 1 Minute
+        let maxTime = 60; 
         let timeLeft = 60;
         let timeElapsed = 0;
         let timerInterval = null;
         let isTyping = false;
-        let targetText = "";
+        
+        // Chunking Variables
+        let wordPool = [];
+        let currentChunkText = "";
         let characterSpans = [];
+        
+        // Global Stats (Persist across chunk clears)
+        let globalCorrectChars = 0;
+        let globalTotalTyped = 0;
+
+        function replenishWordPool() {
+            // Keep the pool filled with at least 50 words
+            while (wordPool.length < 50) {
+                let randomIndex = Math.floor(Math.random() * sentenceBank.length);
+                let words = sentenceBank[randomIndex].split(' ');
+                wordPool.push(...words);
+            }
+        }
+
+        function loadNextChunk() {
+            replenishWordPool();
+            
+            // Take exactly 15 words from the pool
+            let chunkWords = wordPool.splice(0, 15);
+            
+            // Join with spaces and add one trailing space to trigger the next chunk switch
+            currentChunkText = chunkWords.join(' ') + ' ';
+            
+            // Reset the display
+            textDisplay.innerHTML = '';
+            characterSpans = [];
+            hiddenInput.value = '';
+            
+            // Render the spans
+            currentChunkText.split('').forEach(char => {
+                const span = document.createElement('span');
+                span.innerText = char;
+                span.classList.add('char');
+                textDisplay.appendChild(span);
+                characterSpans.push(span);
+            });
+
+            // Set the active cursor on the first letter
+            if (characterSpans.length > 0) {
+                characterSpans[0].classList.add('cursor');
+            }
+        }
 
         function selectTime(seconds, btnElement) {
-            // Update active styling
             document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
             btnElement.classList.add('active');
             maxTime = seconds;
@@ -367,55 +409,23 @@
             timeLeft = maxTime;
             timeElapsed = 0;
             
-            hiddenInput.value = '';
-            targetText = "";
-            textDisplay.innerHTML = '';
-            characterSpans = [];
+            globalCorrectChars = 0;
+            globalTotalTyped = 0;
+            wordPool = [];
             
-            // Add initial block of text
-            addMoreText(5); 
+            loadNextChunk();
             
             updateTimeDisplay();
             wpmDisplay.innerText = '0';
             accDisplay.innerText = '100%';
             
-            // Focus input to start
             hiddenInput.disabled = false;
             hiddenInput.focus();
-        }
-
-        function addMoreText(sentenceCount = 2) {
-            let newSentences = [];
-            for(let i = 0; i < sentenceCount; i++) {
-                let randomIndex = Math.floor(Math.random() * sentenceBank.length);
-                newSentences.push(sentenceBank[randomIndex]);
-            }
-            
-            let stringToAdd = newSentences.join(" ");
-            // Add a leading space if we already have text
-            if (targetText.length > 0) {
-                stringToAdd = " " + stringToAdd;
-            }
-            
-            targetText += stringToAdd;
-
-            // Generate spans for new text
-            stringToAdd.split('').forEach((char) => {
-                const span = document.createElement('span');
-                span.innerText = char;
-                span.classList.add('char');
-                textDisplay.appendChild(span);
-                characterSpans.push(span);
-            });
-
-            // Re-apply cursor if needed
-            if (!isTyping || hiddenInput.value.length === 0) {
-                characterSpans[0].classList.add('cursor');
-            }
+            modal.style.display = 'none';
         }
 
         hiddenInput.addEventListener('input', () => {
-            if (timeLeft <= 0) return; // Ignore typing if test is over
+            if (timeLeft <= 0) return;
 
             if (!isTyping) {
                 startTimer();
@@ -423,49 +433,47 @@
             }
 
             const typedText = hiddenInput.value;
-            let correctChars = 0;
+            let localCorrectChars = 0;
 
-            // Check if we are nearing the end of the generated text (within 100 characters)
-            if (targetText.length - typedText.length < 100) {
-                addMoreText(3); // Inject more text dynamically
-            }
-
-            // Loop through and update character spans based on input
+            // Update visuals for the current chunk
             characterSpans.forEach((span, index) => {
-                span.classList.remove('correct', 'incorrect', 'cursor');
+                span.className = 'char'; // Reset classes
                 
                 if (index < typedText.length) {
-                    // Character has been typed
-                    if (typedText[index] === span.innerText) {
+                    if (typedText[index] === currentChunkText[index]) {
                         span.classList.add('correct');
-                        correctChars++;
+                        localCorrectChars++;
                     } else {
                         span.classList.add('incorrect');
                     }
                 } else if (index === typedText.length) {
-                    // Current cursor position
                     span.classList.add('cursor');
                 }
             });
 
-            // Auto-scroll the view to the current cursor position smoothly
-            const cursorSpan = document.querySelector('.char.cursor');
-            if (cursorSpan) {
-                cursorSpan.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Calculate Live Stats
+            let totalCorrectSoFar = globalCorrectChars + localCorrectChars;
+            let totalTypedSoFar = globalTotalTyped + typedText.length;
+
+            if (totalTypedSoFar > 0) {
+                let accuracy = Math.round((totalCorrectSoFar / totalTypedSoFar) * 100);
+                accDisplay.innerText = `${accuracy}%`;
             }
 
-            // Calculate live Accuracy
-            let accuracy = 100;
-            if (typedText.length > 0) {
-                accuracy = Math.round((correctChars / typedText.length) * 100);
-            }
-            accDisplay.innerText = `${accuracy}%`;
-
-            // Calculate live WPM
             if (timeElapsed > 0) {
-                const minutesElapsed = timeElapsed / 60;
-                const wpm = Math.round((correctChars / 5) / minutesElapsed);
+                let minutesElapsed = timeElapsed / 60;
+                let wpm = Math.round((totalCorrectSoFar / 5) / minutesElapsed);
                 wpmDisplay.innerText = Math.max(0, wpm);
+            }
+
+            // Check if the user reached the end of the chunk
+            if (typedText.length >= currentChunkText.length) {
+                // Bank the stats
+                globalCorrectChars += localCorrectChars;
+                globalTotalTyped += typedText.length;
+                
+                // Instantly load the next block of text
+                loadNextChunk();
             }
         });
 
@@ -476,15 +484,14 @@
                     timeElapsed++;
                     updateTimeDisplay();
                     
-                    // Force WPM recalculation every second to degrade if they stop typing
-                    const typedText = hiddenInput.value;
-                    let correctChars = document.querySelectorAll('.char.correct').length;
-                    const minutesElapsed = timeElapsed / 60;
-                    const wpm = Math.round((correctChars / 5) / minutesElapsed);
+                    // Force WPM recalculation to penalize stopping
+                    let localCorrectChars = document.querySelectorAll('.char.correct').length;
+                    let totalCorrectSoFar = globalCorrectChars + localCorrectChars;
+                    let minutesElapsed = timeElapsed / 60;
+                    let wpm = Math.round((totalCorrectSoFar / 5) / minutesElapsed);
                     wpmDisplay.innerText = Math.max(0, wpm);
                 } 
                 
-                // End test if time runs out
                 if (timeLeft <= 0) {
                     endTest();
                 }
@@ -500,7 +507,7 @@
         function endTest() {
             clearInterval(timerInterval);
             hiddenInput.blur();
-            hiddenInput.disabled = true; // Prevent further typing
+            hiddenInput.disabled = true; // Freeze input entirely
             isTyping = false;
             
             // Remove cursor visually
@@ -515,9 +522,16 @@
 
         function closeModal() {
             modal.style.display = 'none';
+            initTest();
         }
 
-        // Initialize on load
+        // Ensure input stays focused if they click anywhere on the page
+        document.addEventListener('click', (e) => {
+            if(timeLeft > 0 && !modal.style.display.includes('flex')) {
+                hiddenInput.focus();
+            }
+        });
+
         window.onload = initTest;
     </script>
 </body>
