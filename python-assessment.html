@@ -15,16 +15,17 @@
     <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
 
     <style>
+        /* 3-Column Layout for wide screens */
         .ide-container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 20px;
-            max-width: 1200px;
+            max-width: 1450px;
             margin: 20px auto;
             padding: 0 20px;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 1100px) {
             .ide-container { grid-template-columns: 1fr; }
         }
 
@@ -38,20 +39,21 @@
             flex-direction: column;
         }
         
+        .editor-panel { border-top-color: #007acc; }
         .output-panel { border-top-color: var(--maroon); }
 
         .ide-panel h3 {
             margin-top: 0;
             color: var(--navy);
             text-transform: uppercase;
-            font-size: 1.2em;
+            font-size: 1.1em;
         }
 
         select {
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
-            font-size: 16px;
+            font-size: 15px;
             border: 1px solid #ccc;
             border-radius: 4px;
             font-family: inherit;
@@ -61,59 +63,74 @@
         #instruction-panel {
             background-color: #f8f9fa;
             border-left: 4px solid var(--navy);
-            padding: 15px;
+            padding: 12px;
             margin-bottom: 15px;
             border-radius: 0 4px 4px 0;
             font-family: inherit;
-            font-size: 14.5px;
+            font-size: 14px;
             color: #333;
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: 400px;
         }
 
         .block-bank-container {
             border: 2px dashed #b0bec5;
-            padding: 12px;
+            padding: 10px;
             border-radius: 8px;
             margin-top: 10px;
             background-color: #ffffff;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            max-height: 220px;
-            overflow-y: auto;
+            gap: 6px;
         }
 
         .code-block {
             background-color: #1a1a24;
             color: #e0e0e0;
-            padding: 10px 15px;
+            padding: 8px 12px;
             border-radius: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .add-btn {
             background-color: #ffb703;
             color: #000000;
             border: none;
-            padding: 6px 12px;
+            padding: 4px 10px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 13px;
+            font-size: 12px;
             transition: background-color 0.2s;
         }
         
         .add-btn:hover { background-color: #fb8500; }
 
+        .btn-reset {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .btn-reset:hover { background-color: #b71c1c; }
+
         /* CodeMirror Editor Customization */
         .CodeMirror {
-            height: 280px !important;
+            height: 420px !important;
             border-radius: 5px;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 15px;
+            font-size: 14px;
         }
 
         pre.terminal-output {
@@ -122,7 +139,7 @@
             background-color: #000000;
             color: #4af626;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 15px;
+            font-size: 14px;
             padding: 15px;
             border: none;
             border-radius: 5px;
@@ -135,13 +152,13 @@
             display: block;
             width: 100%;
             margin-top: 15px;
-            padding: 15px;
+            padding: 12px;
             background-color: #388e3c;
             color: white;
             text-align: center;
             border: none;
             border-radius: 5px;
-            font-size: 1.1em;
+            font-size: 1.05em;
             font-weight: bold;
             cursor: pointer;
             transition: background-color 0.2s;
@@ -151,13 +168,14 @@
 
         .feedback-box {
             margin-top: 15px;
-            padding: 15px;
+            padding: 12px;
             font-weight: bold;
             border-radius: 4px;
             text-align: center;
-            min-height: 50px;
+            min-height: 40px;
             background-color: #f5f5f5;
             color: var(--navy);
+            font-size: 14px;
         }
     </style>
 </head>
@@ -178,9 +196,9 @@
 
     <main>
         <div class="ide-container">
-            <!-- Left Side: Interactive Editor -->
+            <!-- COLUMN 1: Task Selection & Instructions / Block Bank -->
             <div class="ide-panel">
-                <h3>1. Select Challenge</h3>
+                <h3>1. Instructions</h3>
                 
                 <select id="task-selector" onchange="loadTask()">
                     <option value="t1">Task 1 (Sequence): Delta Adventure Park</option>
@@ -189,18 +207,24 @@
                     <option value="t4">Task 4 (Challenge): The Complete Ticket System</option>
                 </select>
 
-                <!-- Dynamic Instructions Panel -->
                 <div id="instruction-panel"></div>
+            </div>
 
-                <!-- The raw textarea is hidden and replaced by CodeMirror -->
+            <!-- COLUMN 2: Interactive Code Editor -->
+            <div class="ide-panel editor-panel">
+                <h3 style="color: #007acc;">2. Code Editor</h3>
+                <p style="font-size: 13px; color: #666; margin-top: 0;">Write or assemble your Python solution below:</p>
+                
                 <textarea id="python-code"></textarea>
                 
                 <button class="btn-run" onclick="runPython()">▶ Run Code & Mark</button>
             </div>
 
-            <!-- Right Side: Terminal & Feedback -->
+            <!-- COLUMN 3: Terminal Output & Feedback -->
             <div class="ide-panel output-panel">
-                <h3 style="color: var(--maroon);">2. Terminal Output</h3>
+                <h3 style="color: var(--maroon);">3. Terminal Output</h3>
+                <p style="font-size: 13px; color: #666; margin-top: 0;">View program feedback and results:</p>
+                
                 <pre id="output" class="terminal-output"></pre>
                 
                 <div id="feedback" class="feedback-box">
@@ -219,7 +243,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
 
     <script>
-        // Initialize CodeMirror on the textarea to create the interactive IDE
         var editor = CodeMirror.fromTextArea(document.getElementById("python-code"), {
             mode: "python",
             theme: "dracula",
@@ -228,73 +251,100 @@
             matchBrackets: true
         });
 
-        // Instruction content repository matched to your specific curriculum
-        const instructions = {
-            "t1": `<strong>TASK 1:</strong> Read the block bank below. Some are incorrect distractors! Click '+ Add' to place the correct blocks in the right logical sequence to create a working ticket system.
-                   <div class="block-bank-container">
-                       <div class="code-block"><span>total = tickets + price</span><button class="add-btn" onclick="addBlock('total = tickets + price')">+ Add</button></div>
-                       <div class="code-block"><span>age = int(input("What is your age? "))</span><button class="add-btn" onclick='addBlock("age = int(input(\\"What is your age? \\"))")'>+ Add</button></div>
-                       <div class="code-block"><span>print("Welcome to Delta Adventure Park")</span><button class="add-btn" onclick='addBlock("print(\\"Welcome to Delta Adventure Park\\")")'>+ Add</button></div>
-                       <div class="code-block"><span>total = tickets * price</span><button class="add-btn" onclick="addBlock('total = tickets * price')">+ Add</button></div>
-                       <div class="code-block"><span>name = input("What is your name? ")</span><button class="add-btn" onclick='addBlock("name = input(\\"What is your name? \\")")'>+ Add</button></div>
-                       <div class="code-block"><span>tickets = input("How many tickets? ")</span><button class="add-btn" onclick='addBlock("tickets = input(\\"How many tickets? \\")")'>+ Add</button></div>
-                       <div class="code-block"><span>tickets = int(input("How many tickets? "))</span><button class="add-btn" onclick='addBlock("tickets = int(input(\\"How many tickets? \\"))")'>+ Add</button></div>
-                       <div class="code-block"><span>print(name, "your total is £", total)</span><button class="add-btn" onclick='addBlock("print(name, \\"your total is £\\", total)")'>+ Add</button></div>
-                       <div class="code-block"><span>price = 8</span><button class="add-btn" onclick="addBlock('price = 8')">+ Add</button></div>
-                   </div>`,
-            "t2": `<strong>TASK 2: Refactor your program so it makes a decision.</strong><br><br>
-                   1. Age <strong>16 or above</strong>: display that they can ride without an adult.<br>
-                   2. Age <strong>12–15</strong>: display that they can ride with an adult.<br>
-                   3. Age <strong>under 12</strong>: display that they cannot ride.<br><br>
-                   <em>Use <code>if</code>, <code>elif</code> and <code>else</code>.</em>`,
-            "t3": `<strong>TASK 3: The park needs to process 5 visitors.</strong><br><br>
-                   1. Refactor your program using a <strong>for loop</strong>.<br>
-                   2. The loop should repeat 5 times.<br>
-                   3. Ask for each visitor's name and age inside the loop.<br>
-                   4. Apply the Thunderbolt decision to every visitor.`,
-            "t4": `<strong>TASK 4: Bring everything together.</strong><br><br>
-                   1. Your program should use <strong>sequence</strong>, <strong>selection</strong> and <strong>iteration</strong>.<br>
-                   2. It should run without syntax errors.<br>
-                   3. Keep your output clear and easy for a visitor to understand.<br>
-                   4. <strong>Challenge:</strong> add a sensible extra feature of your own.<br><br>
-                   <em>When finished, test it carefully and press Run Code & Mark to Submit Assessment.</em>`
-        };
+        // Master list of blocks for Task 1
+        const originalBlocks = [
+            { id: 'b1', text: 'total = tickets + price' },
+            { id: 'b2', text: 'age = int(input("What is your age? "))' },
+            { id: 'b3', text: 'print("Welcome to Delta Adventure Park")' },
+            { id: 'b4', text: 'total = tickets * price' },
+            { id: 'b5', text: 'name = input("What is your name? ")' },
+            { id: 'b6', text: 'tickets = input("How many tickets? ")' },
+            { id: 'b7', text: 'tickets = int(input("How many tickets? "))' },
+            { id: 'b8', text: 'print(name, "your total is £", total)' },
+            { id: 'b9', text: 'price = 8' }
+        ];
 
-        // Inject the block into the CodeMirror editor when the + Add button is clicked
-        function addBlock(codeText) {
-            var doc = editor.getDoc();
-            var cursor = doc.getCursor();
-            doc.replaceRange(codeText + "\n", cursor);
-            editor.focus();
-        }
+        let currentBlocks = [];
 
-        // Load the selected task instructions and clear the IDE
         function loadTask() {
             var currentTask = document.getElementById("task-selector").value;
             
-            // Set the instructions outside the IDE
-            document.getElementById("instruction-panel").innerHTML = instructions[currentTask];
+            if (currentTask === "t1") {
+                currentBlocks = JSON.parse(JSON.stringify(originalBlocks));
+                renderBlockBank();
+            } else {
+                let textInstr = "";
+                if (currentTask === "t2") {
+                    textInstr = `<strong>Refactor your program so it makes a decision.</strong><br><br>
+                                 1. Age <strong>16 or above</strong>: display that they can ride without an adult.<br><br>
+                                 2. Age <strong>12–15</strong>: display that they can ride with an adult.<br><br>
+                                 3. Age <strong>under 12</strong>: display that they cannot ride.<br><br>
+                                 <em>Use <code>if</code>, <code>elif</code> and <code>else</code>.</em>`;
+                } else if (currentTask === "t3") {
+                    textInstr = `<strong>The park needs to process 5 visitors.</strong><br><br>
+                                 1. Refactor your program using a <strong>for loop</strong>.<br><br>
+                                 2. The loop should repeat 5 times.<br><br>
+                                 3. Ask for each visitor's name and age inside the loop.<br><br>
+                                 4. Apply the Thunderbolt decision to every visitor.`;
+                } else if (currentTask === "t4") {
+                    textInstr = `<strong>Bring everything together.</strong><br><br>
+                                 1. Your program should use <strong>sequence</strong>, <strong>selection</strong> and <strong>iteration</strong>.<br><br>
+                                 2. It should run without syntax errors.<br><br>
+                                 3. Keep your output clear and easy to understand.<br><br>
+                                 4. <strong>Challenge:</strong> add a sensible extra feature of your own.`;
+                }
+                document.getElementById("instruction-panel").innerHTML = textInstr;
+            }
             
-            // Clear the IDE for the student
             editor.setValue("# Type your code here:\n\n");
-            
             document.getElementById("output").innerHTML = "";
             document.getElementById("feedback").innerHTML = "Awaiting code execution...";
             document.getElementById("feedback").style.backgroundColor = "#f5f5f5";
             document.getElementById("feedback").style.color = "var(--navy)";
         }
 
-        // Initialize first task on load
+        // Renders the block bank, removing items that have already been clicked
+        function renderBlockBank() {
+            let html = `<strong>TASK 1:</strong> Click '+ Add' to place the correct blocks in order. Distractors are included!<br><div class="block-bank-container">`;
+            
+            if (currentBlocks.length === 0) {
+                html += `<p style="text-align:center; color:#666; font-size:13px; margin:5px 0;">All blocks added!</p>`;
+            } else {
+                currentBlocks.forEach(b => {
+                    let escapedText = b.text.replace(/"/g, '&quot;');
+                    html += `<div class="code-block"><span>${b.text}</span><button class="add-btn" onclick="addBlock('${b.id}', '${escapedText}')">+ Add</button></div>`;
+                });
+            }
+            html += `</div><button class="btn-reset" onclick="resetBlocks()">Reset Blocks</button>`;
+            document.getElementById("instruction-panel").innerHTML = html;
+        }
+
+        function addBlock(id, codeText) {
+            // Remove from current blocks array
+            currentBlocks = currentBlocks.filter(b => b.id !== id);
+            renderBlockBank();
+
+            // Insert into editor
+            var doc = editor.getDoc();
+            var cursor = doc.getCursor();
+            doc.replaceRange(codeText + "\n", cursor);
+            editor.focus();
+        }
+
+        function resetBlocks() {
+            currentBlocks = JSON.parse(JSON.stringify(originalBlocks));
+            renderBlockBank();
+            editor.setValue("# Type your code here:\n\n");
+        }
+
         window.onload = loadTask;
 
-        // Skulpt configuration for file reading
         function builtinRead(x) {
             if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
                 throw "File not found: '" + x + "'";
             return Sk.builtinFiles["files"][x];
         }
 
-        // Execute the Python code using Skulpt
         function runPython() {
             var code = editor.getValue(); 
             var outputBox = document.getElementById("output");
@@ -313,7 +363,6 @@
                     outputText += text; 
                 },
                 read: builtinRead,
-                // Enables standard input popups for input() functions in the loop
                 inputfun: function (promptMsg) {
                     return new Promise(function(resolve, reject){
                         let userInput = window.prompt(promptMsg);
@@ -330,13 +379,12 @@
                 checkAnswers(currentTask, outputText, code, feedbackBox);
             }, function(err) {
                 outputBox.innerHTML += '<span style="color: #ff5555;">' + err.toString() + '</span>';
-                feedbackBox.innerHTML = "⚠️ Syntax Error! Check your spelling, capitalization, and indentation.";
+                feedbackBox.innerHTML = "⚠️ Syntax Error! Check your spelling or indentation.";
                 feedbackBox.style.backgroundColor = "#ffebee";
                 feedbackBox.style.color = "#d32f2f";
             });
         }
 
-        // Teacher Auto-Marking Logic
         function checkAnswers(task, output, code, feedbackBox) {
             let cleanOutput = output.trim().toLowerCase();
             let lowerCode = code.toLowerCase();
@@ -345,7 +393,6 @@
 
             if (task === "t1") {
                 let stripped = lowerCode.replace(/\s+/g, '');
-                
                 let hasWelcome = stripped.includes('print("welcometodelta') || stripped.includes("print('welcometodelta");
                 let hasCorrectTickets = stripped.includes("tickets=int(input");
                 let hasCorrectTotal = stripped.includes("total=tickets*price");
@@ -363,25 +410,25 @@
 
                 if (hasWelcome && hasCorrectTickets && hasCorrectTotal && !hasWrongTotal && hasFinalPrint && orderCorrect) {
                     isCorrect = true;
-                    successMsg = "✅ SEQUENCE PASSED: You selected the correct blocks and built the ticket system!";
+                    successMsg = "✅ SEQUENCE PASSED: Ticket system built successfully!";
                 }
             } 
             else if (task === "t2") {
                 if (lowerCode.includes("if") && lowerCode.includes("elif") && lowerCode.includes("else") && lowerCode.includes("16") && lowerCode.includes("12")) {
                     isCorrect = true;
-                    successMsg = "✅ SELECTION PASSED: Your decision logic includes all age boundaries[cite: 3]!";
+                    successMsg = "✅ SELECTION PASSED: Decision logic covers all age boundaries!";
                 }
             }
             else if (task === "t3") {
                 if (lowerCode.includes("for") && lowerCode.includes("range") && lowerCode.includes("input") && (lowerCode.includes("5") || lowerCode.includes("range(5)"))) {
                     isCorrect = true;
-                    successMsg = "✅ ITERATION PASSED: You successfully looped the process for 5 visitors[cite: 4]!";
+                    successMsg = "✅ ITERATION PASSED: Loop correctly configured for 5 visitors!";
                 }
             }
             else if (task === "t4") {
                 if (lowerCode.includes("if") && (lowerCode.includes("for") || lowerCode.includes("while")) && cleanOutput.length > 0) {
                     isCorrect = true;
-                    successMsg = "🎉 ASSESSMENT COMPLETE: You successfully combined sequence, selection, and iteration[cite: 5]!";
+                    successMsg = "🎉 ASSESSMENT COMPLETE: Sequence, selection, and iteration combined successfully!";
                 }
             }
 
@@ -390,7 +437,7 @@
                 feedbackBox.style.backgroundColor = "#e8f5e9";
                 feedbackBox.style.color = "#2e7d32";
             } else {
-                feedbackBox.innerHTML = "❌ Incorrect or incomplete. Read the instructions carefully and try again!";
+                feedbackBox.innerHTML = "❌ Incorrect or incomplete. Check the instructions and try again!";
                 feedbackBox.style.backgroundColor = "#ffebee";
                 feedbackBox.style.color = "#d32f2f";
             }
