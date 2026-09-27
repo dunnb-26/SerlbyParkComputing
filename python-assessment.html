@@ -335,29 +335,29 @@
             } else {
                 let textInstr = "";
                 if (currentTask === "t2") {
-                    textInstr = `<strong>TASK 2: Sequence from Scratch (5 Marks)</strong><br>
-                                 Build a complete ticket program without blocks. Earn 1 mark for each requirement:<br>
-                                 1. <strong>[1 Mark]</strong> Ask for user's name using <code>input()</code>.<br>
-                                 2. <strong>[1 Mark]</strong> Define a price variable (e.g. <code>price = 8</code>).<br>
-                                 3. <strong>[1 Mark]</strong> Ask for ticket quantity using integer casting <code>int(input())</code>.<br>
-                                 4. <strong>[1 Mark]</strong> Calculate the math correctly using multiplication (<code>*</code>).<br>
-                                 5. <strong>[1 Mark]</strong> Print a summary statement displaying the total.`;
+                    textInstr = `<strong>TASK 2: Sequence from Scratch</strong><br><br>
+                                 Build a complete ticket program without blocks. Ensure your code does the following:<br><br>
+                                 &bull; Asks for the user's name using <code>input()</code>.<br>
+                                 &bull; Defines a price variable (e.g. <code>price = 8</code>).<br>
+                                 &bull; Asks for ticket quantity using integer casting <code>int(input())</code>.<br>
+                                 &bull; Calculates the math correctly using multiplication (<code>*</code>).<br>
+                                 &bull; Prints a summary statement displaying the total cost.`;
                 } else if (currentTask === "t3") {
-                    textInstr = `<strong>TASK 3: IF Statement Knowledge (5 Marks)</strong><br>
-                                 Write an IF statement program from scratch. Earn 1 mark for each requirement:<br>
-                                 1. <strong>[1 Mark]</strong> Define a variable to test (e.g., <code>score</code> or <code>age</code>).<br>
-                                 2. <strong>[1 Mark]</strong> Include an <code>if</code> statement keyword.<br>
-                                 3. <strong>[1 Mark]</strong> Use a comparison operator (<code>></code>, <code><</code>, or <code>==</code>).<br>
-                                 4. <strong>[1 Mark]</strong> Include an <code>elif</code> or <code>else</code> branch.<br>
-                                 5. <strong>[1 Mark]</strong> Include indented <code>print()</code> actions inside your conditions.`;
+                    textInstr = `<strong>TASK 3: IF Statement Knowledge (Selection)</strong><br><br>
+                                 Write an IF statement program from scratch. Ensure your code includes:<br><br>
+                                 &bull; A defined variable to test (e.g., <code>score</code> or <code>age</code>).<br>
+                                 &bull; An <code>if</code> statement keyword.<br>
+                                 &bull; A comparison operator (<code>></code>, <code><</code>, or <code>==</code>).<br>
+                                 &bull; An <code>elif</code> or <code>else</code> branch.<br>
+                                 &bull; Indented <code>print()</code> actions inside your conditions.`;
                 } else if (currentTask === "t4") {
-                    textInstr = `<strong>TASK 4: Iteration & Loops (5 Marks)</strong><br>
-                                 Write a loop program from scratch. Earn 1 mark for each requirement:<br>
-                                 1. <strong>[1 Mark]</strong> Initialize a control variable or setup.<br>
-                                 2. <strong>[1 Mark]</strong> Use a loop keyword (<code>for</code> or <code>while</code>).<br>
-                                 3. <strong>[1 Mark]</strong> Include a range or logical condition.<br>
-                                 4. <strong>[1 Mark]</strong> Indent and perform code actions inside the loop.<br>
-                                 5. <strong>[1 Mark]</strong> Program runs cleanly with correct output.`;
+                    textInstr = `<strong>TASK 4: Iteration & Loops</strong><br><br>
+                                 Write a loop program from scratch. Ensure your code includes:<br><br>
+                                 &bull; A loop counter variable or setup.<br>
+                                 &bull; A loop keyword (<code>for</code> or <code>while</code>).<br>
+                                 &bull; A valid range or logical condition.<br>
+                                 &bull; Indented code actions inside the loop body.<br>
+                                 &bull; Clean execution producing expected output.`;
                 }
                 document.getElementById("instruction-panel").innerHTML = textInstr;
             }
@@ -370,7 +370,7 @@
         }
 
         function renderBlockBank() {
-            let html = `<strong>TASK 1: Sequence Blocks (5 Marks)</strong><br>Add correct blocks in order (1 mark per milestone):<br><div class="block-bank-container">`;
+            let html = `<strong>TASK 1: Sequence Blocks</strong><br>Click '+ Add' to place the correct blocks in the right logical sequence. Distractors are included!<br><div class="block-bank-container">`;
             
             if (currentBlocks.length === 0) {
                 html += `<p style="text-align:center; color:#666; font-size:12px; margin:3px 0;">All blocks added!</p>`;
@@ -513,14 +513,13 @@
             localStorage.setItem('delta_python_total', total);
         }
 
-        // STRICT 1-MARK-PER-CRITERION MARKING LOGIC
+        // STRICT INTERNAL 5-POINT MARKING RUBRIC
         function checkAnswers(task, output, code, feedbackBox) {
             let lowerCode = code.toLowerCase();
             let earnedMarks = 0;
             let feedbackDetails = [];
 
             if (task === "t1") {
-                // Task 1: 1 mark per correct sequence milestone (Total 5)
                 let lines = code.split('\n').map(l => l.trim()).filter(l => l.length > 0 && !l.startsWith('#'));
                 let hasWelcome = lines.some(l => l.includes('print') && l.includes('welcome'));
                 let hasNameInput = lines.some(l => l.includes('name') && l.includes('input'));
@@ -535,46 +534,43 @@
                 if (hasMathAndPrint) earnedMarks++; else feedbackDetails.push("Missing multiplication math or summary print.");
             } 
             else if (task === "t2") {
-                // Task 2: Sequence from Scratch (1 mark per requirement, Total 5)
                 let hasNameInput = lowerCode.includes("input") && lowerCode.includes("name");
                 let hasPriceVar = lowerCode.includes("price") && lowerCode.includes("=");
                 let hasIntInput = lowerCode.includes("int(input");
                 let hasMath = lowerCode.includes("*") || lowerCode.includes("+");
                 let hasPrint = lowerCode.includes("print");
 
-                if (hasNameInput) earnedMarks++; else feedbackDetails.push("[1] Missing name input.");
-                if (hasPriceVar) earnedMarks++; else feedbackDetails.push("[2] Missing price variable.");
-                if (hasIntInput) earnedMarks++; else feedbackDetails.push("[3] Missing int(input()) for numbers.");
-                if (hasMath) earnedMarks++; else feedbackDetails.push("[4] Missing calculation (math).");
-                if (hasPrint) earnedMarks++; else feedbackDetails.push("[5] Missing print statement.");
+                if (hasNameInput) earnedMarks++; else feedbackDetails.push("Missing name input.");
+                if (hasPriceVar) earnedMarks++; else feedbackDetails.push("Missing price variable.");
+                if (hasIntInput) earnedMarks++; else feedbackDetails.push("Missing int(input()) for numbers.");
+                if (hasMath) earnedMarks++; else feedbackDetails.push("Missing calculation (math).");
+                if (hasPrint) earnedMarks++; else feedbackDetails.push("Missing print statement.");
             }
             else if (task === "t3") {
-                // Task 3: IF Statement Knowledge (1 mark per requirement, Total 5)
                 let hasVar = lowerCode.includes("=") && !lowerCode.includes("==");
                 let hasIf = lowerCode.includes("if ");
                 let hasOperator = lowerCode.includes(">") || lowerCode.includes("<") || lowerCode.includes("==") || lowerCode.includes(">=") || lowerCode.includes("<=");
                 let hasBranch = lowerCode.includes("elif") || lowerCode.includes("else");
                 let hasPrint = lowerCode.includes("print");
 
-                if (hasVar) earnedMarks++; else feedbackDetails.push("[1] Missing variable definition.");
-                if (hasIf) earnedMarks++; else feedbackDetails.push("[2] Missing 'if' statement.");
-                if (hasOperator) earnedMarks++; else feedbackDetails.push("[3] Missing comparison operator (>, <, ==).");
-                if (hasBranch) earnedMarks++; else feedbackDetails.push("[4] Missing 'elif' or 'else' branch.");
-                if (hasPrint) earnedMarks++; else feedbackDetails.push("[5] Missing indented print action.");
+                if (hasVar) earnedMarks++; else feedbackDetails.push("Missing variable definition.");
+                if (hasIf) earnedMarks++; else feedbackDetails.push("Missing 'if' statement.");
+                if (hasOperator) earnedMarks++; else feedbackDetails.push("Missing comparison operator (>, <, ==).");
+                if (hasBranch) earnedMarks++; else feedbackDetails.push("Missing 'elif' or 'else' branch.");
+                if (hasPrint) earnedMarks++; else feedbackDetails.push("Missing indented print action.");
             }
             else if (task === "t4") {
-                // Task 4: Iteration & Loops (1 mark per requirement, Total 5)
                 let hasSetup = lowerCode.includes("=") || lowerCode.includes("range");
                 let hasKeyword = lowerCode.includes("for ") || lowerCode.includes("while ");
                 let hasCondition = lowerCode.includes("in ") || lowerCode.includes(">") || lowerCode.includes("<") || lowerCode.includes("range");
                 let hasBodyAction = lowerCode.includes("print") || lowerCode.includes("input");
                 let hasRun = output.trim().length > 0;
 
-                if (hasSetup) earnedMarks++; else feedbackDetails.push("[1] Missing loop counter/setup.");
-                if (hasKeyword) earnedMarks++; else feedbackDetails.push("[2] Missing 'for' or 'while' keyword.");
-                if (hasCondition) earnedMarks++; else feedbackDetails.push("[3] Missing loop range or condition.");
-                if (hasBodyAction) earnedMarks++; else feedbackDetails.push("[4] Missing loop body action (print/input).");
-                if (hasRun) earnedMarks++; else feedbackDetails.push("[5] Program must run and produce output.");
+                if (hasSetup) earnedMarks++; else feedbackDetails.push("Missing loop counter/setup.");
+                if (hasKeyword) earnedMarks++; else feedbackDetails.push("Missing 'for' or 'while' keyword.");
+                if (hasCondition) earnedMarks++; else feedbackDetails.push("Missing loop range or condition.");
+                if (hasBodyAction) earnedMarks++; else feedbackDetails.push("Missing loop body action (print/input).");
+                if (hasRun) earnedMarks++; else feedbackDetails.push("Program must run and produce output.");
             }
 
             updateScore(task, earnedMarks);
