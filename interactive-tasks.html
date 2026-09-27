@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Tasks</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .ragb-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .task-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-top: 5px solid;
+        }
+        /* RAGB Colors */
+        .red-task { border-top-color: #d32f2f; }
+        .amber-task { border-top-color: #f57c00; }
+        .green-task { border-top-color: #388e3c; }
+        .blue-task { border-top-color: #1976d2; }
+        
+        .task-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        .red-task .task-title { color: #d32f2f; }
+        .amber-task .task-title { color: #f57c00; }
+        .green-task .task-title { color: #388e3c; }
+        .blue-task .task-title { color: #1976d2; }
+
+        .question-group {
+            margin-bottom: 15px;
+        }
+        .question-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--navy);
+        }
+        .question-group input[type="text"],
+        .question-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+        .question-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .btn-mark {
+            display: block;
+            width: 200px;
+            margin: 30px auto;
+            padding: 15px;
+            background-color: var(--maroon);
+            color: white;
+            text-align: center;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-mark:hover {
+            background-color: var(--navy);
+        }
+        /* Marking Colors */
+        .correct { border: 2px solid #388e3c !important; background-color: #e8f5e9; }
+        .incorrect { border: 2px solid #d32f2f !important; background-color: #ffebee; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <img src="logo.jpg" alt="Delta Serlby Park Logo">
+        </div>
+        
+        <div class="header-center">
+            <h1>Interactive Tasks</h1>
+        </div>
+        
+        <div class="header-right">
+            <a href="index.html" class="back-btn">&larr; Back to Curriculum</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="ragb-grid">
+            <!-- RED TASK -->
+            <div class="task-card red-task">
+                <div class="task-title">RED TASK (Basic Recall)</div>
+                <div class="question-group">
+                    <label>1. What does CPU stand for?</label>
+                    <input type="text" id="q1" placeholder="Type your answer here...">
+                </div>
+                <div class="question-group">
+                    <label>2. What hardware device is used to point and click?</label>
+                    <input type="text" id="q2" placeholder="Type your answer here...">
+                </div>
+            </div>
+
+            <!-- AMBER TASK -->
+            <div class="task-card amber-task">
+                <div class="task-title">AMBER TASK (Understanding)</div>
+                <div class="question-group">
+                    <label>3. Explain the main difference between hardware and software.</label>
+                    <textarea id="q3" placeholder="Type your explanation here..."></textarea>
+                </div>
+            </div>
+
+            <!-- GREEN TASK -->
+            <div class="task-card green-task">
+                <div class="task-title">GREEN TASK (Application)</div>
+                <div class="question-group">
+                    <label>4. What year was the World Wide Web invented?</label>
+                    <input type="text" id="q4" placeholder="Type your answer here...">
+                </div>
+            </div>
+
+            <!-- BLUE TASK -->
+            <div class="task-card blue-task">
+                <div class="task-title">BLUE TASK (Challenge)</div>
+                <div class="question-group">
+                    <label>5. What was the exact name of the first computer mouse made of wood?</label>
+                    <input type="text" id="q5" placeholder="Type your answer here...">
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-mark" onclick="markWork()">Mark My Work</button>
+    </main>
+    
+    <footer>
+        &copy; 2026 Delta Serlby Park - Computing Department
+    </footer>
+
+    <script>
+        function checkAnswer(inputId, correctAnswers, isLongAnswer = false) {
+            const inputElement = document.getElementById(inputId);
+            const studentAnswer = inputElement.value.toLowerCase().trim();
+            
+            // If empty, mark incorrect automatically
+            if (studentAnswer === "") {
+                inputElement.classList.add('incorrect');
+                inputElement.classList.remove('correct');
+                return;
+            }
+
+            let isCorrect = false;
+            
+            if (isLongAnswer) {
+                // For long answers, mark correct if they include ANY of the required keywords
+                isCorrect = correctAnswers.some(keyword => studentAnswer.includes(keyword.toLowerCase()));
+            } else {
+                // For short answers, check if it matches one of the accepted answers exactly
+                isCorrect = correctAnswers.some(ans => studentAnswer === ans.toLowerCase());
+            }
+
+            if (isCorrect) {
+                inputElement.classList.add('correct');
+                inputElement.classList.remove('incorrect');
+            } else {
+                inputElement.classList.add('incorrect');
+                inputElement.classList.remove('correct');
+            }
+        }
+
+        function markWork() {
+            // TEACHER SETTINGS: Change the answers inside the ['brackets'] below
+            
+            // RED TASK ANSWERS
+            checkAnswer('q1', ['central processing unit']);
+            checkAnswer('q2', ['mouse', 'computer mouse']);
+            
+            // AMBER TASK ANSWERS (Looks for these keywords in their sentence)
+            checkAnswer('q3', ['physical', 'touch', 'programs', 'code', 'intangible'], true);
+            
+            // GREEN TASK ANSWERS
+            checkAnswer('q4', ['1989']);
+            
+            // BLUE TASK ANSWERS
+            checkAnswer('q5', ['x-y position indicator for a display system', 'x-y position indicator']);
+        }
+    </script>
+</body>
+</html>
