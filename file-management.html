@@ -3,82 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Management & Researching</title>
+    <title>File Management & Researching - Lesson 4</title>
     <link rel="stylesheet" href="style.css">
+
     <style>
-        .ragb-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+        /* Task Container Styling */
+        .task-container {
+            max-width: 900px;
+            margin: 30px auto;
             padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
         }
+
         .task-card {
             background: white;
             border-radius: 8px;
-            padding: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border-top: 5px solid;
         }
-        /* RAGB Colors */
-        .red-task { border-top-color: #d32f2f; }
-        .amber-task { border-top-color: #f57c00; }
-        .green-task { border-top-color: #388e3c; }
-        .blue-task { border-top-color: #1976d2; }
-        
-        .task-title {
-            font-weight: bold;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-        }
-        .red-task .task-title { color: #d32f2f; }
-        .amber-task .task-title { color: #f57c00; }
-        .green-task .task-title { color: #388e3c; }
-        .blue-task .task-title { color: #1976d2; }
 
-        .question-group {
-            margin-bottom: 15px;
-        }
-        .question-group label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: var(--navy);
-        }
-        .question-group input[type="text"],
-        .question-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-family: inherit;
-            box-sizing: border-box;
-        }
-        .question-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-        .btn-mark {
-            display: block;
-            width: 200px;
-            margin: 30px auto;
+        /* Maroon Task: Folder Creation */
+        .task-maroon { border-top: 6px solid #800000; }
+        .task-maroon h2 { color: #800000; margin-top: 0; }
+        .task-maroon .instruction-box { border-left: 4px solid #800000; }
+
+        /* Amber Task: Easy Facts */
+        .task-amber { border-top: 6px solid #ffb300; }
+        .task-amber h2 { color: #ffb300; margin-top: 0; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
+        .task-amber .instruction-box { border-left: 4px solid #ffb300; }
+
+        /* Green Task: Complex Facts */
+        .task-green { border-top: 6px solid #008f39; }
+        .task-green h2 { color: #008f39; margin-top: 0; }
+        .task-green .instruction-box { border-left: 4px solid #008f39; }
+
+        /* Navy Task: Image Saving */
+        .task-navy { border-top: 6px solid #1e3a8a; }
+        .task-navy h2 { color: #1e3a8a; margin-top: 0; }
+        .task-navy .instruction-box { border-left: 4px solid #1e3a8a; }
+
+        /* Common Elements */
+        .instruction-box {
+            background-color: #f8f9fa;
             padding: 15px;
-            background-color: var(--maroon);
-            color: white;
+            border-radius: 0 4px 4px 0;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 20px;
             text-align: center;
-            border: none;
-            border-radius: 5px;
-            font-size: 1.1em;
+        }
+
+        /* Auto-Marking Text Inputs */
+        .question-row {
+            margin-bottom: 20px;
+        }
+        
+        .question-label {
+            display: block;
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .auto-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            background-color: white;
+        }
+
+        .auto-input:focus {
+            outline: none;
+            border-color: #666;
+        }
+
+        /* Correct Answer Styling */
+        .input-correct {
+            border-color: #008f39 !important;
+            background-color: #e8f5e9 !important;
+            color: #006100;
             font-weight: bold;
+        }
+
+        /* Screenshot Upload Zones */
+        .screenshot-zone {
+            width: 100%;
+            min-height: 200px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            background-color: #fafafa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            position: relative;
             cursor: pointer;
+            transition: background-color 0.2s;
         }
-        .btn-mark:hover {
-            background-color: var(--navy);
+
+        .screenshot-zone:hover {
+            background-color: #f0f0f0;
         }
-        /* Marking Colors */
-        .correct { border: 2px solid #388e3c !important; background-color: #e8f5e9; }
-        .incorrect { border: 2px solid #d32f2f !important; background-color: #ffebee; }
+
+        .screenshot-text {
+            color: #666;
+            font-size: 15px;
+            pointer-events: none; /* Prevents text from interfering with paste events */
+        }
+
+        .screenshot-image {
+            max-width: 100%;
+            max-height: 400px;
+            display: none;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Hide the actual file input, we trigger it via JS */
+        .file-input {
+            display: none; 
+        }
     </style>
 </head>
 <body>
@@ -86,60 +137,107 @@
         <div class="header-left">
             <img src="logo.jpg" alt="Delta Serlby Park Logo">
         </div>
-        
         <div class="header-center">
-            <h1>Interactive Tasks</h1>
+            <h1>File Management & Researching</h1>
         </div>
-        
         <div class="header-right">
             <a href="index.html" class="back-btn">&larr; Back to Curriculum</a>
         </div>
     </header>
 
-    <main>
-        <div class="ragb-grid">
-            <!-- RED TASK -->
-            <div class="task-card red-task">
-                <div class="task-title">RED TASK (Basic Recall)</div>
-                <div class="question-group">
-                    <label>1. What does CPU stand for?</label>
-                    <input type="text" id="q1" placeholder="Type your answer here...">
-                </div>
-                <div class="question-group">
-                    <label>2. What hardware device is used to point and click?</label>
-                    <input type="text" id="q2" placeholder="Type your answer here...">
-                </div>
-            </div>
+    <main class="task-container">
 
-            <!-- AMBER TASK -->
-            <div class="task-card amber-task">
-                <div class="task-title">AMBER TASK (Understanding)</div>
-                <div class="question-group">
-                    <label>3. Explain the main difference between hardware and software.</label>
-                    <textarea id="q3" placeholder="Type your explanation here..."></textarea>
-                </div>
+        <!-- Task 1: Maroon (Folder Creation) -->
+        <div class="task-card task-maroon">
+            <h2>Folder Creation</h2>
+            <div class="instruction-box">
+                Create a main folder called <strong>"Year 7"</strong> in your Documents.<br><br>
+                Inside this folder, create a sub-folder called <strong>"Computing"</strong> and another called <strong>"Images"</strong>.
             </div>
-
-            <!-- GREEN TASK -->
-            <div class="task-card green-task">
-                <div class="task-title">GREEN TASK (Application)</div>
-                <div class="question-group">
-                    <label>4. What year was the World Wide Web invented?</label>
-                    <input type="text" id="q4" placeholder="Type your answer here...">
-                </div>
-            </div>
-
-            <!-- BLUE TASK -->
-            <div class="task-card blue-task">
-                <div class="task-title">BLUE TASK (Challenge)</div>
-                <div class="question-group">
-                    <label>5. What was the exact name of the first computer mouse made of wood?</label>
-                    <input type="text" id="q5" placeholder="Type your answer here...">
-                </div>
+            
+            <p style="text-align: center; color: #555; margin-bottom: 10px;">Paste a screenshot here to prove these have been created (fn + print screen):</p>
+            
+            <div class="screenshot-zone" id="zone-maroon" onclick="document.getElementById('file-maroon').click()" tabindex="0">
+                <span class="screenshot-text" id="text-maroon">Click to upload image, or press Ctrl+V to paste screenshot</span>
+                <img id="img-maroon" class="screenshot-image" src="" alt="Student Screenshot">
+                <input type="file" id="file-maroon" class="file-input" accept="image/*" onchange="handleFileUpload(event, 'img-maroon', 'text-maroon')">
             </div>
         </div>
 
-        <button class="btn-mark" onclick="markWork()">Mark My Work</button>
+        <!-- Task 2: Amber (Easy Facts) -->
+        <div class="task-card task-amber">
+            <h2>Easy Facts Research</h2>
+            <div class="instruction-box">
+                Use a search engine to find the answers to these 4 easy facts.
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">What year was the World Wide Web invented?</label>
+                <input type="text" class="auto-input" data-answers='["1989"]' placeholder="Type answer here..." onkeyup="checkAnswer(this)">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">Who invented the first computer mouse?</label>
+                <input type="text" class="auto-input" data-answers='["douglas engelbart", "engelbart"]' placeholder="Type answer here..." onkeyup="checkAnswer(this)">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">What does CPU stand for?</label>
+                <input type="text" class="auto-input" data-answers='["central processing unit"]' placeholder="Type answer here..." onkeyup="checkAnswer(this)">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">What is the capital of Japan?</label>
+                <input type="text" class="auto-input" data-answers='["tokyo"]' placeholder="Type answer here..." onkeyup="checkAnswer(this)">
+            </div>
+        </div>
+
+        <!-- Task 3: Green (Complex Facts) -->
+        <div class="task-card task-green">
+            <h2>Complex Facts Research</h2>
+            <div class="instruction-box">
+                Use a search engine to find the answers to these 4 complex facts:<br>
+                <em>(Remember to use " " and +/- to modify results)</em>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">What was the exact name of the first computer mouse made of wood?</label>
+                <input type="text" class="auto-input" data-answers='["x-y position indicator for a display system", "x-y position indicator", "xy position indicator"]' placeholder="Type answer here..." onkeyup="checkAnswer(this)">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">What is Python?</label>
+                <input type="text" class="auto-input" data-answers='["programming language", "a programming language", "computer language", "coding language"]' placeholder="Type answer here..." onkeyup="checkAnswer(this)">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">What is the tallest mountain in the solar system?</label>
+                <input type="text" class="auto-input" data-answers='["olympus mons"]' placeholder="Type answer here..." onkeyup="checkAnswer(this)">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">What was the first message ever sent on the internet?</label>
+                <input type="text" class="auto-input" data-answers='["lo"]' placeholder="Type answer here..." onkeyup="checkAnswer(this)">
+            </div>
+        </div>
+
+        <!-- Task 4: Navy (Image Saving) -->
+        <div class="task-card task-navy">
+            <h2>Image Saving</h2>
+            <div class="instruction-box">
+                Search for high-quality images of the first computer mouse, the inside of a CPU, and the inventor of the World Wide Web.<br><br>
+                Download these 3 images and save them directly into your <strong>"Images"</strong> sub-folder with suitable names.
+            </div>
+
+            <p style="text-align: center; color: #555; margin-bottom: 10px;">Paste a screenshot here to prove these have been saved correctly (fn + print screen):</p>
+            
+            <div class="screenshot-zone" id="zone-navy" onclick="document.getElementById('file-navy').click()" tabindex="0">
+                <span class="screenshot-text" id="text-navy">Click to upload image, or press Ctrl+V to paste screenshot</span>
+                <img id="img-navy" class="screenshot-image" src="" alt="Student Screenshot">
+                <input type="file" id="file-navy" class="file-input" accept="image/*" onchange="handleFileUpload(event, 'img-navy', 'text-navy')">
+            </div>
+        </div>
+
     </main>
     
     <footer>
@@ -147,51 +245,86 @@
     </footer>
 
     <script>
-        function checkAnswer(inputId, correctAnswers, isLongAnswer = false) {
-            const inputElement = document.getElementById(inputId);
-            const studentAnswer = inputElement.value.toLowerCase().trim();
+        /* --- AUTO-MARKING TEXT INPUT LOGIC --- */
+        function checkAnswer(inputElement) {
+            // Get the student's answer, convert to lowercase, and trim extra spaces
+            var studentAnswer = inputElement.value.toLowerCase().trim();
             
-            // If empty, mark incorrect automatically
-            if (studentAnswer === "") {
-                inputElement.classList.add('incorrect');
-                inputElement.classList.remove('correct');
-                return;
+            // Get the list of accepted answers from the data-answers attribute
+            var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers'));
+            
+            var isCorrect = false;
+            
+            // Loop through accepted answers to check for a match
+            for (var i = 0; i < acceptedAnswers.length; i++) {
+                if (studentAnswer === acceptedAnswers[i].toLowerCase()) {
+                    isCorrect = true;
+                    break;
+                }
             }
 
-            let isCorrect = false;
-            
-            if (isLongAnswer) {
-                // For long answers, mark correct if they include ANY of the required keywords
-                isCorrect = correctAnswers.some(keyword => studentAnswer.includes(keyword.toLowerCase()));
-            } else {
-                // For short answers, check if it matches one of the accepted answers exactly
-                isCorrect = correctAnswers.some(ans => studentAnswer === ans.toLowerCase());
-            }
-
+            // Apply green styling if correct, remove if they delete it
             if (isCorrect) {
-                inputElement.classList.add('correct');
-                inputElement.classList.remove('incorrect');
+                inputElement.classList.add('input-correct');
             } else {
-                inputElement.classList.add('incorrect');
-                inputElement.classList.remove('correct');
+                inputElement.classList.remove('input-correct');
             }
         }
 
-        function markWork() {
-            // TEACHER SETTINGS: Change the answers inside the ['brackets'] below
-            
-            // RED TASK ANSWERS
-            checkAnswer('q1', ['central processing unit']);
-            checkAnswer('q2', ['mouse', 'computer mouse']);
-            
-            // AMBER TASK ANSWERS (Looks for these keywords in their sentence)
-            checkAnswer('q3', ['physical', 'touch', 'programs', 'code', 'intangible'], true);
-            
-            // GREEN TASK ANSWERS
-            checkAnswer('q4', ['1989']);
-            
-            // BLUE TASK ANSWERS
-            checkAnswer('q5', ['x-y position indicator for a display system', 'x-y position indicator']);
+        /* --- SCREENSHOT PASTE & UPLOAD LOGIC --- */
+        
+        // Handle standard file selection (clicking the box)
+        function handleFileUpload(event, imgId, textId) {
+            var file = event.target.files[0];
+            if (file) {
+                displayImage(file, imgId, textId);
+            }
+        }
+
+        // Handle Ctrl+V Paste events anywhere on the document
+        document.addEventListener('paste', function(e) {
+            // Determine which zone is currently focused/clicked
+            var activeElement = document.activeElement;
+            var targetImgId = null;
+            var targetTextId = null;
+
+            // If they clicked the Maroon box before pasting
+            if (activeElement.id === 'zone-maroon') {
+                targetImgId = 'img-maroon';
+                targetTextId = 'text-maroon';
+            } 
+            // If they clicked the Navy box before pasting
+            else if (activeElement.id === 'zone-navy') {
+                targetImgId = 'img-navy';
+                targetTextId = 'text-navy';
+            } else {
+                // If they didn't click a box, do nothing
+                return;
+            }
+
+            var items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            for (var index in items) {
+                var item = items[index];
+                if (item.kind === 'file') {
+                    var blob = item.getAsFile();
+                    displayImage(blob, targetImgId, targetTextId);
+                    e.preventDefault(); // Stop default browser paste behavior
+                }
+            }
+        });
+
+        // Convert file/blob to an image on the screen
+        function displayImage(file, imgId, textId) {
+            var reader = new FileReader();
+            reader.onload = function(event) {
+                var imgElement = document.getElementById(imgId);
+                var textElement = document.getElementById(textId);
+                
+                imgElement.src = event.target.result;
+                imgElement.style.display = 'block';
+                textElement.style.display = 'none'; // Hide the "Click to upload" text
+            };
+            reader.readAsDataURL(file);
         }
     </script>
 </body>
