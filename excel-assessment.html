@@ -171,7 +171,7 @@
             font-family: Calibri, Arial, sans-serif;
             font-size: 14px;
             background-color: white;
-            user-select: none; /* Prevents text highlighting while dragging */
+            user-select: none;
         }
 
         .excel-table th, .excel-table td {
@@ -247,23 +247,14 @@
             z-index: 10;
         }
 
-        /* Show handle only when the TD is active */
-        .td-active .fill-handle {
-            display: block;
-        }
+        .td-active .fill-handle { display: block; }
+        .fill-highlight { background-color: rgba(33, 115, 70, 0.15) !important; }
 
-        /* Styling for cells being dragged over */
-        .fill-highlight {
-            background-color: rgba(33, 115, 70, 0.15) !important;
-        }
-
-        /* Conditional Formatting Colors applied to the TD */
+        /* Conditional Formatting */
         .status-green { background-color: #c6efce !important; }
         .status-green input { color: #006100 !important; font-weight: bold; }
-        
         .status-red { background-color: #ffc7ce !important; }
         .status-red input { color: #9c0006 !important; font-weight: bold; }
-        
         .status-yellow { background-color: #fff2cc !important; }
         .status-yellow input { color: #000000 !important; }
 
@@ -287,17 +278,8 @@
             text-align: center;
             margin-bottom: 15px;
         }
-        .progress-table th {
-            background-color: #1e3a8a;
-            color: white;
-            padding: 8px;
-        }
-        .progress-table td {
-            padding: 12px 8px;
-            font-weight: bold;
-            font-size: 16px;
-            border: 1px solid #ddd;
-        }
+        .progress-table th { background-color: #1e3a8a; color: white; padding: 8px; }
+        .progress-table td { padding: 12px 8px; font-weight: bold; font-size: 16px; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
@@ -320,7 +302,6 @@
         <div class="score-item">Task 4: <span id="score-t4">0</span>/8</div>
         <div class="score-item" style="color: var(--maroon);">TOTAL SCORE: <span id="total-score" style="color: var(--maroon);">0</span>/32</div>
         <div class="scoreboard-actions">
-            <!-- PASTE YOUR MICROSOFT FORM LINK BELOW -->
             <a href="YOUR_MICROSOFT_FORM_LINK_HERE" target="_blank" class="btn-ms-form">📋 Submit Scores Form</a>
             <button class="btn-clear-scores" onclick="clearScores()">Reset Progress</button>
         </div>
@@ -328,7 +309,6 @@
 
     <main>
         <div class="ide-container">
-            <!-- COLUMN 1: Instructions -->
             <div class="ide-panel">
                 <h3>1. Instructions</h3>
                 <select id="task-selector" onchange="switchTask()">
@@ -340,7 +320,6 @@
                 <div id="instruction-panel"></div>
             </div>
 
-            <!-- COLUMN 2: Custom HTML Spreadsheet Editor -->
             <div class="ide-panel editor-panel">
                 <h3 style="color: #217346;">2. Live Spreadsheet Editor</h3>
                 <p style="font-size: 13px; color: #666; margin-top: 0; margin-bottom: 5px;">
@@ -354,27 +333,19 @@
                     <input type="text" id="formula-bar" placeholder="Select a yellow cell to type a formula..." oninput="handleFxInput()" onkeydown="handleFxKey(event)" disabled>
                 </div>
                 
-                <div id="spreadsheet-container">
-                    <!-- Javascript generates grid here -->
-                </div>
+                <div id="spreadsheet-container"></div>
             </div>
 
-            <!-- COLUMN 3: Live Results -->
             <div class="ide-panel output-panel">
                 <h3 style="color: var(--maroon);">3. Section Progress</h3>
                 <p style="font-size: 13px; color: #666; margin-top: 0;">Your answers are evaluated instantly.</p>
-                <div id="feedback" class="feedback-box">
-                    Loading progress...
-                </div>
+                <div id="feedback" class="feedback-box">Loading progress...</div>
             </div>
         </div>
     </main>
     
-    <footer>
-        &copy; 2026 Delta Serlby Park - Computing Department
-    </footer>
+    <footer>&copy; 2026 Delta Serlby Park - Computing Department</footer>
 
-    <!-- BULLETPROOF SCRIPT WITH DRAG-TO-FILL -->
     <script>
         window.onerror = function(msg, url, line) {
             var panel = document.getElementById("instruction-panel");
@@ -383,12 +354,10 @@
         };
 
         var currentTask = "t1";
-        var activeCell = null; // Tracks {r, c} of currently focused cell
-        
-        // Drag-to-fill Global Variables
+        var activeCell = null; 
         var isDraggingFill = false;
-        var dragSource = null; // {r, c} of the cell being copied
-        var dragTarget = null; // {r, c} of the current mouse hover
+        var dragSource = null; 
+        var dragTarget = null; 
 
         var defaultTaskData = {
             "t1": [
@@ -488,14 +457,11 @@
             ]
         };
 
-        /* MATH EVALUATION ENGINE (Calculates the visual answers like real Excel) */
         function getCellRC(ref) {
             var colStr = ref.match(/[A-Z]+/)[0];
             var rowStr = ref.match(/[0-9]+/)[0];
             var col = 0;
-            for(var i=0; i<colStr.length; i++) {
-                col = col * 26 + (colStr.charCodeAt(i) - 64);
-            }
+            for(var i=0; i<colStr.length; i++) col = col * 26 + (colStr.charCodeAt(i) - 64);
             return { r: parseInt(rowStr)-1, c: col-1 };
         }
 
@@ -515,8 +481,7 @@
             var vals = [];
             for(var r = Math.min(s.r, e.r); r <= Math.max(s.r, e.r); r++) {
                 for(var c = Math.min(s.c, e.c); c <= Math.max(s.c, e.c); c++) {
-                    var ref = String.fromCharCode(65+c) + (r+1);
-                    vals.push(getCellValue(ref));
+                    vals.push(getCellValue(String.fromCharCode(65+c) + (r+1)));
                 }
             }
             return vals;
@@ -527,7 +492,6 @@
             var expr = formula.substring(1).toUpperCase();
             
             try {
-                // Functions (SUM, AVERAGE, MAX, MIN)
                 expr = expr.replace(/(SUM|AVERAGE|MAX|MIN)\(([A-Z]+[0-9]+):([A-Z]+[0-9]+)\)/g, function(match, func, start, end) {
                     var vals = getRangeValues(start, end);
                     if (vals.length === 0) return 0;
@@ -537,26 +501,23 @@
                     if (func === 'MIN') return Math.min.apply(null, vals);
                 });
 
-                // Strip absolute $
                 expr = expr.replace(/\$/g, '');
-
-                // Standard Cell Refs (e.g., B2)
-                expr = expr.replace(/[A-Z]+[0-9]+/g, function(match) {
-                    return getCellValue(match);
-                });
+                expr = expr.replace(/[A-Z]+[0-9]+/g, function(match) { return getCellValue(match); });
 
                 var result = new Function('return ' + expr)();
-                return Math.round(result * 100) / 100; // Return nicely formatted number (2 decimals max)
+                return Math.round(result * 100) / 100;
             } catch(e) {
                 return "#ERROR!";
             }
         }
 
-        /* SMART FORMULA ADJUSTER FOR DRAG-TO-FILL */
+        /* SMART FORMULA ADJUSTER FOR DRAG-TO-FILL (FIXED TO AUTO-UPPERCASE) */
         function adjustFormulaForFill(formula, rowOffset, colOffset) {
-            if (!formula.startsWith('=')) return formula; // Only auto-increment formulas
+            if (!String(formula).startsWith('=')) return formula; 
             
-            // Regex strictly matches Cell References like A1, $B$6, AB20
+            // Fix: Force uppercase so regex successfully matches all cell references (e.g. a2 -> A2)
+            formula = String(formula).toUpperCase();
+            
             return formula.replace(/(\$?)([A-Z]+)(\$?)([0-9]+)/g, function(match, absCol, colStr, absRow, rowStr) {
                 var col = 0;
                 for(var i=0; i<colStr.length; i++) {
@@ -564,10 +525,15 @@
                 }
                 var row = parseInt(rowStr);
 
-                if (!absCol) col += colOffset; // Don't shift column if it has a $
-                if (!absRow) row += rowOffset; // Don't shift row if it has a $
+                if (!absCol) {
+                    col += colOffset; 
+                    if (col < 1) col = 1; // Prevent crashing past Column A
+                }
+                if (!absRow) {
+                    row += rowOffset; 
+                    if (row < 1) row = 1; // Prevent crashing past Row 1
+                }
 
-                // Convert Column index back to letters
                 var newColStr = "";
                 var tempCol = col;
                 while(tempCol > 0) {
@@ -645,16 +611,12 @@
             if (!data || !cells) return;
 
             var maxCols = 0;
-            for(var i=0; i<data.length; i++) {
-                if (data[i].length > maxCols) maxCols = data[i].length;
-            }
+            for(var i=0; i<data.length; i++) if (data[i].length > maxCols) maxCols = data[i].length;
             if (maxCols < 9) maxCols = 9;
 
             var html = '<table class="excel-table">';
             html += '<thead><tr><th></th>';
-            for(var c=0; c < maxCols; c++) {
-                html += '<th>' + String.fromCharCode(65 + c) + '</th>';
-            }
+            for(var c=0; c < maxCols; c++) html += '<th>' + String.fromCharCode(65 + c) + '</th>';
             html += '</tr></thead><tbody>';
 
             for(var r=0; r < data.length; r++) {
@@ -666,8 +628,7 @@
                     var isAnswerCell = false;
                     for(var k=0; k<cells.length; k++) {
                         if(cells[k].col === col && cells[k].row === r) {
-                            isAnswerCell = true;
-                            break;
+                            isAnswerCell = true; break;
                         }
                     }
 
@@ -697,7 +658,7 @@
             var container = document.getElementById('spreadsheet-container');
             if (container) container.innerHTML = html;
             
-            evaluateAllCells(); // Calculate everything
+            evaluateAllCells(); 
         }
 
         function switchTask() {
@@ -722,23 +683,24 @@
             var td = document.getElementById('td-' + r + '-' + c);
             var fx = document.getElementById('formula-bar');
             
-            if (td) td.classList.add('td-active'); // Shows the fill-handle square
+            if (td) td.classList.add('td-active'); 
             
             var rawValue = taskData[currentTask][r][c] || "";
-            input.value = rawValue; // Show raw formula instead of calculated answer
+            input.value = rawValue; 
             
             fx.disabled = false;
             fx.value = rawValue;
         }
 
         function handleCellBlur(r, c) {
-            if (isDraggingFill) return; // Don't wipe focus while they are dragging!
+            if (isDraggingFill) return; 
             
             var input = document.getElementById('cell-' + r + '-' + c);
             var td = document.getElementById('td-' + r + '-' + c);
-            if (td) td.classList.remove('td-active'); // Hide the fill-handle square
+            if (td) td.classList.remove('td-active'); 
             
-            taskData[currentTask][r][c] = input.value;
+            var val = input.value;
+            taskData[currentTask][r][c] = val;
             evaluateAllCells();
             
             setTimeout(function() {
@@ -751,9 +713,7 @@
         }
 
         function handleCellKey(e, r, c) {
-            if (e.key === 'Enter') {
-                document.getElementById('cell-' + r + '-' + c).blur(); // Finalize input naturally
-            }
+            if (e.key === 'Enter') document.getElementById('cell-' + r + '-' + c).blur(); 
             setTimeout(function() {
                 if (activeCell && activeCell.r === r && activeCell.c === c) {
                     document.getElementById('formula-bar').value = document.getElementById('cell-' + r + '-' + c).value;
@@ -777,7 +737,7 @@
 
         /* EXCEL DRAG-TO-FILL LOGIC */
         function startFillDrag(e, r, c) {
-            e.preventDefault(); // Prevents input from blurring
+            e.preventDefault(); 
             e.stopPropagation();
             isDraggingFill = true;
             dragSource = {r: r, c: c};
@@ -786,23 +746,17 @@
 
         function handleMouseEnter(r, c) {
             if (isDraggingFill && dragSource) {
-                // Ensure dragging is locked to a single column or row
                 var dr = r - dragSource.r;
                 var dc = c - dragSource.c;
-                if (Math.abs(dr) > Math.abs(dc)) {
-                    dragTarget = {r: r, c: dragSource.c}; // Dragging Vertically
-                } else {
-                    dragTarget = {r: dragSource.r, c: c}; // Dragging Horizontally
-                }
+                if (Math.abs(dr) > Math.abs(dc)) dragTarget = {r: r, c: dragSource.c}; 
+                else dragTarget = {r: dragSource.r, c: c}; 
                 drawHighlight();
             }
         }
 
         function clearHighlights() {
             var inputs = document.getElementsByClassName('cell-input');
-            for(var i=0; i<inputs.length; i++) {
-                inputs[i].classList.remove('fill-highlight');
-            }
+            for(var i=0; i<inputs.length; i++) inputs[i].classList.remove('fill-highlight');
         }
 
         function drawHighlight() {
@@ -821,7 +775,6 @@
             }
         }
 
-        // Catch the moment the student lets go of the mouse click anywhere on the page
         window.addEventListener('mouseup', function(e) {
             if (isDraggingFill) {
                 applyFill();
@@ -837,14 +790,22 @@
             var cMin = Math.min(dragSource.c, dragTarget.c);
             var cMax = Math.max(dragSource.c, dragTarget.c);
 
-            var sourceVal = taskData[currentTask][dragSource.r][dragSource.c];
+            // Read the CURRENT visual text right as they let go to guarantee we copy their newest edit
+            var sourceInput = document.getElementById('cell-' + dragSource.r + '-' + dragSource.c);
+            var sourceVal = sourceInput ? sourceInput.value : taskData[currentTask][dragSource.r][dragSource.c];
+            
+            // Force uppercase so formula shifts correctly
+            if (sourceVal && String(sourceVal).startsWith('=')) sourceVal = String(sourceVal).toUpperCase();
 
             for(var r=rMin; r<=rMax; r++) {
                 for(var c=cMin; c<=cMax; c++) {
-                    if (r === dragSource.r && c === dragSource.c) continue; // Skip original cell
+                    if (r === dragSource.r && c === dragSource.c) {
+                        taskData[currentTask][r][c] = sourceVal;
+                        continue; 
+                    }
                     
                     var targetInput = document.getElementById('cell-' + r + '-' + c);
-                    if (!targetInput) continue; // Skip static non-answer cells
+                    if (!targetInput) continue; 
                     
                     var rOffset = r - dragSource.r;
                     var cOffset = c - dragSource.c;
@@ -855,8 +816,8 @@
             }
             
             evaluateAllCells();
-            // Refocus the original cell so the formula bar updates
-            document.getElementById('cell-' + dragSource.r + '-' + dragSource.c).focus();
+            var focusEl = document.getElementById('cell-' + dragSource.r + '-' + dragSource.c);
+            if (focusEl) focusEl.focus();
         }
 
         /* MAIN EVALUATOR */
@@ -875,9 +836,16 @@
                 if (!inputEl || !tdEl) continue;
                 
                 var rawVal = taskData[currentTask][c.row][c.col] || "";
-                var cleanVal = rawVal.replace(/^\s+|\s+$/g, '');
                 
-                tdEl.className = ""; // Reset background color
+                // AUTO-UPPERCASE MEMORY (Corrects lowercase letters instantly)
+                if (String(rawVal).startsWith('=')) {
+                    rawVal = String(rawVal).toUpperCase();
+                    taskData[currentTask][c.row][c.col] = rawVal;
+                }
+
+                var cleanVal = String(rawVal).replace(/^\s+|\s+$/g, '');
+                
+                tdEl.className = ""; 
                 
                 if (cleanVal === '') {
                     tdEl.classList.add('status-yellow');
@@ -890,7 +858,6 @@
                     incorrect++;
                 }
 
-                // Show calculated VALUE instead of formula (if they aren't actively clicking inside it)
                 if (document.activeElement !== inputEl) {
                     if (cleanVal.startsWith('=')) {
                         inputEl.value = calculateFormula(cleanVal);
