@@ -140,7 +140,7 @@
 
         .excel-table th, .excel-table td {
             border: 1px solid #d0d7e5;
-            padding: 6px;
+            padding: 4px;
             text-align: left;
             min-width: 80px;
             white-space: nowrap;
@@ -178,7 +178,7 @@
             height: 100%;
             box-sizing: border-box;
             border: 2px solid transparent;
-            padding: 5px;
+            padding: 6px;
             font-family: inherit;
             font-size: 14px;
             outline: none;
@@ -421,12 +421,67 @@
             ]
         };
 
+        /* LOCAL STORAGE SAFETY WRAPPERS */
+        function loadScores() {
+            try {
+                ['t1', 't2', 't3', 't4'].forEach(taskKey => {
+                    let savedScore = localStorage.getItem('excel_score_' + taskKey);
+                    if (savedScore !== null) {
+                        let el = document.getElementById(`score-${taskKey}`);
+                        if(el) el.innerText = savedScore;
+                    }
+                });
+                let savedTotal = localStorage.getItem('excel_total');
+                if (savedTotal !== null) {
+                    let el = document.getElementById("total-score");
+                    if(el) el.innerText = savedTotal;
+                }
+            } catch (e) {
+                console.warn("Local storage disabled by browser security, skipping score load.");
+            }
+        }
+
+        function updateScore(taskKey, points) {
+            try {
+                document.getElementById(`score-${taskKey}`).innerText = points;
+                localStorage.setItem('excel_score_' + taskKey, points);
+                
+                let p1 = parseInt(document.getElementById("score-t1").innerText) || 0;
+                let p2 = parseInt(document.getElementById("score-t2").innerText) || 0;
+                let p3 = parseInt(document.getElementById("score-t3").innerText) || 0;
+                let p4 = parseInt(document.getElementById("score-t4").innerText) || 0;
+                
+                let total = p1 + p2 + p3 + p4;
+                document.getElementById("total-score").innerText = total;
+                localStorage.setItem('excel_total', total);
+            } catch(e) {
+                console.warn("Local storage disabled by browser security, skipping score save.");
+            }
+        }
+
+        function clearScores() {
+            if (confirm("Are you sure you want to clear all scores for this student?")) {
+                try {
+                    ['t1', 't2', 't3', 't4'].forEach(taskKey => {
+                        localStorage.removeItem('excel_score_' + taskKey);
+                        document.getElementById(`score-${taskKey}`).innerText = "0";
+                    });
+                    localStorage.removeItem('excel_total');
+                    document.getElementById("total-score").innerText = "0";
+                } catch(e) {
+                    console.warn("Local storage disabled.");
+                }
+                switchTask(); 
+                alert("Scores have been reset.");
+            }
+        }
+
         /* FIREWALL PROOF HTML SPREADSHEET GENERATOR */
         function initCustomSpreadsheet(taskKey) {
             let data = taskData[taskKey];
             let cells = answerCells[taskKey];
 
-            // Ensure enough columns for Task 3 (which requires up to I = 9 cols)
+            // Ensure enough columns for Task 3
             let maxCols = data.reduce((max, row) => Math.max(max, row.length), 0);
             maxCols = Math.max(maxCols, 9);
 
@@ -454,7 +509,7 @@
                     if (isAnswerCell) {
                         // Interactive Input Cell
                         html += `<td style="padding: 0;">
-                                    <input type="text" id="cell-${r}-${c}" class="cell-input status-yellow" oninput="evaluateTask()">
+                                    <input type="text" id="cell-${r}-${c}" class="cell-input status-yellow" oninput="evaluateTask()" autocomplete="off">
                                  </td>`;
                     } else {
                         // Normal Text Cell
@@ -467,7 +522,7 @@
             html += '</tbody></table>';
             document.getElementById('spreadsheet-container').innerHTML = html;
             
-            // Run evaluation once to color them yellow and update progress
+            // Evaluate instantly to draw the progress box
             evaluateTask();
         }
 
@@ -475,45 +530,6 @@
             currentTask = document.getElementById("task-selector").value;
             document.getElementById("instruction-panel").innerHTML = instructions[currentTask];
             initCustomSpreadsheet(currentTask);
-        }
-
-        window.onload = function() {
-            ['t1', 't2', 't3', 't4'].forEach(taskKey => {
-                let savedScore = localStorage.getItem('excel_score_' + taskKey);
-                if (savedScore !== null) document.getElementById(`score-${taskKey}`).innerText = savedScore;
-            });
-            let savedTotal = localStorage.getItem('excel_total');
-            if (savedTotal !== null) document.getElementById("total-score").innerText = savedTotal;
-
-            switchTask();
-        };
-
-        function clearScores() {
-            if (confirm("Are you sure you want to clear all scores for this student?")) {
-                ['t1', 't2', 't3', 't4'].forEach(taskKey => {
-                    localStorage.removeItem('excel_score_' + taskKey);
-                    document.getElementById(`score-${taskKey}`).innerText = "0";
-                });
-                localStorage.removeItem('excel_total');
-                document.getElementById("total-score").innerText = "0";
-                
-                switchTask(); 
-                alert("Scores have been reset.");
-            }
-        }
-
-        function updateScore(taskKey, points) {
-            document.getElementById(`score-${taskKey}`).innerText = points;
-            localStorage.setItem('excel_score_' + taskKey, points);
-            
-            let p1 = parseInt(document.getElementById("score-t1").innerText);
-            let p2 = parseInt(document.getElementById("score-t2").innerText);
-            let p3 = parseInt(document.getElementById("score-t3").innerText);
-            let p4 = parseInt(document.getElementById("score-t4").innerText);
-            
-            let total = p1 + p2 + p3 + p4;
-            document.getElementById("total-score").innerText = total;
-            localStorage.setItem('excel_total', total);
         }
 
         /* LIVE CONDITIONAL FORMATTING EVALUATOR */
@@ -545,7 +561,7 @@
             });
             
             let totalCells = cells.length;
-            let earnedMarks = Math.round((correct / totalCells) * 5);
+            let earnedMarks = totalCells > 0 ? Math.round((correct / totalCells) * 5) : 0;
             updateScore(currentTask, earnedMarks);
             
             let statusText = unanswered === totalCells ? "Not Started" : (correct === totalCells ? "Completed ✅" : "In Progress ⏳");
@@ -573,6 +589,11 @@
             
             document.getElementById("feedback").innerHTML = html;
         }
+
+        // Initialize App Safely
+        loadScores();
+        switchTask();
+        
     </script>
 </body>
 </html>
