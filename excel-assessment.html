@@ -6,11 +6,11 @@
     <title>Interactive Excel Assessment</title>
     <link rel="stylesheet" href="style.css">
     
-    <!-- Stable Jexcel (v4) Links for In-Browser Excel -->
-    <script src="https://bossanova.uk/jspreadsheet/v4/jexcel.js"></script>
-    <script src="https://bossanova.uk/jspreadsheet/v4/jsuites.js"></script>
-    <link rel="stylesheet" href="https://bossanova.uk/jspreadsheet/v4/jexcel.css" type="text/css" />
-    <link rel="stylesheet" href="https://bossanova.uk/jspreadsheet/v4/jsuites.css" type="text/css" />
+    <!-- Ultra-stable CDNJS links for In-Browser Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jexcel/4.6.3/jexcel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsuites/4.3.0/jsuites.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jexcel/4.6.3/jexcel.min.css" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsuites/4.3.0/jsuites.min.css" type="text/css" />
 
     <style>
         /* Scoreboard Banner */
@@ -362,66 +362,69 @@
             ]
         };
 
-        /* Helper to convert Col index (0 = A, 1 = B) to Excel Cell reference (e.g. A1) */
-        function getCellId(col, row) {
-            let letter = String.fromCharCode(65 + col);
-            if (col > 25) {
-                letter = String.fromCharCode(64 + Math.floor(col/26)) + String.fromCharCode(65 + (col%26));
-            }
-            return letter + (row + 1);
-        }
-
         function initSpreadsheet(dataArray) {
-            if (currentSheet) {
-                currentSheet.destroy();
-                document.getElementById('spreadsheet').innerHTML = "";
-            }
-            
-            // Revert back to jexcel for guaranteed stability
-            currentSheet = jexcel(document.getElementById('spreadsheet'), {
-                data: JSON.parse(JSON.stringify(dataArray)), 
-                minDimensions: [9, 10], 
-                defaultColWidth: 100,
-                tableOverflow: true,
-                tableWidth: "100%",
-                tableHeight: "350px",
-                onload: function() { 
-                    setTimeout(evaluateLiveSheet, 100); 
-                },
-                onchange: function() { 
-                    evaluateLiveSheet(); 
-                },
-                updateTable: function(instance, cell, col, row, val, label, cellName) {
-                    // Header Styling
-                    if (row === 0) {
-                        cell.style.backgroundColor = '#1e3a8a'; 
-                        cell.style.fontWeight = 'bold';
-                        cell.style.color = '#ffffff';
-                    }
-                    // Info Row Styling
-                    if ((currentTask === "t3" && row === 5) || (currentTask === "t4" && row === 4)) {
-                        cell.style.backgroundColor = '#f3f3f3';
-                        cell.style.fontWeight = 'bold';
-                    }
+            try {
+                if (currentSheet) {
+                    currentSheet.destroy();
+                    document.getElementById('spreadsheet').innerHTML = "";
                 }
-            });
+                
+                currentSheet = jexcel(document.getElementById('spreadsheet'), {
+                    data: JSON.parse(JSON.stringify(dataArray)), 
+                    minDimensions: [9, 10], 
+                    defaultColWidth: 100,
+                    tableOverflow: true,
+                    tableWidth: "100%",
+                    tableHeight: "350px",
+                    onload: function() { 
+                        setTimeout(evaluateLiveSheet, 100); 
+                    },
+                    onchange: function() { 
+                        evaluateLiveSheet(); 
+                    },
+                    updateTable: function(instance, cell, col, row, val, label, cellName) {
+                        // Header Styling
+                        if (row === 0) {
+                            cell.style.backgroundColor = '#1e3a8a'; 
+                            cell.style.fontWeight = 'bold';
+                            cell.style.color = '#ffffff';
+                        }
+                        // Info Row Styling
+                        if ((currentTask === "t3" && row === 5) || (currentTask === "t4" && row === 4)) {
+                            cell.style.backgroundColor = '#f3f3f3';
+                            cell.style.fontWeight = 'bold';
+                        }
+                    }
+                });
+            } catch (err) {
+                console.error("Spreadsheet failed to initialize:", err);
+                document.getElementById("spreadsheet-container").innerHTML = "<p style='color:red;'>Error loading spreadsheet editor. Please check your internet connection or try a different browser.</p>";
+            }
         }
 
         function switchTask() {
-            currentTask = document.getElementById("task-selector").value;
-            document.getElementById("instruction-panel").innerHTML = instructions[currentTask];
-            initSpreadsheet(taskData[currentTask]);
+            try {
+                currentTask = document.getElementById("task-selector").value;
+                document.getElementById("instruction-panel").innerHTML = instructions[currentTask];
+                initSpreadsheet(taskData[currentTask]);
+            } catch (err) {
+                console.error("Failed to switch task:", err);
+            }
         }
 
         window.onload = function() {
-            ['t1', 't2', 't3', 't4'].forEach(taskKey => {
-                let savedScore = localStorage.getItem('excel_score_' + taskKey);
-                if (savedScore !== null) document.getElementById(`score-${taskKey}`).innerText = savedScore;
-            });
-            let savedTotal = localStorage.getItem('excel_total');
-            if (savedTotal !== null) document.getElementById("total-score").innerText = savedTotal;
+            try {
+                ['t1', 't2', 't3', 't4'].forEach(taskKey => {
+                    let savedScore = localStorage.getItem('excel_score_' + taskKey);
+                    if (savedScore !== null) document.getElementById(`score-${taskKey}`).innerText = savedScore;
+                });
+                let savedTotal = localStorage.getItem('excel_total');
+                if (savedTotal !== null) document.getElementById("total-score").innerText = savedTotal;
 
-            switchTask();
+                switchTask();
+            } catch (err) {
+                console.error("Window onload failed:", err);
+            }
         };
 
         function clearScores() {
@@ -463,7 +466,7 @@
                 let unanswered = 0;
                 
                 cells.forEach(c => {
-                    let cellId = getCellId(c.col, c.row);
+                    let cellId = jexcel.getColumnNameFromId([c.col, c.row]);
                     
                     // Safely extract the raw typed formula directly from the sheet data array
                     let rawVal = currentSheet.options.data[c.row][c.col];
@@ -493,7 +496,7 @@
                 let statusText = unanswered === totalCells ? "Not Started" : (correct === totalCells ? "Completed ✅" : "In Progress ⏳");
                 let statusColor = correct === totalCells ? "#2e7d32" : (unanswered === totalCells ? "#666" : "#ef6c00");
 
-                // Build Live Progress Table matching the uploaded image design
+                // Build Live Progress Table
                 let html = `
                     <table class="progress-table">
                         <tr>
