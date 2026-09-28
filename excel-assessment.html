@@ -5,12 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Excel Assessment</title>
     <link rel="stylesheet" href="style.css">
-    
-    <!-- Ultra-stable CDNJS links for In-Browser Excel -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jexcel/4.6.3/jexcel.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsuites/4.3.0/jsuites.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jexcel/4.6.3/jexcel.min.css" type="text/css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsuites/4.3.0/jsuites.min.css" type="text/css" />
 
     <style>
         /* Scoreboard Banner */
@@ -128,14 +122,79 @@
             line-height: 1.5;
         }
 
+        /* CUSTOM FIREWALL-PROOF SPREADSHEET STYLES */
         #spreadsheet-container {
             width: 100%;
             overflow-x: auto;
-            background-color: #f5f5f5;
-            padding: 10px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
+            background-color: white;
+            border: 1px solid #c0c0c0;
         }
+
+        .excel-table {
+            border-collapse: collapse;
+            width: 100%;
+            font-family: Calibri, Arial, sans-serif;
+            font-size: 14px;
+            background-color: white;
+        }
+
+        .excel-table th, .excel-table td {
+            border: 1px solid #d0d7e5;
+            padding: 6px;
+            text-align: left;
+            min-width: 80px;
+            white-space: nowrap;
+        }
+
+        .excel-table thead th {
+            background-color: #f3f3f3;
+            text-align: center;
+            color: #666;
+            font-weight: normal;
+        }
+
+        .excel-table .row-header {
+            background-color: #f3f3f3;
+            width: 30px;
+            text-align: center;
+            color: #666;
+            font-weight: normal;
+        }
+
+        .excel-table .header-cell {
+            background-color: #1e3a8a; /* Navy */
+            color: white;
+            font-weight: bold;
+        }
+
+        .excel-table .info-cell {
+            background-color: #f3f3f3;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .cell-input {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            border: 2px solid transparent;
+            padding: 5px;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            background-color: transparent;
+        }
+
+        .cell-input:focus {
+            border: 2px solid #217346;
+            background-color: white !important;
+            color: black !important;
+        }
+
+        /* Conditional Formatting Colors */
+        .status-green { background-color: #c6efce !important; color: #006100 !important; font-weight: bold; }
+        .status-red { background-color: #ffc7ce !important; color: #9c0006 !important; font-weight: bold; }
+        .status-yellow { background-color: #fff2cc !important; color: #000000 !important; }
 
         .feedback-box {
             margin-top: 15px;
@@ -167,6 +226,7 @@
             padding: 12px 8px;
             font-weight: bold;
             font-size: 16px;
+            border: 1px solid #ddd;
         }
     </style>
 </head>
@@ -215,7 +275,7 @@
                 <div id="instruction-panel"></div>
             </div>
 
-            <!-- COLUMN 2: Interactive Spreadsheet -->
+            <!-- COLUMN 2: Custom HTML Spreadsheet Editor -->
             <div class="ide-panel editor-panel">
                 <h3 style="color: #217346;">2. Live Spreadsheet Editor</h3>
                 <p style="font-size: 13px; color: #666; margin-top: 0; margin-bottom: 15px;">
@@ -225,7 +285,7 @@
                 </p>
                 
                 <div id="spreadsheet-container">
-                    <div id="spreadsheet"></div>
+                    <!-- The table will be generated here by Javascript -->
                 </div>
             </div>
 
@@ -246,7 +306,6 @@
     </footer>
 
     <script>
-        let currentSheet = null;
         let currentTask = "t1";
 
         /* =========================================
@@ -362,69 +421,71 @@
             ]
         };
 
-        function initSpreadsheet(dataArray) {
-            try {
-                if (currentSheet) {
-                    currentSheet.destroy();
-                    document.getElementById('spreadsheet').innerHTML = "";
-                }
-                
-                currentSheet = jexcel(document.getElementById('spreadsheet'), {
-                    data: JSON.parse(JSON.stringify(dataArray)), 
-                    minDimensions: [9, 10], 
-                    defaultColWidth: 100,
-                    tableOverflow: true,
-                    tableWidth: "100%",
-                    tableHeight: "350px",
-                    onload: function() { 
-                        setTimeout(evaluateLiveSheet, 100); 
-                    },
-                    onchange: function() { 
-                        evaluateLiveSheet(); 
-                    },
-                    updateTable: function(instance, cell, col, row, val, label, cellName) {
-                        // Header Styling
-                        if (row === 0) {
-                            cell.style.backgroundColor = '#1e3a8a'; 
-                            cell.style.fontWeight = 'bold';
-                            cell.style.color = '#ffffff';
-                        }
-                        // Info Row Styling
-                        if ((currentTask === "t3" && row === 5) || (currentTask === "t4" && row === 4)) {
-                            cell.style.backgroundColor = '#f3f3f3';
-                            cell.style.fontWeight = 'bold';
-                        }
-                    }
-                });
-            } catch (err) {
-                console.error("Spreadsheet failed to initialize:", err);
-                document.getElementById("spreadsheet-container").innerHTML = "<p style='color:red;'>Error loading spreadsheet editor. Please check your internet connection or try a different browser.</p>";
+        /* FIREWALL PROOF HTML SPREADSHEET GENERATOR */
+        function initCustomSpreadsheet(taskKey) {
+            let data = taskData[taskKey];
+            let cells = answerCells[taskKey];
+
+            // Ensure enough columns for Task 3 (which requires up to I = 9 cols)
+            let maxCols = data.reduce((max, row) => Math.max(max, row.length), 0);
+            maxCols = Math.max(maxCols, 9);
+
+            let html = '<table class="excel-table">';
+            
+            // Build A, B, C, D headers
+            html += '<thead><tr><th></th>';
+            for(let c=0; c < maxCols; c++) {
+                html += `<th>${String.fromCharCode(65 + c)}</th>`;
             }
+            html += '</tr></thead><tbody>';
+
+            // Build rows
+            for(let r=0; r < data.length; r++) {
+                html += `<tr><th class="row-header">${r+1}</th>`;
+                
+                for(let c=0; c < maxCols; c++) {
+                    let cellVal = data[r][c] !== undefined ? data[r][c] : '';
+                    let isAnswerCell = cells.some(ac => ac.col === c && ac.row === r);
+
+                    let extraClass = "";
+                    if (r === 0) extraClass = "header-cell"; // Top Row Navy
+                    else if ((taskKey === "t3" && r === 5) || (taskKey === "t4" && r === 4)) extraClass = "info-cell"; // Info Row
+
+                    if (isAnswerCell) {
+                        // Interactive Input Cell
+                        html += `<td style="padding: 0;">
+                                    <input type="text" id="cell-${r}-${c}" class="cell-input status-yellow" oninput="evaluateTask()">
+                                 </td>`;
+                    } else {
+                        // Normal Text Cell
+                        html += `<td class="${extraClass}">${cellVal}</td>`;
+                    }
+                }
+                html += '</tr>';
+            }
+            
+            html += '</tbody></table>';
+            document.getElementById('spreadsheet-container').innerHTML = html;
+            
+            // Run evaluation once to color them yellow and update progress
+            evaluateTask();
         }
 
         function switchTask() {
-            try {
-                currentTask = document.getElementById("task-selector").value;
-                document.getElementById("instruction-panel").innerHTML = instructions[currentTask];
-                initSpreadsheet(taskData[currentTask]);
-            } catch (err) {
-                console.error("Failed to switch task:", err);
-            }
+            currentTask = document.getElementById("task-selector").value;
+            document.getElementById("instruction-panel").innerHTML = instructions[currentTask];
+            initCustomSpreadsheet(currentTask);
         }
 
         window.onload = function() {
-            try {
-                ['t1', 't2', 't3', 't4'].forEach(taskKey => {
-                    let savedScore = localStorage.getItem('excel_score_' + taskKey);
-                    if (savedScore !== null) document.getElementById(`score-${taskKey}`).innerText = savedScore;
-                });
-                let savedTotal = localStorage.getItem('excel_total');
-                if (savedTotal !== null) document.getElementById("total-score").innerText = savedTotal;
+            ['t1', 't2', 't3', 't4'].forEach(taskKey => {
+                let savedScore = localStorage.getItem('excel_score_' + taskKey);
+                if (savedScore !== null) document.getElementById(`score-${taskKey}`).innerText = savedScore;
+            });
+            let savedTotal = localStorage.getItem('excel_total');
+            if (savedTotal !== null) document.getElementById("total-score").innerText = savedTotal;
 
-                switchTask();
-            } catch (err) {
-                console.error("Window onload failed:", err);
-            }
+            switchTask();
         };
 
         function clearScores() {
@@ -455,72 +516,62 @@
             localStorage.setItem('excel_total', total);
         }
 
-        /* LIVE CONDITIONAL FORMATTING & SCORING */
-        function evaluateLiveSheet() {
-            try {
-                if (!currentSheet || !currentSheet.options) return;
+        /* LIVE CONDITIONAL FORMATTING EVALUATOR */
+        function evaluateTask() {
+            let cells = answerCells[currentTask];
+            let correct = 0;
+            let incorrect = 0;
+            let unanswered = 0;
+            
+            cells.forEach(c => {
+                let inputEl = document.getElementById(`cell-${c.row}-${c.col}`);
+                if (!inputEl) return;
                 
-                let cells = answerCells[currentTask];
-                let correct = 0;
-                let incorrect = 0;
-                let unanswered = 0;
+                let val = inputEl.value.trim();
                 
-                cells.forEach(c => {
-                    let cellId = jexcel.getColumnNameFromId([c.col, c.row]);
-                    
-                    // Safely extract the raw typed formula directly from the sheet data array
-                    let rawVal = currentSheet.options.data[c.row][c.col];
-                    let val = (rawVal !== null && rawVal !== undefined) ? String(rawVal).trim() : '';
-                    
-                    if (val === '') {
-                        currentSheet.setStyle(cellId, 'background-color', '#fff2cc'); // Yellow
-                        currentSheet.setStyle(cellId, 'color', '#000000');
-                        unanswered++;
-                    } else if (c.check(val)) {
-                        currentSheet.setStyle(cellId, 'background-color', '#c6efce'); // Green
-                        currentSheet.setStyle(cellId, 'color', '#006100');
-                        correct++;
-                    } else {
-                        currentSheet.setStyle(cellId, 'background-color', '#ffc7ce'); // Red
-                        currentSheet.setStyle(cellId, 'color', '#9c0006');
-                        incorrect++;
-                    }
-                });
+                // Reset Classes
+                inputEl.classList.remove('status-green', 'status-red', 'status-yellow');
                 
-                let totalCells = cells.length;
-                
-                // Map the correct cells directly to a score out of 5
-                let earnedMarks = Math.round((correct / totalCells) * 5);
-                updateScore(currentTask, earnedMarks);
-                
-                let statusText = unanswered === totalCells ? "Not Started" : (correct === totalCells ? "Completed ✅" : "In Progress ⏳");
-                let statusColor = correct === totalCells ? "#2e7d32" : (unanswered === totalCells ? "#666" : "#ef6c00");
+                if (val === '') {
+                    inputEl.classList.add('status-yellow');
+                    unanswered++;
+                } else if (c.check(val)) {
+                    inputEl.classList.add('status-green');
+                    correct++;
+                } else {
+                    inputEl.classList.add('status-red');
+                    incorrect++;
+                }
+            });
+            
+            let totalCells = cells.length;
+            let earnedMarks = Math.round((correct / totalCells) * 5);
+            updateScore(currentTask, earnedMarks);
+            
+            let statusText = unanswered === totalCells ? "Not Started" : (correct === totalCells ? "Completed ✅" : "In Progress ⏳");
+            let statusColor = correct === totalCells ? "#2e7d32" : (unanswered === totalCells ? "#666" : "#ef6c00");
 
-                // Build Live Progress Table
-                let html = `
-                    <table class="progress-table">
-                        <tr>
-                            <th style="border-radius: 4px 0 0 0;">Correct</th>
-                            <th>Check</th>
-                            <th style="border-radius: 0 4px 0 0;">Unanswered</th>
-                        </tr>
-                        <tr>
-                            <td style="background-color:#c6efce; color:#006100;">${correct}</td>
-                            <td style="background-color:#ffc7ce; color:#9c0006;">${incorrect}</td>
-                            <td style="background-color:#fff2cc; color:#000000;">${unanswered}</td>
-                        </tr>
-                    </table>
-                    
-                    <div style="font-size: 16px; margin-top: 15px;">
-                        <strong>Marks Awarded:</strong> ${earnedMarks} / 5<br><br>
-                        <strong>Status:</strong> <span style="color:${statusColor}; font-weight:bold;">${statusText}</span>
-                    </div>
-                `;
+            let html = `
+                <table class="progress-table">
+                    <tr>
+                        <th style="border-radius: 4px 0 0 0;">Correct</th>
+                        <th>Check</th>
+                        <th style="border-radius: 0 4px 0 0;">Unanswered</th>
+                    </tr>
+                    <tr>
+                        <td style="background-color:#c6efce; color:#006100;">${correct}</td>
+                        <td style="background-color:#ffc7ce; color:#9c0006;">${incorrect}</td>
+                        <td style="background-color:#fff2cc; color:#000000;">${unanswered}</td>
+                    </tr>
+                </table>
                 
-                document.getElementById("feedback").innerHTML = html;
-            } catch (err) {
-                console.error("Evaluation skipped until sheet fully loads.", err);
-            }
+                <div style="font-size: 16px; margin-top: 15px;">
+                    <strong>Marks Awarded:</strong> ${earnedMarks} / 5<br><br>
+                    <strong>Status:</strong> <span style="color:${statusColor}; font-weight:bold;">${statusText}</span>
+                </div>
+            `;
+            
+            document.getElementById("feedback").innerHTML = html;
         }
     </script>
 </body>
