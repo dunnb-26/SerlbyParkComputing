@@ -305,13 +305,20 @@
         &copy; 2026 Delta Serlby Park - Computing Department
     </footer>
 
+    <!-- BULLETPROOF SCRIPT -->
     <script>
-        let currentTask = "t1";
+        // Global Error Catcher - Prints any school network errors right on the screen!
+        window.onerror = function(msg, url, line) {
+            var panel = document.getElementById("instruction-panel");
+            if (panel) {
+                panel.innerHTML = "<h3 style='color:red;'>School Network Alert</h3><p>An error blocked the page from loading: " + msg + "</p><p>Line: " + line + "</p>";
+            }
+            return false;
+        };
 
-        /* =========================================
-           DATA EXTRACTED DIRECTLY FROM ASSESSMENT PICS
-           ========================================= */
-        const taskData = {
+        var currentTask = "t1";
+
+        var taskData = {
             "t1": [
                 ['Number 1', 'Operation', 'Number 2', 'Answer'],
                 [18, 'add', 27, ''],
@@ -349,128 +356,108 @@
             ]
         };
 
-        const instructions = {
-            "t1": `<strong>TASK 1: Basic Formulae</strong><br><br>
-                   Write formulae in the Answer column. Use cell references, not typed numbers.<br><br>
-                   &bull; Row 2: Add Number 1 and Number 2.<br>
-                   &bull; Row 3: Subtract Number 2 from Number 1.<br>
-                   &bull; Row 4: Multiply Number 1 by Number 2.<br>
-                   &bull; Row 5: Divide Number 1 by Number 2.<br>
-                   &bull; Row 6: Add Number 1 and Number 2.`,
-                   
-            "t2": `<strong>TASK 2: Price Model</strong><br><br>
-                   Complete the price model using cell references.<br><br>
-                   &bull; Column D: Calculate <code>Item cost</code> (Unit price * Quantity).<br>
-                   &bull; Column E: Calculate <code>Cost + delivery</code> (Item cost + Delivery).<br>
-                   &bull; <strong>Absolute Reference:</strong> Use an absolute reference (e.g. <code>$B$6</code>) for the fixed delivery charge.`,
-                   
-            "t3": `<strong>TASK 3: School Club Functions</strong><br><br>
-                   Use functions to analyse the attendance data.<br><br>
-                   &bull; Column G: Use <code>=SUM()</code> to find Total attendance.<br>
-                   &bull; Column H: Use <code>=AVERAGE()</code> to find Average attendance.<br>
-                   &bull; Column I: Use <code>=MAX()</code> to find Highest attendance.<br>
-                   &bull; Cell B7: Use <code>=MIN()</code> to find the smallest attendance over the whole table.<br>
-                   &bull; Cell B8: Use <code>=MAX()</code> to find the largest attendance over the whole table.`,
-                   
-            "t4": `<strong>TASK 4: Charity Café Model</strong><br><br>
-                   Calculate income and answer the summary questions.<br><br>
-                   &bull; Column F: Calculate <code>Total sold</code> using <code>=SUM()</code>.<br>
-                   &bull; Column G: Calculate <code>Income</code> (Price * Total sold).<br>
-                   &bull; Cell B6: Calculate Total café income using <code>=SUM()</code>.<br>
-                   &bull; Cell B7: Calculate Average product income using <code>=AVERAGE()</code>.`
+        var instructions = {
+            "t1": "<strong>TASK 1: Basic Formulae</strong><br><br>Write formulae in the Answer column. Use cell references, not typed numbers.<br><br>&bull; Row 2: Add Number 1 and Number 2.<br>&bull; Row 3: Subtract Number 2 from Number 1.<br>&bull; Row 4: Multiply Number 1 by Number 2.<br>&bull; Row 5: Divide Number 1 by Number 2.<br>&bull; Row 6: Add Number 1 and Number 2.",
+            "t2": "<strong>TASK 2: Price Model</strong><br><br>Complete the price model using cell references.<br><br>&bull; Column D: Calculate <code>Item cost</code> (Unit price * Quantity).<br>&bull; Column E: Calculate <code>Cost + delivery</code> (Item cost + Delivery).<br>&bull; <strong>Absolute Reference:</strong> Use an absolute reference (e.g. <code>$B$6</code>) for the fixed delivery charge.",
+            "t3": "<strong>TASK 3: School Club Functions</strong><br><br>Use functions to analyse the attendance data.<br><br>&bull; Column G: Use <code>=SUM()</code> to find Total attendance.<br>&bull; Column H: Use <code>=AVERAGE()</code> to find Average attendance.<br>&bull; Column I: Use <code>=MAX()</code> to find Highest attendance.<br>&bull; Cell B7: Use <code>=MIN()</code> to find the smallest attendance over the whole table.<br>&bull; Cell B8: Use <code>=MAX()</code> to find the largest attendance over the whole table.",
+            "t4": "<strong>TASK 4: Charity Café Model</strong><br><br>Calculate income and answer the summary questions.<br><br>&bull; Column F: Calculate <code>Total sold</code> using <code>=SUM()</code>.<br>&bull; Column G: Calculate <code>Income</code> (Price * Total sold).<br>&bull; Cell B6: Calculate Total café income using <code>=SUM()</code>.<br>&bull; Cell B7: Calculate Average product income using <code>=AVERAGE()</code>."
         };
 
         /* LIVE CONDITIONAL FORMATTING RULES PER CELL */
-        const answerCells = {
+        var answerCells = {
             "t1": [
-                { col: 3, row: 1, check: (v) => v.startsWith('=') && v.includes('+') },
-                { col: 3, row: 2, check: (v) => v.startsWith('=') && v.includes('-') },
-                { col: 3, row: 3, check: (v) => v.startsWith('=') && v.includes('*') },
-                { col: 3, row: 4, check: (v) => v.startsWith('=') && v.includes('/') },
-                { col: 3, row: 5, check: (v) => v.startsWith('=') && v.includes('+') }
+                { col: 3, row: 1, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('+') > -1; } },
+                { col: 3, row: 2, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('-') > -1; } },
+                { col: 3, row: 3, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('*') > -1; } },
+                { col: 3, row: 4, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('/') > -1; } },
+                { col: 3, row: 5, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('+') > -1; } }
             ],
             "t2": [
-                { col: 3, row: 1, check: (v) => v.startsWith('=') && v.includes('*') },
-                { col: 3, row: 2, check: (v) => v.startsWith('=') && v.includes('*') },
-                { col: 3, row: 3, check: (v) => v.startsWith('=') && v.includes('*') },
-                { col: 3, row: 4, check: (v) => v.startsWith('=') && v.includes('*') },
-                { col: 4, row: 1, check: (v) => v.startsWith('=') && v.includes('+') && (v.includes('$B$6') \vert{}\vert{} v.includes('$B6') || v.includes('B$6')) },                 { col: 4, row: 2, check: (v) => v.startsWith('=') && v.includes('+') && (v.includes('$B$6') \vert{}\vert{} v.includes('$B6') || v.includes('B$6')) },                 { col: 4, row: 3, check: (v) => v.startsWith('=') && v.includes('+') && (v.includes('$B$6') \vert{}\vert{} v.includes('$B6') || v.includes('B$6')) },                 { col: 4, row: 4, check: (v) => v.startsWith('=') && v.includes('+') && (v.includes('$B$6') \vert{}\vert{} v.includes('$B6') || v.includes('B$6')) }
+                { col: 3, row: 1, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('*') > -1; } },
+                { col: 3, row: 2, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('*') > -1; } },
+                { col: 3, row: 3, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('*') > -1; } },
+                { col: 3, row: 4, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('*') > -1; } },
+                { col: 4, row: 1, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('+') > -1 && (s.indexOf('$B$6') > -1 || s.indexOf('$B6') > -1 || s.indexOf('B$6') > -1); } },
+                { col: 4, row: 2, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('+') > -1 && (s.indexOf('$B$6') > -1 || s.indexOf('$B6') > -1 || s.indexOf('B$6') > -1); } },
+                { col: 4, row: 3, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('+') > -1 && (s.indexOf('$B$6') > -1 || s.indexOf('$B6') > -1 || s.indexOf('B$6') > -1); } },
+                { col: 4, row: 4, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('+') > -1 && (s.indexOf('$B$6') > -1 || s.indexOf('$B6') > -1 || s.indexOf('B$6') > -1); } }
             ],
             "t3": [
-                { col: 6, row: 1, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('SUM(') },
-                { col: 6, row: 2, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('SUM(') },
-                { col: 6, row: 3, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('SUM(') },
-                { col: 7, row: 1, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('AVERAGE(') },
-                { col: 7, row: 2, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('AVERAGE(') },
-                { col: 7, row: 3, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('AVERAGE(') },
-                { col: 8, row: 1, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('MAX(') },
-                { col: 8, row: 2, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('MAX(') },
-                { col: 8, row: 3, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('MAX(') },
-                { col: 1, row: 6, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('MIN(') },
-                { col: 1, row: 7, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('MAX(') }
+                { col: 6, row: 1, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('SUM(') > -1; } },
+                { col: 6, row: 2, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('SUM(') > -1; } },
+                { col: 6, row: 3, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('SUM(') > -1; } },
+                { col: 7, row: 1, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('AVERAGE(') > -1; } },
+                { col: 7, row: 2, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('AVERAGE(') > -1; } },
+                { col: 7, row: 3, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('AVERAGE(') > -1; } },
+                { col: 8, row: 1, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('MAX(') > -1; } },
+                { col: 8, row: 2, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('MAX(') > -1; } },
+                { col: 8, row: 3, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('MAX(') > -1; } },
+                { col: 1, row: 6, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('MIN(') > -1; } },
+                { col: 1, row: 7, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('MAX(') > -1; } }
             ],
             "t4": [
-                { col: 5, row: 1, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('SUM(') },
-                { col: 5, row: 2, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('SUM(') },
-                { col: 5, row: 3, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('SUM(') },
-                { col: 6, row: 1, check: (v) => v.startsWith('=') && v.includes('*') },
-                { col: 6, row: 2, check: (v) => v.startsWith('=') && v.includes('*') },
-                { col: 6, row: 3, check: (v) => v.startsWith('=') && v.includes('*') },
-                { col: 1, row: 5, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('SUM(') },
-                { col: 1, row: 6, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('AVERAGE(') }
+                { col: 5, row: 1, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('SUM(') > -1; } },
+                { col: 5, row: 2, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('SUM(') > -1; } },
+                { col: 5, row: 3, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('SUM(') > -1; } },
+                { col: 6, row: 1, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('*') > -1; } },
+                { col: 6, row: 2, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('*') > -1; } },
+                { col: 6, row: 3, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('*') > -1; } },
+                { col: 1, row: 5, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('SUM(') > -1; } },
+                { col: 1, row: 6, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('AVERAGE(') > -1; } }
             ]
         };
 
         /* LOCAL STORAGE SAFETY WRAPPERS */
         function loadScores() {
             try {
-                ['t1', 't2', 't3', 't4'].forEach(taskKey => {
-                    let savedScore = localStorage.getItem('excel_score_' + taskKey);
+                var tasks = ['t1', 't2', 't3', 't4'];
+                for(var i=0; i<tasks.length; i++) {
+                    var tk = tasks[i];
+                    var savedScore = localStorage.getItem('excel_score_' + tk);
                     if (savedScore !== null) {
-                        let el = document.getElementById(`score-${taskKey}`);
+                        var el = document.getElementById('score-' + tk);
                         if(el) el.innerText = savedScore;
                     }
-                });
-                let savedTotal = localStorage.getItem('excel_total');
+                }
+                var savedTotal = localStorage.getItem('excel_total');
                 if (savedTotal !== null) {
-                    let el = document.getElementById("total-score");
-                    if(el) el.innerText = savedTotal;
+                    var tel = document.getElementById("total-score");
+                    if(tel) tel.innerText = savedTotal;
                 }
             } catch (e) {
-                console.warn("Local storage disabled by browser security, skipping score load.");
+                console.warn("Storage blocked, skipping load.");
             }
         }
 
         function updateScore(taskKey, points) {
-            try {
-                document.getElementById(`score-${taskKey}`).innerText = points;
-                localStorage.setItem('excel_score_' + taskKey, points);
-                
-                let p1 = parseInt(document.getElementById("score-t1").innerText) || 0;
-                let p2 = parseInt(document.getElementById("score-t2").innerText) || 0;
-                let p3 = parseInt(document.getElementById("score-t3").innerText) || 0;
-                let p4 = parseInt(document.getElementById("score-t4").innerText) || 0;
-                
-                let total = p1 + p2 + p3 + p4;
-                document.getElementById("total-score").innerText = total;
-                localStorage.setItem('excel_total', total);
-            } catch(e) {
-                console.warn("Local storage disabled by browser security, skipping score save.");
-            }
+            var scoreEl = document.getElementById('score-' + taskKey);
+            if (scoreEl) scoreEl.innerText = points;
+            
+            try { localStorage.setItem('excel_score_' + taskKey, points); } catch(e) {}
+            
+            var p1 = parseInt(document.getElementById("score-t1").innerText) || 0;
+            var p2 = parseInt(document.getElementById("score-t2").innerText) || 0;
+            var p3 = parseInt(document.getElementById("score-t3").innerText) || 0;
+            var p4 = parseInt(document.getElementById("score-t4").innerText) || 0;
+            
+            var total = p1 + p2 + p3 + p4;
+            var totalEl = document.getElementById("total-score");
+            if (totalEl) totalEl.innerText = total;
+            
+            try { localStorage.setItem('excel_total', total); } catch(e) {}
         }
 
         function clearScores() {
             if (confirm("Are you sure you want to clear all scores for this student?")) {
                 try {
-                    ['t1', 't2', 't3', 't4'].forEach(taskKey => {
-                        localStorage.removeItem('excel_score_' + taskKey);
-                        document.getElementById(`score-${taskKey}`).innerText = "0";
-                    });
+                    var tasks = ['t1', 't2', 't3', 't4'];
+                    for(var i=0; i<tasks.length; i++) {
+                        localStorage.removeItem('excel_score_' + tasks[i]);
+                        document.getElementById('score-' + tasks[i]).innerText = "0";
+                    }
                     localStorage.removeItem('excel_total');
                     document.getElementById("total-score").innerText = "0";
-                } catch(e) {
-                    console.warn("Local storage disabled.");
-                }
+                } catch(e) { }
                 switchTask(); 
                 alert("Scores have been reset.");
             }
@@ -478,75 +465,91 @@
 
         /* FIREWALL PROOF HTML SPREADSHEET GENERATOR */
         function initCustomSpreadsheet(taskKey) {
-            let data = taskData[taskKey];
-            let cells = answerCells[taskKey];
+            var data = taskData[taskKey];
+            var cells = answerCells[taskKey];
+            if (!data || !cells) return;
 
-            // Ensure enough columns for Task 3
-            let maxCols = data.reduce((max, row) => Math.max(max, row.length), 0);
-            maxCols = Math.max(maxCols, 9);
+            var maxCols = 0;
+            for(var i=0; i<data.length; i++) {
+                if (data[i].length > maxCols) maxCols = data[i].length;
+            }
+            if (maxCols < 9) maxCols = 9;
 
-            let html = '<table class="excel-table">';
+            var html = '<table class="excel-table">';
             
-            // Build A, B, C, D headers
             html += '<thead><tr><th></th>';
-            for(let c=0; c < maxCols; c++) {
-                html += `<th>${String.fromCharCode(65 + c)}</th>`;
+            for(var c=0; c < maxCols; c++) {
+                html += '<th>' + String.fromCharCode(65 + c) + '</th>';
             }
             html += '</tr></thead><tbody>';
 
-            // Build rows
-            for(let r=0; r < data.length; r++) {
-                html += `<tr><th class="row-header">${r+1}</th>`;
+            for(var r=0; r < data.length; r++) {
+                html += '<tr><th class="row-header">' + (r+1) + '</th>';
                 
-                for(let c=0; c < maxCols; c++) {
-                    let cellVal = data[r][c] !== undefined ? data[r][c] : '';
-                    let isAnswerCell = cells.some(ac => ac.col === c && ac.row === r);
+                for(var col=0; col < maxCols; col++) {
+                    var cellVal = data[r][col] !== undefined ? data[r][col] : '';
+                    
+                    var isAnswerCell = false;
+                    for(var k=0; k<cells.length; k++) {
+                        if(cells[k].col === col && cells[k].row === r) {
+                            isAnswerCell = true;
+                            break;
+                        }
+                    }
 
-                    let extraClass = "";
-                    if (r === 0) extraClass = "header-cell"; // Top Row Navy
-                    else if ((taskKey === "t3" && r === 5) || (taskKey === "t4" && r === 4)) extraClass = "info-cell"; // Info Row
+                    var extraClass = "";
+                    if (r === 0) {
+                        extraClass = "header-cell"; 
+                    } else if ((taskKey === "t3" && r === 5) || (taskKey === "t4" && r === 4)) {
+                        extraClass = "info-cell"; 
+                    }
 
                     if (isAnswerCell) {
-                        // Interactive Input Cell
-                        html += `<td style="padding: 0;">
-                                    <input type="text" id="cell-${r}-${c}" class="cell-input status-yellow" oninput="evaluateTask()" autocomplete="off">
-                                 </td>`;
+                        html += '<td style="padding: 0;"><input type="text" id="cell-' + r + '-' + col + '" class="cell-input status-yellow" onkeyup="evaluateTask()" autocomplete="off"></td>';
                     } else {
-                        // Normal Text Cell
-                        html += `<td class="${extraClass}">${cellVal}</td>`;
+                        html += '<td class="' + extraClass + '">' + cellVal + '</td>';
                     }
                 }
                 html += '</tr>';
             }
             
             html += '</tbody></table>';
-            document.getElementById('spreadsheet-container').innerHTML = html;
             
-            // Evaluate instantly to draw the progress box
+            var container = document.getElementById('spreadsheet-container');
+            if (container) container.innerHTML = html;
+            
             evaluateTask();
         }
 
         function switchTask() {
-            currentTask = document.getElementById("task-selector").value;
-            document.getElementById("instruction-panel").innerHTML = instructions[currentTask];
+            var selector = document.getElementById("task-selector");
+            if (!selector) return;
+            currentTask = selector.value;
+            
+            var panel = document.getElementById("instruction-panel");
+            if (panel) panel.innerHTML = instructions[currentTask];
+            
             initCustomSpreadsheet(currentTask);
         }
 
         /* LIVE CONDITIONAL FORMATTING EVALUATOR */
         function evaluateTask() {
-            let cells = answerCells[currentTask];
-            let correct = 0;
-            let incorrect = 0;
-            let unanswered = 0;
+            var cells = answerCells[currentTask];
+            if (!cells) return;
             
-            cells.forEach(c => {
-                let inputEl = document.getElementById(`cell-${c.row}-${c.col}`);
-                if (!inputEl) return;
+            var correct = 0;
+            var incorrect = 0;
+            var unanswered = 0;
+            
+            for(var i=0; i<cells.length; i++) {
+                var c = cells[i];
+                var inputEl = document.getElementById('cell-' + c.row + '-' + c.col);
+                if (!inputEl) continue;
                 
-                let val = inputEl.value.trim();
+                // Polyfill for trim
+                var val = inputEl.value.replace(/^\s+|\s+$/g, '');
                 
-                // Reset Classes
-                inputEl.classList.remove('status-green', 'status-red', 'status-yellow');
+                inputEl.className = "cell-input"; // Reset classes
                 
                 if (val === '') {
                     inputEl.classList.add('status-yellow');
@@ -558,42 +561,46 @@
                     inputEl.classList.add('status-red');
                     incorrect++;
                 }
-            });
+            }
             
-            let totalCells = cells.length;
-            let earnedMarks = totalCells > 0 ? Math.round((correct / totalCells) * 5) : 0;
+            var totalCells = cells.length;
+            var earnedMarks = totalCells > 0 ? Math.round((correct / totalCells) * 5) : 0;
             updateScore(currentTask, earnedMarks);
             
-            let statusText = unanswered === totalCells ? "Not Started" : (correct === totalCells ? "Completed ✅" : "In Progress ⏳");
-            let statusColor = correct === totalCells ? "#2e7d32" : (unanswered === totalCells ? "#666" : "#ef6c00");
+            var statusText = unanswered === totalCells ? "Not Started" : (correct === totalCells ? "Completed ✅" : "In Progress ⏳");
+            var statusColor = correct === totalCells ? "#2e7d32" : (unanswered === totalCells ? "#666" : "#ef6c00");
 
-            let html = `
-                <table class="progress-table">
-                    <tr>
-                        <th style="border-radius: 4px 0 0 0;">Correct</th>
-                        <th>Check</th>
-                        <th style="border-radius: 0 4px 0 0;">Unanswered</th>
-                    </tr>
-                    <tr>
-                        <td style="background-color:#c6efce; color:#006100;">${correct}</td>
-                        <td style="background-color:#ffc7ce; color:#9c0006;">${incorrect}</td>
-                        <td style="background-color:#fff2cc; color:#000000;">${unanswered}</td>
-                    </tr>
-                </table>
-                
-                <div style="font-size: 16px; margin-top: 15px;">
-                    <strong>Marks Awarded:</strong> ${earnedMarks} / 5<br><br>
-                    <strong>Status:</strong> <span style="color:${statusColor}; font-weight:bold;">${statusText}</span>
-                </div>
-            `;
+            var html = '<table class="progress-table">' +
+                '<tr>' +
+                    '<th style="border-radius: 4px 0 0 0;">Correct</th>' +
+                    '<th>Check</th>' +
+                    '<th style="border-radius: 0 4px 0 0;">Unanswered</th>' +
+                '</tr>' +
+                '<tr>' +
+                    '<td style="background-color:#c6efce; color:#006100;">' + correct + '</td>' +
+                    '<td style="background-color:#ffc7ce; color:#9c0006;">' + incorrect + '</td>' +
+                    '<td style="background-color:#fff2cc; color:#000000;">' + unanswered + '</td>' +
+                '</tr>' +
+            '</table>' +
+            '<div style="font-size: 16px; margin-top: 15px;">' +
+                '<strong>Marks Awarded:</strong> ' + earnedMarks + ' / 5<br><br>' +
+                '<strong>Status:</strong> <span style="color:' + statusColor + '; font-weight:bold;">' + statusText + '</span>' +
+            '</div>';
             
-            document.getElementById("feedback").innerHTML = html;
+            var feedbackBox = document.getElementById("feedback");
+            if (feedbackBox) feedbackBox.innerHTML = html;
         }
 
-        // Initialize App Safely
-        loadScores();
-        switchTask();
-        
+        // Initialize App Safely once DOM is fully loaded
+        window.onload = function() {
+            try {
+                loadScores();
+                switchTask();
+            } catch (e) {
+                var panel = document.getElementById("instruction-panel");
+                if (panel) panel.innerHTML = "<h3 style='color:red;'>Startup Error</h3><p>" + e.message + "</p>";
+            }
+        };
     </script>
 </body>
 </html>
