@@ -122,7 +122,42 @@
             line-height: 1.5;
         }
 
-        /* CUSTOM FIREWALL-PROOF SPREADSHEET STYLES */
+        /* CUSTOM EXCEL UI STYLES */
+        .formula-bar-container {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1px solid #c0c0c0;
+            border-bottom: none;
+            padding: 0;
+            margin-top: 5px;
+        }
+
+        .fx-icon {
+            font-style: italic;
+            font-family: "Times New Roman", Times, serif;
+            font-weight: bold;
+            color: #666;
+            padding: 0 12px;
+            font-size: 16px;
+            border-right: 1px solid #c0c0c0;
+            background: #f3f3f3;
+            height: 36px;
+            display: flex;
+            align-items: center;
+        }
+
+        #formula-bar {
+            flex-grow: 1;
+            border: none;
+            padding: 8px 12px;
+            font-size: 14px;
+            outline: none;
+            font-family: 'Courier New', Courier, monospace;
+            background-color: white;
+        }
+        #formula-bar:disabled { background-color: #f9f9f9; }
+
         #spreadsheet-container {
             width: 100%;
             overflow-x: auto;
@@ -140,17 +175,20 @@
 
         .excel-table th, .excel-table td {
             border: 1px solid #d0d7e5;
-            padding: 4px;
+            padding: 0;
             text-align: left;
             min-width: 80px;
             white-space: nowrap;
         }
+        
+        .static-cell { padding: 6px !important; }
 
         .excel-table thead th {
             background-color: #f3f3f3;
             text-align: center;
             color: #666;
             font-weight: normal;
+            padding: 4px;
         }
 
         .excel-table .row-header {
@@ -159,10 +197,11 @@
             text-align: center;
             color: #666;
             font-weight: normal;
+            padding: 4px;
         }
 
         .excel-table .header-cell {
-            background-color: #1e3a8a; /* Navy */
+            background-color: #1e3a8a;
             color: white;
             font-weight: bold;
         }
@@ -183,18 +222,25 @@
             font-size: 14px;
             outline: none;
             background-color: transparent;
+            cursor: cell;
         }
 
         .cell-input:focus {
             border: 2px solid #217346;
             background-color: white !important;
             color: black !important;
+            cursor: text;
         }
 
-        /* Conditional Formatting Colors */
-        .status-green { background-color: #c6efce !important; color: #006100 !important; font-weight: bold; }
-        .status-red { background-color: #ffc7ce !important; color: #9c0006 !important; font-weight: bold; }
-        .status-yellow { background-color: #fff2cc !important; color: #000000 !important; }
+        /* Conditional Formatting Colors applied to the TD */
+        .status-green { background-color: #c6efce !important; }
+        .status-green input { color: #006100 !important; font-weight: bold; }
+        
+        .status-red { background-color: #ffc7ce !important; }
+        .status-red input { color: #9c0006 !important; font-weight: bold; }
+        
+        .status-yellow { background-color: #fff2cc !important; }
+        .status-yellow input { color: #000000 !important; }
 
         .feedback-box {
             margin-top: 15px;
@@ -209,7 +255,6 @@
             line-height: 1.5;
         }
         
-        /* Progress Table Styles */
         .progress-table {
             width: 100%;
             border-collapse: collapse;
@@ -218,7 +263,7 @@
             margin-bottom: 15px;
         }
         .progress-table th {
-            background-color: #1e3a8a; /* Navy */
+            background-color: #1e3a8a;
             color: white;
             padding: 8px;
         }
@@ -235,26 +280,23 @@
         <div class="header-left">
             <img src="logo.jpg" alt="Delta Serlby Park Logo">
         </div>
-        
         <div class="header-center">
             <h1>Interactive Excel Assessment</h1>
         </div>
-        
         <div class="header-right">
             <a href="spreadsheets.html" class="back-btn">&larr; Back to Curriculum</a>
         </div>
     </header>
 
-    <!-- Scoreboard Banner -->
     <div class="scoreboard">
         <div class="score-item">Task 1: <span id="score-t1">0</span>/5</div>
         <div class="score-item">Task 2: <span id="score-t2">0</span>/8</div>
-        <div class="score-item">Task 3: <span id="score-t3">0</span>11</div>
+        <div class="score-item">Task 3: <span id="score-t3">0</span>/11</div>
         <div class="score-item">Task 4: <span id="score-t4">0</span>/8</div>
         <div class="score-item" style="color: var(--maroon);">TOTAL SCORE: <span id="total-score" style="color: var(--maroon);">0</span>/32</div>
         <div class="scoreboard-actions">
             <!-- PASTE YOUR MICROSOFT FORM LINK BELOW -->
-            <a href="https://forms.cloud.microsoft/e/0n48bZNMPL" target="_blank" class="btn-ms-form">📋 Submit Scores</a>
+            <a href="YOUR_MICROSOFT_FORM_LINK_HERE" target="_blank" class="btn-ms-form">📋 Submit Scores Form</a>
             <button class="btn-clear-scores" onclick="clearScores()">Reset Progress</button>
         </div>
     </div>
@@ -264,36 +306,38 @@
             <!-- COLUMN 1: Instructions -->
             <div class="ide-panel">
                 <h3>1. Instructions</h3>
-                
                 <select id="task-selector" onchange="switchTask()">
                     <option value="t1">Task 1 (Basic Formulae)</option>
                     <option value="t2">Task 2 (Price Model)</option>
                     <option value="t3">Task 3 (School Club Functions)</option>
                     <option value="t4">Task 4 (Charity Café Model)</option>
                 </select>
-
                 <div id="instruction-panel"></div>
             </div>
 
             <!-- COLUMN 2: Custom HTML Spreadsheet Editor -->
             <div class="ide-panel editor-panel">
                 <h3 style="color: #217346;">2. Live Spreadsheet Editor</h3>
-                <p style="font-size: 13px; color: #666; margin-top: 0; margin-bottom: 15px;">
+                <p style="font-size: 13px; color: #666; margin-top: 0; margin-bottom: 5px;">
                     <span style="background:#c6efce; color:#006100; padding:2px 6px; border-radius:3px; font-weight:bold;">Green</span> = Correct Formula &nbsp;|&nbsp; 
                     <span style="background:#ffc7ce; color:#9c0006; padding:2px 6px; border-radius:3px; font-weight:bold;">Red</span> = Incorrect or Typed Answer &nbsp;|&nbsp; 
                     <span style="background:#fff2cc; color:#000000; padding:2px 6px; border-radius:3px; font-weight:bold;">Yellow</span> = Unanswered
                 </p>
                 
+                <div class="formula-bar-container">
+                    <div class="fx-icon">fx</div>
+                    <input type="text" id="formula-bar" placeholder="Select a yellow cell to type a formula..." oninput="handleFxInput()" onkeydown="handleFxKey(event)" disabled>
+                </div>
+                
                 <div id="spreadsheet-container">
-                    <!-- The table will be generated here by Javascript -->
+                    <!-- Javascript generates grid here -->
                 </div>
             </div>
 
             <!-- COLUMN 3: Live Results -->
             <div class="ide-panel output-panel">
                 <h3 style="color: var(--maroon);">3. Section Progress</h3>
-                <p style="font-size: 13px; color: #666; margin-top: 0;">Your answers are evaluated instantly as you type.</p>
-                
+                <p style="font-size: 13px; color: #666; margin-top: 0;">Your answers are evaluated instantly.</p>
                 <div id="feedback" class="feedback-box">
                     Loading progress...
                 </div>
@@ -307,18 +351,16 @@
 
     <!-- BULLETPROOF SCRIPT -->
     <script>
-        // Global Error Catcher - Prints any school network errors right on the screen!
         window.onerror = function(msg, url, line) {
             var panel = document.getElementById("instruction-panel");
-            if (panel) {
-                panel.innerHTML = "<h3 style='color:red;'>School Network Alert</h3><p>An error blocked the page from loading: " + msg + "</p><p>Line: " + line + "</p>";
-            }
+            if (panel) panel.innerHTML = "<h3 style='color:red;'>Startup Alert</h3><p>An error blocked the page from loading: " + msg + "</p><p>Line: " + line + "</p>";
             return false;
         };
 
         var currentTask = "t1";
+        var activeCell = null; // Tracks {r, c} of currently focused cell
 
-        var taskData = {
+        var defaultTaskData = {
             "t1": [
                 ['Number 1', 'Operation', 'Number 2', 'Answer'],
                 [18, 'add', 27, ''],
@@ -356,60 +398,140 @@
             ]
         };
 
+        var taskData = JSON.parse(JSON.stringify(defaultTaskData));
+
         var instructions = {
-            "t1": "<strong>TASK 1: Basic Formulae</strong><br><br>Write formulae in the Answer column. Use cell references, not typed numbers.<br><br>&bull; Row 2: Add Number 1 and Number 2.<br>&bull; Row 3: Subtract Number 2 from Number 1.<br>&bull; Row 4: Multiply Number 1 by Number 2.<br>&bull; Row 5: Divide Number 1 by Number 2.<br>&bull; Row 6: Add Number 1 and Number 2.",
-            "t2": "<strong>TASK 2: Price Model</strong><br><br>Complete the price model using cell references.<br><br>&bull; Column D: Calculate <code>Item cost</code> (Unit price * Quantity).<br>&bull; Column E: Calculate <code>Cost + delivery</code> (Item cost + Delivery).<br>&bull; <strong>Absolute Reference:</strong> Use an absolute reference (e.g. <code>$B$6</code>) for the fixed delivery charge.",
-            "t3": "<strong>TASK 3: School Club Functions</strong><br><br>Use functions to analyse the attendance data.<br><br>&bull; Column G: Use <code>=SUM()</code> to find Total attendance.<br>&bull; Column H: Use <code>=AVERAGE()</code> to find Average attendance.<br>&bull; Column I: Use <code>=MAX()</code> to find Highest attendance.<br>&bull; Cell B7: Use <code>=MIN()</code> to find the smallest attendance over the whole table.<br>&bull; Cell B8: Use <code>=MAX()</code> to find the largest attendance over the whole table.",
-            "t4": "<strong>TASK 4: Charity Café Model</strong><br><br>Calculate income and answer the summary questions.<br><br>&bull; Column F: Calculate <code>Total sold</code> using <code>=SUM()</code>.<br>&bull; Column G: Calculate <code>Income</code> (Price * Total sold).<br>&bull; Cell B6: Calculate Total café income using <code>=SUM()</code>.<br>&bull; Cell B7: Calculate Average product income using <code>=AVERAGE()</code>."
+            "t1": "<strong>TASK 1: Basic Formulae</strong><br><br>Write formulae in the Answer column. Use strict cell references (e.g. <code>=B2+C2</code>), not typed numbers.<br><br>&bull; Row 2: Add Number 1 and Number 2.<br>&bull; Row 3: Subtract Number 2 from Number 1.<br>&bull; Row 4: Multiply Number 1 by Number 2.<br>&bull; Row 5: Divide Number 1 by Number 2.<br>&bull; Row 6: Add Number 1 and Number 2.",
+            "t2": "<strong>TASK 2: Price Model</strong><br><br>Complete the price model using strict cell references.<br><br>&bull; Column D: Calculate <code>Item cost</code> (Unit price * Quantity).<br>&bull; Column E: Calculate <code>Cost + delivery</code> (Item cost + Delivery).<br>&bull; <strong>Absolute Reference:</strong> Use an absolute reference (e.g. <code>$B$6</code>) for the fixed delivery charge.",
+            "t3": "<strong>TASK 3: School Club Functions</strong><br><br>Use functions to analyse the attendance data. Use standard ranges (e.g. <code>=SUM(B2:F2)</code>).<br><br>&bull; Column G: Use <code>=SUM()</code> to find Total attendance.<br>&bull; Column H: Use <code>=AVERAGE()</code> to find Average attendance.<br>&bull; Column I: Use <code>=MAX()</code> to find Highest attendance.<br>&bull; Cell B7: Use <code>=MIN()</code> to find the smallest attendance over the whole table.<br>&bull; Cell B8: Use <code>=MAX()</code> to find the largest attendance over the whole table.",
+            "t4": "<strong>TASK 4: Charity Café Model</strong><br><br>Calculate income and answer the summary questions using exact cell references/ranges.<br><br>&bull; Column F: Calculate <code>Total sold</code> using <code>=SUM()</code>.<br>&bull; Column G: Calculate <code>Income</code> (Price * Total sold).<br>&bull; Cell B6: Calculate Total café income using <code>=SUM()</code>.<br>&bull; Cell B7: Calculate Average product income using <code>=AVERAGE()</code>."
         };
 
-        /* LIVE CONDITIONAL FORMATTING RULES PER CELL */
+        function checkFormula(studentInput, validFormulasArray) {
+            var sanitizedInput = String(studentInput).toUpperCase().replace(/\s+/g, '');
+            for(var i = 0; i < validFormulasArray.length; i++) {
+                if (sanitizedInput === validFormulasArray[i]) return true;
+            }
+            return false;
+        }
+
         var answerCells = {
             "t1": [
-                { col: 3, row: 1, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('+') > -1; } },
-                { col: 3, row: 2, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('-') > -1; } },
-                { col: 3, row: 3, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('*') > -1; } },
-                { col: 3, row: 4, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('/') > -1; } },
-                { col: 3, row: 5, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('+') > -1; } }
+                { col: 3, row: 1, check: function(v) { return checkFormula(v, ['=B2+C2', '=C2+B2']); } },
+                { col: 3, row: 2, check: function(v) { return checkFormula(v, ['=B3-C3']); } },
+                { col: 3, row: 3, check: function(v) { return checkFormula(v, ['=B4*C4', '=C4*B4']); } },
+                { col: 3, row: 4, check: function(v) { return checkFormula(v, ['=B5/C5']); } },
+                { col: 3, row: 5, check: function(v) { return checkFormula(v, ['=B6+C6', '=C6+B6']); } }
             ],
             "t2": [
-                { col: 3, row: 1, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('*') > -1; } },
-                { col: 3, row: 2, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('*') > -1; } },
-                { col: 3, row: 3, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('*') > -1; } },
-                { col: 3, row: 4, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('*') > -1; } },
-                { col: 4, row: 1, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('+') > -1 && (s.indexOf('$B$6') > -1 || s.indexOf('$B6') > -1 || s.indexOf('B$6') > -1); } },
-                { col: 4, row: 2, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('+') > -1 && (s.indexOf('$B$6') > -1 || s.indexOf('$B6') > -1 || s.indexOf('B$6') > -1); } },
-                { col: 4, row: 3, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('+') > -1 && (s.indexOf('$B$6') > -1 || s.indexOf('$B6') > -1 || s.indexOf('B$6') > -1); } },
-                { col: 4, row: 4, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('+') > -1 && (s.indexOf('$B$6') > -1 || s.indexOf('$B6') > -1 || s.indexOf('B$6') > -1); } }
+                { col: 3, row: 1, check: function(v) { return checkFormula(v, ['=B2*C2', '=C2*B2']); } },
+                { col: 3, row: 2, check: function(v) { return checkFormula(v, ['=B3*C3', '=C3*B3']); } },
+                { col: 3, row: 3, check: function(v) { return checkFormula(v, ['=B4*C4', '=C4*B4']); } },
+                { col: 3, row: 4, check: function(v) { return checkFormula(v, ['=B5*C5', '=C5*B5']); } },
+                { col: 4, row: 1, check: function(v) { return checkFormula(v, ['=D2+$B$6', '=$B$6+D2', '=D2+$B6', '=$B6+D2', '=D2+B$6', '=B$6+D2']); } },
+                { col: 4, row: 2, check: function(v) { return checkFormula(v, ['=D3+$B$6', '=$B$6+D3', '=D3+$B6', '=$B6+D3', '=D3+B$6', '=B$6+D3']); } },
+                { col: 4, row: 3, check: function(v) { return checkFormula(v, ['=D4+$B$6', '=$B$6+D4', '=D4+$B6', '=$B6+D4', '=D4+B$6', '=B$6+D4']); } },
+                { col: 4, row: 4, check: function(v) { return checkFormula(v, ['=D5+$B$6', '=$B$6+D5', '=D5+$B6', '=$B6+D5', '=D5+B$6', '=B$6+D5']); } }
             ],
             "t3": [
-                { col: 6, row: 1, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('SUM(') > -1; } },
-                { col: 6, row: 2, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('SUM(') > -1; } },
-                { col: 6, row: 3, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('SUM(') > -1; } },
-                { col: 7, row: 1, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('AVERAGE(') > -1; } },
-                { col: 7, row: 2, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('AVERAGE(') > -1; } },
-                { col: 7, row: 3, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('AVERAGE(') > -1; } },
-                { col: 8, row: 1, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('MAX(') > -1; } },
-                { col: 8, row: 2, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('MAX(') > -1; } },
-                { col: 8, row: 3, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('MAX(') > -1; } },
-                { col: 1, row: 6, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('MIN(') > -1; } },
-                { col: 1, row: 7, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('MAX(') > -1; } }
+                { col: 6, row: 1, check: function(v) { return checkFormula(v, ['=SUM(B2:F2)']); } },
+                { col: 6, row: 2, check: function(v) { return checkFormula(v, ['=SUM(B3:F3)']); } },
+                { col: 6, row: 3, check: function(v) { return checkFormula(v, ['=SUM(B4:F4)']); } },
+                { col: 7, row: 1, check: function(v) { return checkFormula(v, ['=AVERAGE(B2:F2)']); } },
+                { col: 7, row: 2, check: function(v) { return checkFormula(v, ['=AVERAGE(B3:F3)']); } },
+                { col: 7, row: 3, check: function(v) { return checkFormula(v, ['=AVERAGE(B4:F4)']); } },
+                { col: 8, row: 1, check: function(v) { return checkFormula(v, ['=MAX(B2:F2)']); } },
+                { col: 8, row: 2, check: function(v) { return checkFormula(v, ['=MAX(B3:F3)']); } },
+                { col: 8, row: 3, check: function(v) { return checkFormula(v, ['=MAX(B4:F4)']); } },
+                { col: 1, row: 6, check: function(v) { return checkFormula(v, ['=MIN(B2:F4)']); } },
+                { col: 1, row: 7, check: function(v) { return checkFormula(v, ['=MAX(B2:F4)']); } }
             ],
             "t4": [
-                { col: 5, row: 1, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('SUM(') > -1; } },
-                { col: 5, row: 2, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('SUM(') > -1; } },
-                { col: 5, row: 3, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('SUM(') > -1; } },
-                { col: 6, row: 1, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('*') > -1; } },
-                { col: 6, row: 2, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('*') > -1; } },
-                { col: 6, row: 3, check: function(v) { var s = String(v); return s.indexOf('=') === 0 && s.indexOf('*') > -1; } },
-                { col: 1, row: 5, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('SUM(') > -1; } },
-                { col: 1, row: 6, check: function(v) { var s = String(v).toUpperCase(); return s.indexOf('=') === 0 && s.indexOf('AVERAGE(') > -1; } }
+                { col: 5, row: 1, check: function(v) { return checkFormula(v, ['=SUM(C2:E2)']); } },
+                { col: 5, row: 2, check: function(v) { return checkFormula(v, ['=SUM(C3:E3)']); } },
+                { col: 5, row: 3, check: function(v) { return checkFormula(v, ['=SUM(C4:E4)']); } },
+                { col: 6, row: 1, check: function(v) { return checkFormula(v, ['=B2*F2', '=F2*B2']); } },
+                { col: 6, row: 2, check: function(v) { return checkFormula(v, ['=B3*F3', '=F3*B3']); } },
+                { col: 6, row: 3, check: function(v) { return checkFormula(v, ['=B4*F4', '=F4*B4']); } },
+                { col: 1, row: 5, check: function(v) { return checkFormula(v, ['=SUM(G2:G4)']); } },
+                { col: 1, row: 6, check: function(v) { return checkFormula(v, ['=AVERAGE(G2:G4)']); } }
             ]
         };
 
-        /* LOCAL STORAGE SAFETY WRAPPERS */
+        /* MATH EVALUATION ENGINE (Calculates the visual answers like real Excel) */
+        function getCellRC(ref) {
+            var colStr = ref.match(/[A-Z]+/)[0];
+            var rowStr = ref.match(/[0-9]+/)[0];
+            var col = 0;
+            for(var i=0; i<colStr.length; i++) {
+                col = col * 26 + (colStr.charCodeAt(i) - 64);
+            }
+            return { r: parseInt(rowStr)-1, c: col-1 };
+        }
+
+        function getCellValue(ref) {
+            var rc = getCellRC(ref);
+            if (!taskData[currentTask] || !taskData[currentTask][rc.r]) return 0;
+            var val = taskData[currentTask][rc.r][rc.c];
+            if (val === undefined || val === '') return 0;
+            if (String(val).startsWith('=')) {
+                return calculateFormula(val);
+            }
+            return parseFloat(val) || 0;
+        }
+
+        function getRangeValues(start, end) {
+            var s = getCellRC(start);
+            var e = getCellRC(end);
+            var vals = [];
+            for(var r = Math.min(s.r, e.r); r <= Math.max(s.r, e.r); r++) {
+                for(var c = Math.min(s.c, e.c); c <= Math.max(s.c, e.c); c++) {
+                    var ref = String.fromCharCode(65+c) + (r+1);
+                    vals.push(getCellValue(ref));
+                }
+            }
+            return vals;
+        }
+
+        function calculateFormula(formula) {
+            if (!formula.startsWith('=')) return formula;
+            var expr = formula.substring(1).toUpperCase();
+            
+            try {
+                // Functions (SUM, AVERAGE, MAX, MIN)
+                expr = expr.replace(/(SUM|AVERAGE|MAX|MIN)\(([A-Z]+[0-9]+):([A-Z]+[0-9]+)\)/g, function(match, func, start, end) {
+                    var vals = getRangeValues(start, end);
+                    if (vals.length === 0) return 0;
+                    if (func === 'SUM') return vals.reduce(function(a,b){return a+b}, 0);
+                    if (func === 'AVERAGE') return vals.reduce(function(a,b){return a+b}, 0)/vals.length;
+                    if (func === 'MAX') return Math.max.apply(null, vals);
+                    if (func === 'MIN') return Math.min.apply(null, vals);
+                });
+
+                // Strip absolute $
+                expr = expr.replace(/\$/g, '');
+
+                // Standard Cell Refs (e.g., B2)
+                expr = expr.replace(/[A-Z]+[0-9]+/g, function(match) {
+                    return getCellValue(match);
+                });
+
+                // Calculate math
+                var result = new Function('return ' + expr)();
+                
+                // Return nicely formatted number (2 decimals max)
+                return Math.round(result * 100) / 100;
+            } catch(e) {
+                return "#ERROR!";
+            }
+        }
+
+        /* STORAGE FUNCTIONS */
         function loadScores() {
             try {
+                var savedData = localStorage.getItem('excel_taskData');
+                if (savedData) taskData = JSON.parse(savedData);
+
                 var tasks = ['t1', 't2', 't3', 't4'];
                 for(var i=0; i<tasks.length; i++) {
                     var tk = tasks[i];
@@ -424,15 +546,12 @@
                     var tel = document.getElementById("total-score");
                     if(tel) tel.innerText = savedTotal;
                 }
-            } catch (e) {
-                console.warn("Storage blocked, skipping load.");
-            }
+            } catch (e) { }
         }
 
         function updateScore(taskKey, points) {
             var scoreEl = document.getElementById('score-' + taskKey);
             if (scoreEl) scoreEl.innerText = points;
-            
             try { localStorage.setItem('excel_score_' + taskKey, points); } catch(e) {}
             
             var p1 = parseInt(document.getElementById("score-t1").innerText) || 0;
@@ -443,7 +562,6 @@
             var total = p1 + p2 + p3 + p4;
             var totalEl = document.getElementById("total-score");
             if (totalEl) totalEl.innerText = total;
-            
             try { localStorage.setItem('excel_total', total); } catch(e) {}
         }
 
@@ -456,14 +574,17 @@
                         document.getElementById('score-' + tasks[i]).innerText = "0";
                     }
                     localStorage.removeItem('excel_total');
+                    localStorage.removeItem('excel_taskData');
                     document.getElementById("total-score").innerText = "0";
+                    
+                    taskData = JSON.parse(JSON.stringify(defaultTaskData));
                 } catch(e) { }
                 switchTask(); 
-                alert("Scores have been reset.");
+                alert("Scores and typed answers have been reset.");
             }
         }
 
-        /* FIREWALL PROOF HTML SPREADSHEET GENERATOR */
+        /* HTML SPREADSHEET BUILDER */
         function initCustomSpreadsheet(taskKey) {
             var data = taskData[taskKey];
             var cells = answerCells[taskKey];
@@ -476,7 +597,6 @@
             if (maxCols < 9) maxCols = 9;
 
             var html = '<table class="excel-table">';
-            
             html += '<thead><tr><th></th>';
             for(var c=0; c < maxCols; c++) {
                 html += '<th>' + String.fromCharCode(65 + c) + '</th>';
@@ -498,16 +618,18 @@
                     }
 
                     var extraClass = "";
-                    if (r === 0) {
-                        extraClass = "header-cell"; 
-                    } else if ((taskKey === "t3" && r === 5) || (taskKey === "t4" && r === 4)) {
-                        extraClass = "info-cell"; 
-                    }
+                    if (r === 0) extraClass = "header-cell"; 
+                    else if ((taskKey === "t3" && r === 5) || (taskKey === "t4" && r === 4)) extraClass = "info-cell"; 
 
                     if (isAnswerCell) {
-                        html += '<td style="padding: 0;"><input type="text" id="cell-' + r + '-' + col + '" class="cell-input status-yellow" onkeyup="evaluateTask()" autocomplete="off"></td>';
+                        html += '<td id="td-' + r + '-' + col + '" style="padding: 0;">' + 
+                                '<input type="text" id="cell-' + r + '-' + col + '" class="cell-input" ' +
+                                'onfocus="handleCellFocus(' + r + ',' + col + ')" ' +
+                                'onblur="handleCellBlur(' + r + ',' + col + ')" ' +
+                                'onkeydown="handleCellKey(event, ' + r + ',' + col + ')" ' +
+                                'autocomplete="off"></td>';
                     } else {
-                        html += '<td class="' + extraClass + '">' + cellVal + '</td>';
+                        html += '<td class="static-cell ' + extraClass + '">' + cellVal + '</td>';
                     }
                 }
                 html += '</tr>';
@@ -518,7 +640,8 @@
             var container = document.getElementById('spreadsheet-container');
             if (container) container.innerHTML = html;
             
-            evaluateTask();
+            // Force an initial evaluation to map formulas to answers and colorize
+            evaluateAllCells();
         }
 
         function switchTask() {
@@ -529,11 +652,76 @@
             var panel = document.getElementById("instruction-panel");
             if (panel) panel.innerHTML = instructions[currentTask];
             
+            // Reset Formula Bar
+            activeCell = null;
+            document.getElementById("formula-bar").value = "";
+            document.getElementById("formula-bar").disabled = true;
+
             initCustomSpreadsheet(currentTask);
         }
 
-        /* LIVE CONDITIONAL FORMATTING EVALUATOR */
-        function evaluateTask() {
+        /* EVENT HANDLERS FOR AUTHENTIC EXCEL FEEL */
+        function handleCellFocus(r, c) {
+            activeCell = {r: r, c: c};
+            var input = document.getElementById('cell-' + r + '-' + c);
+            var fx = document.getElementById('formula-bar');
+            
+            // When clicked, show the RAW formula they typed instead of the calculated answer
+            var rawValue = taskData[currentTask][r][c];
+            input.value = rawValue;
+            
+            // Enable and sync the formula bar
+            fx.disabled = false;
+            fx.value = rawValue;
+        }
+
+        function handleCellBlur(r, c) {
+            var input = document.getElementById('cell-' + r + '-' + c);
+            // Save whatever they left in the box
+            taskData[currentTask][r][c] = input.value;
+            
+            // Re-evaluate everything (updates colors and calculates new answers)
+            evaluateAllCells();
+            
+            // Disable formula bar if we click completely off the grid
+            setTimeout(function() {
+                if (document.activeElement.id !== 'formula-bar' && (!document.activeElement.id || !document.activeElement.id.startsWith('cell-'))) {
+                    document.getElementById('formula-bar').disabled = true;
+                    document.getElementById('formula-bar').value = "";
+                    activeCell = null;
+                }
+            }, 100);
+        }
+
+        function handleCellKey(e, r, c) {
+            // Pressing ENTER confirms the cell instantly
+            if (e.key === 'Enter') {
+                document.getElementById('cell-' + r + '-' + c).blur();
+            }
+            // Real-time sync to the formula bar as they type
+            setTimeout(function() {
+                if (activeCell && activeCell.r === r && activeCell.c === c) {
+                    document.getElementById('formula-bar').value = document.getElementById('cell-' + r + '-' + c).value;
+                }
+            }, 10);
+        }
+
+        function handleFxInput() {
+            if (activeCell) {
+                var val = document.getElementById('formula-bar').value;
+                document.getElementById('cell-' + activeCell.r + '-' + activeCell.c).value = val;
+            }
+        }
+
+        function handleFxKey(e) {
+            if (e.key === 'Enter' && activeCell) {
+                document.getElementById('formula-bar').blur();
+                document.getElementById('cell-' + activeCell.r + '-' + activeCell.c).blur();
+            }
+        }
+
+        /* MAIN EVALUATOR */
+        function evaluateAllCells() {
             var cells = answerCells[currentTask];
             if (!cells) return;
             
@@ -544,27 +732,39 @@
             for(var i=0; i<cells.length; i++) {
                 var c = cells[i];
                 var inputEl = document.getElementById('cell-' + c.row + '-' + c.col);
-                if (!inputEl) continue;
+                var tdEl = document.getElementById('td-' + c.row + '-' + c.col);
+                if (!inputEl || !tdEl) continue;
                 
-                // Polyfill for trim
-                var val = inputEl.value.replace(/^\s+|\s+$/g, '');
+                var rawVal = taskData[currentTask][c.row][c.col] || "";
+                var cleanVal = rawVal.replace(/^\s+|\s+$/g, '');
                 
-                inputEl.className = "cell-input"; // Reset classes
+                tdEl.className = ""; // Reset background color class
                 
-                if (val === '') {
-                    inputEl.classList.add('status-yellow');
+                if (cleanVal === '') {
+                    tdEl.classList.add('status-yellow');
                     unanswered++;
-                } else if (c.check(val)) {
-                    inputEl.classList.add('status-green');
+                } else if (c.check(cleanVal)) {
+                    tdEl.classList.add('status-green');
                     correct++;
                 } else {
-                    inputEl.classList.add('status-red');
+                    tdEl.classList.add('status-red');
                     incorrect++;
+                }
+
+                // If the cell is NOT currently focused, show the calculated VALUE instead of the formula
+                if (document.activeElement !== inputEl) {
+                    if (cleanVal.startsWith('=')) {
+                        inputEl.value = calculateFormula(cleanVal);
+                    } else {
+                        inputEl.value = cleanVal;
+                    }
                 }
             }
             
-            var totalCells = cells.length;
-            var earnedMarks = totalCells > 0 ? Math.round((correct / totalCells) * 5) : 0;
+            try { localStorage.setItem('excel_taskData', JSON.stringify(taskData)); } catch(e){}
+            
+            var totalCells = cells.length; 
+            var earnedMarks = correct; 
             updateScore(currentTask, earnedMarks);
             
             var statusText = unanswered === totalCells ? "Not Started" : (correct === totalCells ? "Completed ✅" : "In Progress ⏳");
@@ -583,7 +783,7 @@
                 '</tr>' +
             '</table>' +
             '<div style="font-size: 16px; margin-top: 15px;">' +
-                '<strong>Marks Awarded:</strong> ' + earnedMarks + ' / 5<br><br>' +
+                '<strong>Marks Awarded:</strong> ' + earnedMarks + ' / ' + totalCells + '<br><br>' +
                 '<strong>Status:</strong> <span style="color:' + statusColor + '; font-weight:bold;">' + statusText + '</span>' +
             '</div>';
             
@@ -591,7 +791,6 @@
             if (feedbackBox) feedbackBox.innerHTML = html;
         }
 
-        // Initialize App Safely once DOM is fully loaded
         window.onload = function() {
             try {
                 loadScores();
