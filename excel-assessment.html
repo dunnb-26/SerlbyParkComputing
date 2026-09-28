@@ -6,11 +6,11 @@
     <title>Interactive Excel Assessment</title>
     <link rel="stylesheet" href="style.css">
     
-    <!-- Jspreadsheet for Interactive In-Browser Excel -->
-    <script src="https://bossanova.uk/jspreadsheet/v4/jexcel.js"></script>
-    <script src="https://bossanova.uk/jspreadsheet/v4/jsuites.js"></script>
-    <link rel="stylesheet" href="https://bossanova.uk/jspreadsheet/v4/jexcel.css" type="text/css" />
-    <link rel="stylesheet" href="https://bossanova.uk/jspreadsheet/v4/jsuites.css" type="text/css" />
+    <!-- Jspreadsheet CE for Interactive In-Browser Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/jspreadsheet-ce/dist/index.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce/dist/jspreadsheet.min.css" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/jsuites/dist/jsuites.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsuites/dist/jsuites.min.css" type="text/css" />
 
     <style>
         /* Scoreboard Banner */
@@ -362,13 +362,22 @@
             ]
         };
 
+        /* Helper to convert Col index (0 = A, 1 = B) to Excel Cell reference (e.g. A1) */
+        function getCellId(col, row) {
+            let letter = String.fromCharCode(65 + col);
+            if (col > 25) {
+                letter = String.fromCharCode(64 + Math.floor(col/26)) + String.fromCharCode(65 + (col%26));
+            }
+            return letter + (row + 1);
+        }
+
         function initSpreadsheet(dataArray) {
             if (currentSheet) {
                 currentSheet.destroy();
                 document.getElementById('spreadsheet').innerHTML = "";
             }
             
-            currentSheet = jexcel(document.getElementById('spreadsheet'), {
+            currentSheet = jspreadsheet(document.getElementById('spreadsheet'), {
                 data: JSON.parse(JSON.stringify(dataArray)), 
                 minDimensions: [9, 10], 
                 defaultColWidth: 100,
@@ -441,41 +450,41 @@
         /* LIVE CONDITIONAL FORMATTING & SCORING */
         function evaluateLiveSheet() {
             let cells = answerCells[currentTask];
-            let data = currentSheet.getData(null, true); // Get raw formula text
+            let data = currentSheet.getData(null, true); 
             
             let correct = 0;
             let incorrect = 0;
             let unanswered = 0;
             
             cells.forEach(c => {
-                let cellName = jexcel.getColumnNameFromId([c.col, c.row]);
+                let cellId = getCellId(c.col, c.row);
                 let val = String(data[c.row][c.col]).trim();
                 
                 if (val === '') {
-                    currentSheet.setStyle(cellName, 'background-color', '#fff2cc'); // Yellow
-                    currentSheet.setStyle(cellName, 'color', '#000000');
+                    currentSheet.setStyle(cellId, 'background-color', '#fff2cc'); // Yellow
+                    currentSheet.setStyle(cellId, 'color', '#000000');
                     unanswered++;
                 } else if (c.check(val)) {
-                    currentSheet.setStyle(cellName, 'background-color', '#c6efce'); // Green
-                    currentSheet.setStyle(cellName, 'color', '#006100');
+                    currentSheet.setStyle(cellId, 'background-color', '#c6efce'); // Green
+                    currentSheet.setStyle(cellId, 'color', '#006100');
                     correct++;
                 } else {
-                    currentSheet.setStyle(cellName, 'background-color', '#ffc7ce'); // Red
-                    currentSheet.setStyle(cellName, 'color', '#9c0006');
+                    currentSheet.setStyle(cellId, 'background-color', '#ffc7ce'); // Red
+                    currentSheet.setStyle(cellId, 'color', '#9c0006');
                     incorrect++;
                 }
             });
             
             let totalCells = cells.length;
             
-            // Map the correct cells directly to a score out of 5 for the scoreboard
+            // Map the correct cells directly to a score out of 5
             let earnedMarks = Math.round((correct / totalCells) * 5);
             updateScore(currentTask, earnedMarks);
             
             let statusText = unanswered === totalCells ? "Not Started" : (correct === totalCells ? "Completed ✅" : "In Progress ⏳");
             let statusColor = correct === totalCells ? "#2e7d32" : (unanswered === totalCells ? "#666" : "#ef6c00");
 
-            // Build Live Progress Table matching Screenshot 5
+            // Build Live Progress Table
             let html = `
                 <table class="progress-table">
                     <tr>
