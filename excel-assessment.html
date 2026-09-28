@@ -6,11 +6,11 @@
     <title>Interactive Excel Assessment</title>
     <link rel="stylesheet" href="style.css">
     
-    <!-- Jspreadsheet CE for Interactive In-Browser Excel -->
-    <script src="https://cdn.jsdelivr.net/npm/jspreadsheet-ce/dist/index.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce/dist/jspreadsheet.min.css" type="text/css" />
-    <script src="https://cdn.jsdelivr.net/npm/jsuites/dist/jsuites.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsuites/dist/jsuites.min.css" type="text/css" />
+    <!-- Stable Jexcel (v4) Links for In-Browser Excel -->
+    <script src="https://bossanova.uk/jspreadsheet/v4/jexcel.js"></script>
+    <script src="https://bossanova.uk/jspreadsheet/v4/jsuites.js"></script>
+    <link rel="stylesheet" href="https://bossanova.uk/jspreadsheet/v4/jexcel.css" type="text/css" />
+    <link rel="stylesheet" href="https://bossanova.uk/jspreadsheet/v4/jsuites.css" type="text/css" />
 
     <style>
         /* Scoreboard Banner */
@@ -181,7 +181,7 @@
         </div>
         
         <div class="header-right">
-            <a href="index.html" class="back-btn">&larr; Back to Curriculum</a>
+            <a href="spreadsheets.html" class="back-btn">&larr; Back to Curriculum</a>
         </div>
     </header>
 
@@ -207,7 +207,7 @@
                 
                 <select id="task-selector" onchange="switchTask()">
                     <option value="t1">Task 1 (Basic Formulae)</option>
-                    <option value="t2">Task 2 (Price Model & Absolute Ref)</option>
+                    <option value="t2">Task 2 (Price Model)</option>
                     <option value="t3">Task 3 (School Club Functions)</option>
                     <option value="t4">Task 4 (Charity Café Model)</option>
                 </select>
@@ -377,15 +377,20 @@
                 document.getElementById('spreadsheet').innerHTML = "";
             }
             
-            currentSheet = jspreadsheet(document.getElementById('spreadsheet'), {
+            // Revert back to jexcel for guaranteed stability
+            currentSheet = jexcel(document.getElementById('spreadsheet'), {
                 data: JSON.parse(JSON.stringify(dataArray)), 
                 minDimensions: [9, 10], 
                 defaultColWidth: 100,
                 tableOverflow: true,
                 tableWidth: "100%",
                 tableHeight: "350px",
-                onload: function() { evaluateLiveSheet(); },
-                onchange: function() { evaluateLiveSheet(); },
+                onload: function() { 
+                    setTimeout(evaluateLiveSheet, 100); 
+                },
+                onchange: function() { 
+                    evaluateLiveSheet(); 
+                },
                 updateTable: function(instance, cell, col, row, val, label, cellName) {
                     // Header Styling
                     if (row === 0) {
@@ -449,63 +454,70 @@
 
         /* LIVE CONDITIONAL FORMATTING & SCORING */
         function evaluateLiveSheet() {
-            let cells = answerCells[currentTask];
-            let data = currentSheet.getData(null, true); 
-            
-            let correct = 0;
-            let incorrect = 0;
-            let unanswered = 0;
-            
-            cells.forEach(c => {
-                let cellId = getCellId(c.col, c.row);
-                let val = String(data[c.row][c.col]).trim();
+            try {
+                if (!currentSheet || !currentSheet.options) return;
                 
-                if (val === '') {
-                    currentSheet.setStyle(cellId, 'background-color', '#fff2cc'); // Yellow
-                    currentSheet.setStyle(cellId, 'color', '#000000');
-                    unanswered++;
-                } else if (c.check(val)) {
-                    currentSheet.setStyle(cellId, 'background-color', '#c6efce'); // Green
-                    currentSheet.setStyle(cellId, 'color', '#006100');
-                    correct++;
-                } else {
-                    currentSheet.setStyle(cellId, 'background-color', '#ffc7ce'); // Red
-                    currentSheet.setStyle(cellId, 'color', '#9c0006');
-                    incorrect++;
-                }
-            });
-            
-            let totalCells = cells.length;
-            
-            // Map the correct cells directly to a score out of 5
-            let earnedMarks = Math.round((correct / totalCells) * 5);
-            updateScore(currentTask, earnedMarks);
-            
-            let statusText = unanswered === totalCells ? "Not Started" : (correct === totalCells ? "Completed ✅" : "In Progress ⏳");
-            let statusColor = correct === totalCells ? "#2e7d32" : (unanswered === totalCells ? "#666" : "#ef6c00");
+                let cells = answerCells[currentTask];
+                let correct = 0;
+                let incorrect = 0;
+                let unanswered = 0;
+                
+                cells.forEach(c => {
+                    let cellId = getCellId(c.col, c.row);
+                    
+                    // Safely extract the raw typed formula directly from the sheet data array
+                    let rawVal = currentSheet.options.data[c.row][c.col];
+                    let val = (rawVal !== null && rawVal !== undefined) ? String(rawVal).trim() : '';
+                    
+                    if (val === '') {
+                        currentSheet.setStyle(cellId, 'background-color', '#fff2cc'); // Yellow
+                        currentSheet.setStyle(cellId, 'color', '#000000');
+                        unanswered++;
+                    } else if (c.check(val)) {
+                        currentSheet.setStyle(cellId, 'background-color', '#c6efce'); // Green
+                        currentSheet.setStyle(cellId, 'color', '#006100');
+                        correct++;
+                    } else {
+                        currentSheet.setStyle(cellId, 'background-color', '#ffc7ce'); // Red
+                        currentSheet.setStyle(cellId, 'color', '#9c0006');
+                        incorrect++;
+                    }
+                });
+                
+                let totalCells = cells.length;
+                
+                // Map the correct cells directly to a score out of 5
+                let earnedMarks = Math.round((correct / totalCells) * 5);
+                updateScore(currentTask, earnedMarks);
+                
+                let statusText = unanswered === totalCells ? "Not Started" : (correct === totalCells ? "Completed ✅" : "In Progress ⏳");
+                let statusColor = correct === totalCells ? "#2e7d32" : (unanswered === totalCells ? "#666" : "#ef6c00");
 
-            // Build Live Progress Table
-            let html = `
-                <table class="progress-table">
-                    <tr>
-                        <th style="border-radius: 4px 0 0 0;">Correct</th>
-                        <th>Check</th>
-                        <th style="border-radius: 0 4px 0 0;">Unanswered</th>
-                    </tr>
-                    <tr>
-                        <td style="background-color:#c6efce; color:#006100;">${correct}</td>
-                        <td style="background-color:#ffc7ce; color:#9c0006;">${incorrect}</td>
-                        <td style="background-color:#fff2cc; color:#000000;">${unanswered}</td>
-                    </tr>
-                </table>
+                // Build Live Progress Table matching the uploaded image design
+                let html = `
+                    <table class="progress-table">
+                        <tr>
+                            <th style="border-radius: 4px 0 0 0;">Correct</th>
+                            <th>Check</th>
+                            <th style="border-radius: 0 4px 0 0;">Unanswered</th>
+                        </tr>
+                        <tr>
+                            <td style="background-color:#c6efce; color:#006100;">${correct}</td>
+                            <td style="background-color:#ffc7ce; color:#9c0006;">${incorrect}</td>
+                            <td style="background-color:#fff2cc; color:#000000;">${unanswered}</td>
+                        </tr>
+                    </table>
+                    
+                    <div style="font-size: 16px; margin-top: 15px;">
+                        <strong>Marks Awarded:</strong> ${earnedMarks} / 5<br><br>
+                        <strong>Status:</strong> <span style="color:${statusColor}; font-weight:bold;">${statusText}</span>
+                    </div>
+                `;
                 
-                <div style="font-size: 16px; margin-top: 15px;">
-                    <strong>Marks Awarded:</strong> ${earnedMarks} / 5<br><br>
-                    <strong>Status:</strong> <span style="color:${statusColor}; font-weight:bold;">${statusText}</span>
-                </div>
-            `;
-            
-            document.getElementById("feedback").innerHTML = html;
+                document.getElementById("feedback").innerHTML = html;
+            } catch (err) {
+                console.error("Evaluation skipped until sheet fully loads.", err);
+            }
         }
     </script>
 </body>
