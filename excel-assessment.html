@@ -171,6 +171,7 @@
             font-family: Calibri, Arial, sans-serif;
             font-size: 14px;
             background-color: white;
+            user-select: none; /* Prevents text highlighting while dragging */
         }
 
         .excel-table th, .excel-table td {
@@ -230,6 +231,30 @@
             background-color: white !important;
             color: black !important;
             cursor: text;
+        }
+
+        /* EXCEL DRAG-TO-FILL HANDLE STYLES */
+        .fill-handle {
+            display: none;
+            width: 6px;
+            height: 6px;
+            background-color: #217346;
+            border: 1px solid white;
+            position: absolute;
+            bottom: -3px;
+            right: -3px;
+            cursor: crosshair;
+            z-index: 10;
+        }
+
+        /* Show handle only when the TD is active */
+        .td-active .fill-handle {
+            display: block;
+        }
+
+        /* Styling for cells being dragged over */
+        .fill-highlight {
+            background-color: rgba(33, 115, 70, 0.15) !important;
         }
 
         /* Conditional Formatting Colors applied to the TD */
@@ -320,8 +345,8 @@
                 <h3 style="color: #217346;">2. Live Spreadsheet Editor</h3>
                 <p style="font-size: 13px; color: #666; margin-top: 0; margin-bottom: 5px;">
                     <span style="background:#c6efce; color:#006100; padding:2px 6px; border-radius:3px; font-weight:bold;">Green</span> = Correct Formula &nbsp;|&nbsp; 
-                    <span style="background:#ffc7ce; color:#9c0006; padding:2px 6px; border-radius:3px; font-weight:bold;">Red</span> = Incorrect or Typed Answer &nbsp;|&nbsp; 
-                    <span style="background:#fff2cc; color:#000000; padding:2px 6px; border-radius:3px; font-weight:bold;">Yellow</span> = Unanswered
+                    <span style="background:#ffc7ce; color:#9c0006; padding:2px 6px; border-radius:3px; font-weight:bold;">Red</span> = Incorrect/Typed Answer <br>
+                    <strong>Tip:</strong> Select a cell and drag the small bottom-right square downwards to replicate your formula!
                 </p>
                 
                 <div class="formula-bar-container">
@@ -349,7 +374,7 @@
         &copy; 2026 Delta Serlby Park - Computing Department
     </footer>
 
-    <!-- BULLETPROOF SCRIPT -->
+    <!-- BULLETPROOF SCRIPT WITH DRAG-TO-FILL -->
     <script>
         window.onerror = function(msg, url, line) {
             var panel = document.getElementById("instruction-panel");
@@ -359,6 +384,11 @@
 
         var currentTask = "t1";
         var activeCell = null; // Tracks {r, c} of currently focused cell
+        
+        // Drag-to-fill Global Variables
+        var isDraggingFill = false;
+        var dragSource = null; // {r, c} of the cell being copied
+        var dragTarget = null; // {r, c} of the current mouse hover
 
         var defaultTaskData = {
             "t1": [
@@ -428,10 +458,10 @@
                 { col: 3, row: 2, check: function(v) { return checkFormula(v, ['=B3*C3', '=C3*B3']); } },
                 { col: 3, row: 3, check: function(v) { return checkFormula(v, ['=B4*C4', '=C4*B4']); } },
                 { col: 3, row: 4, check: function(v) { return checkFormula(v, ['=B5*C5', '=C5*B5']); } },
-                { col: 4, row: 1, check: function(v) { return checkFormula(v, ['=D2+$B$6', '=$B$6+D2', '=D2+$B6', '=$B6+D2', '=D2+B$6', '=B$6+D2']); } },
-                { col: 4, row: 2, check: function(v) { return checkFormula(v, ['=D3+$B$6', '=$B$6+D3', '=D3+$B6', '=$B6+D3', '=D3+B$6', '=B$6+D3']); } },
-                { col: 4, row: 3, check: function(v) { return checkFormula(v, ['=D4+$B$6', '=$B$6+D4', '=D4+$B6', '=$B6+D4', '=D4+B$6', '=B$6+D4']); } },
-                { col: 4, row: 4, check: function(v) { return checkFormula(v, ['=D5+$B$6', '=$B$6+D5', '=D5+$B6', '=$B6+D5', '=D5+B$6', '=B$6+D5']); } }
+                { col: 4, row: 1, check: function(v) { return checkFormula(v, ['=D2+$B$6', '=$B$6+D2', '=D2+$B6', '=$B6+D2', '=D2+B$6', '=B$6+D2', '=D2+B6', '=B6+D2']); } },
+                { col: 4, row: 2, check: function(v) { return checkFormula(v, ['=D3+$B$6', '=$B$6+D3', '=D3+$B6', '=$B6+D3', '=D3+B$6', '=B$6+D3', '=D3+B6', '=B6+D3']); } },
+                { col: 4, row: 3, check: function(v) { return checkFormula(v, ['=D4+$B$6', '=$B$6+D4', '=D4+$B6', '=$B6+D4', '=D4+B$6', '=B$6+D4', '=D4+B6', '=B6+D4']); } },
+                { col: 4, row: 4, check: function(v) { return checkFormula(v, ['=D5+$B$6', '=$B$6+D5', '=D5+$B6', '=$B6+D5', '=D5+B$6', '=B$6+D5', '=D5+B6', '=B6+D5']); } }
             ],
             "t3": [
                 { col: 6, row: 1, check: function(v) { return checkFormula(v, ['=SUM(B2:F2)']); } },
@@ -474,9 +504,7 @@
             if (!taskData[currentTask] || !taskData[currentTask][rc.r]) return 0;
             var val = taskData[currentTask][rc.r][rc.c];
             if (val === undefined || val === '') return 0;
-            if (String(val).startsWith('=')) {
-                return calculateFormula(val);
-            }
+            if (String(val).startsWith('=')) return calculateFormula(val);
             var parsed = parseFloat(val);
             return isNaN(parsed) ? 0 : parsed;
         }
@@ -517,14 +545,39 @@
                     return getCellValue(match);
                 });
 
-                // Calculate math
                 var result = new Function('return ' + expr)();
-                
-                // Return nicely formatted number (2 decimals max)
-                return Math.round(result * 100) / 100;
+                return Math.round(result * 100) / 100; // Return nicely formatted number (2 decimals max)
             } catch(e) {
                 return "#ERROR!";
             }
+        }
+
+        /* SMART FORMULA ADJUSTER FOR DRAG-TO-FILL */
+        function adjustFormulaForFill(formula, rowOffset, colOffset) {
+            if (!formula.startsWith('=')) return formula; // Only auto-increment formulas
+            
+            // Regex strictly matches Cell References like A1, $B$6, AB20
+            return formula.replace(/(\$?)([A-Z]+)(\$?)([0-9]+)/g, function(match, absCol, colStr, absRow, rowStr) {
+                var col = 0;
+                for(var i=0; i<colStr.length; i++) {
+                    col = col * 26 + (colStr.charCodeAt(i) - 64);
+                }
+                var row = parseInt(rowStr);
+
+                if (!absCol) col += colOffset; // Don't shift column if it has a $
+                if (!absRow) row += rowOffset; // Don't shift row if it has a $
+
+                // Convert Column index back to letters
+                var newColStr = "";
+                var tempCol = col;
+                while(tempCol > 0) {
+                    var rem = (tempCol - 1) % 26;
+                    newColStr = String.fromCharCode(65 + rem) + newColStr;
+                    tempCol = Math.floor((tempCol - 1) / 26);
+                }
+
+                return absCol + newColStr + absRow + row;
+            });
         }
 
         /* STORAGE FUNCTIONS */
@@ -623,12 +676,15 @@
                     else if ((taskKey === "t3" && r === 5) || (taskKey === "t4" && r === 4)) extraClass = "info-cell"; 
 
                     if (isAnswerCell) {
-                        html += '<td id="td-' + r + '-' + col + '" style="padding: 0;">' + 
+                        html += '<td id="td-' + r + '-' + col + '" style="position: relative; padding: 0;">' + 
                                 '<input type="text" id="cell-' + r + '-' + col + '" class="cell-input" ' +
                                 'onfocus="handleCellFocus(' + r + ',' + col + ')" ' +
                                 'onblur="handleCellBlur(' + r + ',' + col + ')" ' +
                                 'onkeydown="handleCellKey(event, ' + r + ',' + col + ')" ' +
-                                'autocomplete="off"></td>';
+                                'onmouseenter="handleMouseEnter(' + r + ',' + col + ')" ' +
+                                'autocomplete="off"> ' +
+                                '<div class="fill-handle" onmousedown="startFillDrag(event, ' + r + ',' + col + ')"></div>' +
+                                '</td>';
                     } else {
                         html += '<td class="static-cell ' + extraClass + '">' + cellVal + '</td>';
                     }
@@ -641,8 +697,7 @@
             var container = document.getElementById('spreadsheet-container');
             if (container) container.innerHTML = html;
             
-            // Force an initial evaluation to map formulas to answers and colorize
-            evaluateAllCells();
+            evaluateAllCells(); // Calculate everything
         }
 
         function switchTask() {
@@ -653,7 +708,6 @@
             var panel = document.getElementById("instruction-panel");
             if (panel) panel.innerHTML = instructions[currentTask];
             
-            // Reset Formula Bar
             activeCell = null;
             document.getElementById("formula-bar").value = "";
             document.getElementById("formula-bar").disabled = true;
@@ -665,26 +719,28 @@
         function handleCellFocus(r, c) {
             activeCell = {r: r, c: c};
             var input = document.getElementById('cell-' + r + '-' + c);
+            var td = document.getElementById('td-' + r + '-' + c);
             var fx = document.getElementById('formula-bar');
             
-            // When clicked, show the RAW formula they typed instead of the calculated answer
-            var rawValue = taskData[currentTask][r][c] || "";
-            input.value = rawValue;
+            if (td) td.classList.add('td-active'); // Shows the fill-handle square
             
-            // Enable and sync the formula bar
+            var rawValue = taskData[currentTask][r][c] || "";
+            input.value = rawValue; // Show raw formula instead of calculated answer
+            
             fx.disabled = false;
             fx.value = rawValue;
         }
 
         function handleCellBlur(r, c) {
-            var input = document.getElementById('cell-' + r + '-' + c);
-            // Save whatever they left in the box
-            taskData[currentTask][r][c] = input.value;
+            if (isDraggingFill) return; // Don't wipe focus while they are dragging!
             
-            // Re-evaluate everything (updates colors and calculates new answers)
+            var input = document.getElementById('cell-' + r + '-' + c);
+            var td = document.getElementById('td-' + r + '-' + c);
+            if (td) td.classList.remove('td-active'); // Hide the fill-handle square
+            
+            taskData[currentTask][r][c] = input.value;
             evaluateAllCells();
             
-            // Disable formula bar if we click completely off the grid
             setTimeout(function() {
                 if (document.activeElement.id !== 'formula-bar' && (!document.activeElement.id || !document.activeElement.id.startsWith('cell-'))) {
                     document.getElementById('formula-bar').disabled = true;
@@ -695,11 +751,9 @@
         }
 
         function handleCellKey(e, r, c) {
-            // Pressing ENTER confirms the cell instantly
             if (e.key === 'Enter') {
-                document.getElementById('cell-' + r + '-' + c).blur();
+                document.getElementById('cell-' + r + '-' + c).blur(); // Finalize input naturally
             }
-            // Real-time sync to the formula bar as they type
             setTimeout(function() {
                 if (activeCell && activeCell.r === r && activeCell.c === c) {
                     document.getElementById('formula-bar').value = document.getElementById('cell-' + r + '-' + c).value;
@@ -721,6 +775,90 @@
             }
         }
 
+        /* EXCEL DRAG-TO-FILL LOGIC */
+        function startFillDrag(e, r, c) {
+            e.preventDefault(); // Prevents input from blurring
+            e.stopPropagation();
+            isDraggingFill = true;
+            dragSource = {r: r, c: c};
+            dragTarget = {r: r, c: c};
+        }
+
+        function handleMouseEnter(r, c) {
+            if (isDraggingFill && dragSource) {
+                // Ensure dragging is locked to a single column or row
+                var dr = r - dragSource.r;
+                var dc = c - dragSource.c;
+                if (Math.abs(dr) > Math.abs(dc)) {
+                    dragTarget = {r: r, c: dragSource.c}; // Dragging Vertically
+                } else {
+                    dragTarget = {r: dragSource.r, c: c}; // Dragging Horizontally
+                }
+                drawHighlight();
+            }
+        }
+
+        function clearHighlights() {
+            var inputs = document.getElementsByClassName('cell-input');
+            for(var i=0; i<inputs.length; i++) {
+                inputs[i].classList.remove('fill-highlight');
+            }
+        }
+
+        function drawHighlight() {
+            clearHighlights();
+            if (!dragSource || !dragTarget) return;
+            var rMin = Math.min(dragSource.r, dragTarget.r);
+            var rMax = Math.max(dragSource.r, dragTarget.r);
+            var cMin = Math.min(dragSource.c, dragTarget.c);
+            var cMax = Math.max(dragSource.c, dragTarget.c);
+
+            for(var r=rMin; r<=rMax; r++) {
+                for(var c=cMin; c<=cMax; c++) {
+                    var inputEl = document.getElementById('cell-' + r + '-' + c);
+                    if(inputEl) inputEl.classList.add('fill-highlight');
+                }
+            }
+        }
+
+        // Catch the moment the student lets go of the mouse click anywhere on the page
+        window.addEventListener('mouseup', function(e) {
+            if (isDraggingFill) {
+                applyFill();
+                isDraggingFill = false;
+                clearHighlights();
+            }
+        });
+
+        function applyFill() {
+            if (!dragSource || !dragTarget) return;
+            var rMin = Math.min(dragSource.r, dragTarget.r);
+            var rMax = Math.max(dragSource.r, dragTarget.r);
+            var cMin = Math.min(dragSource.c, dragTarget.c);
+            var cMax = Math.max(dragSource.c, dragTarget.c);
+
+            var sourceVal = taskData[currentTask][dragSource.r][dragSource.c];
+
+            for(var r=rMin; r<=rMax; r++) {
+                for(var c=cMin; c<=cMax; c++) {
+                    if (r === dragSource.r && c === dragSource.c) continue; // Skip original cell
+                    
+                    var targetInput = document.getElementById('cell-' + r + '-' + c);
+                    if (!targetInput) continue; // Skip static non-answer cells
+                    
+                    var rOffset = r - dragSource.r;
+                    var cOffset = c - dragSource.c;
+                    
+                    var newVal = adjustFormulaForFill(String(sourceVal), rOffset, cOffset);
+                    taskData[currentTask][r][c] = newVal;
+                }
+            }
+            
+            evaluateAllCells();
+            // Refocus the original cell so the formula bar updates
+            document.getElementById('cell-' + dragSource.r + '-' + dragSource.c).focus();
+        }
+
         /* MAIN EVALUATOR */
         function evaluateAllCells() {
             var cells = answerCells[currentTask];
@@ -739,7 +877,7 @@
                 var rawVal = taskData[currentTask][c.row][c.col] || "";
                 var cleanVal = rawVal.replace(/^\s+|\s+$/g, '');
                 
-                tdEl.className = ""; // Reset background color class
+                tdEl.className = ""; // Reset background color
                 
                 if (cleanVal === '') {
                     tdEl.classList.add('status-yellow');
@@ -752,7 +890,7 @@
                     incorrect++;
                 }
 
-                // If the cell is NOT currently focused, show the calculated VALUE instead of the formula
+                // Show calculated VALUE instead of formula (if they aren't actively clicking inside it)
                 if (document.activeElement !== inputEl) {
                     if (cleanVal.startsWith('=')) {
                         inputEl.value = calculateFormula(cleanVal);
