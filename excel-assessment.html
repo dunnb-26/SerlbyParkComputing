@@ -401,7 +401,7 @@
         var taskData = JSON.parse(JSON.stringify(defaultTaskData));
 
         var instructions = {
-            "t1": "<strong>TASK 1: Basic Formulae</strong><br><br>Write formulae in the Answer column. Use strict cell references (e.g. <code>=B2+C2</code>), not typed numbers.<br><br>&bull; Row 2: Add Number 1 and Number 2.<br>&bull; Row 3: Subtract Number 2 from Number 1.<br>&bull; Row 4: Multiply Number 1 by Number 2.<br>&bull; Row 5: Divide Number 1 by Number 2.<br>&bull; Row 6: Add Number 1 and Number 2.",
+            "t1": "<strong>TASK 1: Basic Formulae</strong><br><br>Write formulae in the Answer column. Use strict cell references (e.g. <code>=A2+C2</code>), not typed numbers.<br><br>&bull; Row 2: Add Number 1 and Number 2.<br>&bull; Row 3: Subtract Number 2 from Number 1.<br>&bull; Row 4: Multiply Number 1 by Number 2.<br>&bull; Row 5: Divide Number 1 by Number 2.<br>&bull; Row 6: Add Number 1 and Number 2.",
             "t2": "<strong>TASK 2: Price Model</strong><br><br>Complete the price model using strict cell references.<br><br>&bull; Column D: Calculate <code>Item cost</code> (Unit price * Quantity).<br>&bull; Column E: Calculate <code>Cost + delivery</code> (Item cost + Delivery).<br>&bull; <strong>Absolute Reference:</strong> Use an absolute reference (e.g. <code>$B$6</code>) for the fixed delivery charge.",
             "t3": "<strong>TASK 3: School Club Functions</strong><br><br>Use functions to analyse the attendance data. Use standard ranges (e.g. <code>=SUM(B2:F2)</code>).<br><br>&bull; Column G: Use <code>=SUM()</code> to find Total attendance.<br>&bull; Column H: Use <code>=AVERAGE()</code> to find Average attendance.<br>&bull; Column I: Use <code>=MAX()</code> to find Highest attendance.<br>&bull; Cell B7: Use <code>=MIN()</code> to find the smallest attendance over the whole table.<br>&bull; Cell B8: Use <code>=MAX()</code> to find the largest attendance over the whole table.",
             "t4": "<strong>TASK 4: Charity Café Model</strong><br><br>Calculate income and answer the summary questions using exact cell references/ranges.<br><br>&bull; Column F: Calculate <code>Total sold</code> using <code>=SUM()</code>.<br>&bull; Column G: Calculate <code>Income</code> (Price * Total sold).<br>&bull; Cell B6: Calculate Total café income using <code>=SUM()</code>.<br>&bull; Cell B7: Calculate Average product income using <code>=AVERAGE()</code>."
@@ -417,11 +417,11 @@
 
         var answerCells = {
             "t1": [
-                { col: 3, row: 1, check: function(v) { return checkFormula(v, ['=B2+C2', '=C2+B2']); } },
-                { col: 3, row: 2, check: function(v) { return checkFormula(v, ['=B3-C3']); } },
-                { col: 3, row: 3, check: function(v) { return checkFormula(v, ['=B4*C4', '=C4*B4']); } },
-                { col: 3, row: 4, check: function(v) { return checkFormula(v, ['=B5/C5']); } },
-                { col: 3, row: 5, check: function(v) { return checkFormula(v, ['=B6+C6', '=C6+B6']); } }
+                { col: 3, row: 1, check: function(v) { return checkFormula(v, ['=A2+C2', '=C2+A2']); } },
+                { col: 3, row: 2, check: function(v) { return checkFormula(v, ['=A3-C3']); } },
+                { col: 3, row: 3, check: function(v) { return checkFormula(v, ['=A4*C4', '=C4*A4']); } },
+                { col: 3, row: 4, check: function(v) { return checkFormula(v, ['=A5/C5']); } },
+                { col: 3, row: 5, check: function(v) { return checkFormula(v, ['=A6+C6', '=C6+A6']); } }
             ],
             "t2": [
                 { col: 3, row: 1, check: function(v) { return checkFormula(v, ['=B2*C2', '=C2*B2']); } },
@@ -477,7 +477,8 @@
             if (String(val).startsWith('=')) {
                 return calculateFormula(val);
             }
-            return parseFloat(val) || 0;
+            var parsed = parseFloat(val);
+            return isNaN(parsed) ? 0 : parsed;
         }
 
         function getRangeValues(start, end) {
@@ -667,7 +668,7 @@
             var fx = document.getElementById('formula-bar');
             
             // When clicked, show the RAW formula they typed instead of the calculated answer
-            var rawValue = taskData[currentTask][r][c];
+            var rawValue = taskData[currentTask][r][c] || "";
             input.value = rawValue;
             
             // Enable and sync the formula bar
