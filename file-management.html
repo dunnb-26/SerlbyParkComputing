@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Management & Researching - Lesson 4</title>
+    <title>File Management & Researching</title>
     <link rel="stylesheet" href="style.css">
 
     <style>
@@ -81,12 +81,39 @@
             border-color: #666;
         }
 
-        /* Correct Answer Styling */
+        /* Correct & Incorrect Answer Styling */
         .input-correct {
             border-color: #008f39 !important;
             background-color: #e8f5e9 !important;
             color: #006100;
             font-weight: bold;
+        }
+        
+        .input-incorrect {
+            border-color: #d32f2f !important;
+            background-color: #ffebee !important;
+            color: #b71c1c;
+            font-weight: bold;
+        }
+
+        /* Submit Button */
+        .btn-submit {
+            background-color: #1e3a8a;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            display: block;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+
+        .btn-submit:hover {
+            background-color: #152960;
         }
 
         /* Screenshot Upload Zones */
@@ -105,17 +132,25 @@
             box-sizing: border-box;
             position: relative;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
         }
 
-        .screenshot-zone:hover {
-            background-color: #f0f0f0;
+        /* Highlight the zone when the student clicks it so they know it is active */
+        .screenshot-zone:focus {
+            border-color: #800000;
+            background-color: #f0e6e6;
+            outline: none;
+        }
+        
+        #zone-navy:focus {
+            border-color: #1e3a8a;
+            background-color: #e6e9f0;
         }
 
         .screenshot-text {
             color: #666;
             font-size: 15px;
-            pointer-events: none; /* Prevents text from interfering with paste events */
+            pointer-events: none; 
         }
 
         .screenshot-image {
@@ -124,11 +159,6 @@
             display: none;
             border-radius: 4px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        /* Hide the actual file input, we trigger it via JS */
-        .file-input {
-            display: none; 
         }
     </style>
 </head>
@@ -157,10 +187,9 @@
             
             <p style="text-align: center; color: #555; margin-bottom: 10px;">Paste a screenshot here to prove these have been created (fn + print screen):</p>
             
-            <div class="screenshot-zone" id="zone-maroon" onclick="document.getElementById('file-maroon').click()" tabindex="0">
-                <span class="screenshot-text" id="text-maroon">Click to upload image, or press Ctrl+V to paste screenshot</span>
+            <div class="screenshot-zone" id="zone-maroon" tabindex="0">
+                <span class="screenshot-text" id="text-maroon">Click this box to select it, then press <strong>Ctrl+V</strong> to paste screenshot</span>
                 <img id="img-maroon" class="screenshot-image" src="" alt="Student Screenshot">
-                <input type="file" id="file-maroon" class="file-input" accept="image/*" onchange="handleFileUpload(event, 'img-maroon', 'text-maroon')">
             </div>
         </div>
 
@@ -173,23 +202,25 @@
 
             <div class="question-row">
                 <label class="question-label">What year was the World Wide Web invented?</label>
-                <input type="text" class="auto-input" data-answers='["1989"]' placeholder="Type answer here..." onkeyup="checkAnswer(this)">
+                <input type="text" class="auto-input amber-input" data-answers='["1989"]' placeholder="Type answer here...">
             </div>
 
             <div class="question-row">
                 <label class="question-label">Who invented the first computer mouse?</label>
-                <input type="text" class="auto-input" data-answers='["douglas engelbart", "engelbart"]' placeholder="Type answer here..." onkeyup="checkAnswer(this)">
+                <input type="text" class="auto-input amber-input" data-answers='["douglas engelbart", "engelbart"]' placeholder="Type answer here...">
             </div>
 
             <div class="question-row">
                 <label class="question-label">What does CPU stand for?</label>
-                <input type="text" class="auto-input" data-answers='["central processing unit"]' placeholder="Type answer here..." onkeyup="checkAnswer(this)">
+                <input type="text" class="auto-input amber-input" data-answers='["central processing unit"]' placeholder="Type answer here...">
             </div>
 
             <div class="question-row">
                 <label class="question-label">What is the capital of Japan?</label>
-                <input type="text" class="auto-input" data-answers='["tokyo"]' placeholder="Type answer here..." onkeyup="checkAnswer(this)">
+                <input type="text" class="auto-input amber-input" data-answers='["tokyo"]' placeholder="Type answer here...">
             </div>
+            
+            <button class="btn-submit" onclick="checkAnswers('amber-input')">Submit Answers</button>
         </div>
 
         <!-- Task 3: Green (Complex Facts) -->
@@ -202,23 +233,25 @@
 
             <div class="question-row">
                 <label class="question-label">What was the exact name of the first computer mouse made of wood?</label>
-                <input type="text" class="auto-input" data-answers='["x-y position indicator for a display system", "x-y position indicator", "xy position indicator"]' placeholder="Type answer here..." onkeyup="checkAnswer(this)">
+                <input type="text" class="auto-input green-input" data-answers='["x-y position indicator for a display system", "x-y position indicator", "xy position indicator"]' placeholder="Type answer here...">
             </div>
 
             <div class="question-row">
                 <label class="question-label">What is Python?</label>
-                <input type="text" class="auto-input" data-answers='["programming language", "a programming language", "computer language", "coding language"]' placeholder="Type answer here..." onkeyup="checkAnswer(this)">
+                <input type="text" class="auto-input green-input" data-answers='["programming language", "a programming language", "computer language", "coding language"]' placeholder="Type answer here...">
             </div>
 
             <div class="question-row">
                 <label class="question-label">What is the tallest mountain in the solar system?</label>
-                <input type="text" class="auto-input" data-answers='["olympus mons"]' placeholder="Type answer here..." onkeyup="checkAnswer(this)">
+                <input type="text" class="auto-input green-input" data-answers='["olympus mons"]' placeholder="Type answer here...">
             </div>
 
             <div class="question-row">
                 <label class="question-label">What was the first message ever sent on the internet?</label>
-                <input type="text" class="auto-input" data-answers='["lo"]' placeholder="Type answer here..." onkeyup="checkAnswer(this)">
+                <input type="text" class="auto-input green-input" data-answers='["lo"]' placeholder="Type answer here...">
             </div>
+            
+            <button class="btn-submit" style="background-color: #008f39;" onclick="checkAnswers('green-input')">Submit Answers</button>
         </div>
 
         <!-- Task 4: Navy (Image Saving) -->
@@ -231,10 +264,9 @@
 
             <p style="text-align: center; color: #555; margin-bottom: 10px;">Paste a screenshot here to prove these have been saved correctly (fn + print screen):</p>
             
-            <div class="screenshot-zone" id="zone-navy" onclick="document.getElementById('file-navy').click()" tabindex="0">
-                <span class="screenshot-text" id="text-navy">Click to upload image, or press Ctrl+V to paste screenshot</span>
+            <div class="screenshot-zone" id="zone-navy" tabindex="0">
+                <span class="screenshot-text" id="text-navy">Click this box to select it, then press <strong>Ctrl+V</strong> to paste screenshot</span>
                 <img id="img-navy" class="screenshot-image" src="" alt="Student Screenshot">
-                <input type="file" id="file-navy" class="file-input" accept="image/*" onchange="handleFileUpload(event, 'img-navy', 'text-navy')">
             </div>
         </div>
 
@@ -245,75 +277,70 @@
     </footer>
 
     <script>
-        /* --- AUTO-MARKING TEXT INPUT LOGIC --- */
-        function checkAnswer(inputElement) {
-            // Get the student's answer, convert to lowercase, and trim extra spaces
-            var studentAnswer = inputElement.value.toLowerCase().trim();
+        /* --- BATCH-MARKING TEXT INPUT LOGIC --- */
+        function checkAnswers(groupClass) {
+            // Get all inputs belonging to the specific task (amber-input or green-input)
+            var inputs = document.getElementsByClassName(groupClass);
             
-            // Get the list of accepted answers from the data-answers attribute
-            var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers'));
-            
-            var isCorrect = false;
-            
-            // Loop through accepted answers to check for a match
-            for (var i = 0; i < acceptedAnswers.length; i++) {
-                if (studentAnswer === acceptedAnswers[i].toLowerCase()) {
-                    isCorrect = true;
-                    break;
+            for (var i = 0; i < inputs.length; i++) {
+                var inputElement = inputs[i];
+                var studentAnswer = inputElement.value.toLowerCase().trim();
+                var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers'));
+                
+                var isCorrect = false;
+                
+                for (var j = 0; j < acceptedAnswers.length; j++) {
+                    if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
+                        isCorrect = true;
+                        break;
+                    }
+                }
+
+                // Reset classes before checking
+                inputElement.classList.remove('input-correct', 'input-incorrect');
+
+                // Only mark if they actually typed something
+                if (studentAnswer !== "") {
+                    if (isCorrect) {
+                        inputElement.classList.add('input-correct');
+                    } else {
+                        inputElement.classList.add('input-incorrect');
+                    }
                 }
             }
-
-            // Apply green styling if correct, remove if they delete it
-            if (isCorrect) {
-                inputElement.classList.add('input-correct');
-            } else {
-                inputElement.classList.remove('input-correct');
-            }
         }
 
-        /* --- SCREENSHOT PASTE & UPLOAD LOGIC --- */
-        
-        // Handle standard file selection (clicking the box)
-        function handleFileUpload(event, imgId, textId) {
-            var file = event.target.files[0];
-            if (file) {
-                displayImage(file, imgId, textId);
-            }
-        }
-
-        // Handle Ctrl+V Paste events anywhere on the document
+        /* --- STRICT SCREENSHOT PASTE LOGIC (NO FILE UPLOAD) --- */
         document.addEventListener('paste', function(e) {
-            // Determine which zone is currently focused/clicked
+            // Determine which zone the student clicked on before pressing Ctrl+V
             var activeElement = document.activeElement;
             var targetImgId = null;
             var targetTextId = null;
 
-            // If they clicked the Maroon box before pasting
             if (activeElement.id === 'zone-maroon') {
                 targetImgId = 'img-maroon';
                 targetTextId = 'text-maroon';
-            } 
-            // If they clicked the Navy box before pasting
-            else if (activeElement.id === 'zone-navy') {
+            } else if (activeElement.id === 'zone-navy') {
                 targetImgId = 'img-navy';
                 targetTextId = 'text-navy';
             } else {
-                // If they didn't click a box, do nothing
+                // If they didn't click a specific box, do nothing
                 return;
             }
 
+            // Find the image data from the clipboard
             var items = (e.clipboardData || e.originalEvent.clipboardData).items;
             for (var index in items) {
                 var item = items[index];
                 if (item.kind === 'file') {
                     var blob = item.getAsFile();
                     displayImage(blob, targetImgId, targetTextId);
-                    e.preventDefault(); // Stop default browser paste behavior
+                    e.preventDefault(); 
                 }
             }
         });
 
-        // Convert file/blob to an image on the screen
+        // Convert the pasted clipboard data to a visible image
         function displayImage(file, imgId, textId) {
             var reader = new FileReader();
             reader.onload = function(event) {
@@ -322,7 +349,7 @@
                 
                 imgElement.src = event.target.result;
                 imgElement.style.display = 'block';
-                textElement.style.display = 'none'; // Hide the "Click to upload" text
+                textElement.style.display = 'none'; // Hide the "Click to paste" text
             };
             reader.readAsDataURL(file);
         }
