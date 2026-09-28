@@ -7,6 +7,24 @@
     <link rel="stylesheet" href="style.css">
     <style>
         .text-display { min-height: 120px; }
+        
+        /* Microsoft Form Button Styling */
+        .btn-ms-form {
+            background-color: #0078d4; /* Microsoft Blue */
+            color: white;
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-weight: bold;
+            display: inline-block;
+            transition: background-color 0.2s;
+            border: 2px solid #0078d4;
+        }
+        .btn-ms-form:hover { 
+            background-color: #106ebe; 
+            border-color: #106ebe;
+        }
     </style>
 </head>
 <body>
@@ -24,11 +42,15 @@
         </div>
     </header>
 
-<main class="typing-main">
-        <!-- New Personal Best Banner -->
-        <div class="stats-bar" style="background-color: var(--btn-gold); color: var(--navy); margin-bottom: 10px;">
+    <main class="typing-main">
+        <!-- New Personal Best Banner with Microsoft Form Button -->
+        <div class="stats-bar" style="background-color: var(--btn-gold); color: var(--navy); margin-bottom: 10px; flex-wrap: wrap; gap: 15px;">
             <div>🏆 Personal Best WPM: <span id="pb-wpm">0</span></div>
             <div>🎯 Personal Best Accuracy: <span id="pb-accuracy">0</span>%</div>
+            <div>
+                <!-- REPLACE THE LINK BELOW WITH YOUR ACTUAL MICROSOFT FORM URL -->
+                <a href="https://forms.cloud.microsoft/e/g2Rzvdy70a" target="_blank" class="btn-ms-form">📋 Submit Scores</a>
+            </div>
         </div>
 
         <div class="stats-bar">
@@ -44,14 +66,14 @@
             <button class="btn-restart" onclick="initTest()">Restart Test</button>
         </div>
 
-        <div style="text-align: centre; padding: 0 20px;">
+        <div style="text-align: center; padding: 0 20px;">
             <ul class="instruction-list" style="color: var(--maroon); font-weight: bold; margin-bottom: 10px;">
                 <p>Click in the text box below then start typing to begin the test</p>
             </ul>
         </div>
 
         <div class="text-display" id="text-display" onclick="document.getElementById('hidden-input').focus()"></div>
-        <input type="text" id="hidden-input" autocomplete="off">
+        <input type="text" id="hidden-input" autocomplete="off" style="opacity: 0; position: absolute; z-index: -1;">
     </main>
 
     <!-- Enhanced Score Pop-up Modal -->
@@ -216,6 +238,7 @@
                 localStorage.setItem('typingPbWpm', finalWpm);
                 localStorage.setItem('typingPbAcc', finalAcc);
                 document.getElementById('modal-title').innerText = "🎉 New Personal Best! 🎉";
+                loadHighScores(); // Update UI immediately
             } else {
                 document.getElementById('modal-title').innerText = "Time's Up!";
             }
