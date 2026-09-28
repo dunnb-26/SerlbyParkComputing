@@ -137,35 +137,36 @@
             border: 1px solid #ddd;
         }
 
-        .btn-run {
-            display: block;
-            width: 100%;
-            margin-top: 15px;
-            padding: 12px;
-            background-color: #217346; /* Excel Green */
-            color: white;
-            text-align: center;
-            border: none;
-            border-radius: 5px;
-            font-size: 1.05em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        
-        .btn-run:hover { background-color: #1e603a; }
-
         .feedback-box {
             margin-top: 15px;
             padding: 15px;
-            font-weight: bold;
             border-radius: 4px;
             text-align: center;
             min-height: 40px;
-            background-color: #f5f5f5;
+            background-color: white;
+            border: 2px solid #ddd;
             color: var(--navy);
             font-size: 14px;
             line-height: 1.5;
+        }
+        
+        /* Progress Table Styles */
+        .progress-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .progress-table th {
+            background-color: #1e3a8a; /* Navy */
+            color: white;
+            padding: 8px;
+        }
+        .progress-table td {
+            padding: 12px 8px;
+            font-weight: bold;
+            font-size: 16px;
         }
     </style>
 </head>
@@ -216,23 +217,25 @@
 
             <!-- COLUMN 2: Interactive Spreadsheet -->
             <div class="ide-panel editor-panel">
-                <h3 style="color: #217346;">2. Spreadsheet Editor</h3>
-                <p style="font-size: 13px; color: #666; margin-top: 0;">Click on a cell and type your formulae below (e.g. <code>=A2+C2</code> or <code>=SUM(B2:F2)</code>):</p>
+                <h3 style="color: #217346;">2. Live Spreadsheet Editor</h3>
+                <p style="font-size: 13px; color: #666; margin-top: 0; margin-bottom: 15px;">
+                    <span style="background:#c6efce; color:#006100; padding:2px 6px; border-radius:3px; font-weight:bold;">Green</span> = Correct Formula &nbsp;|&nbsp; 
+                    <span style="background:#ffc7ce; color:#9c0006; padding:2px 6px; border-radius:3px; font-weight:bold;">Red</span> = Incorrect or Typed Answer &nbsp;|&nbsp; 
+                    <span style="background:#fff2cc; color:#000000; padding:2px 6px; border-radius:3px; font-weight:bold;">Yellow</span> = Unanswered
+                </p>
                 
                 <div id="spreadsheet-container">
                     <div id="spreadsheet"></div>
                 </div>
-                
-                <button class="btn-run" onclick="markExcel()">▶ Submit & Mark Data</button>
             </div>
 
-            <!-- COLUMN 3: Feedback -->
+            <!-- COLUMN 3: Live Results -->
             <div class="ide-panel output-panel">
-                <h3 style="color: var(--maroon);">3. Feedback</h3>
-                <p style="font-size: 13px; color: #666; margin-top: 0;">View your marking feedback below:</p>
+                <h3 style="color: var(--maroon);">3. Section Progress</h3>
+                <p style="font-size: 13px; color: #666; margin-top: 0;">Your answers are evaluated instantly as you type.</p>
                 
                 <div id="feedback" class="feedback-box">
-                    Awaiting formula submission...
+                    Loading progress...
                 </div>
             </div>
         </div>
@@ -289,36 +292,74 @@
 
         const instructions = {
             "t1": `<strong>TASK 1: Basic Formulae</strong><br><br>
-                   Write formulae in column D. Use cell references, not typed numbers.<br><br>
-                   <strong>[1 Mark]</strong> Row 2: Add Number 1 and Number 2.<br>
-                   <strong>[1 Mark]</strong> Row 3: Subtract Number 2 from Number 1.<br>
-                   <strong>[1 Mark]</strong> Row 4: Multiply Number 1 by Number 2.<br>
-                   <strong>[1 Mark]</strong> Row 5: Divide Number 1 by Number 2.<br>
-                   <strong>[1 Mark]</strong> Row 6: Add Number 1 and Number 2.`,
+                   Write formulae in the Answer column. Use cell references, not typed numbers.<br><br>
+                   &bull; Row 2: Add Number 1 and Number 2.<br>
+                   &bull; Row 3: Subtract Number 2 from Number 1.<br>
+                   &bull; Row 4: Multiply Number 1 by Number 2.<br>
+                   &bull; Row 5: Divide Number 1 by Number 2.<br>
+                   &bull; Row 6: Add Number 1 and Number 2.`,
                    
             "t2": `<strong>TASK 2: Price Model</strong><br><br>
                    Complete the price model using cell references.<br><br>
-                   <strong>[1 Mark]</strong> Column D: Calculate <code>Item cost</code> (Unit price * Quantity).<br>
-                   <strong>[1 Mark]</strong> Column D: Complete all item cost cells.<br>
-                   <strong>[1 Mark]</strong> Column E: Calculate <code>Cost + delivery</code> (Item cost + Delivery).<br>
-                   <strong>[1 Mark]</strong> Absolute Reference: Use absolute referencing (e.g. <code>$B$6</code>) for the fixed delivery charge.<br>
-                   <strong>[1 Mark]</strong> Column E: Complete all Cost + delivery cells.`,
+                   &bull; Column D: Calculate <code>Item cost</code> (Unit price * Quantity).<br>
+                   &bull; Column E: Calculate <code>Cost + delivery</code> (Item cost + Delivery).<br>
+                   &bull; <strong>Absolute Reference:</strong> Use an absolute reference (e.g. <code>$B$6</code>) for the fixed delivery charge.`,
                    
             "t3": `<strong>TASK 3: School Club Functions</strong><br><br>
                    Use functions to analyse the attendance data.<br><br>
-                   <strong>[1 Mark]</strong> Column G: Use <code>=SUM()</code> to find Total attendance.<br>
-                   <strong>[1 Mark]</strong> Column H: Use <code>=AVERAGE()</code> to find Average attendance.<br>
-                   <strong>[1 Mark]</strong> Column I: Use <code>=MAX()</code> to find Highest attendance.<br>
-                   <strong>[1 Mark]</strong> Cell B7: Use <code>=MIN()</code> to find the smallest attendance over the whole table.<br>
-                   <strong>[1 Mark]</strong> Cell B8: Use <code>=MAX()</code> to find the largest attendance over the whole table.`,
+                   &bull; Column G: Use <code>=SUM()</code> to find Total attendance.<br>
+                   &bull; Column H: Use <code>=AVERAGE()</code> to find Average attendance.<br>
+                   &bull; Column I: Use <code>=MAX()</code> to find Highest attendance.<br>
+                   &bull; Cell B7: Use <code>=MIN()</code> to find the smallest attendance over the whole table.<br>
+                   &bull; Cell B8: Use <code>=MAX()</code> to find the largest attendance over the whole table.`,
                    
             "t4": `<strong>TASK 4: Charity Café Model</strong><br><br>
                    Calculate income and answer the summary questions.<br><br>
-                   <strong>[1 Mark]</strong> Column F: Calculate <code>Total sold</code> using <code>=SUM()</code>.<br>
-                   <strong>[1 Mark]</strong> Column G: Calculate <code>Income</code> (Price * Total sold).<br>
-                   <strong>[1 Mark]</strong> Complete all product rows for Total Sold and Income.<br>
-                   <strong>[1 Mark]</strong> Cell B6: Calculate Total café income using <code>=SUM()</code>.<br>
-                   <strong>[1 Mark]</strong> Cell B7: Calculate Average product income using <code>=AVERAGE()</code>.`
+                   &bull; Column F: Calculate <code>Total sold</code> using <code>=SUM()</code>.<br>
+                   &bull; Column G: Calculate <code>Income</code> (Price * Total sold).<br>
+                   &bull; Cell B6: Calculate Total café income using <code>=SUM()</code>.<br>
+                   &bull; Cell B7: Calculate Average product income using <code>=AVERAGE()</code>.`
+        };
+
+        /* LIVE CONDITIONAL FORMATTING RULES PER CELL */
+        const answerCells = {
+            "t1": [
+                { col: 3, row: 1, check: (v) => v.startsWith('=') && v.includes('+') },
+                { col: 3, row: 2, check: (v) => v.startsWith('=') && v.includes('-') },
+                { col: 3, row: 3, check: (v) => v.startsWith('=') && v.includes('*') },
+                { col: 3, row: 4, check: (v) => v.startsWith('=') && v.includes('/') },
+                { col: 3, row: 5, check: (v) => v.startsWith('=') && v.includes('+') }
+            ],
+            "t2": [
+                { col: 3, row: 1, check: (v) => v.startsWith('=') && v.includes('*') },
+                { col: 3, row: 2, check: (v) => v.startsWith('=') && v.includes('*') },
+                { col: 3, row: 3, check: (v) => v.startsWith('=') && v.includes('*') },
+                { col: 3, row: 4, check: (v) => v.startsWith('=') && v.includes('*') },
+                { col: 4, row: 1, check: (v) => v.startsWith('=') && v.includes('+') && (v.includes('$B$6') \vert{}\vert{} v.includes('$B6') || v.includes('B$6')) },                 { col: 4, row: 2, check: (v) => v.startsWith('=') && v.includes('+') && (v.includes('$B$6') \vert{}\vert{} v.includes('$B6') || v.includes('B$6')) },                 { col: 4, row: 3, check: (v) => v.startsWith('=') && v.includes('+') && (v.includes('$B$6') \vert{}\vert{} v.includes('$B6') || v.includes('B$6')) },                 { col: 4, row: 4, check: (v) => v.startsWith('=') && v.includes('+') && (v.includes('$B$6') \vert{}\vert{} v.includes('$B6') || v.includes('B$6')) }
+            ],
+            "t3": [
+                { col: 6, row: 1, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('SUM(') },
+                { col: 6, row: 2, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('SUM(') },
+                { col: 6, row: 3, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('SUM(') },
+                { col: 7, row: 1, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('AVERAGE(') },
+                { col: 7, row: 2, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('AVERAGE(') },
+                { col: 7, row: 3, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('AVERAGE(') },
+                { col: 8, row: 1, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('MAX(') },
+                { col: 8, row: 2, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('MAX(') },
+                { col: 8, row: 3, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('MAX(') },
+                { col: 1, row: 6, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('MIN(') },
+                { col: 1, row: 7, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('MAX(') }
+            ],
+            "t4": [
+                { col: 5, row: 1, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('SUM(') },
+                { col: 5, row: 2, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('SUM(') },
+                { col: 5, row: 3, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('SUM(') },
+                { col: 6, row: 1, check: (v) => v.startsWith('=') && v.includes('*') },
+                { col: 6, row: 2, check: (v) => v.startsWith('=') && v.includes('*') },
+                { col: 6, row: 3, check: (v) => v.startsWith('=') && v.includes('*') },
+                { col: 1, row: 5, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('SUM(') },
+                { col: 1, row: 6, check: (v) => v.toUpperCase().startsWith('=') && v.toUpperCase().includes('AVERAGE(') }
+            ]
         };
 
         function initSpreadsheet(dataArray) {
@@ -329,19 +370,21 @@
             
             currentSheet = jexcel(document.getElementById('spreadsheet'), {
                 data: JSON.parse(JSON.stringify(dataArray)), 
-                minDimensions: [9, 10], // Ensure enough columns for Task 3
+                minDimensions: [9, 10], 
                 defaultColWidth: 100,
                 tableOverflow: true,
                 tableWidth: "100%",
                 tableHeight: "350px",
+                onload: function() { evaluateLiveSheet(); },
+                onchange: function() { evaluateLiveSheet(); },
                 updateTable: function(instance, cell, col, row, val, label, cellName) {
                     // Header Styling
                     if (row === 0) {
-                        cell.style.backgroundColor = '#1e3a8a'; // Delta Navy
+                        cell.style.backgroundColor = '#1e3a8a'; 
                         cell.style.fontWeight = 'bold';
                         cell.style.color = '#ffffff';
                     }
-                    // Info Row Styling (Whole table analysis)
+                    // Info Row Styling
                     if ((currentTask === "t3" && row === 5) || (currentTask === "t4" && row === 4)) {
                         cell.style.backgroundColor = '#f3f3f3';
                         cell.style.fontWeight = 'bold';
@@ -353,11 +396,6 @@
         function switchTask() {
             currentTask = document.getElementById("task-selector").value;
             document.getElementById("instruction-panel").innerHTML = instructions[currentTask];
-            
-            document.getElementById("feedback").innerHTML = "Awaiting formula submission...";
-            document.getElementById("feedback").style.backgroundColor = "#f5f5f5";
-            document.getElementById("feedback").style.color = "var(--navy)";
-            
             initSpreadsheet(taskData[currentTask]);
         }
 
@@ -400,97 +438,65 @@
             localStorage.setItem('excel_total', total);
         }
 
-        /* AUTOMATED EXCEL MARKING LOGIC */
-        function markExcel() {
-            let earnedMarks = 0;
-            let feedbackDetails = [];
+        /* LIVE CONDITIONAL FORMATTING & SCORING */
+        function evaluateLiveSheet() {
+            let cells = answerCells[currentTask];
+            let data = currentSheet.getData(null, true); // Get raw formula text
             
-            // Get raw un-evaluated data to check if they typed formulas (starts with =)
-            let rawData = currentSheet.getData(null, true); 
+            let correct = 0;
+            let incorrect = 0;
+            let unanswered = 0;
             
-            if (currentTask === "t1") {
-                let d2 = String(rawData[1][3]);
-                let d3 = String(rawData[2][3]);
-                let d4 = String(rawData[3][3]);
-                let d5 = String(rawData[4][3]);
-                let d6 = String(rawData[5][3]);
-
-                if (d2.includes("+")) earnedMarks++; else feedbackDetails.push("[Row 2] Use addition (+).");
-                if (d3.includes("-")) earnedMarks++; else feedbackDetails.push("[Row 3] Use subtraction (-).");
-                if (d4.includes("*")) earnedMarks++; else feedbackDetails.push("[Row 4] Use multiplication (*).");
-                if (d5.includes("/")) earnedMarks++; else feedbackDetails.push("[Row 5] Use division (/).");
-                if (d6.includes("+")) earnedMarks++; else feedbackDetails.push("[Row 6] Use addition (+).");
-            } 
-            else if (currentTask === "t2") {
-                let d_all_correct = true;
-                let e_all_correct = true;
-                let has_absolute = false;
-
-                for (let r = 1; r <= 4; r++) {
-                    let itemCost = String(rawData[r][3]);
-                    let totalCost = String(rawData[r][4]).toUpperCase();
-                    
-                    if (!itemCost.includes("*")) d_all_correct = false;
-                    if (!totalCost.includes("+")) e_all_correct = false;
-                    if (totalCost.includes("$B$6") \vert{}\vert{} totalCost.includes("$B6") || totalCost.includes("B$6")) has_absolute = true;
-                }
-
-                if (String(rawData[1][3]).includes("*")) earnedMarks++; else feedbackDetails.push("Calculate Item Cost using *.");
-                if (d_all_correct) earnedMarks++; else feedbackDetails.push("Complete all Item Cost rows.");
-                if (String(rawData[1][4]).includes("+")) earnedMarks++; else feedbackDetails.push("Calculate Cost + Delivery using +.");
-                if (has_absolute) earnedMarks++; else feedbackDetails.push("Use an absolute reference (e.g. $B$6) for Delivery.");
-                if (e_all_correct) earnedMarks++; else feedbackDetails.push("Complete all Cost + Delivery rows.");
-            }
-            else if (currentTask === "t3") {
-                let g2 = String(rawData[1][6]).toUpperCase(); // Total
-                let h2 = String(rawData[1][7]).toUpperCase(); // Average
-                let i2 = String(rawData[1][8]).toUpperCase(); // Highest
-                let c7 = String(rawData[6][1]).toUpperCase(); // Smallest attendance
-                let c8 = String(rawData[7][1]).toUpperCase(); // Largest attendance
-
-                if (g2.includes("SUM(")) earnedMarks++; else feedbackDetails.push("Use =SUM() for Total column.");
-                if (h2.includes("AVERAGE(")) earnedMarks++; else feedbackDetails.push("Use =AVERAGE() for Average column.");
-                if (i2.includes("MAX(")) earnedMarks++; else feedbackDetails.push("Use =MAX() for Highest column.");
-                if (c7.includes("MIN(")) earnedMarks++; else feedbackDetails.push("Use =MIN() for Smallest attendance.");
-                if (c8.includes("MAX(")) earnedMarks++; else feedbackDetails.push("Use =MAX() for Largest attendance.");
-            }
-            else if (currentTask === "t4") {
-                let f2 = String(rawData[1][5]).toUpperCase();
-                let g2 = String(rawData[1][6]).toUpperCase();
-                let totalIncome = String(rawData[5][1]).toUpperCase();
-                let avgIncome = String(rawData[6][1]).toUpperCase();
+            cells.forEach(c => {
+                let cellName = jexcel.getColumnNameFromId([c.col, c.row]);
+                let val = String(data[c.row][c.col]).trim();
                 
-                let all_products_completed = true;
-                for (let r=1; r<=3; r++) {
-                    if (!String(rawData[r][5]).toUpperCase().includes("SUM(")) all_products_completed = false;
-                    if (!String(rawData[r][6]).includes("*")) all_products_completed = false;
+                if (val === '') {
+                    currentSheet.setStyle(cellName, 'background-color', '#fff2cc'); // Yellow
+                    currentSheet.setStyle(cellName, 'color', '#000000');
+                    unanswered++;
+                } else if (c.check(val)) {
+                    currentSheet.setStyle(cellName, 'background-color', '#c6efce'); // Green
+                    currentSheet.setStyle(cellName, 'color', '#006100');
+                    correct++;
+                } else {
+                    currentSheet.setStyle(cellName, 'background-color', '#ffc7ce'); // Red
+                    currentSheet.setStyle(cellName, 'color', '#9c0006');
+                    incorrect++;
                 }
-
-                if (f2.includes("SUM(")) earnedMarks++; else feedbackDetails.push("Use =SUM() for Total sold.");
-                if (g2.includes("*")) earnedMarks++; else feedbackDetails.push("Use * for Income calculation.");
-                if (all_products_completed) earnedMarks++; else feedbackDetails.push("Complete Total sold and Income for all products.");
-                if (totalIncome.includes("SUM(")) earnedMarks++; else feedbackDetails.push("Use =SUM() for Total cafe income.");
-                if (avgIncome.includes("AVERAGE(")) earnedMarks++; else feedbackDetails.push("Use =AVERAGE() for Average product income.");
-            }
-
+            });
+            
+            let totalCells = cells.length;
+            
+            // Map the correct cells directly to a score out of 5 for the scoreboard
+            let earnedMarks = Math.round((correct / totalCells) * 5);
             updateScore(currentTask, earnedMarks);
-            let feedbackBox = document.getElementById("feedback");
+            
+            let statusText = unanswered === totalCells ? "Not Started" : (correct === totalCells ? "Completed ✅" : "In Progress ⏳");
+            let statusColor = correct === totalCells ? "#2e7d32" : (unanswered === totalCells ? "#666" : "#ef6c00");
 
-            if (earnedMarks === 5) {
-                feedbackBox.innerHTML = `✅ FULL MARKS (5/5): Outstanding! Your formulae are correct.`;
-                feedbackBox.style.backgroundColor = "#e8f5e9";
-                feedbackBox.style.color = "#2e7d32";
-            } else if (earnedMarks > 0) {
-                let uniqueFeedback = [...new Set(feedbackDetails)];
-                feedbackBox.innerHTML = `⚠️ PARTIAL MARKS (${earnedMarks}/5): Good progress!<br><span style="font-size:12px; font-weight:normal;">Fix: ${uniqueFeedback.join(" | ")}</span>`;
-                feedbackBox.style.backgroundColor = "#fff3e0";
-                feedbackBox.style.color = "#ef6c00";
-            } else {
-                let uniqueFeedback = [...new Set(feedbackDetails)];
-                feedbackBox.innerHTML = `❌ 0/5 Marks. Formulae missing or incorrect!<br><span style="font-size:12px; font-weight:normal;">Fix: ${uniqueFeedback.join(" | ")}</span>`;
-                feedbackBox.style.backgroundColor = "#ffebee";
-                feedbackBox.style.color = "#d32f2f";
-            }
+            // Build Live Progress Table matching Screenshot 5
+            let html = `
+                <table class="progress-table">
+                    <tr>
+                        <th style="border-radius: 4px 0 0 0;">Correct</th>
+                        <th>Check</th>
+                        <th style="border-radius: 0 4px 0 0;">Unanswered</th>
+                    </tr>
+                    <tr>
+                        <td style="background-color:#c6efce; color:#006100;">${correct}</td>
+                        <td style="background-color:#ffc7ce; color:#9c0006;">${incorrect}</td>
+                        <td style="background-color:#fff2cc; color:#000000;">${unanswered}</td>
+                    </tr>
+                </table>
+                
+                <div style="font-size: 16px; margin-top: 15px;">
+                    <strong>Marks Awarded:</strong> ${earnedMarks} / 5<br><br>
+                    <strong>Status:</strong> <span style="color:${statusColor}; font-weight:bold;">${statusText}</span>
+                </div>
+            `;
+            
+            document.getElementById("feedback").innerHTML = html;
         }
     </script>
 </body>
