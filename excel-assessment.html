@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Excel Assessment</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Jspreadsheet for Interactive In-Browser Excel -->
+    <script src="https://bossanova.uk/jspreadsheet/v4/jexcel.js"></script>
+    <script src="https://bossanova.uk/jspreadsheet/v4/jsuites.js"></script>
+    <link rel="stylesheet" href="https://bossanova.uk/jspreadsheet/v4/jexcel.css" type="text/css" />
+    <link rel="stylesheet" href="https://bossanova.uk/jspreadsheet/v4/jsuites.css" type="text/css" />
+
+    <style>
+        /* Scoreboard Banner */
+        .scoreboard {
+            max-width: 1450px;
+            margin: 20px auto 0 auto;
+            padding: 15px 25px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 5px solid var(--maroon);
+            font-weight: bold;
+            color: var(--navy);
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .score-item {
+            text-align: center;
+            font-size: 0.95em;
+        }
+        .score-item span {
+            display: block;
+            font-size: 1.3em;
+            color: #388e3c;
+            margin-top: 3px;
+        }
+        .scoreboard-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .btn-ms-form {
+            background-color: #0078d4;
+            color: white;
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: bold;
+            display: inline-block;
+            transition: background-color 0.2s;
+            border: 2px solid #0078d4;
+        }
+        .btn-ms-form:hover { background-color: #106ebe; border-color: #106ebe;}
+
+        .btn-clear-scores {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        .btn-clear-scores:hover { background-color: #b71c1c; }
+
+        /* 3-Column Layout */
+        .ide-container {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1fr;
+            gap: 20px;
+            max-width: 1450px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        @media (max-width: 1100px) {
+            .ide-container { grid-template-columns: 1fr; }
+        }
+
+        .ide-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-top: 5px solid var(--navy);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .editor-panel { border-top-color: #217346; } /* Excel Green */
+        .output-panel { border-top-color: var(--maroon); }
+
+        .ide-panel h3 {
+            margin-top: 0;
+            color: var(--navy);
+            text-transform: uppercase;
+            font-size: 1.1em;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        #instruction-panel {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--navy);
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 0 4px 4px 0;
+            font-family: inherit;
+            font-size: 13.5px;
+            color: #333;
+            flex-grow: 1;
+            line-height: 1.5;
+        }
+
+        #spreadsheet-container {
+            width: 100%;
+            overflow-x: auto;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .btn-run {
+            display: block;
+            width: 100%;
+            margin-top: 15px;
+            padding: 12px;
+            background-color: #217346; /* Excel Green */
+            color: white;
+            text-align: center;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.05em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-run:hover { background-color: #1e603a; }
+
+        .feedback-box {
+            margin-top: 15px;
+            padding: 15px;
+            font-weight: bold;
+            border-radius: 4px;
+            text-align: center;
+            min-height: 40px;
+            background-color: #f5f5f5;
+            color: var(--navy);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <img src="logo.jpg" alt="Delta Serlby Park Logo">
+        </div>
+        
+        <div class="header-center">
+            <h1>Interactive Excel Assessment</h1>
+        </div>
+        
+        <div class="header-right">
+            <a href="index.html" class="back-btn">&larr; Back to Curriculum</a>
+        </div>
+    </header>
+
+    <!-- Scoreboard Banner -->
+    <div class="scoreboard">
+        <div class="score-item">Task 1: <span id="score-t1">0</span>/5</div>
+        <div class="score-item">Task 2: <span id="score-t2">0</span>/5</div>
+        <div class="score-item">Task 3: <span id="score-t3">0</span>/5</div>
+        <div class="score-item">Task 4: <span id="score-t4">0</span>/5</div>
+        <div class="score-item" style="color: var(--maroon);">TOTAL SCORE: <span id="total-score" style="color: var(--maroon);">0</span>/20</div>
+        <div class="scoreboard-actions">
+            <!-- PASTE YOUR MICROSOFT FORM LINK BELOW -->
+            <a href="YOUR_MICROSOFT_FORM_LINK_HERE" target="_blank" class="btn-ms-form">📋 Submit Scores Form</a>
+            <button class="btn-clear-scores" onclick="clearScores()">Reset Progress</button>
+        </div>
+    </div>
+
+    <main>
+        <div class="ide-container">
+            <!-- COLUMN 1: Instructions -->
+            <div class="ide-panel">
+                <h3>1. Instructions</h3>
+                
+                <select id="task-selector" onchange="switchTask()">
+                    <option value="t1">Task 1 (Basic Formulae)</option>
+                    <option value="t2">Task 2 (Price Model & Absolute Ref)</option>
+                    <option value="t3">Task 3 (School Club Functions)</option>
+                    <option value="t4">Task 4 (Charity Café Model)</option>
+                </select>
+
+                <div id="instruction-panel"></div>
+            </div>
+
+            <!-- COLUMN 2: Interactive Spreadsheet -->
+            <div class="ide-panel editor-panel">
+                <h3 style="color: #217346;">2. Spreadsheet Editor</h3>
+                <p style="font-size: 13px; color: #666; margin-top: 0;">Click on a cell and type your formulae below (e.g. <code>=A2+C2</code> or <code>=SUM(B2:F2)</code>):</p>
+                
+                <div id="spreadsheet-container">
+                    <div id="spreadsheet"></div>
+                </div>
+                
+                <button class="btn-run" onclick="markExcel()">▶ Submit & Mark Data</button>
+            </div>
+
+            <!-- COLUMN 3: Feedback -->
+            <div class="ide-panel output-panel">
+                <h3 style="color: var(--maroon);">3. Feedback</h3>
+                <p style="font-size: 13px; color: #666; margin-top: 0;">View your marking feedback below:</p>
+                
+                <div id="feedback" class="feedback-box">
+                    Awaiting formula submission...
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        &copy; 2026 Delta Serlby Park - Computing Department
+    </footer>
+
+    <script>
+        let currentSheet = null;
+        let currentTask = "t1";
+
+        /* =========================================
+           DATA EXTRACTED DIRECTLY FROM ASSESSMENT PICS
+           ========================================= */
+        const taskData = {
+            "t1": [
+                ['Number 1', 'Operation', 'Number 2', 'Answer'],
+                [18, 'add', 27, ''],
+                [75, 'subtract', 38, ''],
+                [14, 'multiply by', 6, ''],
+                [144, 'divide by', 12, ''],
+                [356, 'add', 89, '']
+            ],
+            "t2": [
+                ['Item', 'Unit price', 'Quantity', 'Item cost', 'Cost + delivery'],
+                ['Notebook', 1.25, 4, '', ''],
+                ['Pen pack', 2.40, 3, '', ''],
+                ['Highlighters', 3.10, 2, '', ''],
+                ['Folders', 0.85, 6, '', ''],
+                ['Delivery', 2.50, '', '', '']
+            ],
+            "t3": [
+                ['Club', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Total', 'Average', 'Highest'],
+                ['Coding', 18, 22, 20, 24, 26, '', '', ''],
+                ['Football', 28, 31, 25, 34, 30, '', '', ''],
+                ['Art', 14, 16, 19, 17, 21, '', '', ''],
+                ['', '', '', '', '', '', '', '', ''],
+                ['Whole table analysis', 'Your formula', '', '', '', '', '', '', ''],
+                ['Smallest attendance', '', '', '', '', '', '', '', ''],
+                ['Largest attendance', '', '', '', '', '', '', '', '']
+            ],
+            "t4": [
+                ['Product', 'Price', 'Mon', 'Tue', 'Wed', 'Total sold', 'Income'],
+                ['Cookies', 0.80, 35, 42, 38, '', ''],
+                ['Brownies', 1.20, 28, 31, 34, '', ''],
+                ['Fruit cups', 1.50, 18, 24, 21, '', ''],
+                ['', '', '', '', '', '', ''],
+                ['Total cafe income', '', '', '', '', '', ''],
+                ['Average product income', '', '', '', '', '', '']
+            ]
+        };
+
+        const instructions = {
+            "t1": `<strong>TASK 1: Basic Formulae</strong><br><br>
+                   Write formulae in column D. Use cell references, not typed numbers.<br><br>
+                   <strong>[1 Mark]</strong> Row 2: Add Number 1 and Number 2.<br>
+                   <strong>[1 Mark]</strong> Row 3: Subtract Number 2 from Number 1.<br>
+                   <strong>[1 Mark]</strong> Row 4: Multiply Number 1 by Number 2.<br>
+                   <strong>[1 Mark]</strong> Row 5: Divide Number 1 by Number 2.<br>
+                   <strong>[1 Mark]</strong> Row 6: Add Number 1 and Number 2.`,
+                   
+            "t2": `<strong>TASK 2: Price Model</strong><br><br>
+                   Complete the price model using cell references.<br><br>
+                   <strong>[1 Mark]</strong> Column D: Calculate <code>Item cost</code> (Unit price * Quantity).<br>
+                   <strong>[1 Mark]</strong> Column D: Complete all item cost cells.<br>
+                   <strong>[1 Mark]</strong> Column E: Calculate <code>Cost + delivery</code> (Item cost + Delivery).<br>
+                   <strong>[1 Mark]</strong> Absolute Reference: Use absolute referencing (e.g. <code>$B$6</code>) for the fixed delivery charge.<br>
+                   <strong>[1 Mark]</strong> Column E: Complete all Cost + delivery cells.`,
+                   
+            "t3": `<strong>TASK 3: School Club Functions</strong><br><br>
+                   Use functions to analyse the attendance data.<br><br>
+                   <strong>[1 Mark]</strong> Column G: Use <code>=SUM()</code> to find Total attendance.<br>
+                   <strong>[1 Mark]</strong> Column H: Use <code>=AVERAGE()</code> to find Average attendance.<br>
+                   <strong>[1 Mark]</strong> Column I: Use <code>=MAX()</code> to find Highest attendance.<br>
+                   <strong>[1 Mark]</strong> Cell B7: Use <code>=MIN()</code> to find the smallest attendance over the whole table.<br>
+                   <strong>[1 Mark]</strong> Cell B8: Use <code>=MAX()</code> to find the largest attendance over the whole table.`,
+                   
+            "t4": `<strong>TASK 4: Charity Café Model</strong><br><br>
+                   Calculate income and answer the summary questions.<br><br>
+                   <strong>[1 Mark]</strong> Column F: Calculate <code>Total sold</code> using <code>=SUM()</code>.<br>
+                   <strong>[1 Mark]</strong> Column G: Calculate <code>Income</code> (Price * Total sold).<br>
+                   <strong>[1 Mark]</strong> Complete all product rows for Total Sold and Income.<br>
+                   <strong>[1 Mark]</strong> Cell B6: Calculate Total café income using <code>=SUM()</code>.<br>
+                   <strong>[1 Mark]</strong> Cell B7: Calculate Average product income using <code>=AVERAGE()</code>.`
+        };
+
+        function initSpreadsheet(dataArray) {
+            if (currentSheet) {
+                currentSheet.destroy();
+                document.getElementById('spreadsheet').innerHTML = "";
+            }
+            
+            currentSheet = jexcel(document.getElementById('spreadsheet'), {
+                data: JSON.parse(JSON.stringify(dataArray)), 
+                minDimensions: [9, 10], // Ensure enough columns for Task 3
+                defaultColWidth: 100,
+                tableOverflow: true,
+                tableWidth: "100%",
+                tableHeight: "350px",
+                updateTable: function(instance, cell, col, row, val, label, cellName) {
+                    // Header Styling
+                    if (row === 0) {
+                        cell.style.backgroundColor = '#1e3a8a'; // Delta Navy
+                        cell.style.fontWeight = 'bold';
+                        cell.style.color = '#ffffff';
+                    }
+                    // Info Row Styling (Whole table analysis)
+                    if ((currentTask === "t3" && row === 5) || (currentTask === "t4" && row === 4)) {
+                        cell.style.backgroundColor = '#f3f3f3';
+                        cell.style.fontWeight = 'bold';
+                    }
+                }
+            });
+        }
+
+        function switchTask() {
+            currentTask = document.getElementById("task-selector").value;
+            document.getElementById("instruction-panel").innerHTML = instructions[currentTask];
+            
+            document.getElementById("feedback").innerHTML = "Awaiting formula submission...";
+            document.getElementById("feedback").style.backgroundColor = "#f5f5f5";
+            document.getElementById("feedback").style.color = "var(--navy)";
+            
+            initSpreadsheet(taskData[currentTask]);
+        }
+
+        window.onload = function() {
+            ['t1', 't2', 't3', 't4'].forEach(taskKey => {
+                let savedScore = localStorage.getItem('excel_score_' + taskKey);
+                if (savedScore !== null) document.getElementById(`score-${taskKey}`).innerText = savedScore;
+            });
+            let savedTotal = localStorage.getItem('excel_total');
+            if (savedTotal !== null) document.getElementById("total-score").innerText = savedTotal;
+
+            switchTask();
+        };
+
+        function clearScores() {
+            if (confirm("Are you sure you want to clear all scores for this student?")) {
+                ['t1', 't2', 't3', 't4'].forEach(taskKey => {
+                    localStorage.removeItem('excel_score_' + taskKey);
+                    document.getElementById(`score-${taskKey}`).innerText = "0";
+                });
+                localStorage.removeItem('excel_total');
+                document.getElementById("total-score").innerText = "0";
+                
+                switchTask(); 
+                alert("Scores have been reset.");
+            }
+        }
+
+        function updateScore(taskKey, points) {
+            document.getElementById(`score-${taskKey}`).innerText = points;
+            localStorage.setItem('excel_score_' + taskKey, points);
+            
+            let p1 = parseInt(document.getElementById("score-t1").innerText);
+            let p2 = parseInt(document.getElementById("score-t2").innerText);
+            let p3 = parseInt(document.getElementById("score-t3").innerText);
+            let p4 = parseInt(document.getElementById("score-t4").innerText);
+            
+            let total = p1 + p2 + p3 + p4;
+            document.getElementById("total-score").innerText = total;
+            localStorage.setItem('excel_total', total);
+        }
+
+        /* AUTOMATED EXCEL MARKING LOGIC */
+        function markExcel() {
+            let earnedMarks = 0;
+            let feedbackDetails = [];
+            
+            // Get raw un-evaluated data to check if they typed formulas (starts with =)
+            let rawData = currentSheet.getData(null, true); 
+            
+            if (currentTask === "t1") {
+                let d2 = String(rawData[1][3]);
+                let d3 = String(rawData[2][3]);
+                let d4 = String(rawData[3][3]);
+                let d5 = String(rawData[4][3]);
+                let d6 = String(rawData[5][3]);
+
+                if (d2.includes("+")) earnedMarks++; else feedbackDetails.push("[Row 2] Use addition (+).");
+                if (d3.includes("-")) earnedMarks++; else feedbackDetails.push("[Row 3] Use subtraction (-).");
+                if (d4.includes("*")) earnedMarks++; else feedbackDetails.push("[Row 4] Use multiplication (*).");
+                if (d5.includes("/")) earnedMarks++; else feedbackDetails.push("[Row 5] Use division (/).");
+                if (d6.includes("+")) earnedMarks++; else feedbackDetails.push("[Row 6] Use addition (+).");
+            } 
+            else if (currentTask === "t2") {
+                let d_all_correct = true;
+                let e_all_correct = true;
+                let has_absolute = false;
+
+                for (let r = 1; r <= 4; r++) {
+                    let itemCost = String(rawData[r][3]);
+                    let totalCost = String(rawData[r][4]).toUpperCase();
+                    
+                    if (!itemCost.includes("*")) d_all_correct = false;
+                    if (!totalCost.includes("+")) e_all_correct = false;
+                    if (totalCost.includes("$B$6") \vert{}\vert{} totalCost.includes("$B6") || totalCost.includes("B$6")) has_absolute = true;
+                }
+
+                if (String(rawData[1][3]).includes("*")) earnedMarks++; else feedbackDetails.push("Calculate Item Cost using *.");
+                if (d_all_correct) earnedMarks++; else feedbackDetails.push("Complete all Item Cost rows.");
+                if (String(rawData[1][4]).includes("+")) earnedMarks++; else feedbackDetails.push("Calculate Cost + Delivery using +.");
+                if (has_absolute) earnedMarks++; else feedbackDetails.push("Use an absolute reference (e.g. $B$6) for Delivery.");
+                if (e_all_correct) earnedMarks++; else feedbackDetails.push("Complete all Cost + Delivery rows.");
+            }
+            else if (currentTask === "t3") {
+                let g2 = String(rawData[1][6]).toUpperCase(); // Total
+                let h2 = String(rawData[1][7]).toUpperCase(); // Average
+                let i2 = String(rawData[1][8]).toUpperCase(); // Highest
+                let c7 = String(rawData[6][1]).toUpperCase(); // Smallest attendance
+                let c8 = String(rawData[7][1]).toUpperCase(); // Largest attendance
+
+                if (g2.includes("SUM(")) earnedMarks++; else feedbackDetails.push("Use =SUM() for Total column.");
+                if (h2.includes("AVERAGE(")) earnedMarks++; else feedbackDetails.push("Use =AVERAGE() for Average column.");
+                if (i2.includes("MAX(")) earnedMarks++; else feedbackDetails.push("Use =MAX() for Highest column.");
+                if (c7.includes("MIN(")) earnedMarks++; else feedbackDetails.push("Use =MIN() for Smallest attendance.");
+                if (c8.includes("MAX(")) earnedMarks++; else feedbackDetails.push("Use =MAX() for Largest attendance.");
+            }
+            else if (currentTask === "t4") {
+                let f2 = String(rawData[1][5]).toUpperCase();
+                let g2 = String(rawData[1][6]).toUpperCase();
+                let totalIncome = String(rawData[5][1]).toUpperCase();
+                let avgIncome = String(rawData[6][1]).toUpperCase();
+                
+                let all_products_completed = true;
+                for (let r=1; r<=3; r++) {
+                    if (!String(rawData[r][5]).toUpperCase().includes("SUM(")) all_products_completed = false;
+                    if (!String(rawData[r][6]).includes("*")) all_products_completed = false;
+                }
+
+                if (f2.includes("SUM(")) earnedMarks++; else feedbackDetails.push("Use =SUM() for Total sold.");
+                if (g2.includes("*")) earnedMarks++; else feedbackDetails.push("Use * for Income calculation.");
+                if (all_products_completed) earnedMarks++; else feedbackDetails.push("Complete Total sold and Income for all products.");
+                if (totalIncome.includes("SUM(")) earnedMarks++; else feedbackDetails.push("Use =SUM() for Total cafe income.");
+                if (avgIncome.includes("AVERAGE(")) earnedMarks++; else feedbackDetails.push("Use =AVERAGE() for Average product income.");
+            }
+
+            updateScore(currentTask, earnedMarks);
+            let feedbackBox = document.getElementById("feedback");
+
+            if (earnedMarks === 5) {
+                feedbackBox.innerHTML = `✅ FULL MARKS (5/5): Outstanding! Your formulae are correct.`;
+                feedbackBox.style.backgroundColor = "#e8f5e9";
+                feedbackBox.style.color = "#2e7d32";
+            } else if (earnedMarks > 0) {
+                let uniqueFeedback = [...new Set(feedbackDetails)];
+                feedbackBox.innerHTML = `⚠️ PARTIAL MARKS (${earnedMarks}/5): Good progress!<br><span style="font-size:12px; font-weight:normal;">Fix: ${uniqueFeedback.join(" | ")}</span>`;
+                feedbackBox.style.backgroundColor = "#fff3e0";
+                feedbackBox.style.color = "#ef6c00";
+            } else {
+                let uniqueFeedback = [...new Set(feedbackDetails)];
+                feedbackBox.innerHTML = `❌ 0/5 Marks. Formulae missing or incorrect!<br><span style="font-size:12px; font-weight:normal;">Fix: ${uniqueFeedback.join(" | ")}</span>`;
+                feedbackBox.style.backgroundColor = "#ffebee";
+                feedbackBox.style.color = "#d32f2f";
+            }
+        }
+    </script>
+</body>
+</html>
