@@ -3,364 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Management & Researching</title>
+    <title>File Management & Researching - Lesson 4</title>
     <link rel="stylesheet" href="style.css">
 
     <!-- HTML to PDF Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* Task Container Styling */
-        .task-container {
-            max-width: 900px;
-            margin: 30px auto;
-            padding: 20px;
+        .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
+        
+        .task-card { 
+            background: white; 
+            border-radius: 8px; 
+            padding: 25px; 
+            margin-bottom: 30px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            page-break-inside: avoid; /* Stops the PDF from cutting cards in half! */
         }
-
-        .task-card {
-            background: white;
-            border-radius: 8px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
+        
         /* Section Header Colors */
-        .task-prep { border-top: 6px solid #607d8b; } /* Slate Grey */
+        .task-prep { border-top: 6px solid #607d8b; } 
         .task-prep h2 { color: #607d8b; margin-top: 0; }
         
-        .task-plenary { border-top: 6px solid #673ab7; } /* Deep Purple */
+        .task-plenary { border-top: 6px solid #673ab7; } 
         .task-plenary h2 { color: #673ab7; margin-top: 0; }
 
-        /* Maroon Task: Folder Creation */
+        /* RAGB Colors */
         .task-maroon { border-top: 6px solid #800000; }
         .task-maroon h2 { color: #800000; margin-top: 0; }
         .task-maroon .instruction-box { border-left: 4px solid #800000; }
 
-        /* Amber Task: Easy Facts */
         .task-amber { border-top: 6px solid #ffb300; }
         .task-amber h2 { color: #ffb300; margin-top: 0; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
         .task-amber .instruction-box { border-left: 4px solid #ffb300; }
 
-        /* Green Task: Complex Facts */
         .task-green { border-top: 6px solid #008f39; }
         .task-green h2 { color: #008f39; margin-top: 0; }
         .task-green .instruction-box { border-left: 4px solid #008f39; }
 
-        /* Navy Task: Image Saving */
         .task-navy { border-top: 6px solid #1e3a8a; }
         .task-navy h2 { color: #1e3a8a; margin-top: 0; }
         .task-navy .instruction-box { border-left: 4px solid #1e3a8a; }
 
         /* Common Elements */
-        .instruction-box {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 0 4px 4px 0;
-            font-size: 16px;
-            line-height: 1.5;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        /* Auto-Marking Text Inputs */
-        .question-row {
-            margin-bottom: 20px;
-        }
+        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; text-align: center; }
         
-        .question-label {
-            display: block;
-            font-size: 16px;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: bold;
-        }
-
-        .auto-input {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            border: 2px solid #ccc;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-            background-color: white;
-            font-family: inherit;
-        }
-
-        .auto-input:focus {
-            outline: none;
-            border-color: #666;
-        }
-
-        textarea.auto-input {
-            resize: vertical;
-            min-height: 80px;
-        }
-
+        /* Inputs & Textareas */
+        .question-row { margin-bottom: 20px; }
+        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
+        .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit; }
+        .auto-input:focus { outline: none; border-color: #666; }
+        textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; /* Fixes PDF scrollbar bug */ }
+        
         /* Correct & Incorrect Answer Styling */
-        .input-correct {
-            border-color: #008f39 !important;
-            background-color: #e8f5e9 !important;
-            color: #006100;
-            font-weight: bold;
-        }
+        .input-correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
+        .input-incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
         
-        .input-incorrect {
-            border-color: #d32f2f !important;
-            background-color: #ffebee !important;
-            color: #b71c1c;
-            font-weight: bold;
-        }
-
-        /* Submit Button */
-        .btn-submit {
-            background-color: #1e3a8a;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 4px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 15px;
-            display: block;
-            width: 100%;
-            transition: background-color 0.2s;
-        }
-
-        .btn-submit:hover {
-            background-color: #152960;
-        }
-
-        /* PDF Button */
-        .btn-pdf {
-            background-color: #217346;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 4px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            display: block;
-            text-align: center;
-            width: 100%;
-            max-width: 300px;
-        }
-
-        .btn-pdf:hover {
-            background-color: #124d2d;
-        }
-
-        /* Screenshot Upload Zones */
-        .screenshot-zone {
-            width: 100%;
-            min-height: 200px;
-            border: 2px dashed #ccc;
-            border-radius: 8px;
-            background-color: #fafafa;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 20px;
-            box-sizing: border-box;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        /* Highlight the zone when the student clicks it so they know it is active */
-        .screenshot-zone:focus {
-            border-color: #800000;
-            background-color: #f0e6e6;
-            outline: none;
-        }
+        /* Buttons */
+        .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
+        .btn-submit:hover { background-color: #152960; }
+        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
+        .btn-pdf:hover { background-color: #124d2d; }
         
-        #zone-navy:focus {
-            border-color: #1e3a8a;
-            background-color: #e6e9f0;
-        }
-
-        .screenshot-text {
-            color: #666;
-            font-size: 15px;
-            pointer-events: none; 
-        }
-
-        .screenshot-image {
-            max-width: 100%;
-            max-height: 400px;
-            display: none;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+        /* Screenshots */
+        .screenshot-zone { width: 100%; min-height: 200px; border: 2px dashed #ccc; border-radius: 8px; background-color: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; box-sizing: border-box; position: relative; cursor: pointer; transition: all 0.2s; }
+        .screenshot-zone:focus { border-color: #800000; background-color: #f0e6e6; outline: none; }
+        #zone-navy:focus { border-color: #1e3a8a; background-color: #e6e9f0; }
+        .screenshot-text { color: #666; font-size: 15px; pointer-events: none; }
+        .screenshot-image { max-width: 100%; max-height: 400px; display: none; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
-    <header>
-        <div class="header-left">
-            <img src="logo.jpg" alt="Delta Serlby Park Logo">
-        </div>
-        <div class="header-center">
-            <h1>File Management & Researching</h1>
-        </div>
-        <div class="header-right">
-            <a href="index.html" class="back-btn">&larr; Back to Curriculum</a>
-        </div>
-    </header>
+    <div id="pdf-content">
+        <header>
+            <div class="header-left"><img src="logo.jpg" alt="Delta Serlby Park Logo"></div>
+            <div class="header-center"><h1>File Management & Researching</h1></div>
+            <div class="header-right"><a href="index.html" class="back-btn">&larr; Back to Curriculum</a></div>
+        </header>
 
-    <main class="task-container">
+        <main class="task-container">
 
-        <!-- PREPARATION: Keywords & Notes -->
-        <div class="task-card task-prep">
-            <h2>Lesson Preparation</h2>
-            
-            <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">4 Key Words</h3>
-            <div class="question-row">
-                <label class="question-label">1. Directory (Folder)</label>
-                <input type="text" class="auto-input" placeholder="Type definition here...">
-            </div>
-            <div class="question-row">
-                <label class="question-label">2. File Extension</label>
-                <input type="text" class="auto-input" placeholder="Type definition here...">
-            </div>
-            <div class="question-row">
-                <label class="question-label">3. Sub-folder</label>
-                <input type="text" class="auto-input" placeholder="Type definition here...">
-            </div>
-            <div class="question-row">
-                <label class="question-label">4. Search Engine</label>
-                <input type="text" class="auto-input" placeholder="Type definition here...">
-            </div>
+            <!-- PREPARATION: Keywords & Notes -->
+            <div class="task-card task-prep">
+                <h2>Lesson Preparation</h2>
+                
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">4 Key Words</h3>
+                <div class="question-row">
+                    <label class="question-label">1. Directory (Folder)</label>
+                    <input type="text" class="auto-input" placeholder="Type definition here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">2. File Extension</label>
+                    <input type="text" class="auto-input" placeholder="Type definition here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">3. Sub-folder</label>
+                    <input type="text" class="auto-input" placeholder="Type definition here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">4. Search Engine</label>
+                    <input type="text" class="auto-input" placeholder="Type definition here...">
+                </div>
 
-            <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Lesson Notes</h3>
-            <div class="question-row">
-                <textarea class="auto-input" rows="6" placeholder="Write your notes about today's lesson here..."></textarea>
-            </div>
-        </div>
-
-        <!-- Task 1: Maroon (Folder Creation) -->
-        <div class="task-card task-maroon">
-            <h2>Folder Creation (Base Task)</h2>
-            <div class="instruction-box">
-                Create a main folder called <strong>"Year 7"</strong> in your Documents.<br><br>
-                Inside this folder, create a sub-folder called <strong>"Computing"</strong> and another called <strong>"Images"</strong>.
-            </div>
-            
-            <p style="text-align: center; color: #555; margin-bottom: 10px;">Paste a screenshot here to prove these have been created (fn + print screen):</p>
-            
-            <div class="screenshot-zone" id="zone-maroon" tabindex="0">
-                <span class="screenshot-text" id="text-maroon">Click this box to select it, then press <strong>Ctrl+V</strong> to paste screenshot</span>
-                <img id="img-maroon" class="screenshot-image" src="" alt="Student Screenshot">
-            </div>
-        </div>
-
-        <!-- Task 2: Amber (Easy Facts) -->
-        <div class="task-card task-amber">
-            <h2>Easy Facts Research (Core Task)</h2>
-            <div class="instruction-box">
-                Use a search engine to find the answers to these 4 easy facts.
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Lesson Notes</h3>
+                <div class="question-row">
+                    <textarea class="auto-input" rows="6" placeholder="Write your notes about today's lesson here..."></textarea>
+                </div>
             </div>
 
-            <div class="question-row">
-                <label class="question-label">What year was the World Wide Web invented?</label>
-                <input type="text" class="auto-input amber-input" data-answers='["1989"]' placeholder="Type answer here...">
+            <!-- Task 1: Maroon -->
+            <div class="task-card task-maroon">
+                <h2>Folder Creation (Base Task)</h2>
+                <div class="instruction-box">
+                    Create a main folder called <strong>"Year 7"</strong> in your Documents.<br><br>
+                    Inside this folder, create a sub-folder called <strong>"Computing"</strong> and another called <strong>"Images"</strong>.
+                </div>
+                
+                <p style="text-align: center; color: #555; margin-bottom: 10px;">Paste a screenshot here to prove these have been created (fn + print screen):</p>
+                
+                <div class="screenshot-zone" id="zone-maroon" tabindex="0">
+                    <span class="screenshot-text" id="text-maroon">Click this box to select it, then press <strong>Ctrl+V</strong> to paste screenshot</span>
+                    <img id="img-maroon" class="screenshot-image" src="" alt="Student Screenshot">
+                </div>
             </div>
 
-            <div class="question-row">
-                <label class="question-label">Who invented the first computer mouse?</label>
-                <input type="text" class="auto-input amber-input" data-answers='["douglas engelbart", "engelbart"]' placeholder="Type answer here...">
+            <!-- Task 2: Amber -->
+            <div class="task-card task-amber">
+                <h2>Easy Facts Research (Core Task)</h2>
+                <div class="instruction-box">
+                    Use a search engine to find the answers to these 4 easy facts.
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">What year was the World Wide Web invented?</label>
+                    <input type="text" class="auto-input amber-input" data-answers='["1989"]' placeholder="Type answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Who invented the first computer mouse?</label>
+                    <input type="text" class="auto-input amber-input" data-answers='["douglas engelbart", "engelbart"]' placeholder="Type answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">What does CPU stand for?</label>
+                    <input type="text" class="auto-input amber-input" data-answers='["central processing unit"]' placeholder="Type answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">What is the capital of Japan?</label>
+                    <input type="text" class="auto-input amber-input" data-answers='["tokyo"]' placeholder="Type answer here...">
+                </div>
+                
+                <button class="btn-submit no-print" onclick="checkAnswers('amber-input')">Check Answers</button>
             </div>
 
-            <div class="question-row">
-                <label class="question-label">What does CPU stand for?</label>
-                <input type="text" class="auto-input amber-input" data-answers='["central processing unit"]' placeholder="Type answer here...">
+            <!-- Task 3: Green -->
+            <div class="task-card task-green">
+                <h2>Complex Facts Research (Extension Task)</h2>
+                <div class="instruction-box">
+                    Use a search engine to find the answers to these 4 complex facts:<br>
+                    <em>(Remember to use " " and +/- to modify results)</em>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">What was the exact name of the first computer mouse made of wood?</label>
+                    <input type="text" class="auto-input green-input" data-answers='["x-y position indicator for a display system", "x-y position indicator", "xy position indicator"]' placeholder="Type answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">What is Python?</label>
+                    <input type="text" class="auto-input green-input" data-answers='["programming language", "a programming language", "computer language", "coding language"]' placeholder="Type answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">What is the tallest mountain in the solar system?</label>
+                    <input type="text" class="auto-input green-input" data-answers='["olympus mons"]' placeholder="Type answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">What was the first message ever sent on the internet?</label>
+                    <input type="text" class="auto-input green-input" data-answers='["lo"]' placeholder="Type answer here...">
+                </div>
+                
+                <button class="btn-submit no-print" style="background-color: #008f39;" onclick="checkAnswers('green-input')">Check Answers</button>
             </div>
 
-            <div class="question-row">
-                <label class="question-label">What is the capital of Japan?</label>
-                <input type="text" class="auto-input amber-input" data-answers='["tokyo"]' placeholder="Type answer here...">
-            </div>
-            
-            <button class="btn-submit" onclick="checkAnswers('amber-input')">Check Answers</button>
-        </div>
+            <!-- Task 4: Navy -->
+            <div class="task-card task-navy">
+                <h2>Image Saving (Challenge Task)</h2>
+                <div class="instruction-box">
+                    Search for high-quality images of the first computer mouse, the inside of a CPU, and the inventor of the World Wide Web.<br><br>
+                    Download these 3 images and save them directly into your <strong>"Images"</strong> sub-folder with suitable names.
+                </div>
 
-        <!-- Task 3: Green (Complex Facts) -->
-        <div class="task-card task-green">
-            <h2>Complex Facts Research (Extension Task)</h2>
-            <div class="instruction-box">
-                Use a search engine to find the answers to these 4 complex facts:<br>
-                <em>(Remember to use " " and +/- to modify results)</em>
-            </div>
-
-            <div class="question-row">
-                <label class="question-label">What was the exact name of the first computer mouse made of wood?</label>
-                <input type="text" class="auto-input green-input" data-answers='["x-y position indicator for a display system", "x-y position indicator", "xy position indicator"]' placeholder="Type answer here...">
+                <p style="text-align: center; color: #555; margin-bottom: 10px;">Paste a screenshot here to prove these have been saved correctly (fn + print screen):</p>
+                
+                <div class="screenshot-zone" id="zone-navy" tabindex="0">
+                    <span class="screenshot-text" id="text-navy">Click this box to select it, then press <strong>Ctrl+V</strong> to paste screenshot</span>
+                    <img id="img-navy" class="screenshot-image" src="" alt="Student Screenshot">
+                </div>
             </div>
 
-            <div class="question-row">
-                <label class="question-label">What is Python?</label>
-                <input type="text" class="auto-input green-input" data-answers='["programming language", "a programming language", "computer language", "coding language"]' placeholder="Type answer here...">
+            <!-- PLENARY: 3 Key Takeaways -->
+            <div class="task-card task-plenary">
+                <h2>Lesson Plenary</h2>
+                <h3 style="color: #444; margin-bottom: 15px;">My 3 Key Takeaways</h3>
+                
+                <div class="question-row">
+                    <label class="question-label">1.</label>
+                    <input type="text" class="auto-input" placeholder="What is the most important thing you learned?">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">2.</label>
+                    <input type="text" class="auto-input" placeholder="What is a new skill you practiced?">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">3.</label>
+                    <input type="text" class="auto-input" placeholder="What do you want to remember for next time?">
+                </div>
             </div>
 
-            <div class="question-row">
-                <label class="question-label">What is the tallest mountain in the solar system?</label>
-                <input type="text" class="auto-input green-input" data-answers='["olympus mons"]' placeholder="Type answer here...">
-            </div>
+        </main>
+    </div> <!-- END PDF CONTENT WRAPPER -->
 
-            <div class="question-row">
-                <label class="question-label">What was the first message ever sent on the internet?</label>
-                <input type="text" class="auto-input green-input" data-answers='["lo"]' placeholder="Type answer here...">
-            </div>
-            
-            <button class="btn-submit" style="background-color: #008f39;" onclick="checkAnswers('green-input')">Check Answers</button>
-        </div>
-
-        <!-- Task 4: Navy (Image Saving) -->
-        <div class="task-card task-navy">
-            <h2>Image Saving (Challenge Task)</h2>
-            <div class="instruction-box">
-                Search for high-quality images of the first computer mouse, the inside of a CPU, and the inventor of the World Wide Web.<br><br>
-                Download these 3 images and save them directly into your <strong>"Images"</strong> sub-folder with suitable names.
-            </div>
-
-            <p style="text-align: center; color: #555; margin-bottom: 10px;">Paste a screenshot here to prove these have been saved correctly (fn + print screen):</p>
-            
-            <div class="screenshot-zone" id="zone-navy" tabindex="0">
-                <span class="screenshot-text" id="text-navy">Click this box to select it, then press <strong>Ctrl+V</strong> to paste screenshot</span>
-                <img id="img-navy" class="screenshot-image" src="" alt="Student Screenshot">
-            </div>
-        </div>
-
-        <!-- PLENARY: 3 Key Takeaways -->
-        <div class="task-card task-plenary">
-            <h2>Lesson Plenary</h2>
-            <h3 style="color: #444; margin-bottom: 15px;">My 3 Key Takeaways</h3>
-            
-            <div class="question-row">
-                <label class="question-label">1.</label>
-                <input type="text" class="auto-input" placeholder="What is the most important thing you learned?">
-            </div>
-            <div class="question-row">
-                <label class="question-label">2.</label>
-                <input type="text" class="auto-input" placeholder="What is a new skill you practiced?">
-            </div>
-            <div class="question-row">
-                <label class="question-label">3.</label>
-                <input type="text" class="auto-input" placeholder="What do you want to remember for next time?">
-            </div>
-        </div>
-
-        <!-- UNIVERSAL PDF DOWNLOAD BUTTON -->
-        <div id="action-buttons" style="display: flex; justify-content: center; margin: 40px auto;">
-            <button class="btn-pdf" onclick="downloadPDF()">📄 Download Work as PDF</button>
-        </div>
-
-    </main>
+    <!-- UNIVERSAL PDF DOWNLOAD BUTTON (Moved outside the print zone) -->
+    <div id="action-buttons" style="display: flex; justify-content: center; margin: 20px auto 50px auto;">
+        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Work as PDF</button>
+    </div>
     
     <footer>
         &copy; 2026 Delta Serlby Park - Computing Department
@@ -369,7 +238,6 @@
     <script>
         /* --- BATCH-MARKING TEXT INPUT LOGIC --- */
         function checkAnswers(groupClass) {
-            // Get all inputs belonging to the specific task (amber-input or green-input)
             var inputs = document.getElementsByClassName(groupClass);
             
             for (var i = 0; i < inputs.length; i++) {
@@ -386,10 +254,8 @@
                     }
                 }
 
-                // Reset classes before checking
                 inputElement.classList.remove('input-correct', 'input-incorrect');
 
-                // Only mark if they actually typed something
                 if (studentAnswer !== "") {
                     if (isCorrect) {
                         inputElement.classList.add('input-correct');
@@ -400,9 +266,8 @@
             }
         }
 
-        /* --- STRICT SCREENSHOT PASTE LOGIC (NO FILE UPLOAD) --- */
+        /* --- STRICT SCREENSHOT PASTE LOGIC --- */
         document.addEventListener('paste', function(e) {
-            // Determine which zone the student clicked on before pressing Ctrl+V
             var activeElement = document.activeElement;
             var targetImgId = null;
             var targetTextId = null;
@@ -414,11 +279,9 @@
                 targetImgId = 'img-navy';
                 targetTextId = 'text-navy';
             } else {
-                // If they didn't click a specific box, do nothing
                 return;
             }
 
-            // Find the image data from the clipboard
             var items = (e.clipboardData || e.originalEvent.clipboardData).items;
             for (var index in items) {
                 var item = items[index];
@@ -430,7 +293,6 @@
             }
         });
 
-        // Convert the pasted clipboard data to a visible image
         function displayImage(file, imgId, textId) {
             var reader = new FileReader();
             reader.onload = function(event) {
@@ -439,42 +301,54 @@
                 
                 imgElement.src = event.target.result;
                 imgElement.style.display = 'block';
-                textElement.style.display = 'none'; // Hide the "Click to paste" text
+                textElement.style.display = 'none'; 
             };
             reader.readAsDataURL(file);
         }
 
-        /* --- PDF GENERATION LOGIC --- */
+        /* --- BULLETPROOF PDF GENERATION LOGIC --- */
         function downloadPDF() {
-            // 1. Lock single-line inputs
+            // 1. Hide buttons so they don't print
+            var buttonsToHide = document.querySelectorAll('.no-print');
+            for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'none';
+            document.getElementById('action-buttons').style.display = 'none';
+
+            // 2. Lock text inputs so HTML2PDF can see them
             var textInputs = document.querySelectorAll('input[type="text"]');
             for (var i = 0; i < textInputs.length; i++) {
                 textInputs[i].setAttribute('value', textInputs[i].value);
             }
 
-            // 2. Lock multi-line textareas (Notes section)
+            // 3. Expand textareas to fit all content so no scrollbars hide text
             var textAreas = document.querySelectorAll('textarea');
             for (var j = 0; j < textAreas.length; j++) {
                 textAreas[j].innerHTML = textAreas[j].value;
+                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
             }
 
-            // 3. Temporarily hide the action buttons so they don't appear in the PDF
-            var actionArea = document.getElementById('action-buttons');
-            if (actionArea) actionArea.style.display = 'none';
+            // 4. Target just the lesson content
+            var element = document.getElementById('pdf-content');
 
-            // 4. Configure PDF generation
-            var element = document.body;
+            // 5. Configure PDF rules (scrollY:0 fixes the cutoff bug!)
             var opt = {
-                margin:       [0.5, 0.5, 0.5, 0.5],
+                margin:       0.3,
                 filename:     'File_Management_Workbook.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] } // Stops cards cutting in half
             };
 
-            // 5. Generate and save, then restore buttons
+            // 6. Generate, save, and restore page
             html2pdf().set(opt).from(element).save().then(function() {
-                if (actionArea) actionArea.style.display = 'flex';
+                // Restore buttons
+                for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'block';
+                document.getElementById('action-buttons').style.display = 'flex';
+                
+                // Shrink textareas back to normal
+                for (var k = 0; k < textAreas.length; k++) {
+                    textAreas[k].style.height = "";
+                }
             });
         }
     </script>
