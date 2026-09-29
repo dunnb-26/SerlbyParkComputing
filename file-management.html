@@ -357,11 +357,21 @@
         // Run the loader as soon as the window opens
         window.onload = loadProgress;
 
-        /* --- TEACHER VERIFY LOGIC --- */
+        /* --- SECURE TEACHER VERIFY LOGIC --- */
         function toggleTeacherMark(taskPrefix) {
             var card = document.getElementById('card-' + taskPrefix);
-            card.classList.toggle('teacher-verified');
-            saveProgress(); // Instantly save the verification state
+            
+            // Prompt the user for the teacher passcode
+            var passcode = prompt("Enter Teacher Passcode:");
+            
+            // Change "delta" to whatever secret password you want to use!
+            if (passcode === "delta") {
+                card.classList.toggle('teacher-verified');
+                saveProgress(); // Instantly save the verification state
+            } else if (passcode !== null) {
+                // If they typed the wrong password (and didn't just click Cancel)
+                alert("Incorrect passcode. Teacher verification denied.");
+            }
         }
 
         /* --- BATCH-MARKING TEXT INPUT LOGIC --- */
