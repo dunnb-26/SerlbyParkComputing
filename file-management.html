@@ -56,6 +56,17 @@
         .verified-badge { color: #008f39; font-size: 0.8em; margin-left: 10px; display: none; vertical-align: middle; }
         .teacher-verified .verified-badge { display: inline-block; }
 
+        /* SECURE PASSWORD MODAL STYLES */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 300px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border-top: 5px solid #1e3a8a; }
+        .modal-content h3 { margin-top: 0; color: #333; }
+        .modal-input { width: 100%; padding: 10px; margin: 15px 0; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; box-sizing: border-box; text-align: center; letter-spacing: 2px; }
+        .modal-input:focus { outline: none; border-color: #1e3a8a; }
+        .modal-btn-row { display: flex; gap: 10px; justify-content: center; }
+        .modal-btn-confirm { background-color: #008f39; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; flex-grow: 1; }
+        .modal-btn-cancel { background-color: #d32f2f; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; flex-grow: 1; }
+        .modal-error { color: #d32f2f; font-size: 13px; font-weight: bold; margin-bottom: 10px; display: none; }
+
         /* Common Elements */
         .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; text-align: center; }
         
@@ -126,8 +137,8 @@
             <div class="task-card task-maroon" id="card-maroon">
                 <h2>Red Task <span class="verified-badge">✅ Teacher Verified</span></h2>
                 <div class="instruction-box">
-                    Create a main folder called <strong>"Year 7"</strong> in your Documents<br><br>
-                    Inside this folder, create a sub-folder called <strong>"Computing"</strong> and another sub-folder inside this called <strong>"Images"</strong>
+                    Create a main folder called <strong>"Year 7"</strong> in your Documents.<br><br>
+                    Inside this folder, create a sub-folder called <strong>"Computing"</strong> and another sub-folder inside this called <strong>"Images"</strong>.
                 </div>
                 
                 <p style="text-align: center; color: #555; margin-bottom: 10px;">Paste a screenshot here to prove these have been created (fn + print screen):</p>
@@ -139,7 +150,7 @@
                 
                 <!-- TEACHER VERIFY BUTTON -->
                 <div style="text-align: right;">
-                    <button class="teacher-verify-btn no-print" onclick="toggleTeacherMark('maroon')">👨‍🏫 Teacher Verify</button>
+                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('maroon')">👨‍🏫 Teacher Verify</button>
                 </div>
             </div>
 
@@ -147,7 +158,7 @@
             <div class="task-card task-amber">
                 <h2>Amber Task</h2>
                 <div class="instruction-box">
-                    Use a search engine to find the answers to these 4 easy facts
+                    Use a search engine to find the answers to these 4 easy facts.
                 </div>
 
                 <div class="question-row">
@@ -177,7 +188,7 @@
             <div class="task-card task-green">
                 <h2>Green Task</h2>
                 <div class="instruction-box">
-                    Use a search engine to find the answers to these 4 complex facts<br>
+                    Use a search engine to find the answers to these 4 complex facts:<br>
                     <em>(Remember to use " " and +/- to modify results)</em>
                 </div>
 
@@ -208,8 +219,8 @@
             <div class="task-card task-navy" id="card-navy">
                 <h2>Blue Task <span class="verified-badge">✅ Teacher Verified</span></h2>
                 <div class="instruction-box">
-                    Search for high-quality images of the first computer mouse, the inside of a CPU, and the inventor of the World Wide Web<br><br>
-                    Download these 3 images and save them directly into your <strong>"Images"</strong> sub-folder with suitable names
+                    Search for high-quality images of the first computer mouse, the inside of a CPU, and the inventor of the World Wide Web.<br><br>
+                    Download these 3 images and save them directly into your <strong>"Images"</strong> sub-folder with suitable names.
                 </div>
 
                 <p style="text-align: center; color: #555; margin-bottom: 10px;">Paste a screenshot here to prove these have been saved correctly (fn + print screen):</p>
@@ -221,7 +232,7 @@
                 
                 <!-- TEACHER VERIFY BUTTON -->
                 <div style="text-align: right;">
-                    <button class="teacher-verify-btn no-print" onclick="toggleTeacherMark('navy')">👨‍🏫 Teacher Verify</button>
+                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('navy')">👨‍🏫 Teacher Verify</button>
                 </div>
             </div>
 
@@ -247,10 +258,23 @@
         </main>
     </div> <!-- END PDF CONTENT WRAPPER -->
 
-    <!-- UNIVERSAL PDF DOWNLOAD BUTTON (Moved outside the print zone) -->
+    <!-- UNIVERSAL PDF DOWNLOAD BUTTON -->
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
         <button class="btn-pdf" onclick="downloadPDF()">📄 Download Work</button>
         <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+    </div>
+
+    <!-- SECURE PASSWORD MODAL -->
+    <div class="modal-overlay" id="verify-modal">
+        <div class="modal-content">
+            <h3>Teacher Verification</h3>
+            <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
+            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter Passcode">
+            <div class="modal-btn-row">
+                <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
+                <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
+            </div>
+        </div>
     </div>
     
     <footer>
@@ -259,47 +283,37 @@
 
     <script>
         /* --- AUTO-SAVE MEMORY LOGIC --- */
-        
-        // Triggers every time the student types something, pastes an image, or teacher clicks verify
         function saveProgress() {
             var inputs = document.querySelectorAll('.auto-input');
             var dataToSave = {};
             
-            // Save all text boxes
             for (var i = 0; i < inputs.length; i++) {
                 dataToSave['input_' + i] = inputs[i].value;
             }
             
-            // Save Teacher Verified States
             dataToSave['maroon_verified'] = document.getElementById('card-maroon').classList.contains('teacher-verified');
             dataToSave['navy_verified'] = document.getElementById('card-navy').classList.contains('teacher-verified');
             
-            // Try to save screenshots (Wrapped in try/catch because huge images can exceed browser memory limits)
             try {
                 dataToSave['img_maroon'] = document.getElementById('img-maroon').src;
                 dataToSave['img_navy'] = document.getElementById('img-navy').src;
                 localStorage.setItem('fileManagementMemory', JSON.stringify(dataToSave));
             } catch (e) {
-                console.warn("Screenshots too large to save to memory, saving text only.");
                 delete dataToSave['img_maroon'];
                 delete dataToSave['img_navy'];
                 localStorage.setItem('fileManagementMemory', JSON.stringify(dataToSave));
             }
         }
 
-        // Triggers when the page first loads
         function loadProgress() {
             var savedDataStr = localStorage.getItem('fileManagementMemory');
             if (savedDataStr) {
                 var data = JSON.parse(savedDataStr);
                 var inputs = document.querySelectorAll('.auto-input');
                 
-                // Restore Text
                 for (var i = 0; i < inputs.length; i++) {
                     if (data['input_' + i]) {
                         inputs[i].value = data['input_' + i];
-                        
-                        // If it's a textarea, auto-expand it to fit the loaded text
                         if (inputs[i].tagName.toLowerCase() === 'textarea') {
                             inputs[i].style.height = 'auto';
                             inputs[i].style.height = inputs[i].scrollHeight + 'px';
@@ -307,15 +321,9 @@
                     }
                 }
                 
-                // Restore Teacher Verified States
-                if (data['maroon_verified']) {
-                    document.getElementById('card-maroon').classList.add('teacher-verified');
-                }
-                if (data['navy_verified']) {
-                    document.getElementById('card-navy').classList.add('teacher-verified');
-                }
+                if (data['maroon_verified']) document.getElementById('card-maroon').classList.add('teacher-verified');
+                if (data['navy_verified']) document.getElementById('card-navy').classList.add('teacher-verified');
                 
-                // Restore Screenshots
                 if (data['img_maroon'] && data['img_maroon'].length > 100) {
                     document.getElementById('img-maroon').src = data['img_maroon'];
                     document.getElementById('img-maroon').style.display = 'block';
@@ -327,18 +335,14 @@
                     document.getElementById('text-navy').style.display = 'none';
                 }
 
-                // Re-check loaded answers automatically
                 checkAnswers('amber-input');
                 checkAnswers('green-input');
             }
         }
 
-        // Add event listener to capture typing instantly
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('auto-input')) {
                 saveProgress();
-                
-                // Expanding the textarea smoothly as they type
                 if (e.target.tagName.toLowerCase() === 'textarea') {
                     e.target.style.height = 'auto';
                     e.target.style.height = e.target.scrollHeight + 'px';
@@ -346,7 +350,6 @@
             }
         });
 
-        // Add a "Reset Page" button so a new student using the PC can clear it
         function clearData() {
             if (confirm("Are you sure you want to clear all your work on this page?")) {
                 localStorage.removeItem('fileManagementMemory');
@@ -354,52 +357,64 @@
             }
         }
 
-        // Run the loader as soon as the window opens
         window.onload = loadProgress;
 
         /* --- SECURE TEACHER VERIFY LOGIC --- */
-        function toggleTeacherMark(taskPrefix) {
-            var card = document.getElementById('card-' + taskPrefix);
-            
-            // Prompt the user for the teacher passcode
-            var passcode = prompt("Enter Teacher Passcode:");
+        var activeTaskToVerify = null;
+
+        function openVerifyModal(taskPrefix) {
+            activeTaskToVerify = taskPrefix;
+            document.getElementById('verify-modal').style.display = 'flex';
+            document.getElementById('teacher-password-input').value = ""; // Clear old input
+            document.getElementById('modal-error-msg').style.display = 'none'; // Hide error
+            document.getElementById('teacher-password-input').focus();
+        }
+
+        function closeVerifyModal() {
+            document.getElementById('verify-modal').style.display = 'none';
+            activeTaskToVerify = null;
+        }
+
+        function submitVerify() {
+            var inputElement = document.getElementById('teacher-password-input');
+            var passcode = inputElement.value;
             
             // Change "delta" to whatever secret password you want to use!
             if (passcode === "delta") {
+                var card = document.getElementById('card-' + activeTaskToVerify);
                 card.classList.toggle('teacher-verified');
-                saveProgress(); // Instantly save the verification state
-            } else if (passcode !== null) {
-                // If they typed the wrong password (and didn't just click Cancel)
-                alert("Incorrect passcode. Teacher verification denied.");
+                saveProgress(); 
+                closeVerifyModal();
+            } else {
+                document.getElementById('modal-error-msg').style.display = 'block';
+                inputElement.value = "";
+                inputElement.focus();
             }
         }
+
+        // Allow pressing 'Enter' key inside the password box to submit
+        document.getElementById('teacher-password-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') submitVerify();
+        });
 
         /* --- BATCH-MARKING TEXT INPUT LOGIC --- */
         function checkAnswers(groupClass) {
             var inputs = document.getElementsByClassName(groupClass);
-            
             for (var i = 0; i < inputs.length; i++) {
                 var inputElement = inputs[i];
                 var studentAnswer = inputElement.value.toLowerCase().trim();
                 var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers'));
-                
                 var isCorrect = false;
                 
                 for (var j = 0; j < acceptedAnswers.length; j++) {
                     if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
-                        isCorrect = true;
-                        break;
+                        isCorrect = true; break;
                     }
                 }
-
                 inputElement.classList.remove('input-correct', 'input-incorrect');
-
                 if (studentAnswer !== "") {
-                    if (isCorrect) {
-                        inputElement.classList.add('input-correct');
-                    } else {
-                        inputElement.classList.add('input-incorrect');
-                    }
+                    if (isCorrect) inputElement.classList.add('input-correct');
+                    else inputElement.classList.add('input-incorrect');
                 }
             }
         }
@@ -410,15 +425,9 @@
             var targetImgId = null;
             var targetTextId = null;
 
-            if (activeElement.id === 'zone-maroon') {
-                targetImgId = 'img-maroon';
-                targetTextId = 'text-maroon';
-            } else if (activeElement.id === 'zone-navy') {
-                targetImgId = 'img-navy';
-                targetTextId = 'text-navy';
-            } else {
-                return;
-            }
+            if (activeElement.id === 'zone-maroon') { targetImgId = 'img-maroon'; targetTextId = 'text-maroon'; } 
+            else if (activeElement.id === 'zone-navy') { targetImgId = 'img-navy'; targetTextId = 'text-navy'; } 
+            else return;
 
             var items = (e.clipboardData || e.originalEvent.clipboardData).items;
             for (var index in items) {
@@ -436,59 +445,46 @@
             reader.onload = function(event) {
                 var imgElement = document.getElementById(imgId);
                 var textElement = document.getElementById(textId);
-                
                 imgElement.src = event.target.result;
                 imgElement.style.display = 'block';
                 textElement.style.display = 'none'; 
-                
-                saveProgress(); // Instantly save the screenshot to memory
+                saveProgress(); 
             };
             reader.readAsDataURL(file);
         }
 
         /* --- BULLETPROOF PDF GENERATION LOGIC --- */
         function downloadPDF() {
-            // 1. Hide buttons so they don't print
             var buttonsToHide = document.querySelectorAll('.no-print');
             for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'none';
             document.getElementById('action-buttons').style.display = 'none';
 
-            // 2. Lock text inputs so HTML2PDF can see them
             var textInputs = document.querySelectorAll('input[type="text"]');
             for (var i = 0; i < textInputs.length; i++) {
                 textInputs[i].setAttribute('value', textInputs[i].value);
             }
 
-            // 3. Expand textareas to fit all content so no scrollbars hide text
             var textAreas = document.querySelectorAll('textarea');
             for (var j = 0; j < textAreas.length; j++) {
                 textAreas[j].innerHTML = textAreas[j].value;
                 textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
             }
 
-            // 4. Target just the lesson content
             var element = document.getElementById('pdf-content');
 
-            // 5. Configure PDF rules (scrollY:0 fixes the cutoff bug!)
             var opt = {
                 margin:       0.3,
                 filename:     'File_Management_Workbook.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
                 jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] } // Stops cards cutting in half
+                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] } 
             };
 
-            // 6. Generate, save, and restore page
             html2pdf().set(opt).from(element).save().then(function() {
-                // Restore buttons
                 for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'block';
                 document.getElementById('action-buttons').style.display = 'flex';
-                
-                // Shrink textareas back to normal
-                for (var k = 0; k < textAreas.length; k++) {
-                    textAreas[k].style.height = "";
-                }
+                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
             });
         }
     </script>
