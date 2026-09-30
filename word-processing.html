@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Word Processing - Lesson 5</title>
+    <title>Word Processing - Lesson 1</title>
     <link rel="stylesheet" href="style.css">
 
     <!-- HTML to PDF Library -->
@@ -33,21 +33,26 @@
         /* RAGB Colors */
         .task-maroon { border-top: 6px solid #800000; }
         .task-maroon h2 { color: #800000; margin-top: 0; transition: color 0.3s; }
+        .task-maroon .instruction-box { border-left: 4px solid #800000; transition: border-color 0.3s; }
 
         .task-amber { border-top: 6px solid #ffb300; }
-        .task-amber h2 { color: #ffb300; margin-top: 0; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); transition: color 0.3s;}
+        .task-amber h2 { color: #ffb300; margin-top: 0; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
+        .task-amber .instruction-box { border-left: 4px solid #ffb300; }
 
         .task-green { border-top: 6px solid #008f39; }
-        .task-green h2 { color: #008f39; margin-top: 0; transition: color 0.3s;}
+        .task-green h2 { color: #008f39; margin-top: 0; }
+        .task-green .instruction-box { border-left: 4px solid #008f39; }
 
         .task-navy { border-top: 6px solid #1e3a8a; }
         .task-navy h2 { color: #1e3a8a; margin-top: 0; transition: color 0.3s; }
+        .task-navy .instruction-box { border-left: 4px solid #1e3a8a; transition: border-color 0.3s; }
 
         /* TEACHER VERIFICATION STYLES */
         .teacher-verify-btn { background-color: #607d8b; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background-color 0.2s; display: inline-block; }
         .teacher-verify-btn:hover { background-color: #455a64; }
         .teacher-verified { border-top-color: #008f39 !important; background-color: #f0fff0 !important; }
         .teacher-verified h2 { color: #008f39 !important; }
+        .teacher-verified .instruction-box { border-left-color: #008f39 !important; }
         .verified-badge { color: #008f39; font-size: 0.8em; margin-left: 10px; display: none; vertical-align: middle; }
         .teacher-verified .verified-badge { display: inline-block; }
 
@@ -63,7 +68,7 @@
         .modal-error { color: #d32f2f; font-size: 13px; font-weight: bold; margin-bottom: 10px; display: none; }
 
         /* Common Elements */
-        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 4px; font-size: 16px; line-height: 1.5; margin-bottom: 20px; text-align: center; border: 1px solid #e0e0e0; }
+        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; text-align: center; }
         
         /* Inputs & Textareas */
         .question-row { margin-bottom: 20px; }
@@ -75,119 +80,35 @@
         /* Buttons */
         .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
         .btn-pdf:hover { background-color: #124d2d; }
-
-        /* === WORD PROCESSOR SIMULATOR STYLES === */
-        .word-app {
-            background-color: #f3f2f1;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 40px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-        }
         
-        .word-header {
-            background-color: #2b579a; /* MS Word Blue */
-            color: white;
-            padding: 8px 15px;
-            font-size: 14px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            align-items: center;
-        }
-
-        .word-header-icon {
-            background-color: white;
-            color: #2b579a;
-            font-weight: bold;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 3px;
-            margin-right: 10px;
-        }
-
-        .word-ribbon {
-            background-color: #f3f2f1;
-            padding: 10px;
-            display: flex;
-            gap: 15px;
-            border-bottom: 1px solid #e1dfdd;
-            flex-wrap: wrap;
-        }
-
-        .ribbon-group {
-            display: flex;
-            gap: 4px;
-            align-items: center;
-            padding-right: 15px;
-            border-right: 1px solid #ccc;
-        }
-        .ribbon-group:last-child { border-right: none; }
-
-        .ribbon-btn {
-            background: white;
-            border: 1px solid transparent;
-            padding: 6px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 15px;
-            color: #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 32px;
-        }
-        .ribbon-btn:hover { background-color: #e1dfdd; border-color: #c8c6c4; }
+        /* Screenshots */
+        .screenshot-zone { width: 100%; min-height: 200px; border: 2px dashed #ccc; border-radius: 8px; background-color: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; box-sizing: border-box; position: relative; cursor: pointer; transition: all 0.2s; }
+        .screenshot-zone:focus { border-color: #800000; background-color: #f0e6e6; outline: none; }
+        .screenshot-text { color: #666; font-size: 15px; pointer-events: none; }
+        .screenshot-image { max-width: 100%; max-height: 400px; display: none; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         
-        .ribbon-select {
-            padding: 6px;
-            border: 1px solid #c8c6c4;
-            border-radius: 4px;
-            font-size: 14px;
-            background: white;
-        }
-
-        .word-canvas-area {
-            background-color: #e1dfdd;
-            padding: 40px 20px;
-            display: flex;
-            justify-content: center;
-            height: 600px;
-            overflow-y: auto;
-        }
-
-        .word-page {
-            background-color: white;
-            width: 100%;
-            max-width: 21cm; /* A4 Width */
-            min-height: 29.7cm; /* A4 Height */
-            padding: 1in; /* Standard margins */
-            box-sizing: border-box;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            font-family: Arial, sans-serif;
-            font-size: 11pt;
-            color: black;
-            outline: none; /* Removes the glowing blue border when typing */
-            cursor: text;
-        }
-        
-        /* Ensures images pasted into the Word doc fit */
-        .word-page img { max-width: 100%; height: auto; }
-
+        /* Download Banner */
+        .download-banner { background-color: #e3f2fd; border: 2px solid #2196f3; border-radius: 8px; padding: 25px; text-align: center; margin-bottom: 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .btn-download-word { background-color: #2b579a; color: white; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; font-size: 18px; display: inline-block; margin-top: 15px; transition: background-color 0.2s;}
+        .btn-download-word:hover { background-color: #1a3a6c; }
     </style>
 </head>
 <body>
     <div id="pdf-content">
         <header>
             <div class="header-left"><img src="logo.jpg" alt="Delta Serlby Park Logo"></div>
-            <div class="header-center"><h1>Word Processing & Formatting</h1></div>
-            <div class="header-right"><a href="index.html" class="back-btn">&larr; Back to Curriculum</a></div>
+            <div class="header-center"><h1>Word Processing</h1></div>
+            <div class="header-right"><a href="microsoft-tools.html" class="back-btn">&larr; Back to Curriculum</a></div>
         </header>
 
         <main class="task-container">
+
+            <!-- LESSON RESOURCES -->
+            <div class="download-banner no-print">
+                <h2 style="margin: 0; color: #1e3a8a;">Step 1: Open the Workspace</h2>
+                <p style="color: #555; margin-bottom: 0;">Click below to download the starter document. Open it in Microsoft Word to complete today's tasks.</p>
+                <a href="My_Computing_Profile.docx" class="btn-download-word" download>📥 Download Starter Document</a>
+            </div>
 
             <!-- PREPARATION: Keywords & Notes -->
             <div class="task-card task-prep">
@@ -217,108 +138,71 @@
                 </div>
             </div>
 
-            <!-- TASK INSTRUCTIONS -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-                
-                <!-- Red Task -->
-                <div class="task-card task-maroon" id="card-maroon" style="margin-bottom: 0;">
-                    <h2>Red Task <span class="verified-badge">✅</span></h2>
-                    <div class="instruction-box">
-                        Type the title <strong>"My Computing Profile"</strong> at the top of your document.<br><br>
-                        Highlight it, change the size to <strong>Large (Heading 1)</strong>, and make it <strong>Bold</strong> and <strong>Underlined</strong>.
-                    </div>
-                    <div style="text-align: center;">
-                        <button class="teacher-verify-btn no-print" onclick="openVerifyModal('maroon')">👨‍🏫 Teacher Verify</button>
-                    </div>
+            <!-- Task 1: Maroon -->
+            <div class="task-card task-maroon" id="card-maroon">
+                <h2>Red Task <span class="verified-badge">✅ Teacher Verified</span></h2>
+                <div class="instruction-box">
+                    Type the title <strong>"My Computing Profile"</strong> at the top of your Word document.<br><br>
+                    Highlight it, change the size to <strong>Large (Heading 1)</strong>, and make it <strong>Bold</strong> and <strong>Underlined</strong>.
                 </div>
-
-                <!-- Amber Task -->
-                <div class="task-card task-amber" id="card-amber" style="margin-bottom: 0;">
-                    <h2>Amber Task <span class="verified-badge">✅</span></h2>
-                    <div class="instruction-box">
-                        Underneath your title, type a short paragraph about your favorite hobby.<br><br>
-                        Highlight the text, change the Font Style to <strong>Comic Sans</strong>, and change the text color to <strong>Blue</strong>.
-                    </div>
-                    <div style="text-align: center;">
-                        <button class="teacher-verify-btn no-print" onclick="openVerifyModal('amber')">👨‍‍🏫 Teacher Verify</button>
-                    </div>
+                <p style="text-align: center; color: #555; margin-bottom: 10px;">Paste a screenshot from Word showing your title formatting:</p>
+                <div class="screenshot-zone" id="zone-maroon" tabindex="0">
+                    <span class="screenshot-text" id="text-maroon">Click this box to select it, then press <strong>Ctrl+V</strong> to paste screenshot</span>
+                    <img id="img-maroon" class="screenshot-image" src="" alt="Student Screenshot">
                 </div>
-
-                <!-- Green Task -->
-                <div class="task-card task-green" id="card-green" style="margin-bottom: 0;">
-                    <h2>Green Task <span class="verified-badge">✅</span></h2>
-                    <div class="instruction-box">
-                        Start a new line and click the <strong>Bulleted List</strong> button on the ribbon.<br><br>
-                        Type out a list of your top 3 favorite subjects in school.
-                    </div>
-                    <div style="text-align: center;">
-                        <button class="teacher-verify-btn no-print" onclick="openVerifyModal('green')">👨‍🏫 Teacher Verify</button>
-                    </div>
+                <div style="text-align: right;">
+                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('maroon')">👨‍🏫 Teacher Verify</button>
                 </div>
-
-                <!-- Blue Task -->
-                <div class="task-card task-navy" id="card-navy" style="margin-bottom: 0;">
-                    <h2>Blue Task <span class="verified-badge">✅</span></h2>
-                    <div class="instruction-box">
-                        Search the internet for a picture of a computer keyboard. <strong>Copy</strong> the image.<br><br>
-                        Click below your list and press <strong>Ctrl + V</strong> to paste it. Highlight the picture and <strong>Center Align</strong> it.
-                    </div>
-                    <div style="text-align: center;">
-                        <button class="teacher-verify-btn no-print" onclick="openVerifyModal('navy')">👨‍🏫 Teacher Verify</button>
-                    </div>
-                </div>
-
             </div>
 
-            <!-- SIMULATED WORD PROCESSOR -->
-            <h3 style="color: #333; margin-bottom: 10px;">Complete your tasks in the document below:</h3>
-            <div class="word-app">
-                <div class="word-header">
-                    <div class="word-header-icon">W</div>
-                    Document 1 - Microsoft Word Simulator
+            <!-- Task 2: Amber -->
+            <div class="task-card task-amber" id="card-amber">
+                <h2>Amber Task <span class="verified-badge">✅ Teacher Verified</span></h2>
+                <div class="instruction-box">
+                    Underneath your title, type a short paragraph about your favorite hobby.<br><br>
+                    Highlight the text, change the Font Style to <strong>Comic Sans</strong>, and change the text color to <strong>Blue</strong>.
                 </div>
-                
-                <div class="word-ribbon no-print">
-                    <!-- Font Group -->
-                    <div class="ribbon-group">
-                        <select class="ribbon-select" onchange="formatDoc('fontName', this.value)">
-                            <option value="Arial">Arial</option>
-                            <option value="Times New Roman">Times New Roman</option>
-                            <option value="Courier New">Courier New</option>
-                            <option value="Comic Sans MS">Comic Sans MS</option>
-                        </select>
-                        <select class="ribbon-select" onchange="formatDoc('formatBlock', this.value)">
-                            <option value="P">Normal Text</option>
-                            <option value="H1">Heading 1 (Large)</option>
-                            <option value="H2">Heading 2 (Medium)</option>
-                        </select>
-                    </div>
-
-                    <!-- Styling Group -->
-                    <div class="ribbon-group">
-                        <button class="ribbon-btn" onclick="formatDoc('bold')" title="Bold"><b>B</b></button>
-                        <button class="ribbon-btn" onclick="formatDoc('italic')" title="Italic"><i>I</i></button>
-                        <button class="ribbon-btn" onclick="formatDoc('underline')" title="Underline"><u>U</u></button>
-                        <input type="color" oninput="formatDoc('foreColor', this.value)" style="height: 30px; border: none; cursor: pointer;" title="Text Color">
-                    </div>
-
-                    <!-- Paragraph Group -->
-                    <div class="ribbon-group">
-                        <button class="ribbon-btn" onclick="formatDoc('justifyLeft')" title="Align Left">⬅️</button>
-                        <button class="ribbon-btn" onclick="formatDoc('justifyCenter')" title="Center">↔️</button>
-                        <button class="ribbon-btn" onclick="formatDoc('justifyRight')" title="Align Right">➡️</button>
-                    </div>
-
-                    <!-- Lists Group -->
-                    <div class="ribbon-group">
-                        <button class="ribbon-btn" onclick="formatDoc('insertUnorderedList')" title="Bulleted List">● ⠇</button>
-                        <button class="ribbon-btn" onclick="formatDoc('insertOrderedList')" title="Numbered List">1. ⠇</button>
-                    </div>
+                <p style="text-align: center; color: #555; margin-bottom: 10px;">Paste a screenshot from Word showing your styled paragraph:</p>
+                <div class="screenshot-zone" id="zone-amber" tabindex="0">
+                    <span class="screenshot-text" id="text-amber">Click this box to select it, then press <strong>Ctrl+V</strong> to paste screenshot</span>
+                    <img id="img-amber" class="screenshot-image" src="" alt="Student Screenshot">
                 </div>
+                <div style="text-align: right;">
+                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('amber')">👨‍🏫 Teacher Verify</button>
+                </div>
+            </div>
 
-                <div class="word-canvas-area">
-                    <!-- This is the interactive typing area -->
-                    <div class="word-page" id="word-editor" contenteditable="true" spellcheck="false" placeholder="Start typing your document here..."></div>
+            <!-- Task 3: Green -->
+            <div class="task-card task-green" id="card-green">
+                <h2>Green Task <span class="verified-badge">✅ Teacher Verified</span></h2>
+                <div class="instruction-box">
+                    Start a new line and click the <strong>Bulleted List</strong> button on the Word ribbon.<br><br>
+                    Type out a list of your top 3 favorite subjects in school.
+                </div>
+                <p style="text-align: center; color: #555; margin-bottom: 10px;">Paste a screenshot from Word showing your bulleted list:</p>
+                <div class="screenshot-zone" id="zone-green" tabindex="0">
+                    <span class="screenshot-text" id="text-green">Click this box to select it, then press <strong>Ctrl+V</strong> to paste screenshot</span>
+                    <img id="img-green" class="screenshot-image" src="" alt="Student Screenshot">
+                </div>
+                <div style="text-align: right;">
+                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('green')">👨‍🏫 Teacher Verify</button>
+                </div>
+            </div>
+
+            <!-- Task 4: Navy -->
+            <div class="task-card task-navy" id="card-navy">
+                <h2>Blue Task <span class="verified-badge">✅ Teacher Verified</span></h2>
+                <div class="instruction-box">
+                    Search the internet for a picture of a computer keyboard. <strong>Copy</strong> the image.<br><br>
+                    Click below your list in Word and press <strong>Ctrl + V</strong> to paste it. Highlight the picture and <strong>Center Align</strong> it.
+                </div>
+                <p style="text-align: center; color: #555; margin-bottom: 10px;">Paste a screenshot showing your centered image:</p>
+                <div class="screenshot-zone" id="zone-navy" tabindex="0">
+                    <span class="screenshot-text" id="text-navy">Click this box to select it, then press <strong>Ctrl+V</strong> to paste screenshot</span>
+                    <img id="img-navy" class="screenshot-image" src="" alt="Student Screenshot">
+                </div>
+                <div style="text-align: right;">
+                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('navy')">👨‍🏫 Teacher Verify</button>
                 </div>
             </div>
 
@@ -326,7 +210,6 @@
             <div class="task-card task-plenary">
                 <h2>Lesson Plenary</h2>
                 <h3 style="color: #444; margin-bottom: 15px;">My 3 Key Takeaways</h3>
-                
                 <div class="question-row">
                     <label class="question-label">1.</label>
                     <input type="text" class="auto-input" placeholder="Type first takeaway here...">
@@ -368,42 +251,30 @@
     </footer>
 
     <script>
-        /* --- WORD PROCESSOR LOGIC --- */
-        
-        // Execute Formatting Commands
-        function formatDoc(command, value = null) {
-            document.execCommand(command, false, value);
-            document.getElementById('word-editor').focus();
-            saveProgress();
-        }
-
-        // Add event listener to save Word Doc when typing or pasting
-        document.getElementById('word-editor').addEventListener('input', saveProgress);
-
         /* --- AUTO-SAVE MEMORY LOGIC --- */
         function saveProgress() {
             var inputs = document.querySelectorAll('.auto-input');
             var dataToSave = {};
             
-            // Save standard text boxes
             for (var i = 0; i < inputs.length; i++) {
                 dataToSave['input_' + i] = inputs[i].value;
             }
             
-            // Save Word Document content
-            try {
-                dataToSave['word_doc'] = document.getElementById('word-editor').innerHTML;
-            } catch(e) {
-                console.warn("Could not save document (images might be too large).");
-            }
-
-            // Save Teacher Verified States
             dataToSave['maroon_verified'] = document.getElementById('card-maroon').classList.contains('teacher-verified');
             dataToSave['amber_verified'] = document.getElementById('card-amber').classList.contains('teacher-verified');
             dataToSave['green_verified'] = document.getElementById('card-green').classList.contains('teacher-verified');
             dataToSave['navy_verified'] = document.getElementById('card-navy').classList.contains('teacher-verified');
             
-            localStorage.setItem('wordLessonMemory', JSON.stringify(dataToSave));
+            try {
+                dataToSave['img_maroon'] = document.getElementById('img-maroon').src;
+                dataToSave['img_amber'] = document.getElementById('img-amber').src;
+                dataToSave['img_green'] = document.getElementById('img-green').src;
+                dataToSave['img_navy'] = document.getElementById('img-navy').src;
+                localStorage.setItem('wordLessonMemory', JSON.stringify(dataToSave));
+            } catch (e) {
+                console.warn("Screenshots too large to save to memory, saving text only.");
+                localStorage.setItem('wordLessonMemory', JSON.stringify(dataToSave));
+            }
         }
 
         function loadProgress() {
@@ -422,12 +293,19 @@
                     }
                 }
                 
-                if (data['word_doc']) document.getElementById('word-editor').innerHTML = data['word_doc'];
-
                 if (data['maroon_verified']) document.getElementById('card-maroon').classList.add('teacher-verified');
                 if (data['amber_verified']) document.getElementById('card-amber').classList.add('teacher-verified');
                 if (data['green_verified']) document.getElementById('card-green').classList.add('teacher-verified');
                 if (data['navy_verified']) document.getElementById('card-navy').classList.add('teacher-verified');
+                
+                const zones = ['maroon', 'amber', 'green', 'navy'];
+                zones.forEach(zone => {
+                    if (data['img_' + zone] && data['img_' + zone].length > 100) {
+                        document.getElementById('img-' + zone).src = data['img_' + zone];
+                        document.getElementById('img-' + zone).style.display = 'block';
+                        document.getElementById('text-' + zone).style.display = 'none';
+                    }
+                });
             }
         }
 
@@ -486,15 +364,47 @@
             if (e.key === 'Enter') submitVerify();
         });
 
+        /* --- STRICT SCREENSHOT PASTE LOGIC --- */
+        document.addEventListener('paste', function(e) {
+            var activeElement = document.activeElement;
+            var targetImgId = null;
+            var targetTextId = null;
+
+            if (activeElement.id === 'zone-maroon') { targetImgId = 'img-maroon'; targetTextId = 'text-maroon'; } 
+            else if (activeElement.id === 'zone-amber') { targetImgId = 'img-amber'; targetTextId = 'text-amber'; } 
+            else if (activeElement.id === 'zone-green') { targetImgId = 'img-green'; targetTextId = 'text-green'; } 
+            else if (activeElement.id === 'zone-navy') { targetImgId = 'img-navy'; targetTextId = 'text-navy'; } 
+            else return;
+
+            var items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            for (var index in items) {
+                var item = items[index];
+                if (item.kind === 'file') {
+                    var blob = item.getAsFile();
+                    displayImage(blob, targetImgId, targetTextId);
+                    e.preventDefault(); 
+                }
+            }
+        });
+
+        function displayImage(file, imgId, textId) {
+            var reader = new FileReader();
+            reader.onload = function(event) {
+                var imgElement = document.getElementById(imgId);
+                var textElement = document.getElementById(textId);
+                imgElement.src = event.target.result;
+                imgElement.style.display = 'block';
+                textElement.style.display = 'none'; 
+                saveProgress(); 
+            };
+            reader.readAsDataURL(file);
+        }
+
         /* --- BULLETPROOF PDF GENERATION LOGIC --- */
         function downloadPDF() {
             var buttonsToHide = document.querySelectorAll('.no-print');
             for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'none';
             document.getElementById('action-buttons').style.display = 'none';
-
-            // Remove the scrollbar area from the word canvas for printing
-            document.querySelector('.word-canvas-area').style.height = 'auto';
-            document.querySelector('.word-canvas-area').style.overflow = 'visible';
 
             var textInputs = document.querySelectorAll('input[type="text"]');
             for (var i = 0; i < textInputs.length; i++) {
@@ -521,11 +431,6 @@
             html2pdf().set(opt).from(element).save().then(function() {
                 for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'inline-block';
                 document.getElementById('action-buttons').style.display = 'flex';
-                
-                // Restore word canvas height
-                document.querySelector('.word-canvas-area').style.height = '600px';
-                document.querySelector('.word-canvas-area').style.overflowY = 'auto';
-
                 for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
             });
         }
