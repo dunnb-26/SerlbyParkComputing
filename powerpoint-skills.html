@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerPoint Skills - Lesson 2</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- HTML to PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        /* Task Container Styling */
+        .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
+        
+        .task-card { 
+            background: white; 
+            border-radius: 8px; 
+            padding: 25px; 
+            margin-bottom: 30px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            page-break-inside: avoid; 
+            transition: all 0.3s ease;
+        }
+        
+        /* Section Header Colors */
+        .task-prep { border-top: 6px solid #607d8b; } 
+        .task-prep h2 { color: #607d8b; margin-top: 0; }
+        
+        .task-plenary { border-top: 6px solid #673ab7; } 
+        .task-plenary h2 { color: #673ab7; margin-top: 0; }
+
+        /* RAGB Colors */
+        .task-maroon { border-top: 6px solid #800000; }
+        .task-maroon h2 { color: #800000; margin-top: 0; transition: color 0.3s; }
+        .task-maroon .instruction-box { border-left: 4px solid #800000; transition: border-color 0.3s; }
+
+        .task-amber { border-top: 6px solid #ffb300; }
+        .task-amber h2 { color: #ffb300; margin-top: 0; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
+        .task-amber .instruction-box { border-left: 4px solid #ffb300; }
+
+        .task-green { border-top: 6px solid #008f39; }
+        .task-green h2 { color: #008f39; margin-top: 0; }
+        .task-green .instruction-box { border-left: 4px solid #008f39; }
+
+        .task-navy { border-top: 6px solid #1e3a8a; }
+        .task-navy h2 { color: #1e3a8a; margin-top: 0; transition: color 0.3s; }
+        .task-navy .instruction-box { border-left: 4px solid #1e3a8a; transition: border-color 0.3s; }
+
+        /* TEACHER VERIFICATION STYLES */
+        .teacher-verify-btn { background-color: #607d8b; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background-color 0.2s; display: inline-block; }
+        .teacher-verify-btn:hover { background-color: #455a64; }
+        .teacher-verified { border-top-color: #008f39 !important; background-color: #f0fff0 !important; }
+        .teacher-verified h2 { color: #008f39 !important; }
+        .teacher-verified .instruction-box { border-left-color: #008f39 !important; }
+        .verified-badge { color: #008f39; font-size: 0.8em; margin-left: 10px; display: none; vertical-align: middle; }
+        .teacher-verified .verified-badge { display: inline-block; }
+
+        /* SECURE PASSWORD MODAL STYLES */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 300px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border-top: 5px solid #d34b22; }
+        .modal-content h3 { margin-top: 0; color: #333; }
+        .modal-input { width: 100%; padding: 10px; margin: 15px 0; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; box-sizing: border-box; text-align: center; letter-spacing: 2px; }
+        .modal-input:focus { outline: none; border-color: #d34b22; }
+        .modal-btn-row { display: flex; gap: 10px; justify-content: center; }
+        .modal-btn-confirm { background-color: #008f39; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; flex-grow: 1; }
+        .modal-btn-cancel { background-color: #d32f2f; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; flex-grow: 1; }
+        .modal-error { color: #d32f2f; font-size: 13px; font-weight: bold; margin-bottom: 10px; display: none; }
+
+        /* Common Elements */
+        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; text-align: center; }
+        
+        /* Inputs & Textareas */
+        .question-row { margin-bottom: 20px; }
+        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
+        .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit; }
+        .auto-input:focus { outline: none; border-color: #666; }
+        textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; }
+        
+        /* Buttons */
+        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
+        .btn-pdf:hover { background-color: #124d2d; }
+        
+        /* Screenshots */
+        .screenshot-zone { width: 100%; min-height: 200px; border: 2px dashed #ccc; border-radius: 8px; background-color: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; box-sizing: border-box; position: relative; cursor: pointer; transition: all 0.2s; }
+        .screenshot-zone:focus { border-color: #800000; background-color: #f0e6e6; outline: none; }
+        .screenshot-text { color: #666; font-size: 15px; pointer-events: none; }
+        .screenshot-image { max-width: 100%; max-height: 400px; display: none; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        
+        /* Download Banner - PowerPoint Orange Color */
+        .download-banner { background-color: #fff3f0; border: 2px solid #d34b22; border-radius: 8px; padding: 25px; text-align: center; margin-bottom: 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body>
+    <div id="pdf-content">
+        <header>
+            <div class="header-left"><img src="logo.jpg" alt="Delta Serlby Park Logo"></div>
+            <div class="header-center"><h1>PowerPoint Skills</h1></div>
+            <div class="header-right"><a href="microsoft-tools.html" class="back-btn">&larr; Back to Curriculum</a></div>
+        </header>
+
+        <main class="task-container">
+
+            <!-- LESSON RESOURCES -->
+            <div class="download-banner no-print">
+                <h2 style="margin: 0; color: #b23b18;">Step 1: Open the Workspace</h2>
+                <p style="color: #333; margin-top: 10px; font-size: 16px; line-height: 1.6;">Go to your <strong>Microsoft Teams</strong> class and open the assignment for today.<br>Open the attached <strong>PPT Template</strong> to complete the tasks below, then paste your screenshots here!</p>
+            </div>
+
+            <!-- PREPARATION: Keywords & Notes -->
+            <div class="task-card task-prep">
+                <h2>Lesson Preparation</h2>
+                
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">Key Words</h3>
+                <div class="question-row">
+                    <label class="question-label">Presentation</label>
+                    <input type="text" class="auto-input" placeholder="Type definition here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">Slide Master</label>
+                    <input type="text" class="auto-input" placeholder="Type definition here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">Transition</label>
+                    <input type="text" class="auto-input" placeholder="Type definition here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">Animation</label>
+                    <input type="text" class="auto-input" placeholder="Type definition here...">
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Lesson Notes</h3>
+                <div class="question-row">
+                    <textarea class="auto-input" rows="6" placeholder="Write your notes from today's lesson here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                </div>
+            </div>
+
+            <!-- Task 1: Maroon -->
+            <div class="task-card task-maroon" id="card-maroon">
+                <h2>Red Task <span class="verified-badge">✅ Teacher Verified</span></h2>
+                <div class="instruction-box">
+                    Add <strong>3 new slides</strong> to your presentation using the 'Title and Content' layout.<br><br>
+                    On slide 2, add the title "My Hobbies" and create a bulleted list of 3 things you like to do.
+                </div>
+                <p style="text-align: center; color: #555; margin-bottom: 10px;">Paste a screenshot showing your completed Slide 2:</p>
+                <div class="screenshot-zone" id="zone-maroon" tabindex="0">
+                    <span class="screenshot-text" id="text-maroon">Click this box to select it, then press <strong>Ctrl+V</strong> to paste screenshot</span>
+                    <img id="img-maroon" class="screenshot-image" src="" alt="Student Screenshot">
+                </div>
+                <div style="text-align: right;">
+                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('maroon')">👨‍‍🏫 Teacher Verify</button>
+                </div>
+            </div>
+
+            <!-- Task 2: Amber -->
+            <div class="task-card task-amber" id="card-amber">
+                <h2>Amber Task <span class="verified-badge">✅ Teacher Verified</span></h2>
+                <div class="instruction-box">
+                    Go to the <strong>Transitions</strong> tab at the top of the screen.<br><br>
+                    Select a transition you like (e.g., Fade or Push) and click <strong>"Apply To All"</strong> so every slide uses it.
+                </div>
+                <p style="text-align: center; color: #555; margin-bottom: 10px;">Paste a screenshot of your Transitions ribbon showing it has been applied:</p>
+                <div class="screenshot-zone" id="zone-amber" tabindex="0">
+                    <span class="screenshot-text" id="text-amber">Click this box to select it, then press <strong>Ctrl+V</strong> to paste screenshot</span>
+                    <img id="img-amber" class="screenshot-image" src="" alt="Student Screenshot">
+                </div>
+                <div style="text-align: right;">
+                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('amber')">👨‍🏫 Teacher Verify</button>
+                </div>
+            </div>
+
+            <!-- Task 3: Green -->
+            <div class="task-card task-green" id="card-green">
+                <h2>Green Task <span class="verified-badge">✅ Teacher Verified</span></h2>
+                <div class="instruction-box">
+                    Insert an image onto Slide 3. Go to the <strong>Animations</strong> tab and apply an 'Entrance' animation to the picture.<br><br>
+                    Click the <strong>Animation Pane</strong> button so the side menu appears.
+                </div>
+                <p style="text-align: center; color: #555; margin-bottom: 10px;">Paste a screenshot showing your image and the Animation Pane open:</p>
+                <div class="screenshot-zone" id="zone-green" tabindex="0">
+                    <span class="screenshot-text" id="text-green">Click this box to select it, then press <strong>Ctrl+V</strong> to paste screenshot</span>
+                    <img id="img-green" class="screenshot-image" src="" alt="Student Screenshot">
+                </div>
+                <div style="text-align: right;">
+                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('green')">👨‍🏫 Teacher Verify</button>
+                </div>
+            </div>
+
+            <!-- Task 4: Navy -->
+            <div class="task-card task-navy" id="card-navy">
+                <h2>Blue Task <span class="verified-badge">✅ Teacher Verified</span></h2>
+                <div class="instruction-box">
+                    Go to the <strong>View</strong> tab and click on <strong>Slide Master</strong>.<br><br>
+                    Change the background color of the top master slide, and change the Title font to a style of your choice. Close the Master View when finished.
+                </div>
+                <p style="text-align: center; color: #555; margin-bottom: 10px;">Paste a screenshot of your screen while inside the Slide Master view:</p>
+                <div class="screenshot-zone" id="zone-navy" tabindex="0">
+                    <span class="screenshot-text" id="text-navy">Click this box to select it, then press <strong>Ctrl+V</strong> to paste screenshot</span>
+                    <img id="img-navy" class="screenshot-image" src="" alt="Student Screenshot">
+                </div>
+                <div style="text-align: right;">
+                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('navy')">👨‍‍🏫 Teacher Verify</button>
+                </div>
+            </div>
+
+            <!-- PLENARY: 3 Key Takeaways -->
+            <div class="task-card task-plenary">
+                <h2>Lesson Plenary</h2>
+                <h3 style="color: #444; margin-bottom: 15px;">My 3 Key Takeaways</h3>
+                <div class="question-row">
+                    <label class="question-label">1.</label>
+                    <input type="text" class="auto-input" placeholder="Type first takeaway here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">2.</label>
+                    <input type="text" class="auto-input" placeholder="Type second takeaway here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">3.</label>
+                    <input type="text" class="auto-input" placeholder="Type third takeaway here...">
+                </div>
+            </div>
+
+        </main>
+    </div> <!-- END PDF CONTENT WRAPPER -->
+
+    <!-- UNIVERSAL PDF DOWNLOAD BUTTON -->
+    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
+        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Work</button>
+        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+    </div>
+
+    <!-- SECURE PASSWORD MODAL -->
+    <div class="modal-overlay" id="verify-modal">
+        <div class="modal-content">
+            <h3>Teacher Verification</h3>
+            <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
+            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter Passcode">
+            <div class="modal-btn-row">
+                <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
+                <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        &copy; 2026 Delta Serlby Park - Computing Department
+    </footer>
+
+    <script>
+        /* --- AUTO-SAVE MEMORY LOGIC (Updated for PowerPoint) --- */
+        function saveProgress() {
+            var inputs = document.querySelectorAll('.auto-input');
+            var dataToSave = {};
+            
+            for (var i = 0; i < inputs.length; i++) {
+                dataToSave['input_' + i] = inputs[i].value;
+            }
+            
+            dataToSave['maroon_verified'] = document.getElementById('card-maroon').classList.contains('teacher-verified');
+            dataToSave['amber_verified'] = document.getElementById('card-amber').classList.contains('teacher-verified');
+            dataToSave['green_verified'] = document.getElementById('card-green').classList.contains('teacher-verified');
+            dataToSave['navy_verified'] = document.getElementById('card-navy').classList.contains('teacher-verified');
+            
+            try {
+                dataToSave['img_maroon'] = document.getElementById('img-maroon').src;
+                dataToSave['img_amber'] = document.getElementById('img-amber').src;
+                dataToSave['img_green'] = document.getElementById('img-green').src;
+                dataToSave['img_navy'] = document.getElementById('img-navy').src;
+                localStorage.setItem('powerpointLessonMemory', JSON.stringify(dataToSave));
+            } catch (e) {
+                console.warn("Screenshots too large to save to memory, saving text only.");
+                localStorage.setItem('powerpointLessonMemory', JSON.stringify(dataToSave));
+            }
+        }
+
+        function loadProgress() {
+            var savedDataStr = localStorage.getItem('powerpointLessonMemory');
+            if (savedDataStr) {
+                var data = JSON.parse(savedDataStr);
+                var inputs = document.querySelectorAll('.auto-input');
+                
+                for (var i = 0; i < inputs.length; i++) {
+                    if (data['input_' + i]) {
+                        inputs[i].value = data['input_' + i];
+                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                            inputs[i].style.height = 'auto';
+                            inputs[i].style.height = inputs[i].scrollHeight + 'px';
+                        }
+                    }
+                }
+                
+                if (data['maroon_verified']) document.getElementById('card-maroon').classList.add('teacher-verified');
+                if (data['amber_verified']) document.getElementById('card-amber').classList.add('teacher-verified');
+                if (data['green_verified']) document.getElementById('card-green').classList.add('teacher-verified');
+                if (data['navy_verified']) document.getElementById('card-navy').classList.add('teacher-verified');
+                
+                const zones = ['maroon', 'amber', 'green', 'navy'];
+                zones.forEach(zone => {
+                    if (data['img_' + zone] && data['img_' + zone].length > 100) {
+                        document.getElementById('img-' + zone).src = data['img_' + zone];
+                        document.getElementById('img-' + zone).style.display = 'block';
+                        document.getElementById('text-' + zone).style.display = 'none';
+                    }
+                });
+            }
+        }
+
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                saveProgress();
+                if (e.target.tagName.toLowerCase() === 'textarea') {
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                }
+            }
+        });
+
+        function clearData() {
+            if (confirm("Are you sure you want to clear all your work on this page?")) {
+                localStorage.removeItem('powerpointLessonMemory');
+                window.location.reload();
+            }
+        }
+
+        window.onload = loadProgress;
+
+        /* --- SECURE TEACHER VERIFY LOGIC --- */
+        var activeTaskToVerify = null;
+
+        function openVerifyModal(taskPrefix) {
+            activeTaskToVerify = taskPrefix;
+            document.getElementById('verify-modal').style.display = 'flex';
+            document.getElementById('teacher-password-input').value = ""; 
+            document.getElementById('modal-error-msg').style.display = 'none'; 
+            document.getElementById('teacher-password-input').focus();
+        }
+
+        function closeVerifyModal() {
+            document.getElementById('verify-modal').style.display = 'none';
+            activeTaskToVerify = null;
+        }
+
+        function submitVerify() {
+            var inputElement = document.getElementById('teacher-password-input');
+            var passcode = inputElement.value;
+            
+            if (passcode === "delta") {
+                var card = document.getElementById('card-' + activeTaskToVerify);
+                card.classList.toggle('teacher-verified');
+                saveProgress(); 
+                closeVerifyModal();
+            } else {
+                document.getElementById('modal-error-msg').style.display = 'block';
+                inputElement.value = "";
+                inputElement.focus();
+            }
+        }
+
+        document.getElementById('teacher-password-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') submitVerify();
+        });
+
+        /* --- STRICT SCREENSHOT PASTE LOGIC --- */
+        document.addEventListener('paste', function(e) {
+            var activeElement = document.activeElement;
+            var targetImgId = null;
+            var targetTextId = null;
+
+            if (activeElement.id === 'zone-maroon') { targetImgId = 'img-maroon'; targetTextId = 'text-maroon'; } 
+            else if (activeElement.id === 'zone-amber') { targetImgId = 'img-amber'; targetTextId = 'text-amber'; } 
+            else if (activeElement.id === 'zone-green') { targetImgId = 'img-green'; targetTextId = 'text-green'; } 
+            else if (activeElement.id === 'zone-navy') { targetImgId = 'img-navy'; targetTextId = 'text-navy'; } 
+            else return;
+
+            var items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            for (var index in items) {
+                var item = items[index];
+                if (item.kind === 'file') {
+                    var blob = item.getAsFile();
+                    displayImage(blob, targetImgId, targetTextId);
+                    e.preventDefault(); 
+                }
+            }
+        });
+
+        function displayImage(file, imgId, textId) {
+            var reader = new FileReader();
+            reader.onload = function(event) {
+                var imgElement = document.getElementById(imgId);
+                var textElement = document.getElementById(textId);
+                imgElement.src = event.target.result;
+                imgElement.style.display = 'block';
+                textElement.style.display = 'none'; 
+                saveProgress(); 
+            };
+            reader.readAsDataURL(file);
+        }
+
+        /* --- BULLETPROOF PDF GENERATION LOGIC --- */
+        function downloadPDF() {
+            var buttonsToHide = document.querySelectorAll('.no-print');
+            for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'none';
+            document.getElementById('action-buttons').style.display = 'none';
+
+            var textInputs = document.querySelectorAll('input[type="text"]');
+            for (var i = 0; i < textInputs.length; i++) {
+                textInputs[i].setAttribute('value', textInputs[i].value);
+            }
+
+            var textAreas = document.querySelectorAll('textarea');
+            for (var j = 0; j < textAreas.length; j++) {
+                textAreas[j].innerHTML = textAreas[j].value;
+                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
+            }
+
+            var element = document.getElementById('pdf-content');
+
+            var opt = {
+                margin:       0.3,
+                filename:     'PowerPoint_Skills_Workbook.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] } 
+            };
+
+            html2pdf().set(opt).from(element).save().then(function() {
+                for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'inline-block';
+                document.getElementById('action-buttons').style.display = 'flex';
+                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
+            });
+        }
+    </script>
+</body>
+</html>
