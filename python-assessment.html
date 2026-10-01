@@ -583,19 +583,29 @@
                 if (hasPrint) earnedMarks++; else feedbackDetails.push("Missing prize print action inside conditions.");
             }
             else if (task === "t4") {
-                let hasSetup = lowerCode.includes("=") || lowerCode.includes("range");
-                let hasKeyword = lowerCode.includes("for ") || lowerCode.includes("while ");
-                let hasCondition = lowerCode.includes("in ") || lowerCode.includes(">") || lowerCode.includes("<") || lowerCode.includes("range");
-                let hasBodyAction = lowerCode.includes("print") || lowerCode.includes("input");
+                // Strict check for a valid loop structure
+                let hasForLoop = lowerCode.includes("for") && lowerCode.includes("in range(");
+                let hasWhileLoop = lowerCode.includes("while") && (lowerCode.includes("<") || lowerCode.includes(">") || lowerCode.includes("!="));
+                let hasValidLoop = hasForLoop || hasWhileLoop;
+                
+                // Ensure they are asking for an input (e.g., meal choice)
+                let hasInput = lowerCode.includes("input(");
+                
+                // Ensure they print a confirmation
+                let hasPrint = lowerCode.includes("print(");
+                
+                // Ensure they used a variable to store the meal
+                let hasVariable = lowerCode.includes("=") && lowerCode.indexOf("=") < lowerCode.indexOf("input(");
+
+                // Ensure the program actually produced an output
                 let hasRun = output.trim().length > 0;
 
-                if (hasSetup) earnedMarks++; else feedbackDetails.push("Missing queue loop counter/setup.");
-                if (hasKeyword) earnedMarks++; else feedbackDetails.push("Missing 'for' or 'while' loop keyword.");
-                if (hasCondition) earnedMarks++; else feedbackDetails.push("Missing loop range or condition.");
-                if (hasBodyAction) earnedMarks++; else feedbackDetails.push("Missing loop body action (print/input for orders).");
-                if (hasRun) earnedMarks++; else feedbackDetails.push("Program must run and produce order output.");
+                if (hasValidLoop) earnedMarks++; else feedbackDetails.push("Missing a valid 'for x in range()' or 'while' loop condition.");
+                if (hasInput) earnedMarks++; else feedbackDetails.push("Missing 'input()' to ask for the meal choice.");
+                if (hasVariable) earnedMarks++; else feedbackDetails.push("Missing a variable to store the student's order (e.g., meal = input...).");
+                if (hasPrint) earnedMarks++; else feedbackDetails.push("Missing 'print()' to confirm the order.");
+                if (hasRun && !output.toLowerCase().includes("error")) earnedMarks++; else feedbackDetails.push("Program must run cleanly and produce output without errors.");
             }
-
             updateScore(task, earnedMarks);
 
             if (earnedMarks === 5) {
@@ -612,6 +622,17 @@
                 feedbackBox.style.color = "#d32f2f";
             }
         }
+        // Prevent Insert key from turning on Overtype mode in CodeMirror
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Insert' || e.keyCode === 45) {
+                e.preventDefault();
+            }
+        });
+        
+        // Ensure CodeMirror itself blocks the overwrite command
+        editor.addKeyMap({
+            "Insert": function(cm) { return false; } 
+        });
     </script>
 </body>
 </html>
