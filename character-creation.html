@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pixel Art - Character Creation</title>
+    <title>Binary Character Studio</title>
     
     <!-- HTML to PDF Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -218,8 +218,6 @@
             color: transparent;
         }
 
-        .pixel-input::placeholder { color: #aaa; font-weight: normal; font-size: 11px; }
-
         /* Color Legend Area */
         .legend-grid {
             display: grid;
@@ -263,7 +261,7 @@
                 <img src="logo.jpg" alt="Delta Serlby Park Logo">
             </div>
             <div class="header-center">
-                <h1>Pixel Art - Character Creation</h1>
+                <h1>Binary Character Studio</h1>
             </div>
             <div class="header-right">
                 <a href="index.html" class="back-btn">&larr; Back to Curriculum</a>
@@ -323,9 +321,9 @@
                     <div id="instruction-panel">
                         <strong>Studio Instructions:</strong><br><br>
                         1. Select your task from the dropdown menu above.<br>
-                        2. Look at the <strong>Binary Palette</strong> on the right to find the color you want.<br>
-                        3. <strong>Type the binary code</strong> directly into a grid cell.<br>
-                        4. As soon as you finish typing a valid code, the cell will fill with color!<br><br>
+                        2. Look at the <strong>Denary Palette</strong> on the right to find the color you want.<br>
+                        3. <strong>Convert the denary number into binary</strong>.<br>
+                        4. Type the <strong>binary code</strong> directly into a grid cell.<br><br>
                         <em>Tip: If you make a mistake, simply delete the binary code from the cell to make it blank again.</em>
                     </div>
                 </div>
@@ -341,8 +339,8 @@
 
                 <!-- 3. The Palette -->
                 <div class="ide-panel output-panel" id="panel-legend">
-                    <h3 style="color: var(--maroon);">3. Binary Palette</h3>
-                    <p style="font-size: 13px; color: #666; margin-top: 0;">Type these exact codes into the grid.</p>
+                    <h3 style="color: var(--maroon);">3. Denary Palette</h3>
+                    <p style="font-size: 13px; color: #666; margin-top: 0;">Convert these denary numbers to binary.</p>
                     <div id="legend-container" class="legend-grid"></div>
                 </div>
             </div>
@@ -452,9 +450,6 @@
             const state = userBinaryDesigns[currentTask];
             const container = document.getElementById('spreadsheet-container');
             const bits = parseInt(currentTask);
-            
-            // Build placeholder hints based on bit depth
-            let placeholder = "0".repeat(bits);
 
             let html = '<table class="excel-table"><tbody>';
             let cellIndex = 0;
@@ -468,7 +463,6 @@
                                        id="cell-${cellIndex}" 
                                        class="pixel-input" 
                                        maxlength="${bits}"
-                                       placeholder="${placeholder}"
                                        value="${savedCode}"
                                        data-index="${cellIndex}"
                                        oninput="checkBinaryCode(this)">
@@ -493,10 +487,12 @@
             for (let binCode in map) {
                 // If it's white, give it a border so they can see it
                 let borderStyle = (map[binCode] === '#ffffff') ? 'border: 1px solid #ccc;' : 'border: 1px solid transparent;';
+                let denaryNumber = parseInt(binCode, 2); // Convert the binary string to a decimal integer
+
                 html += `
                     <div class="legend-item">
                         <div class="color-box" style="background-color: ${map[binCode]}; ${borderStyle}"></div>
-                        <code>${binCode}</code>
+                        <code>${denaryNumber}</code>
                     </div>`;
             }
             legendContainer.innerHTML = html;
