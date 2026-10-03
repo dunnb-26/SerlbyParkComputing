@@ -9,7 +9,8 @@
 <body>
     <header>
         <div class="header-left">
-            <img src="logo.jpg" alt="Delta Serlby Park Logo">
+            <!-- Logo is now a clickable home button -->
+            <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
         </div>
         
         <div class="header-center">
@@ -76,22 +77,28 @@
             { title: "AI & Ethics", description: "<ul><li>What is AI?</li><li>The Reality of AI</li><li>How AI Learns</li><li>Algorithmic Bias</li><li>Responsibility & Policy</li><li>The Grand Summary</li></ul>" },
             { title: "Assessment", description: "<ul><li>Consolidation/Revision</li><li>Revision</li><li>Assessment</li></ul>" },
             { title: "Photoshop", description: "<ul><li>Object Selection</li><li>Airbrushing</li><li>Filters</li><li>Composites</li><li>Project</li></ul>" }
-          ], // <-- COMMA ADDED HERE
+          ],
           gcse: [
             { title: "Creative iMedia", description: "<ul><li>R093 - Exam</li><li>R094 - Coursework</li><li>R097 - Coursework</li></ul>" },
-            { title: "Enterprise", description: "<ul><li>Component 1 - Coursework</li>li>Component 2 - Coursework</li><li>Component 3 - Exam</li></ul>" }
-          ],
+            { title: "Enterprise", description: "<ul><li>Component 1 - Coursework</li><li>Component 2 - Coursework</li><li>Component 3 - Exam</li></ul>" }
+          ]
         };
 
         function loadYear(year) {
-            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('btn-' + year).classList.add('active');
+            // Failsafe: if the memory asks for a year that doesn't exist anymore, force it to Year 7
+            if (!curriculumData[year]) {
+                year = 'year7';
+            }
 
-            // Fixed the "year 11" typo here:
+            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+            
+            // Failsafe: only highlight the button if it actually exists on the page
+            const activeBtn = document.getElementById('btn-' + year);
+            if (activeBtn) activeBtn.classList.add('active');
+
             const titles = { year7: 'Year 7 Curriculum', year8: 'Year 8 Curriculum', year9: 'Year 9 Curriculum', gcse: 'GCSE Curriculum' };
             document.getElementById('year-title').innerText = titles[year];
 
-            // SAFETY NET: Try to save memory, but don't crash if the browser blocks it
             try {
                 localStorage.setItem('lastViewedYearGroup', year);
             } catch (error) {
@@ -111,17 +118,16 @@
                     window.location.href = fileName;
                 };
 
-               // Checks if the tab is GCSE. If yes, it removes the subtitle. If no, it numbers the units.
-let subtitleHtml = year === 'gcse' ? '' : `<div class="card-subtitle">UNIT ${index + 1}</div>`;
+                // Checks if the tab is GCSE. If yes, it removes the subtitle entirely. If no, it numbers the units.
+                let subtitleHtml = year === 'gcse' ? '' : `<div class="card-subtitle">UNIT ${index + 1} &bull; COMPUTING</div>`;
 
-card.innerHTML = `
-    ${subtitleHtml}
-    <div class="card-title">${unit.title}</div>
-    <div class="card-body">
-        ${unit.description}
-    </div>
-    <button class="card-btn">View Lesson Materials</button>
-`;
+                card.innerHTML = `
+                    ${subtitleHtml}
+                    <div class="card-title">${unit.title}</div>
+                    <div class="card-body">
+                        ${unit.description}
+                    </div>
+                    <button class="card-btn">View Lesson Materials</button>
                 `;
                 grid.appendChild(card);
             });
@@ -130,7 +136,6 @@ card.innerHTML = `
         window.onload = () => {
             let savedYear = 'year7';
             
-            // SAFETY NET: Try to read memory, default to year 7 if blocked
             try {
                 savedYear = localStorage.getItem('lastViewedYearGroup') || 'year7';
             } catch (error) {
