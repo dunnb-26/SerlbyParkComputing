@@ -312,9 +312,9 @@
                 <div class="ide-panel" id="panel-instructions">
                     <h3>1. Design Brief</h3>
                     <select id="task-selector" onchange="switchTask()">
-                        <option value="1">🔴 RED TASK: Make a Face (1-Bit Binary)</option>
-                        <option value="2">🟠 AMBER TASK: Make a Pet (2-Bit Binary)</option>
-                        <option value="3">🟢 GREEN TASK: Make a Person (3-Bit Binary)</option>
+                        <option value="1">🔴 RED TASK: Make a Face (4-Bit Binary)</option>
+                        <option value="2">🟠 AMBER TASK: Make a Pet (4-Bit Binary)</option>
+                        <option value="3">🟢 GREEN TASK: Make a Person (4-Bit Binary)</option>
                         <option value="4">🔵 BLUE TASK: Make a Villain (4-Bit Binary)</option>
                     </select>
                     
@@ -322,7 +322,7 @@
                         <strong>Studio Instructions:</strong><br><br>
                         1. Select your task from the dropdown menu above.<br>
                         2. Look at the <strong>Denary Palette</strong> on the right to find the color you want.<br>
-                        3. <strong>Convert the denary number into binary</strong>.<br>
+                        3. <strong>Convert the denary number into a 4-bit binary code</strong> (e.g. 0101).<br>
                         4. Type the <strong>binary code</strong> directly into a grid cell.<br><br>
                         <em>Tip: If you make a mistake, simply delete the binary code from the cell to make it blank again.</em>
                     </div>
@@ -332,7 +332,7 @@
                 <div class="ide-panel editor-panel" id="panel-editor">
                     <h3 style="color: #217346; align-self: flex-start;" id="editor-title">2. Binary Canvas (10x10)</h3>
                     <p style="font-size: 13px; color: #666; margin-top: 0; margin-bottom: 5px; align-self: flex-start;" id="canvas-hint">
-                        Type binary numbers to paint. Press Tab to move quickly.
+                        Type 4-bit binary numbers to paint. Press Tab to move quickly.
                     </p>
                     <div id="spreadsheet-container"></div>
                 </div>
@@ -340,7 +340,7 @@
                 <!-- 3. The Palette -->
                 <div class="ide-panel output-panel" id="panel-legend">
                     <h3 style="color: var(--maroon);">3. Denary Palette</h3>
-                    <p style="font-size: 13px; color: #666; margin-top: 0;">Convert these denary numbers to binary.</p>
+                    <p style="font-size: 13px; color: #666; margin-top: 0;">Convert these denary numbers to 4-bit binary.</p>
                     <div id="legend-container" class="legend-grid"></div>
                 </div>
             </div>
@@ -359,55 +359,48 @@
         // Memory Configuration
         const gridSize = 100; // 10x10 grid - perfect for characters
         let userBinaryDesigns = JSON.parse(localStorage.getItem('binaryStudioMemory')) || {};
-        let currentTask = "1"; // Represents bit-depth
+        let currentTask = "1"; // Represents task ID
 
         const taskNames = {
-            "1": "Red Task - 1-Bit Pixel Face",
-            "2": "Amber Task - 2-Bit Pixel Pet",
-            "3": "Green Task - 3-Bit Pixel Person",
-            "4": "Blue Task - 4-Bit Pixel Villain"
+            "1": "Red Task - Pixel Face",
+            "2": "Amber Task - Pixel Pet",
+            "3": "Green Task - Pixel Person",
+            "4": "Blue Task - Pixel Villain"
         };
 
-        // Binary Palettes Mapping
+        // Universal 16-Color Palette mapped for all tasks to 4-bit binary
+        const universalPalette = {
+            '0000': '#ffffff', 
+            '0001': '#000000', 
+            '0010': '#d32f2f', 
+            '0011': '#388e3c',
+            '0100': '#1976d2', 
+            '0101': '#fbc02d', 
+            '0110': '#f57c00', 
+            '0111': '#8e24aa',
+            '1000': '#e91e63', 
+            '1001': '#00bcd4', 
+            '1010': '#cddc39', 
+            '1011': '#795548',
+            '1100': '#9e9e9e', 
+            '1101': '#607d8b', 
+            '1110': '#8d6e63', 
+            '1111': '#009688'
+        };
+
         const colorMaps = {
-            "1": { 
-                '0': '#ffffff', 
-                '1': '#000000' 
-            },
-            "2": { 
-                '00': '#ffffff', 
-                '01': '#000000', 
-                '10': '#d32f2f', 
-                '11': '#388e3c' 
-            },
-            "3": { 
-                '000': '#ffffff', 
-                '001': '#000000', 
-                '010': '#d32f2f', 
-                '011': '#388e3c', 
-                '100': '#1976d2', 
-                '101': '#fbc02d', 
-                '110': '#8e24aa', 
-                '111': '#f57c00'
-            },
-            "4": {
-                '0000': '#ffffff', 
-                '0001': '#000000', 
-                '0010': '#d32f2f', 
-                '0011': '#388e3c',
-                '0100': '#1976d2', 
-                '0101': '#fbc02d', 
-                '0110': '#8e24aa', 
-                '0111': '#f57c00',
-                '1000': '#795548', 
-                '1001': '#e91e63', 
-                '1010': '#00bcd4', 
-                '1011': '#cddc39',
-                '1100': '#607d8b', 
-                '1101': '#9e9e9e', 
-                '1110': '#7986cb', 
-                '1111': '#009688'
-            }
+            "1": universalPalette,
+            "2": universalPalette,
+            "3": universalPalette,
+            "4": universalPalette
+        };
+
+        // Standardized 4-bit config for all tasks
+        const imageData = {
+            "1": { bits: 4 },
+            "2": { bits: 4 },
+            "3": { bits: 4 },
+            "4": { bits: 4 }
         };
 
         /* --- AUTO-SAVE FOR TEXT INPUTS --- */
@@ -449,7 +442,7 @@
         function buildGrid() {
             const state = userBinaryDesigns[currentTask];
             const container = document.getElementById('spreadsheet-container');
-            const bits = parseInt(currentTask);
+            const bits = imageData[currentTask].bits;
 
             let html = '<table class="excel-table"><tbody>';
             let cellIndex = 0;
@@ -485,14 +478,15 @@
             const map = colorMaps[currentTask];
             
             for (let binCode in map) {
-                // If it's white, give it a border so they can see it
-                let borderStyle = (map[binCode] === '#ffffff') ? 'border: 1px solid #ccc;' : 'border: 1px solid transparent;';
-                let denaryNumber = parseInt(binCode, 2); // Convert the binary string to a decimal integer
-
+                // Determine styling and text based on the 16 standard colors
+                let denaryNumber = parseInt(binCode, 2); 
+                let displayCode = denaryNumber === 0 ? "White/Blank" : denaryNumber;
+                let borderStyle = denaryNumber === 0 ? 'border: 1px solid #ccc;' : 'border: 1px solid transparent;';
+                
                 html += `
                     <div class="legend-item">
                         <div class="color-box" style="background-color: ${map[binCode]}; ${borderStyle}"></div>
-                        <code>${denaryNumber}</code>
+                        <code>${displayCode}</code>
                     </div>`;
             }
             legendContainer.innerHTML = html;
@@ -528,7 +522,7 @@
                 let designArray = userBinaryDesigns[t];
                 let map = colorMaps[t];
                 
-                // Check if they have painted at least 1 pixel that is NOT white ('0', '00', etc)
+                // Check if they have painted at least 1 pixel that is NOT white ('0000')
                 if (designArray) {
                     let hasPainted = designArray.some(code => {
                         return map.hasOwnProperty(code) && map[code] !== '#ffffff';
