@@ -201,23 +201,29 @@
             font-size: 14px;
             font-weight: bold;
             color: #333;
-            background-color: transparent;
+            /* Graph paper / cross-hatch pattern for unattempted cells */
+            background-color: #fafafa;
+            background-image: linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px), 
+                              linear-gradient(0deg, rgba(0,0,0,0.06) 1px, transparent 1px);
+            background-size: 10px 10px;
             outline: none;
             transition: all 0.2s;
         }
 
         .pixel-input:focus {
             border: 2px solid #217346;
-            background-color: rgba(255,255,255,0.8) !important;
+            background-color: rgba(255,255,255,0.95) !important;
+            background-image: none !important;
             color: #000 !important;
             text-shadow: none !important;
         }
 
         .pixel-input.valid {
             color: transparent;
+            background-image: none !important;
         }
 
-        /* Color Legend Area (Ordered Top-to-Bottom by Columns 0-8 and 9-16) */
+        /* Color Legend Area */
         .legend-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -323,7 +329,7 @@
                         2. Look at the <strong>Denary Palette</strong> on the right.<br>
                         3. <strong>Convert the denary number into 4-bit binary</strong> (e.g., 0 = 0000, 9 = 1001).<br>
                         4. Type the binary code directly into a grid cell to paint!<br><br>
-                        <em>Tip: If you make a mistake, simply delete the binary code from the cell to clear it.</em>
+                        <em>Tip: Empty cells show a grid pattern. Typing 0 (0000) will turn the cell solid white.</em>
                     </div>
                 </div>
 
@@ -366,7 +372,6 @@
             "4": "Blue Task - Pixel Villain"
         };
 
-        // 17-Color Palette mapped from Denary 0 to 16
         const paletteOrder = [
             { denary: 0, bin: '0000', color: '#ffffff', label: '0 (Blank)' },
             { denary: 1, bin: '0001', color: '#000000', label: '1' },
@@ -384,16 +389,16 @@
             { denary: 13, bin: '1101', color: '#607d8b', label: '13' },
             { denary: 14, bin: '1110', color: '#8d6e63', label: '14' },
             { denary: 15, bin: '1111', color: '#009688', label: '15' },
-            { denary: 16, bin: '10000', color: '#4a148c', label: '16' } // Extended color for max palette richness
+            { denary: 16, bin: '10000', color: '#4a148c', label: '16' }
         ];
 
-        // Build quick lookup map for validation
         const activeColorMap = {};
         paletteOrder.forEach(item => {
             activeColorMap[item.bin] = item.color;
         });
 
         const colorMaps = { "1": activeColorMap, "2": activeColorMap, "3": activeColorMap, "4": activeColorMap };
+        const imageData = { "1": { bits: 4 }, "2": { bits: 4 }, "3": { bits: 4 }, "4": { bits: 4 } };
 
         /* --- AUTO-SAVE FOR TEXT INPUTS --- */
         document.addEventListener('input', function(e) {
@@ -465,13 +470,11 @@
             const legendContainer = document.getElementById('legend-container');
             let html = '';
             
-            // Re-order the 17 items into two columns top-to-bottom: 0-8 on left, 9-16 on right
             let leftCol = paletteOrder.slice(0, 9);   // 0 to 8
             let rightCol = paletteOrder.slice(9, 17); // 9 to 16
 
             let maxRows = Math.max(leftCol.length, rightCol.length);
             for (let i = 0; i < maxRows; i++) {
-                // Left Column item
                 if (leftCol[i]) {
                     let item = leftCol[i];
                     let borderStyle = item.denary === 0 ? 'border: 1px solid #ccc;' : 'border: 1px solid transparent;';
@@ -484,7 +487,6 @@
                     html += `<div></div>`;
                 }
 
-                // Right Column item
                 if (rightCol[i]) {
                     let item = rightCol[i];
                     html += `
@@ -510,9 +512,12 @@
 
             if (map.hasOwnProperty(typedVal)) {
                 el.style.backgroundColor = map[typedVal];
+                el.style.backgroundImage = 'none';
                 el.classList.add('valid'); 
             } else {
-                el.style.backgroundColor = 'transparent';
+                el.style.backgroundColor = '#fafafa';
+                el.style.backgroundImage = 'linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px), linear-gradient(0deg, rgba(0,0,0,0.06) 1px, transparent 1px)';
+                el.style.backgroundSize = '10px 10px';
                 el.classList.remove('valid');
             }
 
@@ -592,7 +597,7 @@
                 let map = activeColorMap;
 
                 if (state) {
-                    let hasPainted = state.some(code => map.hasOwnProperty(code) && map[code] !== '#ffffff');
+                    let hasPainted = state.some(code => map.hasOwnProperty(code));
                     
                     if (hasPainted) {
                         attemptedCount++;
