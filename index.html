@@ -78,15 +78,19 @@
           ]
         };
 
-       function loadYear(year) {
+        function loadYear(year) {
             document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
             document.getElementById('btn-' + year).classList.add('active');
 
             const titles = { year7: 'Year 7 Curriculum', year8: 'Year 8 Curriculum', year9: 'Year 9 Curriculum' };
             document.getElementById('year-title').innerText = titles[year];
 
-            // Save the clicked year into the browser's local memory
-            localStorage.setItem('lastViewedYearGroup', year);
+            // SAFETY NET: Try to save memory, but don't crash if the browser blocks it
+            try {
+                localStorage.setItem('lastViewedYearGroup', year);
+            } catch (error) {
+                console.log("Memory saving blocked by browser, ignoring.");
+            }
 
             const grid = document.getElementById('content-grid');
             grid.innerHTML = ''; 
@@ -101,7 +105,7 @@
                     window.location.href = fileName;
                 };
 
-                let subtitleText = `UNIT ${index + 1} &bull; COMPUTING`;
+                let subtitleText = `UNIT ${index + 1}`;
 
                 card.innerHTML = `
                     <div class="card-subtitle">${subtitleText}</div>
@@ -115,8 +119,16 @@
             });
         }
 
-        // When the page loads, check memory to see where we left off (default to year7 if empty)
         window.onload = () => {
-            const savedYear = localStorage.getItem('lastViewedYearGroup') || 'year7';
+            let savedYear = 'year7';
+            
+            // SAFETY NET: Try to read memory, default to year 7 if blocked
+            try {
+                savedYear = localStorage.getItem('lastViewedYearGroup') || 'year7';
+            } catch (error) {
+                console.log("Memory reading blocked by browser.");
+            }
+            
             loadYear(savedYear);
         };
+    </script>
