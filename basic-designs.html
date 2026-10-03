@@ -203,6 +203,13 @@
             width: 45px;
             height: 45px;
             position: relative;
+            transition: width 0.3s, height 0.3s;
+        }
+
+        /* Dynamic Expansion for the 8-Bit Task */
+        .excel-table.task-8bit td {
+            width: 65px;
+            height: 65px;
         }
 
         .pixel-input {
@@ -218,7 +225,12 @@
             background-color: transparent;
             outline: none;
             cursor: cell;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s, font-size 0.3s;
+        }
+
+        .excel-table.task-8bit .pixel-input {
+            font-size: 11px;
+            letter-spacing: -0.5px;
         }
 
         .pixel-input::placeholder { color: #888; font-weight: normal; }
@@ -522,7 +534,10 @@
         function buildGrid() {
             const task = imageData[currentTask];
             const savedState = userProgress[currentTask];
-            let html = '<table class="excel-table"><thead><tr><th></th>';
+            
+            // Apply the 8-bit expansion class ONLY when the Blue task is active
+            let tableClass = task.bits === 8 ? "excel-table task-8bit" : "excel-table";
+            let html = `<table class="${tableClass}"><thead><tr><th></th>`;
             
             // Columns A-H
             for(let c=0; c < 8; c++) html += `<th>${String.fromCharCode(65 + c)}</th>`;
