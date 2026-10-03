@@ -90,7 +90,7 @@
             margin-top: 3px;
         }
 
-        /* 3-Column Layout */
+        /* 3-Column Layout for Simulator */
         .ide-container {
             display: grid;
             grid-template-columns: 1fr 1.5fr 1fr;
@@ -123,6 +123,27 @@
             text-transform: uppercase;
             font-size: 1.1em;
         }
+
+        /* Task Card Styling for Prep Section */
+        .task-card { 
+            background: white; 
+            border-radius: 8px; 
+            padding: 25px; 
+            margin: 20px auto 30px auto; 
+            max-width: 1410px; /* Matches IDE width with padding */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            page-break-inside: avoid; 
+            box-sizing: border-box;
+        }
+        .task-prep { border-top: 6px solid #607d8b; } 
+        .task-prep h2 { color: #607d8b; margin-top: 0; }
+
+        /* Inputs & Textareas */
+        .question-row { margin-bottom: 20px; }
+        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
+        .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit; }
+        .auto-input:focus { outline: none; border-color: #666; }
+        textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; }
 
         select {
             width: 100%;
@@ -287,10 +308,40 @@
             <div class="score-item">Amber Task (3-Bit): <span id="score-amber">0/3</span></div>
             <div class="score-item">Green Task (4-Bit): <span id="score-green">0/3</span></div>
             <div class="score-item">Blue Task (8-Bit): <span id="score-blue">0/3</span></div>
-            <div class="score-item" style="color: var(--maroon);">TOTAL SCORE: <span id="total-score" style="color: var(--maroon);">0/12</span></div>
         </div>
 
         <main>
+            <!-- PREPARATION: Keywords & Notes -->
+            <div class="task-card task-prep" style="margin: 30px auto 20px auto;">
+                <h2>Lesson Preparation</h2>
+                
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">Key Words</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div class="question-row">
+                        <label class="question-label">Pixel</label>
+                        <input type="text" class="auto-input" placeholder="Type definition here...">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">Resolution</label>
+                        <input type="text" class="auto-input" placeholder="Type definition here...">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">Binary</label>
+                        <input type="text" class="auto-input" placeholder="Type definition here...">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">Palette</label>
+                        <input type="text" class="auto-input" placeholder="Type definition here...">
+                    </div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 15px;">Lesson Notes</h3>
+                <div class="question-row" style="margin-bottom: 0;">
+                    <textarea class="auto-input" rows="5" placeholder="Write your notes from today's lesson here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                </div>
+            </div>
+
+            <!-- INTERACTIVE SIMULATOR -->
             <div class="ide-container" id="main-ide">
                 <!-- 1. Instructions Panel -->
                 <div class="ide-panel" id="panel-instructions">
@@ -352,7 +403,7 @@
     <!-- UNIVERSAL PDF DOWNLOAD BUTTONS -->
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
         <button class="btn-pdf no-print" onclick="downloadPDF()">📄 Download Full Portfolio</button>
-        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearScores()">Reset Page</button>
+        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
     </div>
     
     <footer>&copy; 2026 Delta Serlby Park - Computing Department</footer>
@@ -503,6 +554,31 @@
         function getColor(val, bits) { return colorMaps[bits][val]; }
         function toBinaryString(dec, bits) { return parseInt(dec, 10).toString(2).padStart(bits, '0'); }
 
+        /* --- AUTO-SAVE FOR TEXT INPUTS --- */
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                var inputs = document.querySelectorAll('.auto-input');
+                for (var i = 0; i < inputs.length; i++) {
+                    userProgress['input_' + i] = inputs[i].value;
+                }
+                localStorage.setItem('pixelArtMemory', JSON.stringify(userProgress));
+            }
+        });
+
+        function loadTextInputs() {
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                if (userProgress['input_' + i]) {
+                    inputs[i].value = userProgress['input_' + i];
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto';
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
+                    }
+                }
+            }
+        }
+
+        /* --- SIMULATOR LOGIC --- */
         function switchTask() {
             currentTask = document.getElementById("task-selector").value;
             if (!userProgress[currentTask]) {
@@ -615,13 +691,13 @@
             document.getElementById('score-amber').innerText = `${amberScore}/3`;
             document.getElementById('score-green').innerText = `${greenScore}/3`;
             document.getElementById('score-blue').innerText = `${blueScore}/3`;
-            document.getElementById('total-score').innerText = `${redScore + amberScore + greenScore + blueScore}/12`;
         }
 
-        function clearScores() {
-            if (confirm("Are you sure you want to clear all your pixel art progress?")) {
+        function clearData() {
+            if (confirm("Are you sure you want to clear all your pixel art progress AND text notes?")) {
                 localStorage.removeItem('pixelArtMemory');
                 userProgress = {};
+                loadTextInputs();
                 switchTask();
                 alert("Progress reset successfully.");
             }
@@ -634,11 +710,22 @@
             document.getElementById('panel-instructions').style.display = 'none';
             document.getElementById('panel-legend').style.display = 'none';
             
-            // 2. Expand the center panel to full width
+            // 2. Prep Text Inputs
+            var textInputs = document.querySelectorAll('input.auto-input[type="text"]');
+            for (var i = 0; i < textInputs.length; i++) {
+                textInputs[i].setAttribute('value', textInputs[i].value);
+            }
+            var textAreas = document.querySelectorAll('textarea');
+            for (var j = 0; j < textAreas.length; j++) {
+                textAreas[j].innerHTML = textAreas[j].value;
+                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
+            }
+
+            // 3. Expand the center panel to full width
             var ideContainer = document.getElementById('main-ide');
             ideContainer.style.gridTemplateColumns = '1fr';
             
-            // 3. Save the original UI state of the editor panel
+            // 4. Save the original UI state of the editor panel
             var gridContainer = document.getElementById('spreadsheet-container');
             var originalGridHTML = gridContainer.innerHTML;
             var titleEl = document.getElementById('editor-title');
@@ -646,7 +733,7 @@
             var textEl = document.getElementById('pixels-left-text');
             var originalTextDisplay = textEl.style.display;
 
-            // 4. Construct the "Portfolio" view HTML
+            // 5. Construct the "Portfolio" view HTML
             titleEl.innerText = "Student Portfolio - Attempted Images";
             titleEl.style.textAlign = "center";
             textEl.style.display = 'none';
@@ -674,7 +761,7 @@
             // Inject the portfolio view into the DOM
             gridContainer.innerHTML = portfolioHTML;
 
-            // 5. Configure html2pdf rules
+            // 6. Configure html2pdf rules
             var element = document.getElementById('pdf-content');
             var opt = {
                 margin:       0.3,
@@ -685,7 +772,7 @@
                 pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
             };
 
-            // 6. Generate PDF, then restore the interface back to normal
+            // 7. Generate PDF, then restore the interface back to normal
             html2pdf().set(opt).from(element).save().then(function() {
                 // Bring back panels
                 document.getElementById('action-buttons').style.display = 'flex';
@@ -693,6 +780,9 @@
                 document.getElementById('panel-legend').style.display = 'flex';
                 ideContainer.style.gridTemplateColumns = '1fr 1.5fr 1fr';
                 
+                // Restore Text Area Heights
+                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
+
                 // Restore Editor Panel
                 titleEl.innerText = originalTitle;
                 titleEl.style.textAlign = "left";
@@ -734,6 +824,7 @@
 
         // Initialize on load
         window.onload = () => {
+            loadTextInputs();
             switchTask();
             updateScoreboard();
         };
