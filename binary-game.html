@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Time Attack</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .game-container {
+            max-width: 800px;
+            margin: 30px auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            border-top: 6px solid #1e3a8a;
+            text-align: center;
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .target-display {
+            font-size: 5em;
+            font-weight: bold;
+            color: #800000;
+            margin: 10px 0 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .current-total {
+            font-size: 1.5em;
+            color: #666;
+            margin-bottom: 20px;
+            min-height: 30px;
+        }
+
+        /* Interaction Area sets a minimum height to stop the UI from jumping when switching modes */
+        .game-interaction-area {
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .bits-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .bit-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 70px;
+        }
+
+        .bit-value {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .bit-btn {
+            width: 100%;
+            height: 70px;
+            font-size: 2em;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            border: 3px solid #1e3a8a;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.1s;
+            background-color: #f8f9fa;
+            color: #1e3a8a;
+        }
+
+        .bit-btn.active {
+            background-color: #dfaa2b; /* Delta Gold */
+            color: #fff;
+            border-color: #dfaa2b;
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(223, 170, 43, 0.4);
+        }
+
+        /* Text Input Mode Styling */
+        .text-input-wrapper {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .denary-input {
+            font-size: 2.5em;
+            padding: 10px;
+            width: 180px;
+            text-align: center;
+            border: 4px solid #1e3a8a;
+            border-radius: 8px;
+            outline: none;
+            font-weight: bold;
+            color: #1e3a8a;
+            transition: border-color 0.2s;
+        }
+
+        .denary-input:focus {
+            border-color: #dfaa2b;
+            box-shadow: 0 0 10px rgba(223, 170, 43, 0.3);
+        }
+
+        .btn-enter {
+            font-size: 1.5em;
+            padding: 13px 30px;
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .btn-enter:hover {
+            background: #dfaa2b;
+            color: #1e3a8a;
+        }
+
+        .controls { margin-top: 10px; }
+
+        .btn-start {
+            background-color: #008f39;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 6px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-start:hover { background-color: #006100; }
+
+        .game-over-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+        }
+
+        .game-over-overlay h2 { color: #dfaa2b; font-size: 3em; margin-bottom: 10px; }
+        .game-over-overlay p { font-size: 1.5em; margin-bottom: 30px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-left"><img src="logo.jpg" alt="Delta Serlby Park Logo"></div>
+        <div class="header-center"><h1>Binary Time Attack</h1></div>
+        <div class="header-right"><a href="javascript:history.back()" class="back-btn">&larr; Go Back</a></div>
+    </header>
+
+    <main>
+        <div class="game-container">
+            <div class="scoreboard">
+                <div>Score: <span id="score">0</span></div>
+                <div style="color: #d32f2f;">Time: <span id="time">60</span>s</div>
+            </div>
+
+            <!-- Dynamic Instruction Text -->
+            <div id="instruction-text" style="color: #666; font-weight: bold; font-size: 1.2em; text-transform: uppercase;">AWAITING START</div>
+            
+            <div class="target-display" id="target-number">---</div>
+            
+            <div class="current-total" id="current-total-container" style="visibility: hidden;">Current Total: <strong id="current-total">0</strong></div>
+
+            <div class="game-interaction-area">
+                
+                <!-- MODE 1: Denary to Binary Buttons -->
+                <div class="bits-container" id="bits-board" style="pointer-events: none; opacity: 0.5;">
+                    <div class="bit-column"><div class="bit-value">128</div><button class="bit-btn" onclick="toggleBit(0, 128)">0</button></div>
+                    <div class="bit-column"><div class="bit-value">64</div><button class="bit-btn" onclick="toggleBit(1, 64)">0</button></div>
+                    <div class="bit-column"><div class="bit-value">32</div><button class="bit-btn" onclick="toggleBit(2, 32)">0</button></div>
+                    <div class="bit-column"><div class="bit-value">16</div><button class="bit-btn" onclick="toggleBit(3, 16)">0</button></div>
+                    <div class="bit-column"><div class="bit-value">8</div><button class="bit-btn" onclick="toggleBit(4, 8)">0</button></div>
+                    <div class="bit-column"><div class="bit-value">4</div><button class="bit-btn" onclick="toggleBit(5, 4)">0</button></div>
+                    <div class="bit-column"><div class="bit-value">2</div><button class="bit-btn" onclick="toggleBit(6, 2)">0</button></div>
+                    <div class="bit-column"><div class="bit-value">1</div><button class="bit-btn" onclick="toggleBit(7, 1)">0</button></div>
+                </div>
+
+                <!-- MODE 2: Binary to Denary Text Input -->
+                <div class="text-input-wrapper" id="text-input-container">
+                    <input type="number" id="denary-input" class="denary-input" placeholder="Type..." onkeydown="if(event.key==='Enter') checkTextInput()">
+                    <button class="btn-enter" onclick="checkTextInput()">Submit</button>
+                </div>
+
+            </div>
+
+            <div class="controls">
+                <button class="btn-start" id="start-btn" onclick="startGame()">Start Game</button>
+            </div>
+        </div>
+    </main>
+
+    <div class="game-over-overlay" id="game-over">
+        <h2>Time's Up!</h2>
+        <p>You converted <strong id="final-score" style="color: #dfaa2b;">0</strong> numbers correctly.</p>
+        <button class="btn-start" onclick="closeGameOver()">Play Again</button>
+    </div>
+
+    <footer>&copy; 2026 Delta Serlby Park - Computing Department</footer>
+
+    <script>
+        let score = 0;
+        let timeLeft = 60;
+        let targetNumber = 0;
+        let currentTotal = 0;
+        let timerInterval;
+        let bits = [0, 0, 0, 0, 0, 0, 0, 0];
+        const bitValues = [128, 64, 32, 16, 8, 4, 2, 1];
+        let currentMode = 0; // 0 = Denary to Binary, 1 = Binary to Denary
+
+        function startGame() {
+            score = 0;
+            timeLeft = 60;
+            document.getElementById('score').innerText = score;
+            document.getElementById('time').innerText = timeLeft;
+            document.getElementById('start-btn').style.display = 'none';
+            
+            generateNewTarget();
+            
+            clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            timeLeft--;
+            document.getElementById('time').innerText = timeLeft;
+            if (timeLeft <= 0) {
+                endGame();
+            }
+        }
+
+        function generateNewTarget() {
+            // Target is a random number between 1 and 255
+            targetNumber = Math.floor(Math.random() * 254) + 1;
+            
+            // Randomly pick a mode (50/50 chance)
+            currentMode = Math.random() > 0.5 ? 0 : 1;
+            
+            let instructionEl = document.getElementById('instruction-text');
+            let targetEl = document.getElementById('target-number');
+            
+            if (currentMode === 0) {
+                // --- MODE 0: Denary to Binary ---
+                instructionEl.innerText = "MAKE THIS DENARY NUMBER:";
+                instructionEl.style.color = "#800000"; // Maroon cue
+                
+                targetEl.innerText = targetNumber;
+                targetEl.style.color = "#800000";
+                targetEl.style.letterSpacing = "normal";
+                
+                document.getElementById('text-input-container').style.display = 'none';
+                document.getElementById('current-total-container').style.visibility = 'visible';
+                
+                document.getElementById('bits-board').style.display = 'flex';
+                document.getElementById('bits-board').style.pointerEvents = 'auto';
+                document.getElementById('bits-board').style.opacity = '1';
+                
+                resetBits();
+                
+            } else {
+                // --- MODE 1: Binary to Denary ---
+                instructionEl.innerText = "CONVERT THIS BINARY TO DENARY:";
+                instructionEl.style.color = "#1e3a8a"; // Navy cue
+                
+                // Convert denary to 8-bit binary string
+                let binStr = targetNumber.toString(2).padStart(8, '0');
+                targetEl.innerText = binStr;
+                targetEl.style.color = "#1e3a8a";
+                targetEl.style.letterSpacing = "6px"; // Spaced out for readability
+                
+                document.getElementById('bits-board').style.display = 'none';
+                document.getElementById('current-total-container').style.visibility = 'hidden';
+                
+                let inputContainer = document.getElementById('text-input-container');
+                let denaryInput = document.getElementById('denary-input');
+                
+                inputContainer.style.display = 'flex';
+                denaryInput.value = '';
+                denaryInput.style.borderColor = '#1e3a8a';
+                
+                // Auto focus the input box for fast typing
+                setTimeout(() => denaryInput.focus(), 10);
+            }
+        }
+
+        // --- Logic for Denary to Binary (Mode 0) ---
+        function toggleBit(index, value) {
+            if (currentMode !== 0) return; // Prevent clicks in wrong mode
+
+            const btns = document.querySelectorAll('.bit-btn');
+            
+            if (bits[index] === 0) {
+                bits[index] = 1;
+                btns[index].innerText = '1';
+                btns[index].classList.add('active');
+            } else {
+                bits[index] = 0;
+                btns[index].innerText = '0';
+                btns[index].classList.remove('active');
+            }
+            
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            currentTotal = 0;
+            for (let i = 0; i < 8; i++) {
+                if (bits[i] === 1) currentTotal += bitValues[i];
+            }
+            document.getElementById('current-total').innerText = currentTotal;
+
+            if (currentTotal === targetNumber) {
+                triggerCorrectAnswer();
+            }
+        }
+
+        function resetBits() {
+            bits = [0, 0, 0, 0, 0, 0, 0, 0];
+            currentTotal = 0;
+            document.getElementById('current-total').innerText = currentTotal;
+            const btns = document.querySelectorAll('.bit-btn');
+            btns.forEach(btn => {
+                btn.innerText = '0';
+                btn.classList.remove('active');
+            });
+        }
+
+        // --- Logic for Binary to Denary (Mode 1) ---
+        function checkTextInput() {
+            if (currentMode !== 1) return;
+
+            let inputField = document.getElementById('denary-input');
+            let val = parseInt(inputField.value);
+            
+            if (val === targetNumber) {
+                triggerCorrectAnswer();
+            } else {
+                // Flash red and clear if incorrect
+                inputField.style.borderColor = '#d32f2f';
+                setTimeout(() => inputField.style.borderColor = '#1e3a8a', 400);
+                inputField.value = '';
+                inputField.focus();
+            }
+        }
+
+        // --- Shared Success/End Game Logic ---
+        function triggerCorrectAnswer() {
+            score++;
+            timeLeft += 3; // +3 seconds bonus time for being correct
+            document.getElementById('score').innerText = score;
+            document.getElementById('time').innerText = timeLeft;
+            
+            // Flash background green
+            document.body.style.backgroundColor = '#e8f5e9'; 
+            setTimeout(() => document.body.style.backgroundColor = '#f4f6f8', 200);
+            
+            generateNewTarget();
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('game-over').style.display = 'flex';
+        }
+
+        function closeGameOver() {
+            document.getElementById('game-over').style.display = 'none';
+            document.getElementById('start-btn').style.display = 'inline-block';
+            document.getElementById('instruction-text').innerText = "AWAITING START";
+            document.getElementById('instruction-text').style.color = "#666";
+            document.getElementById('target-number').innerText = "---";
+            document.getElementById('target-number').style.color = "#800000";
+            
+            document.getElementById('bits-board').style.display = 'flex';
+            document.getElementById('bits-board').style.pointerEvents = 'none';
+            document.getElementById('bits-board').style.opacity = '0.5';
+            
+            document.getElementById('text-input-container').style.display = 'none';
+            document.getElementById('current-total-container').style.visibility = 'hidden';
+            
+            resetBits();
+        }
+    </script>
+</body>
+</html>
