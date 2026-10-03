@@ -34,6 +34,10 @@
             color: #800000;
             margin: 10px 0 20px 0;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            min-height: 120px; /* Keeps layout stable when mode switches */
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .current-total {
@@ -273,9 +277,8 @@
                 instructionEl.innerText = "MAKE THIS DENARY NUMBER:";
                 instructionEl.style.color = "#800000"; // Maroon cue
                 
-                targetEl.innerText = targetNumber;
+                targetEl.innerHTML = targetNumber; // Renders plain text for denary
                 targetEl.style.color = "#800000";
-                targetEl.style.letterSpacing = "normal";
                 
                 document.getElementById('text-input-container').style.display = 'none';
                 document.getElementById('current-total-container').style.visibility = 'visible';
@@ -293,9 +296,19 @@
                 
                 // Convert denary to 8-bit binary string
                 let binStr = targetNumber.toString(2).padStart(8, '0');
-                targetEl.innerText = binStr;
+                
+                // --- INJECT HELPER HEADINGS ABOVE DIGITS ---
+                let html = '<div style="display: flex; justify-content: center; gap: 8px;">';
+                for(let i=0; i<8; i++) {
+                    html += `<div style="display: flex; flex-direction: column; align-items: center;">
+                                <span style="font-size: 16px; color: #666; background: #e9ecef; padding: 4px 6px; border-radius: 4px; margin-bottom: -5px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">${bitValues[i]}</span>
+                                <span>${binStr[i]}</span>
+                             </div>`;
+                }
+                html += '</div>';
+                
+                targetEl.innerHTML = html;
                 targetEl.style.color = "#1e3a8a";
-                targetEl.style.letterSpacing = "6px"; // Spaced out for readability
                 
                 document.getElementById('bits-board').style.display = 'none';
                 document.getElementById('current-total-container').style.visibility = 'hidden';
@@ -375,7 +388,7 @@
         // --- Shared Success/End Game Logic ---
         function triggerCorrectAnswer() {
             score++;
-            timeLeft += 5; // +5 seconds bonus time for being correct
+            timeLeft += 3; // +3 seconds bonus time for being correct
             document.getElementById('score').innerText = score;
             document.getElementById('time').innerText = timeLeft;
             
@@ -397,7 +410,7 @@
             document.getElementById('start-btn').style.display = 'inline-block';
             document.getElementById('instruction-text').innerText = "AWAITING START";
             document.getElementById('instruction-text').style.color = "#666";
-            document.getElementById('target-number').innerText = "---";
+            document.getElementById('target-number').innerHTML = "---";
             document.getElementById('target-number').style.color = "#800000";
             
             document.getElementById('bits-board').style.display = 'flex';
