@@ -209,27 +209,26 @@
         .pixel-input:focus {
             border: 2px solid #217346;
             background-color: rgba(255,255,255,0.8) !important;
-            color: #000 !important; /* Force text to be visible when editing */
+            color: #000 !important;
             text-shadow: none !important;
         }
 
-        /* Hide text when cell is correctly colored so it looks like a real drawing */
         .pixel-input.valid {
             color: transparent;
         }
 
-        /* Color Legend Area */
+        /* Color Legend Area (Ordered Top-to-Bottom by Columns 0-8 and 9-16) */
         .legend-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 8px 12px;
             margin-top: 10px;
         }
         
         .legend-item {
             display: flex;
             align-items: center;
-            font-size: 14px;
+            font-size: 13px;
             color: #333;
             font-weight: bold;
             background: #f8f9fa;
@@ -239,11 +238,11 @@
         }
 
         .color-box {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-right: 10px;
+            border-radius: 3px;
+            margin-right: 8px;
         }
 
         /* PDF Buttons */
@@ -321,10 +320,10 @@
                     <div id="instruction-panel">
                         <strong>Studio Instructions:</strong><br><br>
                         1. Select your task from the dropdown menu above.<br>
-                        2. Look at the <strong>Denary Palette</strong> on the right to find the color you want.<br>
-                        3. <strong>Convert the denary number into a 4-bit binary code</strong> (e.g. 0101).<br>
-                        4. Type the <strong>binary code</strong> directly into a grid cell.<br><br>
-                        <em>Tip: If you make a mistake, simply delete the binary code from the cell to make it blank again.</em>
+                        2. Look at the <strong>Denary Palette</strong> on the right.<br>
+                        3. <strong>Convert the denary number into 4-bit binary</strong> (e.g., 0 = 0000, 9 = 1001).<br>
+                        4. Type the binary code directly into a grid cell to paint!<br><br>
+                        <em>Tip: If you make a mistake, simply delete the binary code from the cell to clear it.</em>
                     </div>
                 </div>
 
@@ -356,10 +355,9 @@
     <footer>&copy; 2026 Delta Serlby Park - Computing Department</footer>
 
     <script>
-        // Memory Configuration
-        const gridSize = 100; // 10x10 grid - perfect for characters
+        const gridSize = 100; // 10x10 grid
         let userBinaryDesigns = JSON.parse(localStorage.getItem('binaryStudioMemory')) || {};
-        let currentTask = "1"; // Represents task ID
+        let currentTask = "1";
 
         const taskNames = {
             "1": "Red Task - Pixel Face",
@@ -368,40 +366,34 @@
             "4": "Blue Task - Pixel Villain"
         };
 
-        // Universal 16-Color Palette mapped for all tasks to 4-bit binary
-        const universalPalette = {
-            '0000': '#ffffff', 
-            '0001': '#000000', 
-            '0010': '#d32f2f', 
-            '0011': '#388e3c',
-            '0100': '#1976d2', 
-            '0101': '#fbc02d', 
-            '0110': '#f57c00', 
-            '0111': '#8e24aa',
-            '1000': '#e91e63', 
-            '1001': '#00bcd4', 
-            '1010': '#cddc39', 
-            '1011': '#795548',
-            '1100': '#9e9e9e', 
-            '1101': '#607d8b', 
-            '1110': '#8d6e63', 
-            '1111': '#009688'
-        };
+        // 17-Color Palette mapped from Denary 0 to 16
+        const paletteOrder = [
+            { denary: 0, bin: '0000', color: '#ffffff', label: '0 (Blank)' },
+            { denary: 1, bin: '0001', color: '#000000', label: '1' },
+            { denary: 2, bin: '0010', color: '#d32f2f', label: '2' },
+            { denary: 3, bin: '0011', color: '#388e3c', label: '3' },
+            { denary: 4, bin: '0100', color: '#1976d2', label: '4' },
+            { denary: 5, bin: '0101', color: '#fbc02d', label: '5' },
+            { denary: 6, bin: '0110', color: '#f57c00', label: '6' },
+            { denary: 7, bin: '0111', color: '#8e24aa', label: '7' },
+            { denary: 8, bin: '1000', color: '#e91e63', label: '8' },
+            { denary: 9, bin: '1001', color: '#00bcd4', label: '9' },
+            { denary: 10, bin: '1010', color: '#cddc39', label: '10' },
+            { denary: 11, bin: '1011', color: '#795548', label: '11' },
+            { denary: 12, bin: '1100', color: '#9e9e9e', label: '12' },
+            { denary: 13, bin: '1101', color: '#607d8b', label: '13' },
+            { denary: 14, bin: '1110', color: '#8d6e63', label: '14' },
+            { denary: 15, bin: '1111', color: '#009688', label: '15' },
+            { denary: 16, bin: '10000', color: '#4a148c', label: '16' } // Extended color for max palette richness
+        ];
 
-        const colorMaps = {
-            "1": universalPalette,
-            "2": universalPalette,
-            "3": universalPalette,
-            "4": universalPalette
-        };
+        // Build quick lookup map for validation
+        const activeColorMap = {};
+        paletteOrder.forEach(item => {
+            activeColorMap[item.bin] = item.color;
+        });
 
-        // Standardized 4-bit config for all tasks
-        const imageData = {
-            "1": { bits: 4 },
-            "2": { bits: 4 },
-            "3": { bits: 4 },
-            "4": { bits: 4 }
-        };
+        const colorMaps = { "1": activeColorMap, "2": activeColorMap, "3": activeColorMap, "4": activeColorMap };
 
         /* --- AUTO-SAVE FOR TEXT INPUTS --- */
         document.addEventListener('input', function(e) {
@@ -430,7 +422,6 @@
         /* --- STUDIO LOGIC --- */
         function switchTask() {
             currentTask = document.getElementById("task-selector").value;
-            // Initialize blank canvas memory if empty
             if (!userBinaryDesigns[currentTask]) {
                 userBinaryDesigns[currentTask] = new Array(gridSize).fill('');
             }
@@ -442,7 +433,6 @@
         function buildGrid() {
             const state = userBinaryDesigns[currentTask];
             const container = document.getElementById('spreadsheet-container');
-            const bits = imageData[currentTask].bits;
 
             let html = '<table class="excel-table"><tbody>';
             let cellIndex = 0;
@@ -455,7 +445,7 @@
                                 <input type="text" 
                                        id="cell-${cellIndex}" 
                                        class="pixel-input" 
-                                       maxlength="${bits}"
+                                       maxlength="5"
                                        value="${savedCode}"
                                        data-index="${cellIndex}"
                                        oninput="checkBinaryCode(this)">
@@ -467,7 +457,6 @@
             html += '</tbody></table>';
             container.innerHTML = html;
 
-            // Trigger color application for loaded data
             let inputs = document.querySelectorAll('.pixel-input');
             inputs.forEach(input => checkBinaryCode(input));
         }
@@ -475,38 +464,54 @@
         function buildLegend() {
             const legendContainer = document.getElementById('legend-container');
             let html = '';
-            const map = colorMaps[currentTask];
             
-            for (let binCode in map) {
-                // Determine styling and text based on the 16 standard colors
-                let denaryNumber = parseInt(binCode, 2); 
-                let displayCode = denaryNumber === 0 ? "White/Blank" : denaryNumber;
-                let borderStyle = denaryNumber === 0 ? 'border: 1px solid #ccc;' : 'border: 1px solid transparent;';
-                
-                html += `
-                    <div class="legend-item">
-                        <div class="color-box" style="background-color: ${map[binCode]}; ${borderStyle}"></div>
-                        <code>${displayCode}</code>
-                    </div>`;
+            // Re-order the 17 items into two columns top-to-bottom: 0-8 on left, 9-16 on right
+            let leftCol = paletteOrder.slice(0, 9);   // 0 to 8
+            let rightCol = paletteOrder.slice(9, 17); // 9 to 16
+
+            let maxRows = Math.max(leftCol.length, rightCol.length);
+            for (let i = 0; i < maxRows; i++) {
+                // Left Column item
+                if (leftCol[i]) {
+                    let item = leftCol[i];
+                    let borderStyle = item.denary === 0 ? 'border: 1px solid #ccc;' : 'border: 1px solid transparent;';
+                    html += `
+                        <div class="legend-item">
+                            <div class="color-box" style="background-color: ${item.color}; ${borderStyle}"></div>
+                            <span>${item.label}</span>
+                        </div>`;
+                } else {
+                    html += `<div></div>`;
+                }
+
+                // Right Column item
+                if (rightCol[i]) {
+                    let item = rightCol[i];
+                    html += `
+                        <div class="legend-item">
+                            <div class="color-box" style="background-color: ${item.color}; border: 1px solid transparent;"></div>
+                            <span>${item.label}</span>
+                        </div>`;
+                } else {
+                    html += `<div></div>`;
+                }
             }
+
             legendContainer.innerHTML = html;
         }
 
         function checkBinaryCode(el) {
             let typedVal = el.value.trim();
             let cellIndex = el.getAttribute('data-index');
-            let map = colorMaps[currentTask];
+            let map = activeColorMap;
             
-            // Save exactly what they typed
             userBinaryDesigns[currentTask][cellIndex] = typedVal;
             localStorage.setItem('binaryStudioMemory', JSON.stringify(userBinaryDesigns));
 
-            // If the code matches a color in the palette, paint it
             if (map.hasOwnProperty(typedVal)) {
                 el.style.backgroundColor = map[typedVal];
-                el.classList.add('valid'); // Hides the text so it looks like a clean drawing
+                el.classList.add('valid'); 
             } else {
-                // Not valid or deleted: turn back to transparent
                 el.style.backgroundColor = 'transparent';
                 el.classList.remove('valid');
             }
@@ -520,12 +525,10 @@
             tasks.forEach(t => {
                 let statusEl = document.getElementById('status-' + t);
                 let designArray = userBinaryDesigns[t];
-                let map = colorMaps[t];
                 
-                // Check if they have painted at least 1 pixel that is NOT white ('0000')
                 if (designArray) {
                     let hasPainted = designArray.some(code => {
-                        return map.hasOwnProperty(code) && map[code] !== '#ffffff';
+                        return activeColorMap.hasOwnProperty(code) && activeColorMap[code] !== '#ffffff';
                     });
 
                     if (hasPainted) {
@@ -551,12 +554,10 @@
 
         /* --- BULLETPROOF PDF GENERATION LOGIC --- */
         function downloadPDF() {
-            // 1. Hide interactive elements
             document.getElementById('action-buttons').style.display = 'none';
             document.getElementById('panel-instructions').style.display = 'none';
             document.getElementById('panel-legend').style.display = 'none';
             
-            // 2. Prep Text Inputs
             var textInputs = document.querySelectorAll('input.auto-input[type="text"]');
             for (var i = 0; i < textInputs.length; i++) {
                 textInputs[i].setAttribute('value', textInputs[i].value);
@@ -567,11 +568,9 @@
                 textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
             }
 
-            // 3. Expand the center panel to full width
             var ideContainer = document.getElementById('main-ide');
             ideContainer.style.gridTemplateColumns = '1fr';
             
-            // 4. Save original UI state
             var gridContainer = document.getElementById('spreadsheet-container');
             var originalGridHTML = gridContainer.innerHTML;
             var titleEl = document.getElementById('editor-title');
@@ -579,7 +578,6 @@
             var hintEl = document.getElementById('canvas-hint');
             var originalHintDisplay = hintEl.style.display;
 
-            // 5. Construct "Portfolio" View
             titleEl.innerText = "Student Portfolio - Binary Coding Designs";
             titleEl.style.textAlign = "center";
             hintEl.style.display = 'none';
@@ -591,9 +589,8 @@
             
             tasks.forEach(t => {
                 let state = userBinaryDesigns[t];
-                let map = colorMaps[t];
+                let map = activeColorMap;
 
-                // Only print canvases that have been drawn on
                 if (state) {
                     let hasPainted = state.some(code => map.hasOwnProperty(code) && map[code] !== '#ffffff');
                     
@@ -612,10 +609,8 @@
                 portfolioHTML = '<p style="text-align:center; font-size: 18px; padding: 40px; color: #666;">No characters coded yet. Use the canvas to build your binary portfolio!</p>';
             }
 
-            // Inject the portfolio view
             gridContainer.innerHTML = portfolioHTML;
 
-            // 6. Generate PDF
             var element = document.getElementById('pdf-content');
             var opt = {
                 margin:       0.3,
@@ -627,27 +622,22 @@
             };
 
             html2pdf().set(opt).from(element).save().then(function() {
-                // Restore Panels
                 document.getElementById('action-buttons').style.display = 'flex';
                 document.getElementById('panel-instructions').style.display = 'flex';
                 document.getElementById('panel-legend').style.display = 'flex';
                 ideContainer.style.gridTemplateColumns = '1fr 1.5fr 1fr';
                 
-                // Restore Text Heights
                 for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
 
-                // Restore Editor UI
                 titleEl.innerText = originalTitle;
                 titleEl.style.textAlign = "left";
                 hintEl.style.display = originalHintDisplay;
                 gridContainer.innerHTML = originalGridHTML;
                 
-                // Rebind inputs
                 switchTask();
             });
         }
 
-        // Helper function for building the static portfolio grids
         function generateStaticGridHTML(state, map) {
             let html = `<table style="border-collapse: collapse; margin: 0 auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"><tbody>`;
             let cellIndex = 0;
@@ -655,7 +645,7 @@
                 html += `<tr>`;
                 for(let c=0; c < 10; c++) {
                     let typedCode = state[cellIndex];
-                    let bgColor = '#ffffff'; // Default blank
+                    let bgColor = '#ffffff'; 
                     
                     if (map.hasOwnProperty(typedCode)) {
                         bgColor = map[typedCode];
@@ -670,7 +660,6 @@
             return html;
         }
 
-        // Initialize on load
         window.onload = () => {
             loadTextInputs();
             switchTask();
