@@ -78,12 +78,15 @@
           ]
         };
 
-        function loadYear(year) {
+       function loadYear(year) {
             document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
             document.getElementById('btn-' + year).classList.add('active');
 
             const titles = { year7: 'Year 7 Curriculum', year8: 'Year 8 Curriculum', year9: 'Year 9 Curriculum' };
             document.getElementById('year-title').innerText = titles[year];
+
+            // Save the clicked year into the browser's local memory
+            localStorage.setItem('lastViewedYearGroup', year);
 
             const grid = document.getElementById('content-grid');
             grid.innerHTML = ''; 
@@ -98,8 +101,7 @@
                     window.location.href = fileName;
                 };
 
-                // Simply uses the index (position in the list) to number the units sequentially
-                let subtitleText = `UNIT ${index + 1}`;
+                let subtitleText = `UNIT ${index + 1} &bull; COMPUTING`;
 
                 card.innerHTML = `
                     <div class="card-subtitle">${subtitleText}</div>
@@ -113,7 +115,8 @@
             });
         }
 
-        window.onload = () => loadYear('year7');
-    </script>
-</body>
-</html>
+        // When the page loads, check memory to see where we left off (default to year7 if empty)
+        window.onload = () => {
+            const savedYear = localStorage.getItem('lastViewedYearGroup') || 'year7';
+            loadYear(savedYear);
+        };
