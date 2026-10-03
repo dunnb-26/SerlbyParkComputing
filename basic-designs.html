@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pixel Art - Basic Designs</title>
     
+    <!-- HTML to PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
         :root {
             /* Delta Serlby Park Color Scheme */
@@ -86,32 +89,6 @@
             color: #388e3c;
             margin-top: 3px;
         }
-        .scoreboard-actions { display: flex; gap: 10px; align-items: center; }
-        .btn-ms-form {
-            background-color: #0078d4; 
-            color: white;
-            text-decoration: none;
-            padding: 8px 14px;
-            border-radius: 4px;
-            font-size: 0.85em;
-            font-weight: bold;
-            display: inline-block;
-            transition: background-color 0.2s;
-            border: 2px solid #0078d4;
-        }
-        .btn-ms-form:hover { background-color: #106ebe; border-color: #106ebe;}
-
-        .btn-clear-scores {
-            background-color: #d32f2f;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.85em;
-            font-weight: bold;
-        }
-        .btn-clear-scores:hover { background-color: #b71c1c; }
 
         /* 3-Column Layout */
         .ide-container {
@@ -282,107 +259,110 @@
             font-size: 14px;
             line-height: 1.5;
         }
+
+        /* PDF Buttons */
+        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
+        .btn-pdf:hover { background-color: #124d2d; }
         
         footer { text-align: center; padding: 25px; color: #666; margin-top: 50px; border-top: 1px solid #ddd; background-color: white; }
     </style>
 </head>
 <body>
-    <header>
-        <div class="header-left">
-            <img src="logo.jpg" alt="Delta Serlby Park Logo">
-        </div>
-        <div class="header-center">
-            <h1>Pixel Art - Basic Designs</h1>
-        </div>
-        <div class="header-right">
-            <a href="index.html" class="back-btn">&larr; Back to Curriculum</a>
-        </div>
-    </header>
 
-    <div class="scoreboard">
-        <div class="score-item">Red Task (2-Bit): <span id="score-red">0/3</span></div>
-        <div class="score-item">Amber Task (3-Bit): <span id="score-amber">0/3</span></div>
-        <div class="score-item">Green Task (4-Bit): <span id="score-green">0/3</span></div>
-        <div class="score-item">Blue Task (8-Bit): <span id="score-blue">0/3</span></div>
-        <div class="score-item" style="color: var(--maroon);">TOTAL SCORE: <span id="total-score" style="color: var(--maroon);">0/12</span></div>
-        <div class="scoreboard-actions">
-            <a href="https://forms.cloud.microsoft/" target="_blank" class="btn-ms-form">📋 Submit Scores</a>
-            <button class="btn-clear-scores" onclick="clearScores()">Reset Progress</button>
-        </div>
-    </div>
+    <div id="pdf-content">
+        <header>
+            <div class="header-left">
+                <img src="logo.jpg" alt="Delta Serlby Park Logo">
+            </div>
+            <div class="header-center">
+                <h1>Pixel Art - Basic Designs</h1>
+            </div>
+            <div class="header-right">
+                <a href="index.html" class="back-btn">&larr; Back to Curriculum</a>
+            </div>
+        </header>
 
-    <main>
-        <div class="ide-container">
-            <!-- 1. Instructions Panel -->
-            <div class="ide-panel">
-                <h3>1. Task Selection</h3>
-                <select id="task-selector" onchange="switchTask()">
-                    <optgroup label="🔴 Red Task (2-Bit Binary - 4 Colours)">
-                        <option value="red1">Image 1 (Easy)</option>
-                        <option value="red2">Image 2 (Easy)</option>
-                        <option value="red3">Image 3 (Easy)</option>
-                    </optgroup>
-                    <optgroup label="🟠 Amber Task (3-Bit Binary - 8 Colours)">
-                        <option value="amber1">Image 1 (Medium)</option>
-                        <option value="amber2">Image 2 (Medium)</option>
-                        <option value="amber3">Image 3 (Medium)</option>
-                    </optgroup>
-                    <optgroup label="🟢 Green Task (4-Bit Binary - 10 Colours)">
-                        <option value="green1">Image 1 (Hard)</option>
-                        <option value="green2">Image 2 (Hard)</option>
-                        <option value="green3">Image 3 (Hard)</option>
-                    </optgroup>
-                    <optgroup label="🔵 Blue Task (8-Bit Binary - 10 Colours)">
-                        <option value="blue1">Image 1 (Expert)</option>
-                        <option value="blue2">Image 2 (Expert)</option>
-                        <option value="blue3">Image 3 (Expert)</option>
-                    </optgroup>
-                </select>
-                <div id="instruction-panel">
-                    <strong>Instructions:</strong><br><br>
-                    1. Look at the binary number inside each cell.<br>
-                    2. Convert the binary number into a denary (decimal) number.<br>
-                    3. Use the legend to see which denary number maps to which color.<br>
-                    4. Type the denary number into the cell<br><br>
-                    <em>Note: The legend only shows the denary number, forcing you to do the conversion yourself!</em>
+        <div class="scoreboard">
+            <div class="score-item">Red Task (2-Bit): <span id="score-red">0/3</span></div>
+            <div class="score-item">Amber Task (3-Bit): <span id="score-amber">0/3</span></div>
+            <div class="score-item">Green Task (4-Bit): <span id="score-green">0/3</span></div>
+            <div class="score-item">Blue Task (8-Bit): <span id="score-blue">0/3</span></div>
+            <div class="score-item" style="color: var(--maroon);">TOTAL SCORE: <span id="total-score" style="color: var(--maroon);">0/12</span></div>
+        </div>
+
+        <main>
+            <div class="ide-container" id="main-ide">
+                <!-- 1. Instructions Panel -->
+                <div class="ide-panel" id="panel-instructions">
+                    <h3>1. Task Selection</h3>
+                    <select id="task-selector" onchange="switchTask()">
+                        <optgroup label="🔴 Red Task (2-Bit Binary - 4 Colours)">
+                            <option value="red1">Image 1 (Easy)</option>
+                            <option value="red2">Image 2 (Easy)</option>
+                            <option value="red3">Image 3 (Easy)</option>
+                        </optgroup>
+                        <optgroup label="🟠 Amber Task (3-Bit Binary - 8 Colours)">
+                            <option value="amber1">Image 1 (Medium)</option>
+                            <option value="amber2">Image 2 (Medium)</option>
+                            <option value="amber3">Image 3 (Medium)</option>
+                        </optgroup>
+                        <optgroup label="🟢 Green Task (4-Bit Binary - 10 Colours)">
+                            <option value="green1">Image 1 (Hard)</option>
+                            <option value="green2">Image 2 (Hard)</option>
+                            <option value="green3">Image 3 (Hard)</option>
+                        </optgroup>
+                        <optgroup label="🔵 Blue Task (8-Bit Binary - 10 Colours)">
+                            <option value="blue1">Image 1 (Expert)</option>
+                            <option value="blue2">Image 2 (Expert)</option>
+                            <option value="blue3">Image 3 (Expert)</option>
+                        </optgroup>
+                    </select>
+                    <div id="instruction-panel">
+                        <strong>Instructions:</strong><br><br>
+                        1. Look at the binary number inside each cell.<br>
+                        2. Convert the binary number into a denary (decimal) number.<br>
+                        3. Use the legend to see which denary number maps to which color.<br>
+                        4. Type the denary number into the cell<br><br>
+                        <em>Note: The legend only shows the denary number, forcing you to do the conversion yourself!</em>
+                    </div>
+                </div>
+
+                <!-- 2. Excel Editor Panel -->
+                <div class="ide-panel editor-panel" id="panel-editor">
+                    <h3 style="color: #217346; align-self: flex-start;" id="editor-title">2. Pixel Grid Simulator</h3>
+                    <p style="font-size: 13px; color: #666; margin-top: 0; margin-bottom: 5px; align-self: flex-start;" id="pixels-left-text">
+                        Click a cell to type your decimal answer. <span id="pixels-left" style="font-weight: bold; color: var(--maroon);">64 pixels remaining.</span>
+                    </p>
+                    <div id="spreadsheet-container"></div>
+                </div>
+
+                <!-- 3. Legend / Progress Panel -->
+                <div class="ide-panel output-panel" id="panel-legend">
+                    <h3 style="color: var(--maroon);">3. Color Legend</h3>
+                    <p style="font-size: 13px; color: #666; margin-top: 0;">Type these denary numbers into the grid.</p>
+                    <div id="legend-container" class="legend-grid"></div>
+                    
+                    <h3 style="color: var(--navy); margin-top: 25px;">Image Progress</h3>
+                    <div id="feedback" class="feedback-box">Not started.</div>
                 </div>
             </div>
+        </main>
+    </div> <!-- END PDF CONTENT WRAPPER -->
 
-            <!-- 2. Excel Editor Panel -->
-            <div class="ide-panel editor-panel">
-                <h3 style="color: #217346; align-self: flex-start;">2. Pixel Grid Simulator</h3>
-                <p style="font-size: 13px; color: #666; margin-top: 0; margin-bottom: 5px; align-self: flex-start;">
-                    Click a cell to type your decimal answer. <span id="pixels-left" style="font-weight: bold; color: var(--maroon);">64 pixels remaining.</span>
-                </p>
-                <div id="spreadsheet-container"></div>
-            </div>
-
-            <!-- 3. Legend / Progress Panel -->
-            <div class="ide-panel output-panel">
-                <h3 style="color: var(--maroon);">3. Color Legend</h3>
-                <p style="font-size: 13px; color: #666; margin-top: 0;">Type these denary numbers into the grid.</p>
-                <div id="legend-container" class="legend-grid"></div>
-                
-                <h3 style="color: var(--navy); margin-top: 25px;">Image Progress</h3>
-                <div id="feedback" class="feedback-box">Not started.</div>
-            </div>
-        </div>
-    </main>
+    <!-- UNIVERSAL PDF DOWNLOAD BUTTONS -->
+    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
+        <button class="btn-pdf no-print" onclick="downloadPDF()">📄 Download Full Portfolio</button>
+        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearScores()">Reset Page</button>
+    </div>
     
     <footer>&copy; 2026 Delta Serlby Park - Computing Department</footer>
 
     <script>
         // Store user progress locally
-        let userProgress = JSON.parse(localStorage.getItem('pixelArtProgress')) || {};
+        let userProgress = JSON.parse(localStorage.getItem('pixelArtMemory')) || {};
         let currentTask = "red1";
 
-        /* 
-           IMAGE DATA: 
-           Red   = 2-bit (4 colors: 0-3)
-           Amber = 3-bit (8 colors: 0-7) 
-           Green = 4-bit (10 colors: 0-9) 
-           Blue  = 8-bit (10 colors: 0-9) - Padded with 8 bits for the challenge!
-        */
+        /* IMAGE DATA DICTIONARY */
         const imageData = {
             "red1": { bits: 2, data: [
                 0,2,2,0,0,2,2,0,
@@ -494,6 +474,13 @@
                 1,8,0,0,0,0,0,0 ]}
         };
 
+        const taskNames = {
+            "red1": "Red Task - Image 1", "red2": "Red Task - Image 2", "red3": "Red Task - Image 3",
+            "amber1": "Amber Task - Image 1", "amber2": "Amber Task - Image 2", "amber3": "Amber Task - Image 3",
+            "green1": "Green Task - Image 1", "green2": "Green Task - Image 2", "green3": "Green Task - Image 3",
+            "blue1": "Blue Task - Image 1", "blue2": "Blue Task - Image 2", "blue3": "Blue Task - Image 3"
+        };
+
         // Universal 10-Color Palette
         const colorMaps = {
             2: { 0: '#ffffff', 1: '#000000', 2: '#d32f2f', 3: '#388e3c' },
@@ -513,13 +500,8 @@
             }
         };
 
-        function getColor(val, bits) {
-            return colorMaps[bits][val];
-        }
-
-        function toBinaryString(dec, bits) {
-            return parseInt(dec, 10).toString(2).padStart(bits, '0');
-        }
+        function getColor(val, bits) { return colorMaps[bits][val]; }
+        function toBinaryString(dec, bits) { return parseInt(dec, 10).toString(2).padStart(bits, '0'); }
 
         function switchTask() {
             currentTask = document.getElementById("task-selector").value;
@@ -535,11 +517,9 @@
             const task = imageData[currentTask];
             const savedState = userProgress[currentTask];
             
-            // Apply the 8-bit expansion class ONLY when the Blue task is active
             let tableClass = task.bits === 8 ? "excel-table task-8bit" : "excel-table";
             let html = `<table class="${tableClass}"><thead><tr><th></th>`;
             
-            // Columns A-H
             for(let c=0; c < 8; c++) html += `<th>${String.fromCharCode(65 + c)}</th>`;
             html += '</tr></thead><tbody>';
 
@@ -570,8 +550,6 @@
             const bits = imageData[currentTask].bits;
             const legendContainer = document.getElementById('legend-container');
             let html = '';
-
-            // This ensures all tasks show the exact colors available without revealing the binary
             const map = colorMaps[bits];
             for (let key in map) {
                 html += `
@@ -580,7 +558,6 @@
                         ${key}
                     </div>`;
             }
-            
             legendContainer.innerHTML = html;
         }
 
@@ -592,18 +569,15 @@
                 let cellIndex = el.getAttribute('data-index');
                 let bits = imageData[currentTask].bits;
                 
-                // Style the correct cell
                 el.style.backgroundColor = getColor(correctAns, bits);
-                el.disabled = true; // Locks and hides the text
+                el.disabled = true; 
 
-                // Save progress
                 userProgress[currentTask][cellIndex] = true;
-                localStorage.setItem('pixelArtProgress', JSON.stringify(userProgress));
+                localStorage.setItem('pixelArtMemory', JSON.stringify(userProgress));
 
                 updateImageProgress();
                 updateScoreboard();
                 
-                // Jump focus to next empty cell horizontally
                 let nextInput = el.parentElement.nextElementSibling?.querySelector('input:not([disabled])');
                 if(!nextInput) nextInput = el.parentElement.parentElement.nextElementSibling?.querySelector('td input:not([disabled])');
                 if(nextInput) nextInput.focus();
@@ -646,11 +620,116 @@
 
         function clearScores() {
             if (confirm("Are you sure you want to clear all your pixel art progress?")) {
-                localStorage.removeItem('pixelArtProgress');
+                localStorage.removeItem('pixelArtMemory');
                 userProgress = {};
                 switchTask();
                 alert("Progress reset successfully.");
             }
+        }
+
+        /* --- BULLETPROOF PDF GENERATION LOGIC --- */
+        function downloadPDF() {
+            // 1. Hide interactive elements not needed in the PDF
+            document.getElementById('action-buttons').style.display = 'none';
+            document.getElementById('panel-instructions').style.display = 'none';
+            document.getElementById('panel-legend').style.display = 'none';
+            
+            // 2. Expand the center panel to full width
+            var ideContainer = document.getElementById('main-ide');
+            ideContainer.style.gridTemplateColumns = '1fr';
+            
+            // 3. Save the original UI state of the editor panel
+            var gridContainer = document.getElementById('spreadsheet-container');
+            var originalGridHTML = gridContainer.innerHTML;
+            var titleEl = document.getElementById('editor-title');
+            var originalTitle = titleEl.innerText;
+            var textEl = document.getElementById('pixels-left-text');
+            var originalTextDisplay = textEl.style.display;
+
+            // 4. Construct the "Portfolio" view HTML
+            titleEl.innerText = "Student Portfolio - Attempted Images";
+            titleEl.style.textAlign = "center";
+            textEl.style.display = 'none';
+
+            var portfolioHTML = '<div style="display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; margin-top: 20px;">';
+            var attemptedCount = 0;
+
+            for (let taskKey in imageData) {
+                let state = userProgress[taskKey];
+                // If they have solved at least 1 pixel in this task, include it in the PDF
+                if (state && state.some(val => val === true)) {
+                    attemptedCount++;
+                    portfolioHTML += '<div style="text-align: center; page-break-inside: avoid;">';
+                    portfolioHTML += '<h4 style="color: var(--navy); margin-bottom: 15px; font-size: 16px;">' + taskNames[taskKey] + '</h4>';
+                    portfolioHTML += generateStaticGridHTML(taskKey, state);
+                    portfolioHTML += '</div>';
+                }
+            }
+            portfolioHTML += '</div>';
+
+            if (attemptedCount === 0) {
+                portfolioHTML = '<p style="text-align:center; font-size: 18px; padding: 40px; color: #666;">No images attempted yet. Start decoding to build your portfolio!</p>';
+            }
+
+            // Inject the portfolio view into the DOM
+            gridContainer.innerHTML = portfolioHTML;
+
+            // 5. Configure html2pdf rules
+            var element = document.getElementById('pdf-content');
+            var opt = {
+                margin:       0.3,
+                filename:     'Pixel_Art_Portfolio.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            // 6. Generate PDF, then restore the interface back to normal
+            html2pdf().set(opt).from(element).save().then(function() {
+                // Bring back panels
+                document.getElementById('action-buttons').style.display = 'flex';
+                document.getElementById('panel-instructions').style.display = 'flex';
+                document.getElementById('panel-legend').style.display = 'flex';
+                ideContainer.style.gridTemplateColumns = '1fr 1.5fr 1fr';
+                
+                // Restore Editor Panel
+                titleEl.innerText = originalTitle;
+                titleEl.style.textAlign = "left";
+                textEl.style.display = originalTextDisplay;
+                
+                // Restore the original interactive grid HTML
+                gridContainer.innerHTML = originalGridHTML;
+                
+                // Re-bind the inputs by switching back to current task
+                switchTask();
+            });
+        }
+
+        // Helper function to build a clean, static version of the grid for the PDF
+        function generateStaticGridHTML(taskKey, state) {
+            const task = imageData[taskKey];
+            let html = `<table style="border-collapse: collapse; margin: 0 auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"><tbody>`;
+            
+            let cellIndex = 0;
+            for(let r=0; r < 8; r++) {
+                html += `<tr>`;
+                for(let c=0; c < 8; c++) {
+                    let decimalAns = task.data[cellIndex];
+                    let isSolved = state[cellIndex];
+                    
+                    if (isSolved) {
+                        let bgColor = getColor(decimalAns, task.bits);
+                        html += `<td style="width: 28px; height: 28px; background-color: ${bgColor}; border: 1px solid rgba(0,0,0,0.05);"></td>`;
+                    } else {
+                        html += `<td style="width: 28px; height: 28px; background-color: #fafafa; border: 1px solid rgba(0,0,0,0.05);"></td>`;
+                    }
+                    cellIndex++;
+                }
+                html += '</tr>';
+            }
+            html += '</tbody></table>';
+            return html;
         }
 
         // Initialize on load
