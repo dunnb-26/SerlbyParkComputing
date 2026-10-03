@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Conversions - Lesson</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- HTML to PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
+        .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid; }
+        
+        /* Section Header Colors */
+        .task-prep { border-top: 6px solid #607d8b; } 
+        .task-prep h2 { color: #607d8b; margin-top: 0; }
+        
+        /* RAGB Colors */
+        .task-maroon { border-top: 6px solid #d32f2f; } /* Red Task */
+        .task-maroon h2 { color: #d32f2f; margin-top: 0; }
+        .task-maroon .instruction-box { border-left: 4px solid #d32f2f; }
+
+        .task-amber { border-top: 6px solid #ffb300; } /* Amber Task */
+        .task-amber h2 { color: #ffb300; margin-top: 0; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
+        .task-amber .instruction-box { border-left: 4px solid #ffb300; }
+
+        .task-green { border-top: 6px solid #008f39; } /* Green Task */
+        .task-green h2 { color: #008f39; margin-top: 0; }
+        .task-green .instruction-box { border-left: 4px solid #008f39; }
+
+        .task-navy { border-top: 6px solid #1976d2; } /* Blue Task */
+        .task-navy h2 { color: #1976d2; margin-top: 0; }
+        .task-navy .instruction-box { border-left: 4px solid #1976d2; }
+
+        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; text-align: center; }
+        
+        /* Question & Helper Heading Styling */
+        .question-row { margin-bottom: 25px; }
+        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
+        
+        .helper-headings {
+            display: flex;
+            gap: 4px;
+            max-width: 250px;
+            margin-bottom: 4px;
+        }
+        .helper-headings span {
+            flex: 1;
+            text-align: center;
+            font-size: 11px;
+            font-weight: bold;
+            color: #666;
+            background: #e9ecef;
+            border-radius: 2px;
+            padding: 2px 0;
+        }
+        .helper-headings-8bit {
+            max-width: 400px;
+        }
+
+        .auto-input { 
+            width: 100%; 
+            max-width: 350px;
+            padding: 12px; 
+            font-size: 16px; 
+            border: 2px solid #ccc; 
+            border-radius: 4px; 
+            transition: all 0.3s ease; 
+            box-sizing: border-box; 
+            background-color: white; 
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .auto-input:focus { outline: none; border-color: #666; }
+        textarea.auto-input { resize: vertical; min-height: 80px; font-family: inherit; font-weight: normal; letter-spacing: normal; max-width: 100%; }
+        
+        .input-correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100; }
+        .input-incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; }
+        
+        /* Buttons */
+        .btn-submit { background-color: var(--navy); color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; max-width: 200px; transition: background-color 0.2s; }
+        .btn-submit:hover { background-color: var(--yellow); color: var(--navy); }
+        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
+        .btn-pdf:hover { background-color: #124d2d; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-left"><img src="logo.jpg" alt="Delta Serlby Park Logo"></div>
+        <div class="header-center"><h1>Binary Conversions Lesson</h1></div>
+        <div class="header-right"><a href="index.html" class="back-btn">&larr; Back to Curriculum</a></div>
+    </header>
+
+    <main class="task-container">
+
+        <!-- PREPARATION: Keywords & Notes -->
+        <div class="task-card task-prep">
+            <h2>Lesson Preparation</h2>
+            
+            <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">4 Key Words</h3>
+            <div class="question-row">
+                <label class="question-label">Binary</label>
+                <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type definition here...">
+            </div>
+            <div class="question-row">
+                <label class="question-label">Denary / Decimal</label>
+                <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type definition here...">
+            </div>
+            <div class="question-row">
+                <label class="question-label">Bit</label>
+                <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type definition here...">
+            </div>
+            <div class="question-row">
+                <label class="question-label">Byte</label>
+                <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type definition here...">
+            </div>
+
+            <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Lesson Notes</h3>
+            <div class="question-row" style="margin-bottom: 0;">
+                <textarea class="auto-input" rows="6" placeholder="Write your notes about today's lesson here..."></textarea>
+            </div>
+        </div>
+
+        <!-- RED TASK: 4-Bit Binary to Denary -->
+        <div class="task-card task-maroon">
+            <h2>Red Task: 4-Bit Binary to Denary</h2>
+            <div class="instruction-box">
+                Convert the 4-bit binary numbers into denary (decimal) numbers. <em>(Hint: Use the place-value headings 8, 4, 2, 1)</em>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">1. Convert binary <code>1011</code> to denary:</label>
+                <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                <input type="text" class="auto-input red-input" data-answers='["11"]' placeholder="Enter number...">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">2. Convert binary <code>0101</code> to denary:</label>
+                <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                <input type="text" class="auto-input red-input" data-answers='["5"]' placeholder="Enter number...">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">3. Convert binary <code>1110</code> to denary:</label>
+                <input type="text" class="auto-input red-input" data-answers='["14"]' placeholder="Enter number...">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">4. Convert binary <code>1000</code> to denary:</label>
+                <input type="text" class="auto-input red-input" data-answers='["8"]' placeholder="Enter number...">
+            </div>
+
+            <button class="btn-submit no-print" onclick="checkAnswers('red-input')">Check Answers</button>
+        </div>
+
+        <!-- AMBER TASK: 8-Bit Binary to Denary -->
+        <div class="task-card task-amber">
+            <h2>Amber Task: 8-Bit Binary to Denary</h2>
+            <div class="instruction-box">
+                Convert the 8-bit binary numbers into denary numbers. <em>(Hint: 128, 64, 32, 16, 8, 4, 2, 1)</em>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">1. Convert binary <code>10010110</code> to denary:</label>
+                <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                <input type="text" class="auto-input amber-input" data-answers='["150"]' placeholder="Enter number...">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">2. Convert binary <code>00011101</code> to denary:</label>
+                <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                <input type="text" class="auto-input amber-input" data-answers='["29"]' placeholder="Enter number...">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">3. Convert binary <code>11000011</code> to denary:</label>
+                <input type="text" class="auto-input amber-input" data-answers='["195"]' placeholder="Enter number...">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">4. Convert binary <code>11111111</code> to denary:</label>
+                <input type="text" class="auto-input amber-input" data-answers='["255"]' placeholder="Enter number...">
+            </div>
+
+            <button class="btn-submit no-print" onclick="checkAnswers('amber-input')">Check Answers</button>
+        </div>
+
+        <!-- GREEN TASK: 4-Bit Denary to Binary -->
+        <div class="task-card task-green">
+            <h2>Green Task: 4-Bit Denary to Binary</h2>
+            <div class="instruction-box">
+                Convert the denary numbers into 4-bit binary codes.
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">1. Convert denary <code>7</code> to 4-bit binary:</label>
+                <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                <input type="text" class="auto-input green-input" data-answers='["0111", "7"]' placeholder="e.g. 0111">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">2. Convert denary <code>12</code> to 4-bit binary:</label>
+                <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                <input type="text" class="auto-input green-input" data-answers='["1100"]' placeholder="e.g. 1100">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">3. Convert denary <code>9</code> to 4-bit binary:</label>
+                <input type="text" class="auto-input green-input" data-answers='["1001"]' placeholder="e.g. 1001">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">4. Convert denary <code>15</code> to 4-bit binary:</label>
+                <input type="text" class="auto-input green-input" data-answers='["1111"]' placeholder="e.g. 1111">
+            </div>
+
+            <button class="btn-submit no-print" style="background-color: #008f39;" onclick="checkAnswers('green-input')">Check Answers</button>
+        </div>
+
+        <!-- BLUE TASK: 8-Bit Denary to Binary -->
+        <div class="task-card task-navy">
+            <h2>Blue Task: 8-Bit Denary to Binary</h2>
+            <div class="instruction-box">
+                Convert the denary numbers into full 8-bit binary codes.
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">1. Convert denary <code>45</code> to 8-bit binary:</label>
+                <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                <input type="text" class="auto-input navy-input" data-answers='["00101101"]' placeholder="e.g. 00101101">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">2. Convert denary <code>168</code> to 8-bit binary:</label>
+                <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                <input type="text" class="auto-input navy-input" data-answers='["10101000"]' placeholder="e.g. 10101000">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">3. Convert denary <code>210</code> to 8-bit binary:</label>
+                <input type="text" class="auto-input navy-input" data-answers='["11010010"]' placeholder="e.g. 11010010">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">4. Convert denary <code>15</code> to 8-bit binary:</label>
+                <input type="text" class="auto-input navy-input" data-answers='["00001111"]' placeholder="e.g. 00001111">
+            </div>
+
+            <button class="btn-submit no-print" style="background-color: #1976d2;" onclick="checkAnswers('navy-input')">Check Answers</button>
+        </div>
+
+        <!-- UNIVERSAL PDF DOWNLOAD BUTTON -->
+        <div id="action-buttons" style="display: flex; justify-content: center; margin: 40px auto;">
+            <button class="btn-pdf no-print" onclick="downloadPDF()">📄 Download Work as PDF</button>
+        </div>
+
+    </main>
+    
+    <footer>
+        &copy; 2026 Delta Serlby Park - Computing Department
+    </footer>
+
+    <script>
+        /* --- BATCH-MARKING TEXT INPUT LOGIC --- */
+        function checkAnswers(groupClass) {
+            var inputs = document.getElementsByClassName(groupClass);
+            for (var i = 0; i < inputs.length; i++) {
+                var inputElement = inputs[i];
+                var studentAnswer = inputElement.value.toLowerCase().trim();
+                var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers'));
+                var isCorrect = false;
+                
+                for (var j = 0; j < acceptedAnswers.length; j++) {
+                    if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
+                        isCorrect = true;
+                        break;
+                    }
+                }
+
+                inputElement.classList.remove('input-correct', 'input-incorrect');
+                if (studentAnswer !== "") {
+                    if (isCorrect) {
+                        inputElement.classList.add('input-correct');
+                    } else {
+                        inputElement.classList.add('input-incorrect');
+                    }
+                }
+            }
+        }
+
+        /* --- PDF GENERATION LOGIC --- */
+        function downloadPDF() {
+            var textInputs = document.querySelectorAll('input[type="text"]');
+            for (var i = 0; i < textInputs.length; i++) {
+                textInputs[i].setAttribute('value', textInputs[i].value);
+            }
+
+            var textAreas = document.querySelectorAll('textarea');
+            for (var j = 0; j < textAreas.length; j++) {
+                textAreas[j].innerHTML = textAreas[j].value;
+            }
+
+            var actionArea = document.getElementById('action-buttons');
+            if (actionArea) actionArea.style.display = 'none';
+
+            var element = document.body;
+            var opt = {
+                margin:       [0.5, 0.5, 0.5, 0.5],
+                filename:     'Binary_Conversions_Work.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(function() {
+                if (actionArea) actionArea.style.display = 'flex';
+            });
+        }
+    </script>
+</body>
+</html>
