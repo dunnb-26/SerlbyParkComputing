@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Art - Character Design</title>
+    
+    <!-- HTML to PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            /* Delta Serlby Park Color Scheme */
+            --navy: #1B1464; 
+            --yellow: #F7931D;
+            --maroon: #822433;
+            --bg-color: #f4f6f8;
+            --text-color: #333;
+            --btn-gold: #e2a829;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            user-select: none; /* Prevents text highlighting while drawing */
+        }
+
+        header { 
+            background-color: var(--navy); 
+            color: white; 
+            padding: 20px; 
+            display: grid; 
+            grid-template-columns: 1fr auto 1fr; 
+            align-items: center; 
+            border-bottom: 6px solid var(--maroon); 
+        }
+
+        .header-left { display: flex; justify-content: flex-start; }
+        .header-center { text-align: center; }
+        .header-right { display: flex; justify-content: flex-end; align-items: center; }
+
+        header img { 
+            height: 80px; 
+            background-color: white; 
+            border-radius: 8px; 
+            padding: 5px;
+        }
+
+        header h1 { 
+            margin: 0; 
+            font-size: 28px; 
+            letter-spacing: 1px;
+        }
+
+        .back-btn {
+            background-color: var(--yellow);
+            color: var(--navy);
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .back-btn:hover { transform: scale(1.05); }
+
+        /* Scoreboard Banner */
+        .scoreboard {
+            max-width: 1450px;
+            margin: 20px auto 0 auto;
+            padding: 15px 25px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 5px solid var(--maroon);
+            font-weight: bold;
+            color: var(--navy);
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .score-item { text-align: center; font-size: 0.95em; }
+        .score-item span {
+            display: block;
+            font-size: 1.2em;
+            color: #666;
+            margin-top: 5px;
+        }
+        .status-started { color: #388e3c !important; font-weight: bold; }
+
+        /* Task Card Styling for Prep Section */
+        .task-card { 
+            background: white; 
+            border-radius: 8px; 
+            padding: 25px; 
+            margin: 30px auto 20px auto; 
+            max-width: 900px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            page-break-inside: avoid; 
+            box-sizing: border-box;
+        }
+        .task-prep { border-top: 6px solid #607d8b; } 
+        .task-prep h2 { color: #607d8b; margin-top: 0; }
+
+        /* Inputs & Textareas */
+        .question-row { margin-bottom: 20px; }
+        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
+        .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit; }
+        .auto-input:focus { outline: none; border-color: #666; }
+        textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; }
+
+        /* 3-Column Layout for Simulator */
+        .ide-container {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1fr;
+            gap: 20px;
+            max-width: 1450px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        @media (max-width: 1100px) {
+            .ide-container { grid-template-columns: 1fr; }
+        }
+
+        .ide-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-top: 5px solid var(--navy);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .editor-panel { border-top-color: #217346; align-items: center; } 
+        .output-panel { border-top-color: var(--maroon); }
+
+        .ide-panel h3 {
+            margin-top: 0;
+            color: var(--navy);
+            text-transform: uppercase;
+            font-size: 1.1em;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        #instruction-panel {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--navy);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 4px 4px 0;
+            font-family: inherit;
+            font-size: 14px;
+            color: #333;
+            flex-grow: 1;
+            line-height: 1.6;
+        }
+
+        /* Drawing Grid Styling */
+        #spreadsheet-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .drawing-table {
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            cursor: crosshair;
+        }
+
+        .drawing-table td {
+            border: 1px solid #e0e0e0;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            transition: transform 0.1s;
+        }
+
+        .drawing-table td:hover {
+            transform: scale(1.1);
+            z-index: 10;
+            position: relative;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+
+        /* Color Palette Layout */
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+        }
+        
+        .color-swatch {
+            height: 40px;
+            border-radius: 6px;
+            border: 2px solid #ddd;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .color-swatch:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .color-swatch.active {
+            border: 3px solid var(--navy);
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(27, 20, 100, 0.4);
+        }
+
+        .eraser-btn {
+            background-color: white;
+            color: #333;
+            border: 2px dashed #999;
+            text-shadow: none;
+        }
+        .eraser-btn.active { border: 3px dashed var(--maroon); }
+
+        .clear-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            background-color: #f8f9fa;
+            color: #d32f2f;
+            border: 2px solid #d32f2f;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .clear-btn:hover { background-color: #ffebee; }
+
+        /* PDF Buttons */
+        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
+        .btn-pdf:hover { background-color: #124d2d; }
+        
+        footer { text-align: center; padding: 25px; color: #666; margin-top: 50px; border-top: 1px solid #ddd; background-color: white; }
+    </style>
+</head>
+<body>
+
+    <div id="pdf-content">
+        <header>
+            <div class="header-left">
+                <img src="logo.jpg" alt="Delta Serlby Park Logo">
+            </div>
+            <div class="header-center">
+                <h1>Pixel Art - Character Design</h1>
+            </div>
+            <div class="header-right">
+                <a href="index.html" class="back-btn">&larr; Back to Curriculum</a>
+            </div>
+        </header>
+
+        <div class="scoreboard">
+            <div class="score-item">Red Task: <span id="status-red">Not Started</span></div>
+            <div class="score-item">Amber Task: <span id="status-amber">Not Started</span></div>
+            <div class="score-item">Green Task: <span id="status-green">Not Started</span></div>
+            <div class="score-item">Blue Task: <span id="status-blue">Not Started</span></div>
+        </div>
+
+        <main>
+            <!-- PREPARATION: Keywords & Notes -->
+            <div class="task-card task-prep">
+                <h2>Lesson Preparation</h2>
+                
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">4 Key Words</h3>
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <div class="question-row" style="margin-bottom: 0;">
+                        <label class="question-label">Sprite</label>
+                        <input type="text" class="auto-input" placeholder="Type definition here...">
+                    </div>
+                    <div class="question-row" style="margin-bottom: 0;">
+                        <label class="question-label">Canvas</label>
+                        <input type="text" class="auto-input" placeholder="Type definition here...">
+                    </div>
+                    <div class="question-row" style="margin-bottom: 0;">
+                        <label class="question-label">Proportions</label>
+                        <input type="text" class="auto-input" placeholder="Type definition here...">
+                    </div>
+                    <div class="question-row" style="margin-bottom: 0;">
+                        <label class="question-label">Palette</label>
+                        <input type="text" class="auto-input" placeholder="Type definition here...">
+                    </div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Lesson Notes</h3>
+                <div class="question-row" style="margin-bottom: 0;">
+                    <textarea class="auto-input" rows="6" placeholder="Write your notes from today's lesson here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                </div>
+            </div>
+
+            <!-- INTERACTIVE DESIGN STUDIO -->
+            <div class="ide-container" id="main-ide">
+                <!-- 1. Instructions Panel -->
+                <div class="ide-panel" id="panel-instructions">
+                    <h3>1. Design Brief</h3>
+                    <select id="task-selector" onchange="switchTask()">
+                        <option value="red">🔴 RED TASK: Make a Pixel Face</option>
+                        <option value="amber">🟠 AMBER TASK: Make a Pixel Pet</option>
+                        <option value="green">🟢 GREEN TASK: Make a Pixel Person</option>
+                        <option value="blue">🔵 BLUE TASK: Make a Pixel Villain</option>
+                    </select>
+                    
+                    <div id="instruction-panel">
+                        <strong>Studio Instructions:</strong><br><br>
+                        1. Select your task from the dropdown menu above.<br>
+                        2. Pick a color from your <strong>Painter's Palette</strong> on the right.<br>
+                        3. <strong>Click and drag</strong> across the grid to paint your character!<br>
+                        4. Need to fix a mistake? Select the Eraser tool.<br><br>
+                        <em>Tip: You have a 12x12 canvas. Plan your character's proportions carefully so they fit!</em>
+                    </div>
+                </div>
+
+                <!-- 2. The Canvas -->
+                <div class="ide-panel editor-panel" id="panel-editor">
+                    <h3 style="color: #217346; align-self: flex-start;" id="editor-title">2. Drawing Canvas (12x12)</h3>
+                    <p style="font-size: 13px; color: #666; margin-top: 0; margin-bottom: 5px; align-self: flex-start;" id="canvas-hint">
+                        Click and drag to paint.
+                    </p>
+                    <div id="spreadsheet-container"></div>
+                </div>
+
+                <!-- 3. The Palette -->
+                <div class="ide-panel output-panel" id="panel-legend">
+                    <h3 style="color: var(--maroon);">3. Painter's Palette</h3>
+                    <p style="font-size: 13px; color: #666; margin-top: 0;">Select a color to load your brush.</p>
+                    
+                    <div class="palette-grid">
+                        <!-- Standard Colors -->
+                        <div class="color-swatch active" style="background-color: #000000;" onclick="selectColor('#000000', this)">Black</div>
+                        <div class="color-swatch" style="background-color: #555555;" onclick="selectColor('#555555', this)">D. Grey</div>
+                        <div class="color-swatch" style="background-color: #D32F2F;" onclick="selectColor('#D32F2F', this)">Red</div>
+                        <div class="color-swatch" style="background-color: #1976D2;" onclick="selectColor('#1976D2', this)">Blue</div>
+                        <div class="color-swatch" style="background-color: #388E3C;" onclick="selectColor('#388E3C', this)">Green</div>
+                        <div class="color-swatch" style="background-color: #FBC02D; color: #333; text-shadow: none;" onclick="selectColor('#FBC02D', this)">Yellow</div>
+                        <div class="color-swatch" style="background-color: #F57C00;" onclick="selectColor('#F57C00', this)">Orange</div>
+                        <div class="color-swatch" style="background-color: #8E24AA;" onclick="selectColor('#8E24AA', this)">Purple</div>
+                        
+                        <!-- Skin tones and accents -->
+                        <div class="color-swatch" style="background-color: #E91E63;" onclick="selectColor('#E91E63', this)">Pink</div>
+                        <div class="color-swatch" style="background-color: #4DD0E1; color: #333; text-shadow: none;" onclick="selectColor('#4DD0E1', this)">Cyan</div>
+                        <div class="color-swatch" style="background-color: #FFD54F; color: #333; text-shadow: none;" onclick="selectColor('#FFD54F', this)">Tan</div>
+                        <div class="color-swatch" style="background-color: #8D6E63;" onclick="selectColor('#8D6E63', this)">Warm Brown</div>
+                        <div class="color-swatch" style="background-color: #795548;" onclick="selectColor('#795548', this)">Dark Brown</div>
+                        
+                        <!-- Eraser -->
+                        <div class="color-swatch eraser-btn" onclick="selectColor('#FFFFFF', this)">Eraser 🧼</div>
+                    </div>
+
+                    <button class="clear-btn" onclick="clearCanvas()">🗑️ Clear Canvas</button>
+                </div>
+            </div>
+        </main>
+    </div> <!-- END PDF CONTENT WRAPPER -->
+
+    <!-- UNIVERSAL PDF DOWNLOAD BUTTONS -->
+    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
+        <button class="btn-pdf no-print" onclick="downloadPDF()">📄 Download Design Portfolio</button>
+        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearAllData()">Reset Page</button>
+    </div>
+    
+    <footer>&copy; 2026 Delta Serlby Park - Computing Department</footer>
+
+    <script>
+        // Memory Configuration
+        const gridSize = 144; // 12x12 grid
+        let userDesigns = JSON.parse(localStorage.getItem('pixelCharacterDesigns')) || {};
+        let currentTask = "red";
+        let brushColor = "#000000";
+        let isDrawing = false;
+
+        const taskNames = {
+            "red": "Red Task - Pixel Face",
+            "amber": "Amber Task - Pixel Pet",
+            "green": "Green Task - Pixel Person",
+            "blue": "Blue Task - Pixel Villain"
+        };
+
+        /* --- GLOBAL MOUSE TRACKING FOR DRAG-TO-PAINT --- */
+        document.addEventListener('mousedown', () => isDrawing = true);
+        document.addEventListener('mouseup', () => isDrawing = false);
+        
+        // Prevent browsers from trying to "drag" the table cells
+        document.addEventListener('dragstart', (e) => {
+            if (e.target.tagName.toLowerCase() === 'td') e.preventDefault();
+        });
+
+        /* --- AUTO-SAVE FOR TEXT INPUTS --- */
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                var inputs = document.querySelectorAll('.auto-input');
+                for (var i = 0; i < inputs.length; i++) {
+                    userDesigns['input_' + i] = inputs[i].value;
+                }
+                localStorage.setItem('pixelCharacterDesigns', JSON.stringify(userDesigns));
+            }
+        });
+
+        function loadTextInputs() {
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                if (userDesigns['input_' + i]) {
+                    inputs[i].value = userDesigns['input_' + i];
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto';
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
+                    }
+                }
+            }
+        }
+
+        /* --- STUDIO LOGIC --- */
+        function selectColor(hex, el) {
+            brushColor = hex;
+            // Remove active class from all swatches
+            var swatches = document.querySelectorAll('.color-swatch');
+            swatches.forEach(s => s.classList.remove('active'));
+            // Add active class to clicked swatch
+            el.classList.add('active');
+        }
+
+        function switchTask() {
+            currentTask = document.getElementById("task-selector").value;
+            // Initialize blank canvas if they haven't started this task
+            if (!userDesigns[currentTask]) {
+                userDesigns[currentTask] = new Array(gridSize).fill('#FFFFFF');
+            }
+            buildGrid();
+            updateScoreboard();
+        }
+
+        function buildGrid() {
+            const state = userDesigns[currentTask];
+            const container = document.getElementById('spreadsheet-container');
+            
+            let html = '<table class="drawing-table" id="drawing-board" onmouseleave="isDrawing=false"><tbody>';
+            let cellIndex = 0;
+            
+            for(let r=0; r < 12; r++) {
+                html += '<tr>';
+                for(let c=0; c < 12; c++) {
+                    let bgColor = state[cellIndex] || '#FFFFFF';
+                    html += `<td id="cell-${cellIndex}" 
+                                 style="background-color: ${bgColor};" 
+                                 onmousedown="paintPixel(${cellIndex})" 
+                                 onmouseenter="paintPixelHover(${cellIndex})">
+                             </td>`;
+                    cellIndex++;
+                }
+                html += '</tr>';
+            }
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function paintPixel(index) {
+            // Apply color to DOM
+            document.getElementById('cell-' + index).style.backgroundColor = brushColor;
+            // Save to memory array
+            userDesigns[currentTask][index] = brushColor;
+            localStorage.setItem('pixelCharacterDesigns', JSON.stringify(userDesigns));
+            updateScoreboard();
+        }
+
+        function paintPixelHover(index) {
+            if (isDrawing) {
+                paintPixel(index);
+            }
+        }
+
+        function clearCanvas() {
+            if (confirm("Are you sure you want to clear your current drawing?")) {
+                userDesigns[currentTask] = new Array(gridSize).fill('#FFFFFF');
+                buildGrid();
+                updateScoreboard();
+                localStorage.setItem('pixelCharacterDesigns', JSON.stringify(userDesigns));
+            }
+        }
+
+        function updateScoreboard() {
+            let tasks = ['red', 'amber', 'green', 'blue'];
+            
+            tasks.forEach(t => {
+                let statusEl = document.getElementById('status-' + t);
+                let designArray = userDesigns[t];
+                
+                // Check if they have painted at least 1 pixel that is NOT white
+                if (designArray && designArray.some(color => color !== '#FFFFFF' && color !== '#ffffff')) {
+                    statusEl.innerText = "Saved ✅";
+                    statusEl.classList.add('status-started');
+                } else {
+                    statusEl.innerText = "Not Started";
+                    statusEl.classList.remove('status-started');
+                }
+            });
+        }
+
+        function clearAllData() {
+            if (confirm("Are you sure you want to clear EVERYTHING including your text notes and all 4 drawings?")) {
+                localStorage.removeItem('pixelCharacterDesigns');
+                userDesigns = {};
+                loadTextInputs();
+                switchTask();
+                alert("Portfolio reset successfully.");
+            }
+        }
+
+        /* --- BULLETPROOF PDF GENERATION LOGIC --- */
+        function downloadPDF() {
+            // 1. Hide interactive elements
+            document.getElementById('action-buttons').style.display = 'none';
+            document.getElementById('panel-instructions').style.display = 'none';
+            document.getElementById('panel-legend').style.display = 'none';
+            
+            // 2. Prep Text Inputs
+            var textInputs = document.querySelectorAll('input.auto-input[type="text"]');
+            for (var i = 0; i < textInputs.length; i++) {
+                textInputs[i].setAttribute('value', textInputs[i].value);
+            }
+            var textAreas = document.querySelectorAll('textarea');
+            for (var j = 0; j < textAreas.length; j++) {
+                textAreas[j].innerHTML = textAreas[j].value;
+                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
+            }
+
+            // 3. Expand the center panel to full width
+            var ideContainer = document.getElementById('main-ide');
+            ideContainer.style.gridTemplateColumns = '1fr';
+            
+            // 4. Save original UI state
+            var gridContainer = document.getElementById('spreadsheet-container');
+            var originalGridHTML = gridContainer.innerHTML;
+            var titleEl = document.getElementById('editor-title');
+            var originalTitle = titleEl.innerText;
+            var hintEl = document.getElementById('canvas-hint');
+            var originalHintDisplay = hintEl.style.display;
+
+            // 5. Construct "Portfolio" View
+            titleEl.innerText = "Student Portfolio - Character Designs";
+            titleEl.style.textAlign = "center";
+            hintEl.style.display = 'none';
+
+            var portfolioHTML = '<div style="display: flex; flex-wrap: wrap; gap: 40px; justify-content: center; margin-top: 20px;">';
+            var attemptedCount = 0;
+
+            let tasks = ['red', 'amber', 'green', 'blue'];
+            
+            tasks.forEach(t => {
+                let state = userDesigns[t];
+                // Only print canvases that have been drawn on
+                if (state && state.some(color => color !== '#FFFFFF' && color !== '#ffffff')) {
+                    attemptedCount++;
+                    portfolioHTML += '<div style="text-align: center; page-break-inside: avoid; background: #fafafa; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">';
+                    portfolioHTML += '<h4 style="color: var(--navy); margin-top: 0; margin-bottom: 15px; font-size: 18px;">' + taskNames[t] + '</h4>';
+                    portfolioHTML += generateStaticGridHTML(state);
+                    portfolioHTML += '</div>';
+                }
+            });
+            portfolioHTML += '</div>';
+
+            if (attemptedCount === 0) {
+                portfolioHTML = '<p style="text-align:center; font-size: 18px; padding: 40px; color: #666;">No characters designed yet. Use the canvas to build your portfolio!</p>';
+            }
+
+            // Inject the portfolio view
+            gridContainer.innerHTML = portfolioHTML;
+
+            // 6. Generate PDF
+            var element = document.getElementById('pdf-content');
+            var opt = {
+                margin:       0.3,
+                filename:     'Character_Design_Portfolio.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            html2pdf().set(opt).from(element).save().then(function() {
+                // Restore Panels
+                document.getElementById('action-buttons').style.display = 'flex';
+                document.getElementById('panel-instructions').style.display = 'flex';
+                document.getElementById('panel-legend').style.display = 'flex';
+                ideContainer.style.gridTemplateColumns = '1fr 1.5fr 1fr';
+                
+                // Restore Text Heights
+                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
+
+                // Restore Editor UI
+                titleEl.innerText = originalTitle;
+                titleEl.style.textAlign = "left";
+                hintEl.style.display = originalHintDisplay;
+                gridContainer.innerHTML = originalGridHTML;
+                
+                switchTask();
+            });
+        }
+
+        // Helper function for building the static portfolio grids
+        function generateStaticGridHTML(state) {
+            let html = `<table style="border-collapse: collapse; margin: 0 auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"><tbody>`;
+            let cellIndex = 0;
+            for(let r=0; r < 12; r++) {
+                html += `<tr>`;
+                for(let c=0; c < 12; c++) {
+                    let bgColor = state[cellIndex] || '#FFFFFF';
+                    html += `<td style="width: 22px; height: 22px; background-color: ${bgColor}; border: 1px solid rgba(0,0,0,0.05);"></td>`;
+                    cellIndex++;
+                }
+                html += '</tr>';
+            }
+            html += '</tbody></table>';
+            return html;
+        }
+
+        // Initialize on load
+        window.onload = () => {
+            loadTextInputs();
+            switchTask();
+            updateScoreboard();
+        };
+    </script>
+</body>
+</html>
