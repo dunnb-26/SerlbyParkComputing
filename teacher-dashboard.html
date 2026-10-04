@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Dashboard - Live Tracker</title>
+    <title>Teacher Dashboard - Live Portfolio</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .dashboard-layout { display: grid; grid-template-columns: 300px 1fr; gap: 20px; max-width: 1200px; margin: 20px auto; padding: 0 20px; }
-        .sidebar { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #1e3a8a; height: fit-content; }
-        .main-view { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #dfaa2b; height: 80vh; overflow-y: auto; }
+        .dashboard-layout { display: grid; grid-template-columns: 300px 1fr; gap: 20px; max-width: 1400px; margin: 20px auto; padding: 0 20px; }
+        .sidebar { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #1e3a8a; height: 85vh; overflow-y: auto; }
+        .main-view { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #dfaa2b; height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
         
         .student-btn { display: block; width: 100%; padding: 12px; margin-bottom: 8px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; text-align: left; font-weight: bold; font-size: 1em; cursor: pointer; transition: 0.2s; }
         .student-btn:hover, .student-btn.active { background: #1e3a8a; color: white; border-color: #1e3a8a; }
@@ -17,15 +17,11 @@
         
         select { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #ccc; font-weight: bold; }
         
-        .lesson-block { background: #fff; border: 2px solid #eee; border-radius: 8px; padding: 20px; margin-bottom: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .lesson-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
-        .lesson-header h3 { color: #1e3a8a; margin: 0; font-size: 1.4em; }
+        .lesson-btn { display: inline-block; padding: 15px 25px; margin: 10px 10px 10px 0; background: #f0f4f8; border: 2px solid #1e3a8a; color: #1e3a8a; border-radius: 8px; font-weight: bold; font-size: 1.1em; cursor: pointer; transition: 0.2s; }
+        .lesson-btn:hover { background: #1e3a8a; color: white; }
         
-        .answer-box { background: #f8f9fa; border: 2px solid #ccc; padding: 15px; border-radius: 6px; margin-bottom: 15px; min-height: 40px; color: #333; font-family: inherit; }
-        .answer-box.empty { background: #fff5f5; border-color: #ffcdd2; color: #999; font-style: italic; }
-        
-        .rag-badge { display: inline-block; padding: 5px 10px; color: white; border-radius: 4px; font-weight: bold; margin-bottom: 15px; }
-        .rag-pending { background-color: #666; }
+        /* The viewing window for the student pages */
+        iframe { flex-grow: 1; width: 100%; border: 2px solid #eee; border-radius: 8px; background: #f8f9fa; }
     </style>
 </head>
 <body>
@@ -36,6 +32,7 @@
     </header>
 
     <div class="dashboard-layout">
+        <!-- Sidebar: Roster View -->
         <div class="sidebar">
             <h3>Class Roster</h3>
             <select id="class-filter" onchange="fetchData()">
@@ -53,18 +50,27 @@
             <div id="student-list" style="margin-top: 20px;"><p style="color: #666; font-size: 0.9em;">Loading class list...</p></div>
         </div>
 
+        <!-- Main View: Dynamic Iframe Window -->
         <div class="main-view" id="work-view">
-            <h2 style="color: #666; text-align: center; margin-top: 50px;">&larr; Select a student to view their complete portfolio</h2>
+            <h2 style="color: #666; text-align: center; margin-top: 50px;">&larr; Select a student to view their portfolio</h2>
         </div>
     </div>
 
     <script>
+        // --- MASTER LESSON DIRECTORY ---
+        // Add all future lessons here so the dashboard knows which HTML file to open!
+        const taskMap = {
+            'Y7-HT1': 'Y7-HT1-D-C.html',
+            'Y8-HT1': 'y8-ht1-d-c.html',
+            'Y9-HT1': 'y9-ht1-d-c.html',
+            'Binary-Hex': 'binary-and-hex.html'
+        };
+
         const supabaseUrl = 'https://zqvmrmhiqxmghtxgjrtk.supabase.co';
         const supabaseKey = 'sb_publishable_iD26_DKTKRUWP7Jj3giEPA_f2xd5OCW';
         let db = null;
         try { if (window.supabase) db = window.supabase.createClient(supabaseUrl, supabaseKey); } catch (e) { console.error("DB init failed"); }
         
-        let allRecords = [];
         let uniqueStudents = {};
 
         async function fetchData() {
@@ -79,9 +85,8 @@
             const { data, error } = await query;
             if (error) { listDiv.innerHTML = `<p style="color:red">Error: ${error.message}</p>`; return; }
 
-            allRecords = data || [];
             uniqueStudents = {};
-            allRecords.forEach(record => {
+            (data || []).forEach(record => {
                 if (!uniqueStudents[record.student_name]) uniqueStudents[record.student_name] = [];
                 uniqueStudents[record.student_name].push(record);
             });
@@ -106,96 +111,81 @@
                 btn.onclick = () => {
                     document.querySelectorAll('.student-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    viewStudentPortfolio(name);
+                    showLessonMenu(name);
                 };
                 listDiv.appendChild(btn);
             });
         }
 
-        function viewStudentPortfolio(studentName) {
+        function showLessonMenu(studentName) {
             const studentWork = uniqueStudents[studentName];
+            const className = studentWork[0].class_name;
             const viewDiv = document.getElementById('work-view');
             
             let html = `
-                <div style="border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 30px;">
+                <div style="border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 20px;">
                     <h1 style="margin: 0; color: #1e3a8a;">${studentName}</h1>
-                    <p style="margin: 5px 0 0 0; color: #666; font-size: 1.1em; font-weight: bold;">Class: ${studentWork[0].class_name}</p>
+                    <p style="margin: 5px 0 0 0; color: #666; font-size: 1.1em; font-weight: bold;">Class: ${className}</p>
+                    <p style="color: #555; margin-top: 15px;">Select a lesson below to view their live work:</p>
                 </div>
+                <div style="overflow-y: auto;">
             `;
 
             studentWork.forEach(record => {
-                html += `
-                    <div class="lesson-block">
-                        <div class="lesson-header">
-                            <h3>Lesson: ${record.task_id}</h3>
-                            <span style="font-weight: bold; color: #1e3a8a; background: #dfaa2b; padding: 5px 12px; border-radius: 4px;">
-                                Score: ${record.score !== null ? record.score : 'Not Marked'}
-                            </span>
-                        </div>
-                `;
-
-                // 1. Check if it's a Normal RAGB Lesson
-                if (record.maroon !== undefined || record.notes !== undefined || record.keywords !== undefined) {
-                    const ragbFields = [
-                        { key: 'keywords', label: 'Key Words' },
-                        { key: 'notes', label: 'Lesson Notes' },
-                        { key: 'maroon', label: 'Maroon Task (Base)' },
-                        { key: 'amber', label: 'Amber Task (Core)' },
-                        { key: 'green', label: 'Green Task (Extension)' },
-                        { key: 'navy', label: 'Navy Task (Challenge)' },
-                        { key: 'takeaways', label: '3 Key Takeaways' }
-                    ];
-
-                    ragbFields.forEach(field => {
-                        let ans = record[field.key];
-                        if (ans && ans.trim() !== "") {
-                            html += `<p><strong>${field.label}:</strong></p><div class="answer-box">${ans}</div>`;
-                        } else {
-                            html += `<p><strong>${field.label}:</strong></p><div class="answer-box empty">(Left Blank)</div>`;
-                        }
-                    });
-                } 
-                
-                // 2. Otherwise, check if it's a D&C Task
-                else if (record.q1 !== undefined || record.rag_answer !== undefined) {
-                    for (let i = 1; i <= 5; i++) {
-                        let ans = record['q' + i];
-                        if (ans && ans.trim() !== "") {
-                            html += `<p><strong>Question ${i}:</strong></p><div class="answer-box">${ans}</div>`;
-                        } else {
-                            html += `<p><strong>Question ${i}:</strong></p><div class="answer-box empty">(Left Blank)</div>`;
-                        }
-                    }
-
-                    let ragColor = "#666";
-                    let badgeClass = record.rag_level ? "" : "rag-pending";
-                    let ragLabel = record.rag_level || "No Level Assigned Yet";
-                    
-                    if(ragLabel.includes("Red") || ragLabel === "Maroon") ragColor = "#d32f2f";
-                    if(ragLabel.includes("Amber")) ragColor = "#f57c00";
-                    if(ragLabel.includes("Green")) ragColor = "#388e3c";
-                    if(ragLabel === "Navy") ragColor = "#1e3a8a";
-
-                    html += `<hr style="border: 0; border-top: 1px dashed #ccc; margin: 25px 0;">`;
-                    html += `<p><strong>Connect Phase / Extended Task:</strong></p>`;
-                    html += `<div class="rag-badge ${badgeClass}" style="background-color: ${ragColor};">${ragLabel}</div>`;
-                    
-                    if (record.rag_answer && record.rag_answer.trim() !== "") {
-                        html += `<div class="answer-box" style="min-height: 80px;">${record.rag_answer}</div>`;
-                    } else {
-                        html += `<div class="answer-box empty" style="min-height: 80px;">(Extended task left blank or not reached)</div>`;
-                    }
-                }
-                
-                // 3. Fallback for Assessments (Just a score)
-                else {
-                    html += `<p style="color:#666; font-style:italic;">This was a practical task or test. View their score in the top right of this box.</p>`;
-                }
-
-                html += `</div>`; // Close block
+                html += `<button class="lesson-btn" onclick="openLiveView('${studentName}', '${className}', '${record.task_id}')">${record.task_id}</button>`;
             });
 
+            html += `</div>`;
             viewDiv.innerHTML = html;
+        }
+
+        function openLiveView(studentName, className, taskId) {
+            const viewDiv = document.getElementById('work-view');
+            const filename = taskMap[taskId];
+
+            // Set browser memory so the iframe thinks the student is logged in
+            localStorage.setItem('studentName', studentName);
+            localStorage.setItem('className', className);
+            localStorage.setItem('loggedInName', studentName);
+            localStorage.setItem('loggedInClass', className);
+
+            if (filename) {
+                viewDiv.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 15px; flex-shrink: 0;">
+                        <div>
+                            <h2 style="margin: 0; color: #1e3a8a;">${studentName} - ${taskId}</h2>
+                            <p style="margin: 0; color: #dfaa2b; font-weight: bold;">Over-The-Shoulder View</p>
+                        </div>
+                        <button onclick="showLessonMenu('${studentName}')" style="padding: 10px 20px; background: #eee; border: 1px solid #ccc; font-weight:bold; cursor: pointer; border-radius: 4px;">&larr; Back to Menu</button>
+                    </div>
+                    <iframe src="${filename}" onload="lockStudentInputs(this)"></iframe>
+                `;
+            } else {
+                viewDiv.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 15px; flex-shrink: 0;">
+                        <div>
+                            <h2 style="margin: 0; color: #d32f2f;">Lesson Not Linked</h2>
+                            <p style="margin: 0; color: #666;">Task ID: ${taskId}</p>
+                        </div>
+                        <button onclick="showLessonMenu('${studentName}')" style="padding: 10px 20px; background: #eee; border: 1px solid #ccc; font-weight:bold; cursor: pointer; border-radius: 4px;">&larr; Back to Menu</button>
+                    </div>
+                    <div class="answer-box">
+                        To view this lesson visually, add <strong>'${taskId}': 'filename.html'</strong> to the <em>taskMap</em> directory at the top of your Teacher Dashboard code.
+                    </div>
+                `;
+            }
+        }
+
+        function lockStudentInputs(iframe) {
+            try {
+                const doc = iframe.contentWindow.document;
+                // Lock all text boxes so the teacher can't accidentally edit them
+                doc.querySelectorAll('input, textarea').forEach(el => el.readOnly = true);
+                // Hide all submit/save buttons to prevent accidental overwrites
+                doc.querySelectorAll('button').forEach(el => el.style.display = 'none');
+            } catch(e) {
+                console.log("Iframe cross-origin lockdown bypassed.");
+            }
         }
 
         window.onload = () => { fetchData(); };
