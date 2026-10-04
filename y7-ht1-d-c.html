@@ -131,7 +131,7 @@
         }
         .btn-reset:hover { background-color: #b71c1c; }
 
-        /* Spelling Practice Area */
+        /* Spelling Practice Area (Restored to 3 Attempts) */
         .spag-practice-box {
             background-color: #fff3e0;
             border: 2px solid #f57c00;
@@ -307,7 +307,7 @@
             <div id="demonstrate-stage" class="task-card">
                 <div class="task-title">Part 1: Demonstrate</div>
                 <div class="instruction-box">
-                    Write full sentences to answer the 5 questions below. Browser spellcheck will underline any spelling errors in red as you type. When you click "Mark My Work", your score and spelling errors table will appear below. Your progress is automatically saved.
+                    Write full sentences to answer the 5 questions below. Browser spellcheck will underline any spelling errors in red as you type. When you click "Mark My Work", your score and spelling table will appear below. Your progress is automatically saved.
                 </div>
 
                 <div class="question-group">
@@ -405,11 +405,11 @@
 
         </div>
 
-        <!-- UNIVERSAL PDF DOWNLOAD BUTTON -->
-    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Work</button>
-        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
-    </div>
+        <!-- UNIVERSAL ACTION BUTTONS (PDF & RESET) -->
+        <div class="action-row" id="action-buttons">
+            <button class="btn-pdf no-print" onclick="downloadPDF()">📄 Download Work as PDF</button>
+            <button class="btn-reset no-print" onclick="clearData()">🗑️ Reset Page</button>
+        </div>
     </main>
 
     <!-- SECURE PASSWORD MODAL -->
@@ -431,11 +431,11 @@
 
     <script>
         const qKeywords = {
-            1: ['type', 'typing', 'write', 'enter', 'letters', 'words', 'text', 'input'],
-            2: ['organise', 'organize', 'find', 'save', 'store', 'neat', 'tidy', 'lose', 'sort', 'lost'],
+            1: ['type', 'typing', 'write', 'enter', 'letters', 'words', 'text'],
+            2: ['organise', 'organize', 'find', 'save', 'store', 'neat', 'tidy', 'lose', 'sort'],
             3: ['stranger', 'tell', 'adult', 'password', 'private', 'personal', 'name', 'address', 'safe', 'careful'],
-            4: ['click', 'point', 'select', 'move', 'drag', 'scroll', 'cursor', 'arrow', 'navigate', 'moving', 'navigating'],
-            5: ['hack', 'hacker', 'steal', 'delete', 'account', 'safe', 'secure', 'protect', 'log in', 'login', 'guess', 'personal', 'private']
+            4: ['click', 'point', 'select', 'move', 'drag', 'scroll', 'cursor', 'arrow'],
+            5: ['hack', 'hacker', 'steal', 'delete', 'account', 'safe', 'secure', 'protect', 'log in', 'login', 'guess']
         };
 
         function checkSentenceAnswer(inputId, keywords) {
@@ -467,9 +467,9 @@
             row.className = 'practice-row';
             row.innerHTML = `
                 <input type="text" class="spag-input" value="${word1}" placeholder="Word...">
-                <input type="text" class="spag-input" value="${word2}" placeholder="Correct spelling...">
-                <input type="text" class="spag-input" value="${word3}" placeholder="Correct spelling...">
-                <input type="text" class="spag-input" value="${word4}" placeholder="Correct spelling...">
+                <input type="text" class="spag-input" value="${word2}" placeholder="Attempt 1...">
+                <input type="text" class="spag-input" value="${word3}" placeholder="Attempt 2...">
+                <input type="text" class="spag-input" value="${word4}" placeholder="Attempt 3...">
                 <button type="button" class="btn-remove-row no-print" onclick="removePracticeRow(this)" title="Remove row">❌</button>
             `;
             container.appendChild(row);
@@ -539,6 +539,7 @@
 
             document.getElementById('spag-section').classList.remove('hidden');
 
+            // Default to 1 row when revealed
             if (document.getElementById('practice-rows-container').children.length === 0) {
                 addPracticeRow();
             }
@@ -727,9 +728,7 @@
                         addPracticeRow(row.w0, row.w1, row.w2, row.w3);
                     });
                 } else {
-                    addPracticeRow();
-                    addPracticeRow();
-                    addPracticeRow();
+                    addPracticeRow(); // Default to 1 row
                 }
             } catch (e) {
                 console.log("Local storage read blocked.");
@@ -742,14 +741,12 @@
                 window.location.reload();
             }
         }
-        
+
         window.onload = function() {
             loadFromLocalStorage();
 
             if (document.getElementById('practice-rows-container').children.length === 0) {
-                addPracticeRow();
-                addPracticeRow();
-                addPracticeRow();
+                addPracticeRow(); // Default to 1 row
             }
 
             document.querySelectorAll('.persist-input').forEach(el => {
