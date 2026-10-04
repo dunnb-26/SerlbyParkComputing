@@ -37,7 +37,7 @@
 
         #score-display { font-size: 1.2em; font-weight: bold; text-align: center; margin-top: 20px; padding: 15px; border-radius: 6px; }
         
-        /* Loading overlay to hide blank boxes while data downloads */
+        /* Loading overlay */
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; justify-content: center; align-items: center; font-size: 1.5em; color: #1e3a8a; font-weight: bold; transition: opacity 0.5s; }
     </style>
 </head>
@@ -57,11 +57,11 @@
                 <div class="task-title">Part 1: Demonstrate (Knowledge Check)</div>
                 <div class="instruction-box">Write short, full sentences to answer the 5 questions below.</div>
 
-                <div class="question-group"><label>1. Write a sentence explaining what you use a computer keyboard for:</label><textarea id="q1" spellcheck="false" placeholder="Type your sentence here..."></textarea></div>
-                <div class="question-group"><label>2. Why is it important to save your files inside correctly named folders?</label><textarea id="q2" spellcheck="false" placeholder="Type your sentence here..."></textarea></div>
-                <div class="question-group"><label>3. Write down one important rule for staying safe on the internet:</label><textarea id="q3" spellcheck="false" placeholder="Type your sentence here..."></textarea></div>
-                <div class="question-group"><label>4. Explain what you use a computer mouse for on the screen:</label><textarea id="q4" spellcheck="false" placeholder="Type your sentence here..."></textarea></div>
-                <div class="question-group"><label>5. Why is it important to keep your password a secret from other people?</label><textarea id="q5" spellcheck="false" placeholder="Type your sentence here..."></textarea></div>
+                <div class="question-group"><label>1. Write a sentence explaining what you use a computer keyboard for:</label><textarea id="q1" class="auto-save" spellcheck="false" placeholder="Type your sentence here..."></textarea></div>
+                <div class="question-group"><label>2. Why is it important to save your files inside correctly named folders?</label><textarea id="q2" class="auto-save" spellcheck="false" placeholder="Type your sentence here..."></textarea></div>
+                <div class="question-group"><label>3. Write down one important rule for staying safe on the internet:</label><textarea id="q3" class="auto-save" spellcheck="false" placeholder="Type your sentence here..."></textarea></div>
+                <div class="question-group"><label>4. Explain what you use a computer mouse for on the screen:</label><textarea id="q4" class="auto-save" spellcheck="false" placeholder="Type your sentence here..."></textarea></div>
+                <div class="question-group"><label>5. Why is it important to keep your password a secret from other people?</label><textarea id="q5" class="auto-save" spellcheck="false" placeholder="Type your sentence here..."></textarea></div>
 
                 <div class="btn-row" id="stage1-buttons">
                     <button class="btn-spag" onclick="runSpagCheck()">🔍 SPAG Check</button>
@@ -73,19 +73,19 @@
             <!-- STAGE 2 (RAG) -->
             <div id="task-red" class="task-card red-task hidden">
                 <div class="task-title">Part 2: Connect - RED TASK</div>
-                <div class="question-group"><label>List 3 rules you should always follow to stay safe when using the internet:</label><textarea id="ans-red" placeholder="Type your list here..."></textarea></div>
+                <div class="question-group"><label>List 3 rules you should always follow to stay safe when using the internet:</label><textarea id="ans-red" class="auto-save" placeholder="Type your list here..."></textarea></div>
                 <button class="btn-submit-final" onclick="submitFinalWork()">💾 Save Final Answer</button>
             </div>
 
             <div id="task-amber" class="task-card amber-task hidden">
                 <div class="task-title">Part 2: Connect - AMBER TASK</div>
-                <div class="question-group"><label>Explain the difference between clicking "Save" and "Save As" when working on a document:</label><textarea id="ans-amber" placeholder="Type your explanation here..."></textarea></div>
+                <div class="question-group"><label>Explain the difference between clicking "Save" and "Save As" when working on a document:</label><textarea id="ans-amber" class="auto-save" placeholder="Type your explanation here..."></textarea></div>
                 <button class="btn-submit-final" onclick="submitFinalWork()">💾 Save Final Answer</button>
             </div>
 
             <div id="task-green" class="task-card green-task hidden">
                 <div class="task-title">Part 2: Connect - GREEN TASK</div>
-                <div class="question-group"><label>Write a short paragraph explaining what a "digital footprint" is, and how you can make sure your footprint is positive:</label><textarea id="ans-green" placeholder="Type your response here..."></textarea></div>
+                <div class="question-group"><label>Write a short paragraph explaining what a "digital footprint" is, and how you can make sure your footprint is positive:</label><textarea id="ans-green" class="auto-save" placeholder="Type your response here..."></textarea></div>
                 <button class="btn-submit-final" onclick="submitFinalWork()">💾 Save Final Answer</button>
             </div>
         </div>
@@ -94,12 +94,18 @@
     <footer>&copy; 2026 Delta Serlby Park - Computing Department</footer>
 
     <script>
-        // --- FIXED DATABASE CONNECTION ---
-        const supabaseUrl = 'https://zqvrmmhiqxmghtxgjrtk.supabase.co';
-        const supabaseKey = 'sb_publishable_iD26_DKTKRUWP7Jj3giEPA_f2xd5OCWeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpxdm1ybWhpcXhtZ2h0eGdqcnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExMTY3NDksImV4cCI6MjEwNjY5Mjc0OX0.sHAwiZA3teRC3LmrC3ts7yVol-SnvWoqP3aUu9kvxZ4';
+        // --- DATABASE CONNECTION ---
+        const supabaseUrl = 'https://zqvmrmhiqxmghtxgjrtk.supabase.co';
+        const supabaseKey = 'sb_publishable_iD26_DKTKRUWP7Jj3giEPA_f2xd5OCW';
         
         let db = null;
-        try { if (window.supabase) db = window.supabase.createClient(supabaseUrl, supabaseKey); } catch (e) {}
+        try { 
+            if (window.supabase) {
+                db = window.supabase.createClient(supabaseUrl, supabaseKey); 
+            }
+        } catch (e) {
+            console.error("Database connection failed", e);
+        }
         
         let dbRecordId = null;
         let globalScore = 0;
@@ -126,9 +132,13 @@
                 return;
             }
 
-            if (!db) { alert("Database connection blocked. Progress cannot be saved."); return; }
+            if (!db) { 
+                alert("Database connection blocked. Progress cannot be saved."); 
+                document.getElementById('loading-overlay').style.display = 'none';
+                return; 
+            }
 
-            // Check if student already has a saved session for this lesson
+            // 1. Check if student already has a saved session for this lesson
             const { data, error } = await db.from('dnc_responses')
                 .select('*').eq('student_name', studentName).eq('class_name', className).eq('task_id', 'Y7-HT1');
 
@@ -157,9 +167,21 @@
                     scoreDisplay.classList.remove('hidden');
                     scoreDisplay.innerText = `You scored ${globalScore} out of 5!`;
 
-                    if (globalScore <= 2) { assignedRagLevel = "Red Task"; document.getElementById('task-red').classList.remove('hidden'); scoreDisplay.style.backgroundColor = "#ffebee"; scoreDisplay.style.color = "#d32f2f"; if(record.rag_answer) document.getElementById('ans-red').value = record.rag_answer; }
-                    else if (globalScore >= 3 && globalScore <= 4) { assignedRagLevel = "Amber Task"; document.getElementById('task-amber').classList.remove('hidden'); scoreDisplay.style.backgroundColor = "#fff3e0"; scoreDisplay.style.color = "#ef6c00"; if(record.rag_answer) document.getElementById('ans-amber').value = record.rag_answer; }
-                    else if (globalScore === 5) { assignedRagLevel = "Green Task"; document.getElementById('task-green').classList.remove('hidden'); scoreDisplay.style.backgroundColor = "#e8f5e9"; scoreDisplay.style.color = "#2e7d32"; if(record.rag_answer) document.getElementById('ans-green').value = record.rag_answer; }
+                    if (globalScore <= 2) { 
+                        document.getElementById('task-red').classList.remove('hidden'); 
+                        scoreDisplay.style.backgroundColor = "#ffebee"; scoreDisplay.style.color = "#d32f2f"; 
+                        if(record.rag_answer) document.getElementById('ans-red').value = record.rag_answer; 
+                    }
+                    else if (globalScore >= 3 && globalScore <= 4) { 
+                        document.getElementById('task-amber').classList.remove('hidden'); 
+                        scoreDisplay.style.backgroundColor = "#fff3e0"; scoreDisplay.style.color = "#ef6c00"; 
+                        if(record.rag_answer) document.getElementById('ans-amber').value = record.rag_answer; 
+                    }
+                    else if (globalScore === 5) { 
+                        document.getElementById('task-green').classList.remove('hidden'); 
+                        scoreDisplay.style.backgroundColor = "#e8f5e9"; scoreDisplay.style.color = "#2e7d32"; 
+                        if(record.rag_answer) document.getElementById('ans-green').value = record.rag_answer; 
+                    }
                 }
             } else {
                 // If it is their first time opening the page, create a fresh record in the database
@@ -177,9 +199,10 @@
             setTimeout(() => { document.getElementById('loading-overlay').style.display = 'none'; }, 500);
         };
 
-        // Quiet background sync triggered when a student clicks away from a text box
+        // Saving Engine
+        let saveTimeout;
         async function syncToDatabase(isFinal) {
-            if (!dbRecordId) return;
+            if (!dbRecordId || !db) return;
 
             let finalRagAnswer = "";
             if (assignedRagLevel === "Red Task") finalRagAnswer = document.getElementById('ans-red').value;
@@ -202,9 +225,14 @@
             }
         }
 
-        // Attach Auto-Save to every text area (triggers when they click away from the box)
-        document.querySelectorAll('textarea').forEach(box => {
-            box.addEventListener('blur', () => syncToDatabase(false));
+        // Attach Instant Auto-Save (triggers a background save 1 second after they stop typing)
+        document.querySelectorAll('.auto-save').forEach(box => {
+            box.addEventListener('input', () => {
+                clearTimeout(saveTimeout);
+                saveTimeout = setTimeout(() => {
+                    syncToDatabase(false);
+                }, 1000); // Waits 1 second after they stop typing to save
+            });
         });
 
         // --- MARKING LOGIC ---
