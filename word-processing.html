@@ -3,236 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lesson 1 - Microsoft Word</title>
+    <title>Word Processing - Lesson 1</title>
     <link rel="stylesheet" href="style.css">
 
-    <!-- HTML to PDF Library -->
+    <!-- Supabase & PDF Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* Task Container Styling */
         .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
+        .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: all 0.3s ease; }
         
-        .task-card { 
-            background: white; 
-            border-radius: 8px; 
-            padding: 25px; 
-            margin-bottom: 30px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-            page-break-inside: avoid; 
-            transition: all 0.3s ease;
-        }
-        
-        /* Section Header Colors */
-        .task-prep { border-top: 6px solid #607d8b; } 
-        .task-prep h2 { color: #607d8b; margin-top: 0; }
-        
-        .task-plenary { border-top: 6px solid #673ab7; } 
-        .task-plenary h2 { color: #673ab7; margin-top: 0; }
+        .task-prep { border-top: 6px solid #607d8b; } .task-prep h2 { color: #607d8b; margin-top: 0; }
+        .task-plenary { border-top: 6px solid #673ab7; } .task-plenary h2 { color: #673ab7; margin-top: 0; }
+        .task-maroon { border-top: 6px solid #800000; } .task-maroon h2 { color: #800000; margin-top: 0; } .task-maroon .instruction-box { border-left: 4px solid #800000; }
+        .task-amber { border-top: 6px solid #ffb300; } .task-amber h2 { color: #ffb300; margin-top: 0; } .task-amber .instruction-box { border-left: 4px solid #ffb300; }
+        .task-green { border-top: 6px solid #008f39; } .task-green h2 { color: #008f39; margin-top: 0; } .task-green .instruction-box { border-left: 4px solid #008f39; }
+        .task-navy { border-top: 6px solid #1e3a8a; } .task-navy h2 { color: #1e3a8a; margin-top: 0; } .task-navy .instruction-box { border-left: 4px solid #1e3a8a; }
 
-        /* RAGB Colors */
-        .task-maroon { border-top: 6px solid #800000; }
-        .task-maroon h2 { color: #800000; margin-top: 0; transition: color 0.3s; }
-        .task-maroon .instruction-box { border-left: 4px solid #800000; transition: border-color 0.3s; }
-
-        .task-amber { border-top: 6px solid #ffb300; }
-        .task-amber h2 { color: #ffb300; margin-top: 0; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
-        .task-amber .instruction-box { border-left: 4px solid #ffb300; }
-
-        .task-green { border-top: 6px solid #008f39; }
-        .task-green h2 { color: #008f39; margin-top: 0; }
-        .task-green .instruction-box { border-left: 4px solid #008f39; }
-
-        .task-navy { border-top: 6px solid #1e3a8a; }
-        .task-navy h2 { color: #1e3a8a; margin-top: 0; transition: color 0.3s; }
-        .task-navy .instruction-box { border-left: 4px solid #1e3a8a; transition: border-color 0.3s; }
-
-        /* TEACHER VERIFICATION STYLES */
-        .teacher-verify-btn { background-color: #607d8b; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background-color 0.2s; display: inline-block; }
-        .teacher-verify-btn:hover { background-color: #455a64; }
+        .teacher-verify-btn { background-color: #607d8b; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background-color 0.2s; }
         .teacher-verified { border-top-color: #008f39 !important; background-color: #f0fff0 !important; }
         .teacher-verified h2 { color: #008f39 !important; }
-        .teacher-verified .instruction-box { border-left-color: #008f39 !important; }
         .verified-badge { color: #008f39; font-size: 0.8em; margin-left: 10px; display: none; vertical-align: middle; }
         .teacher-verified .verified-badge { display: inline-block; }
 
-        /* SECURE PASSWORD MODAL STYLES */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background: white; padding: 25px; border-radius: 8px; width: 300px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border-top: 5px solid #1e3a8a; }
-        .modal-content h3 { margin-top: 0; color: #333; }
-        .modal-input { width: 100%; padding: 10px; margin: 15px 0; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; box-sizing: border-box; text-align: center; letter-spacing: 2px; }
-        .modal-input:focus { outline: none; border-color: #1e3a8a; }
+        .modal-input { width: 100%; padding: 10px; margin: 15px 0; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; text-align: center; letter-spacing: 2px; }
         .modal-btn-row { display: flex; gap: 10px; justify-content: center; }
         .modal-btn-confirm { background-color: #008f39; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; flex-grow: 1; }
         .modal-btn-cancel { background-color: #d32f2f; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; flex-grow: 1; }
-        .modal-error { color: #d32f2f; font-size: 13px; font-weight: bold; margin-bottom: 10px; display: none; }
+        .modal-error { color: #d32f2f; font-size: 13px; font-weight: bold; display: none; }
 
-        /* Common Elements */
-        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; text-align: center; }
-        
-        /* Inputs & Textareas */
+        .instruction-box { background-color: #f8f9fa; padding: 15px; font-size: 16px; text-align: center; margin-bottom: 20px; }
         .question-row { margin-bottom: 20px; }
-        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
-        .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit; }
-        .auto-input:focus { outline: none; border-color: #666; }
-        textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; }
-        
-        /* Buttons */
-        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
-        .btn-pdf:hover { background-color: #124d2d; }
-        
-        /* Screenshots */
-        .screenshot-zone { width: 100%; min-height: 200px; border: 2px dashed #ccc; border-radius: 8px; background-color: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; box-sizing: border-box; position: relative; cursor: pointer; transition: all 0.2s; }
-        .screenshot-zone:focus { border-color: #800000; background-color: #f0e6e6; outline: none; }
-        .screenshot-text { color: #666; font-size: 15px; pointer-events: none; }
-        .screenshot-image { max-width: 100%; max-height: 400px; display: none; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        
-        /* Download Banner */
-        .download-banner { background-color: #e3f2fd; border: 2px solid #2196f3; border-radius: 8px; padding: 25px; text-align: center; margin-bottom: 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .question-label { display: block; font-weight: bold; margin-bottom: 8px; color: #333; }
+        .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
+        .screenshot-zone { width: 100%; min-height: 200px; border: 2px dashed #ccc; border-radius: 8px; background: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; box-sizing: border-box; cursor: pointer; }
+        .screenshot-zone:focus { border-color: #1e3a8a; background-color: #e6e9f0; outline: none; }
+        .screenshot-image { max-width: 100%; max-height: 400px; display: none; border-radius: 4px; }
+        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%; max-width: 300px; }
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; justify-content: center; align-items: center; font-size: 1.5em; color: #1e3a8a; font-weight: bold; transition: opacity 0.5s; }
     </style>
 </head>
 <body>
+    <div id="loading-overlay">Loading your workspace...</div>
+
     <div id="pdf-content">
         <header>
-            <div class="header-left">
-    <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
-</div>
-            <div class="header-center"><h1>Microsoft Word</h1></div>
-            <div class="header-right"><a href="microsoft-tools.html" class="back-btn">&larr; Back to Curriculum</a></div>
+            <div class="header-left"><img src="logo.jpg" alt="Logo"></div>
+            <div class="header-center"><h1>Word Processing</h1></div>
+            <div class="header-right"><a href="microsoft-tools.html" class="back-btn">&larr; Back</a></div>
         </header>
 
         <main class="task-container">
 
-            
-
-            <!-- PREPARATION: Keywords & Notes -->
             <div class="task-card task-prep">
                 <h2>Lesson Preparation</h2>
-                
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">Key Words</h3>
-                <div class="question-row">
-                    <label class="question-label">Word Processor</label>
-                    <input type="text" class="auto-input" placeholder="Type definition here...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">Formatting</label>
-                    <input type="text" class="auto-input" placeholder="Type definition here...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">Alignment</label>
-                    <input type="text" class="auto-input" placeholder="Type definition here...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">Font</label>
-                    <input type="text" class="auto-input" placeholder="Type definition here...">
-                </div>
+                <div class="question-row"><label class="question-label">Word Processor</label><input type="text" id="kw1" class="auto-input"></div>
+                <div class="question-row"><label class="question-label">Formatting</label><input type="text" id="kw2" class="auto-input"></div>
+                <div class="question-row"><label class="question-label">Alignment</label><input type="text" id="kw3" class="auto-input"></div>
+                <div class="question-row"><label class="question-label">Font</label><input type="text" id="kw4" class="auto-input"></div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Lesson Notes</h3>
-                <div class="question-row">
-                    <textarea class="auto-input" rows="6" placeholder="Write your notes from today's lesson here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
-                </div>
+                <div class="question-row"><textarea id="lesson-notes" class="auto-input" rows="4"></textarea></div>
             </div>
-<!-- LESSON RESOURCES -->
-            <div class="download-banner no-print">
-                <h2 style="margin: 0; color: #1e3a8a;">Step 1: Open the Workspace</h2>
-                <p style="color: #333; margin-top: 10px; font-size: 16px; line-height: 1.6;">Go to your <strong>Microsoft Teams</strong> class and open the assignment for today.<br>Open the attached <strong>Word Template</strong> to complete the tasks below, then paste your screenshots here!</p>
-            </div>
+
             <!-- Task 1: Maroon -->
             <div class="task-card task-maroon" id="card-maroon">
                 <h2>Red Task <span class="verified-badge">✅ Teacher Verified</span></h2>
-                <div class="instruction-box">
-                    Type the title <strong>"My Computing Profile"</strong> at the top of your Word document.<br><br>
-                    Highlight it, change the size to <strong>Large (Heading 1)</strong>, and make it <strong>Bold</strong> and <strong>Underlined</strong>.
-                </div>
-                <p style="text-align: center; color: #555; margin-bottom: 10px;">Paste a screenshot from Word showing your title formatting:</p>
+                <div class="instruction-box">Type the title <strong>"My Computing Profile"</strong> in Word. Make it <strong>Heading 1</strong>, <strong>Bold</strong> and <strong>Underlined</strong>.</div>
                 <div class="screenshot-zone" id="zone-maroon" tabindex="0">
-                    <span class="screenshot-text" id="text-maroon">Click this box to select it, then press <strong>Ctrl+V</strong> to paste screenshot</span>
-                    <img id="img-maroon" class="screenshot-image" src="" alt="Student Screenshot">
+                    <span class="screenshot-text" id="text-maroon">Click here and press <strong>Ctrl+V</strong> to paste screenshot</span>
+                    <img id="img-maroon" class="screenshot-image" src="">
                 </div>
-                <div style="text-align: right;">
-                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('maroon')">👨‍🏫 Teacher Verify</button>
-                </div>
+                <div style="text-align: right;"><button class="teacher-verify-btn no-print" onclick="openVerifyModal('maroon')">👨‍🏫 Teacher Verify</button></div>
             </div>
 
             <!-- Task 2: Amber -->
             <div class="task-card task-amber" id="card-amber">
                 <h2>Amber Task <span class="verified-badge">✅ Teacher Verified</span></h2>
-                <div class="instruction-box">
-                    Underneath your title, type a short paragraph about your favorite hobby.<br><br>
-                    Highlight the text, change the Font Style to <strong>Comic Sans</strong>, and change the text color to <strong>Blue</strong>.
-                </div>
-                <p style="text-align: center; color: #555; margin-bottom: 10px;">Paste a screenshot from Word showing your styled paragraph:</p>
+                <div class="instruction-box">Type a short paragraph. Change the Font to <strong>Comic Sans</strong> and color to <strong>Blue</strong>.</div>
                 <div class="screenshot-zone" id="zone-amber" tabindex="0">
-                    <span class="screenshot-text" id="text-amber">Click this box to select it, then press <strong>Ctrl+V</strong> to paste screenshot</span>
-                    <img id="img-amber" class="screenshot-image" src="" alt="Student Screenshot">
+                    <span class="screenshot-text" id="text-amber">Click here and press <strong>Ctrl+V</strong> to paste screenshot</span>
+                    <img id="img-amber" class="screenshot-image" src="">
                 </div>
-                <div style="text-align: right;">
-                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('amber')">👨‍🏫 Teacher Verify</button>
-                </div>
+                <div style="text-align: right;"><button class="teacher-verify-btn no-print" onclick="openVerifyModal('amber')">👨‍🏫 Teacher Verify</button></div>
             </div>
 
             <!-- Task 3: Green -->
             <div class="task-card task-green" id="card-green">
                 <h2>Green Task <span class="verified-badge">✅ Teacher Verified</span></h2>
-                <div class="instruction-box">
-                    Start a new line and click the <strong>Bulleted List</strong> button on the Word ribbon.<br><br>
-                    Type out a list of your top 3 favorite subjects in school.
-                </div>
-                <p style="text-align: center; color: #555; margin-bottom: 10px;">Paste a screenshot from Word showing your bulleted list:</p>
+                <div class="instruction-box">Create a <strong>Bulleted List</strong> of your top 3 favorite subjects.</div>
                 <div class="screenshot-zone" id="zone-green" tabindex="0">
-                    <span class="screenshot-text" id="text-green">Click this box to select it, then press <strong>Ctrl+V</strong> to paste screenshot</span>
-                    <img id="img-green" class="screenshot-image" src="" alt="Student Screenshot">
+                    <span class="screenshot-text" id="text-green">Click here and press <strong>Ctrl+V</strong> to paste screenshot</span>
+                    <img id="img-green" class="screenshot-image" src="">
                 </div>
-                <div style="text-align: right;">
-                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('green')">👨‍🏫 Teacher Verify</button>
-                </div>
+                <div style="text-align: right;"><button class="teacher-verify-btn no-print" onclick="openVerifyModal('green')">👨‍🏫 Teacher Verify</button></div>
             </div>
 
             <!-- Task 4: Navy -->
             <div class="task-card task-navy" id="card-navy">
                 <h2>Blue Task <span class="verified-badge">✅ Teacher Verified</span></h2>
-                <div class="instruction-box">
-                    Search the internet for a picture of a computer keyboard. <strong>Copy</strong> the image.<br><br>
-                    Click below your list in Word and press <strong>Ctrl + V</strong> to paste it. Highlight the picture and <strong>Center Align</strong> it.
-                </div>
-                <p style="text-align: center; color: #555; margin-bottom: 10px;">Paste a screenshot showing your centered image:</p>
+                <div class="instruction-box">Find a picture of a keyboard online. Paste it into Word and <strong>Center Align</strong> it.</div>
                 <div class="screenshot-zone" id="zone-navy" tabindex="0">
-                    <span class="screenshot-text" id="text-navy">Click this box to select it, then press <strong>Ctrl+V</strong> to paste screenshot</span>
-                    <img id="img-navy" class="screenshot-image" src="" alt="Student Screenshot">
+                    <span class="screenshot-text" id="text-navy">Click here and press <strong>Ctrl+V</strong> to paste screenshot</span>
+                    <img id="img-navy" class="screenshot-image" src="">
                 </div>
-                <div style="text-align: right;">
-                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('navy')">👨‍🏫 Teacher Verify</button>
-                </div>
+                <div style="text-align: right;"><button class="teacher-verify-btn no-print" onclick="openVerifyModal('navy')">👨‍🏫 Teacher Verify</button></div>
             </div>
 
-            <!-- PLENARY: 3 Key Takeaways -->
+            <!-- Plenary -->
             <div class="task-card task-plenary">
-                <h2>Lesson Plenary</h2>
-                <h3 style="color: #444; margin-bottom: 15px;">My 3 Key Takeaways</h3>
-                <div class="question-row">
-                    <label class="question-label">1.</label>
-                    <input type="text" class="auto-input" placeholder="Type first takeaway here...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">2.</label>
-                    <input type="text" class="auto-input" placeholder="Type second takeaway here...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">3.</label>
-                    <input type="text" class="auto-input" placeholder="Type third takeaway here...">
-                </div>
+                <h2>Lesson Plenary: 3 Key Takeaways</h2>
+                <div class="question-row"><input type="text" id="t1" class="auto-input" placeholder="1. "></div>
+                <div class="question-row"><input type="text" id="t2" class="auto-input" placeholder="2. "></div>
+                <div class="question-row"><input type="text" id="t3" class="auto-input" placeholder="3. "></div>
             </div>
-
         </main>
-    </div> <!-- END PDF CONTENT WRAPPER -->
-
-    <!-- UNIVERSAL PDF DOWNLOAD BUTTON -->
-    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Work</button>
-        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
     </div>
 
-    <!-- SECURE PASSWORD MODAL -->
+    <!-- PDF & SUBMIT -->
+    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
+        <button class="btn-pdf" onclick="manualSave()">💾 Save & Submit Work</button>
+        <button class="btn-pdf no-print" style="background-color: #666;" onclick="downloadPDF()">📄 Download PDF</button>
+    </div>
+
+    <!-- VERIFY MODAL -->
     <div class="modal-overlay" id="verify-modal">
         <div class="modal-content">
             <h3>Teacher Verification</h3>
@@ -245,192 +143,178 @@
         </div>
     </div>
     
-    <footer>
-        &copy; 2026 Delta Serlby Park - Computing Department
-    </footer>
+    <footer>&copy; 2026 Delta Serlby Park - Computing Department</footer>
 
     <script>
-        /* --- AUTO-SAVE MEMORY LOGIC --- */
-        function saveProgress() {
-            var inputs = document.querySelectorAll('.auto-input');
-            var dataToSave = {};
-            
-            for (var i = 0; i < inputs.length; i++) {
-                dataToSave['input_' + i] = inputs[i].value;
-            }
-            
-            dataToSave['maroon_verified'] = document.getElementById('card-maroon').classList.contains('teacher-verified');
-            dataToSave['amber_verified'] = document.getElementById('card-amber').classList.contains('teacher-verified');
-            dataToSave['green_verified'] = document.getElementById('card-green').classList.contains('teacher-verified');
-            dataToSave['navy_verified'] = document.getElementById('card-navy').classList.contains('teacher-verified');
-            
-            try {
-                dataToSave['img_maroon'] = document.getElementById('img-maroon').src;
-                dataToSave['img_amber'] = document.getElementById('img-amber').src;
-                dataToSave['img_green'] = document.getElementById('img-green').src;
-                dataToSave['img_navy'] = document.getElementById('img-navy').src;
-                localStorage.setItem('wordLessonMemory', JSON.stringify(dataToSave));
-            } catch (e) {
-                console.warn("Screenshots too large to save to memory, saving text only.");
-                localStorage.setItem('wordLessonMemory', JSON.stringify(dataToSave));
-            }
+        // --- DATABASE CONNECTION ---
+        const supabaseUrl = 'https://zqvmrmhiqxmghtxgjrtk.supabase.co';
+        const supabaseKey = 'sb_publishable_iD26_DKTKRUWP7Jj3giEPA_f2xd5OCW';
+        let db = null;
+        try { if (window.supabase) db = window.supabase.createClient(supabaseUrl, supabaseKey); } catch (e) {}
+        
+        let dbRecordId = null;
+        const currentTaskId = 'Word-Processing';
+        
+        let studentName = localStorage.getItem('loggedInName');
+        let className = localStorage.getItem('loggedInClass');
+
+        function safeText(val) { return val.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>"); }
+        function decodeText(val) { return val.replace(/<br>/g, "\n").replace(/&lt;/g, "<").replace(/&gt;/g, ">"); }
+        
+        function compileGroup(ids) {
+            return ids.map((id, index) => {
+                let val = document.getElementById(id) ? document.getElementById(id).value : "";
+                if(val) return `Q${index+1}: ${safeText(val)}`; return "";
+            }).filter(v => v !== "").join('<br><br>');
         }
 
-        function loadProgress() {
-            var savedDataStr = localStorage.getItem('wordLessonMemory');
-            if (savedDataStr) {
-                var data = JSON.parse(savedDataStr);
-                var inputs = document.querySelectorAll('.auto-input');
-                
-                for (var i = 0; i < inputs.length; i++) {
-                    if (data['input_' + i]) {
-                        inputs[i].value = data['input_' + i];
-                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                            inputs[i].style.height = 'auto';
-                            inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                        }
-                    }
+        function restoreGroup(ids, dbString) {
+            if (!dbString) return;
+            const parts = dbString.split('<br><br>');
+            let dataIndex = 0;
+            ids.forEach((id) => {
+                const el = document.getElementById(id);
+                if (el && parts[dataIndex] && !parts[dataIndex].startsWith('<img') && !parts[dataIndex].startsWith('<b>')) {
+                    el.value = decodeText(parts[dataIndex].replace(/^Q\d+: /, ""));
+                    dataIndex++;
                 }
-                
-                if (data['maroon_verified']) document.getElementById('card-maroon').classList.add('teacher-verified');
-                if (data['amber_verified']) document.getElementById('card-amber').classList.add('teacher-verified');
-                if (data['green_verified']) document.getElementById('card-green').classList.add('teacher-verified');
-                if (data['navy_verified']) document.getElementById('card-navy').classList.add('teacher-verified');
-                
-                const zones = ['maroon', 'amber', 'green', 'navy'];
-                zones.forEach(zone => {
-                    if (data['img_' + zone] && data['img_' + zone].length > 100) {
-                        document.getElementById('img-' + zone).src = data['img_' + zone];
-                        document.getElementById('img-' + zone).style.display = 'block';
-                        document.getElementById('text-' + zone).style.display = 'none';
-                    }
-                });
+            });
+        }
+
+        // Packs image and verification status for the Teacher Dashboard
+        function getTaskData(cardId, imgId) {
+            let html = "";
+            const isVerified = document.getElementById(cardId).classList.contains('teacher-verified');
+            if (isVerified) html += "<b>✅ Teacher Verified in Class</b><br><br>";
+            else html += "<b>⏳ Pending Teacher Check</b><br><br>";
+
+            const imgSrc = document.getElementById(imgId).src;
+            if (imgSrc && imgSrc.startsWith('data:image')) {
+                html += `<img src="${imgSrc}" style="max-width:100%; border:1px solid #ccc; border-radius:4px;">`;
+            } else { html += "<i>(No screenshot pasted yet)</i>"; }
+            return html;
+        }
+
+        // Unpacks HTML from database back into the student page
+        function restoreTaskData(dbString, cardId, imgId, textId) {
+            if (!dbString) return;
+            if (dbString.includes('✅ Teacher Verified')) document.getElementById(cardId).classList.add('teacher-verified');
+            const imgMatch = dbString.match(/src="([^"]+)"/);
+            if (imgMatch && imgMatch[1]) {
+                document.getElementById(imgId).src = imgMatch[1];
+                document.getElementById(imgId).style.display = 'block';
+                document.getElementById(textId).style.display = 'none';
             }
         }
 
-        document.addEventListener('input', function(e) {
-            if (e.target.classList.contains('auto-input')) {
-                saveProgress();
-                if (e.target.tagName.toLowerCase() === 'textarea') {
-                    e.target.style.height = 'auto';
-                    e.target.style.height = e.target.scrollHeight + 'px';
-                }
-            }
-        });
+        window.onload = async function() {
+            if (!studentName || !className) { alert("Please log in from the home page."); window.location.href = "index.html"; return; }
+            if (!db) { document.getElementById('loading-overlay').style.display = 'none'; return; }
 
-        function clearData() {
-            if (confirm("Are you sure you want to clear all your work on this page?")) {
-                localStorage.removeItem('wordLessonMemory');
-                window.location.reload();
-            }
-        }
+            const { data } = await db.from('dnc_responses').select('*').eq('student_name', studentName).eq('class_name', className).eq('task_id', currentTaskId);
 
-        window.onload = loadProgress;
+            if (data && data.length > 0) {
+                const record = data[0];
+                dbRecordId = record.id;
 
-        /* --- SECURE TEACHER VERIFY LOGIC --- */
-        var activeTaskToVerify = null;
+                restoreGroup(['kw1', 'kw2', 'kw3', 'kw4'], record.keywords);
+                restoreGroup(['t1', 't2', 't3'], record.takeaways);
+                if(record.notes) document.getElementById('lesson-notes').value = decodeText(record.notes);
 
-        function openVerifyModal(taskPrefix) {
-            activeTaskToVerify = taskPrefix;
-            document.getElementById('verify-modal').style.display = 'flex';
-            document.getElementById('teacher-password-input').value = ""; 
-            document.getElementById('modal-error-msg').style.display = 'none'; 
-            document.getElementById('teacher-password-input').focus();
-        }
-
-        function closeVerifyModal() {
-            document.getElementById('verify-modal').style.display = 'none';
-            activeTaskToVerify = null;
-        }
-
-        function submitVerify() {
-            var inputElement = document.getElementById('teacher-password-input');
-            var passcode = inputElement.value;
-            
-            if (passcode === "2525") {
-                var card = document.getElementById('card-' + activeTaskToVerify);
-                card.classList.toggle('teacher-verified');
-                saveProgress(); 
-                closeVerifyModal();
+                restoreTaskData(record.maroon, 'card-maroon', 'img-maroon', 'text-maroon');
+                restoreTaskData(record.amber, 'card-amber', 'img-amber', 'text-amber');
+                restoreTaskData(record.green, 'card-green', 'img-green', 'text-green');
+                restoreTaskData(record.navy, 'card-navy', 'img-navy', 'text-navy');
             } else {
-                document.getElementById('modal-error-msg').style.display = 'block';
-                inputElement.value = "";
-                inputElement.focus();
+                const { data: newData } = await db.from('dnc_responses').insert([{ student_name: studentName, class_name: className, task_id: currentTaskId }]).select();
+                if (newData && newData.length > 0) dbRecordId = newData[0].id;
             }
+            document.getElementById('loading-overlay').style.display = 'none';
+        };
+
+        let saveTimeout;
+        async function syncToDatabase(isFinal) {
+            if (!dbRecordId || !db) return;
+            await db.from('dnc_responses').update({
+                keywords: compileGroup(['kw1', 'kw2', 'kw3', 'kw4']),
+                notes: safeText(document.getElementById('lesson-notes').value),
+                maroon: getTaskData('card-maroon', 'img-maroon'),
+                amber: getTaskData('card-amber', 'img-amber'),
+                green: getTaskData('card-green', 'img-green'),
+                navy: getTaskData('card-navy', 'img-navy'),
+                takeaways: compileGroup(['t1', 't2', 't3'])
+            }).eq('id', dbRecordId);
+
+            if (isFinal) alert("Work Saved Successfully!");
         }
 
-        document.getElementById('teacher-password-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') submitVerify();
+        document.querySelectorAll('.auto-input').forEach(box => {
+            box.addEventListener('input', () => { clearTimeout(saveTimeout); saveTimeout = setTimeout(() => { syncToDatabase(false); }, 1000); });
         });
+        function manualSave() { syncToDatabase(true); }
 
-        /* --- STRICT SCREENSHOT PASTE LOGIC --- */
+        /* --- IMAGE COMPRESSOR (Prevents Database Overload) --- */
         document.addEventListener('paste', function(e) {
-            var activeElement = document.activeElement;
-            var targetImgId = null;
-            var targetTextId = null;
-
-            if (activeElement.id === 'zone-maroon') { targetImgId = 'img-maroon'; targetTextId = 'text-maroon'; } 
-            else if (activeElement.id === 'zone-amber') { targetImgId = 'img-amber'; targetTextId = 'text-amber'; } 
-            else if (activeElement.id === 'zone-green') { targetImgId = 'img-green'; targetTextId = 'text-green'; } 
-            else if (activeElement.id === 'zone-navy') { targetImgId = 'img-navy'; targetTextId = 'text-navy'; } 
+            var active = document.activeElement;
+            var targetImgId = null, targetTextId = null;
+            if (active.id === 'zone-maroon') { targetImgId = 'img-maroon'; targetTextId = 'text-maroon'; } 
+            else if (active.id === 'zone-amber') { targetImgId = 'img-amber'; targetTextId = 'text-amber'; } 
+            else if (active.id === 'zone-green') { targetImgId = 'img-green'; targetTextId = 'text-green'; } 
+            else if (active.id === 'zone-navy') { targetImgId = 'img-navy'; targetTextId = 'text-navy'; } 
             else return;
 
             var items = (e.clipboardData || e.originalEvent.clipboardData).items;
-            for (var index in items) {
-                var item = items[index];
-                if (item.kind === 'file') {
-                    var blob = item.getAsFile();
-                    displayImage(blob, targetImgId, targetTextId);
+            for (var i in items) {
+                if (items[i].kind === 'file') {
+                    displayAndCompressImage(items[i].getAsFile(), targetImgId, targetTextId);
                     e.preventDefault(); 
                 }
             }
         });
 
-        function displayImage(file, imgId, textId) {
+        function displayAndCompressImage(file, imgId, textId) {
             var reader = new FileReader();
             reader.onload = function(event) {
-                var imgElement = document.getElementById(imgId);
-                var textElement = document.getElementById(textId);
-                imgElement.src = event.target.result;
-                imgElement.style.display = 'block';
-                textElement.style.display = 'none'; 
-                saveProgress(); 
+                var img = new Image();
+                img.onload = function() {
+                    var canvas = document.createElement('canvas');
+                    var MAX_WIDTH = 800; // Compresses giant 4K screenshots down to safe size
+                    var width = img.width; var height = img.height;
+                    if (width > MAX_WIDTH) { height = Math.round(height * MAX_WIDTH / width); width = MAX_WIDTH; }
+                    canvas.width = width; canvas.height = height;
+                    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                    
+                    var dataUrl = canvas.toDataURL('image/jpeg', 0.6); // 60% Quality
+                    document.getElementById(imgId).src = dataUrl;
+                    document.getElementById(imgId).style.display = 'block';
+                    document.getElementById(textId).style.display = 'none'; 
+                    syncToDatabase(false); // Auto-save after paste!
+                }
+                img.src = event.target.result;
             };
             reader.readAsDataURL(file);
         }
 
-        /* --- BULLETPROOF PDF GENERATION LOGIC --- */
+        /* --- TEACHER VERIFY MODAL --- */
+        var activeTask = null;
+        function openVerifyModal(task) { activeTask = task; document.getElementById('verify-modal').style.display = 'flex'; document.getElementById('teacher-password-input').focus(); }
+        function closeVerifyModal() { document.getElementById('verify-modal').style.display = 'none'; }
+        function submitVerify() {
+            if (document.getElementById('teacher-password-input').value === "delta") {
+                document.getElementById('card-' + activeTask).classList.toggle('teacher-verified');
+                closeVerifyModal(); syncToDatabase(false);
+            } else { document.getElementById('modal-error-msg').style.display = 'block'; }
+        }
+
+        /* --- PDF DOWNLOADER --- */
         function downloadPDF() {
-            var buttonsToHide = document.querySelectorAll('.no-print');
-            for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'none';
-            document.getElementById('action-buttons').style.display = 'none';
-
-            var textInputs = document.querySelectorAll('input[type="text"]');
-            for (var i = 0; i < textInputs.length; i++) {
-                textInputs[i].setAttribute('value', textInputs[i].value);
-            }
-
-            var textAreas = document.querySelectorAll('textarea');
-            for (var j = 0; j < textAreas.length; j++) {
-                textAreas[j].innerHTML = textAreas[j].value;
-                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
-            }
-
-            var element = document.getElementById('pdf-content');
-
-            var opt = {
-                margin:       0.3,
-                filename:     'Word_Processing_Workbook.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] } 
-            };
-
-            html2pdf().set(opt).from(element).save().then(function() {
-                for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'inline-block';
-                document.getElementById('action-buttons').style.display = 'flex';
-                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
+            var btns = document.querySelectorAll('.no-print');
+            btns.forEach(b => b.style.display = 'none'); document.getElementById('action-buttons').style.display = 'none';
+            document.querySelectorAll('input[type="text"]').forEach(i => i.setAttribute('value', i.value));
+            
+            html2pdf().set({ margin: 0.3, filename: 'Word_Processing.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } })
+            .from(document.getElementById('pdf-content')).save().then(() => {
+                btns.forEach(b => b.style.display = 'inline-block'); document.getElementById('action-buttons').style.display = 'flex';
             });
         }
     </script>
