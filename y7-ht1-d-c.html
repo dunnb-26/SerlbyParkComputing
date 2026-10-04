@@ -86,41 +86,50 @@
         }
         .btn-mark:hover { background-color: #c99722; }
 
-        /* Permanent Spelling Correction Area */
-        .spag-correction-box {
+        /* Spelling Practice Area */
+        .spag-practice-box {
             background-color: #fff3e0;
             border: 2px solid #f57c00;
             border-radius: 6px;
             padding: 20px;
-            margin-top: 20px;
+            margin-top: 15px;
         }
-        .spag-correction-box h3 {
-            margin-top: 0;
-            color: #e65100;
-        }
-        .correction-row {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 12px;
-        }
-        .correction-row .flagged-word {
+        .practice-header {
             font-weight: bold;
-            color: #d32f2f;
-            min-width: 110px;
-            background: #ffebee;
-            padding: 6px 10px;
-            border-radius: 4px;
+            color: #e65100;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 10px;
             text-align: center;
-            border: 1px solid #ef9a9a;
         }
-        .correction-row input {
-            flex: 1;
+        .practice-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .practice-row input {
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            font-size: 1em;
+            font-size: 0.95em;
+            width: 100%;
+            box-sizing: border-box;
         }
+        .btn-add-word {
+            background-color: #607d8b;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-add-word:hover { background-color: #455a64; }
 
         /* Marking Colors & Utility */
         .correct { border-color: #388e3c !important; background-color: #e8f5e9; }
@@ -157,28 +166,28 @@
             <div id="demonstrate-stage" class="task-card">
                 <div class="task-title">Part 1: Demonstrate (Knowledge Check)</div>
                 <div class="instruction-box">
-                    Write full sentences to answer the 5 questions below. When you click "Mark My Work", your score will be calculated and your spelling corrections and Connect task will appear below.
+                    Write full sentences to answer the 5 questions below. Any spelling mistakes will be underlined in red by your browser. When you click "Mark My Work", your score, spelling practice table, and Connect task will appear below.
                 </div>
 
                 <div class="question-group">
                     <label>1. Write a sentence explaining what you use a computer keyboard for:</label>
-                    <textarea id="q1" placeholder="Type your detailed answer here..."></textarea>
+                    <textarea id="q1" spellcheck="true" placeholder="Type your detailed answer here..."></textarea>
                 </div>
                 <div class="question-group">
                     <label>2. Why is it important to save your files inside correctly named folders?</label>
-                    <textarea id="q2" placeholder="Type your detailed answer here..."></textarea>
+                    <textarea id="q2" spellcheck="true" placeholder="Type your detailed answer here..."></textarea>
                 </div>
                 <div class="question-group">
                     <label>3. Write down one important rule for staying safe on the internet:</label>
-                    <textarea id="q3" placeholder="Type your detailed answer here..."></textarea>
+                    <textarea id="q3" spellcheck="true" placeholder="Type your detailed answer here..."></textarea>
                 </div>
                 <div class="question-group">
                     <label>4. Explain what you use a computer mouse for on the screen:</label>
-                    <textarea id="q4" placeholder="Type your detailed answer here..."></textarea>
+                    <textarea id="q4" spellcheck="true" placeholder="Type your detailed answer here..."></textarea>
                 </div>
                 <div class="question-group">
                     <label>5. Why is it important to keep your password a secret from other people?</label>
-                    <textarea id="q5" placeholder="Type your detailed answer here..."></textarea>
+                    <textarea id="q5" spellcheck="true" placeholder="Type your detailed answer here..."></textarea>
                 </div>
 
                 <div class="btn-row" id="stage1-buttons">
@@ -188,20 +197,49 @@
                 <div id="score-display" class="hidden"></div>
             </div>
 
-            <!-- PERMANENT SPELLING CORRECTION BOX (Initially Hidden) -->
+            <!-- LESSON 2: SPELLING PRACTICE BOX (Initially Hidden) -->
             <div id="spag-section" class="task-card hidden" style="border-top-color: #f57c00;">
-                <div class="task-title" style="color: #e65100;">Spelling Practice & Corrections</div>
+                <div class="task-title" style="color: #e65100;">Spelling Corrections & Practice</div>
                 <div class="instruction-box">
-                    Any unusual or misspelled words from your Demonstrate answers are listed below. <strong>Keep these visible</strong> while you complete your Connect task and write each corrected word out 3 times.
+                    Look at any words in your Demonstrate answers that had red underlines. Type each misspelled word in the first column, and practice spelling it correctly **3 times** across the next three columns.
                 </div>
-                <div id="spag-inputs-container"></div>
+                
+                <div class="spag-practice-box">
+                    <div class="practice-header">
+                        <div>Misspelled Word</div>
+                        <div>Attempt 1</div>
+                        <div>Attempt 2</div>
+                        <div>Attempt 3</div>
+                    </div>
+                    <div id="practice-rows-container">
+                        <div class="practice-row">
+                            <input type="text" placeholder="Word...">
+                            <input type="text" placeholder="Correct spelling...">
+                            <input type="text" placeholder="Correct spelling...">
+                            <input type="text" placeholder="Correct spelling...">
+                        </div>
+                        <div class="practice-row">
+                            <input type="text" placeholder="Word...">
+                            <input type="text" placeholder="Correct spelling...">
+                            <input type="text" placeholder="Correct spelling...">
+                            <input type="text" placeholder="Correct spelling...">
+                        </div>
+                        <div class="practice-row">
+                            <input type="text" placeholder="Word...">
+                            <input type="text" placeholder="Correct spelling...">
+                            <input type="text" placeholder="Correct spelling...">
+                            <input type="text" placeholder="Correct spelling...">
+                        </div>
+                    </div>
+                    <button class="btn-add-word" onclick="addPracticeRow()">+ Add Another Word</button>
+                </div>
             </div>
 
             <!-- STAGE 2: CONNECT TASKS (Initially Hidden) -->
             <div id="task-red" class="task-card red-task hidden">
                 <div class="task-title">Part 2: Connect - RED TASK (Consolidation)</div>
                 <div class="instruction-box">
-                    Review the basics. Remember to reference your spelling box above and write any corrections 3 times each.
+                    Review the basics. Complete the task below after finishing your spelling practice above.
                 </div>
                 <div class="question-group">
                     <label>List 3 rules you should always follow to stay safe when using the internet:</label>
@@ -212,7 +250,7 @@
             <div id="task-amber" class="task-card amber-task hidden">
                 <div class="task-title">Part 2: Connect - AMBER TASK (Application)</div>
                 <div class="instruction-box">
-                    Great effort! Connect your knowledge. Remember to reference your spelling box above and write any corrections 3 times each.
+                    Great effort! Connect your knowledge. Complete the task below after finishing your spelling practice above.
                 </div>
                 <div class="question-group">
                     <label>Explain the difference between clicking "Save" and "Save As" when working on a document:</label>
@@ -223,7 +261,7 @@
             <div id="task-green" class="task-card green-task hidden">
                 <div class="task-title">Part 2: Connect - GREEN TASK (Challenge)</div>
                 <div class="instruction-box">
-                    Perfect score! Challenge task complete with spelling practice. Remember to reference your spelling box above and write any corrections 3 times each.
+                    Perfect score! Challenge task complete. Complete the task below after finishing your spelling practice above.
                 </div>
                 <div class="question-group">
                     <label>Write a short paragraph explaining what a "digital footprint" is, and how you can make sure your footprint is positive:</label>
@@ -239,17 +277,6 @@
     </footer>
 
     <script>
-        const commonWords = new Set([
-            "the", "be", "to", "of", "and", "a", "in", "that", "have", "i", "it", "for", "not", "on", "with", "he", "as", "you", "do", "at",
-            "this", "but", "his", "by", "from", "they", "we", "say", "her", "she", "or", "an", "will", "my", "one", "all", "would", "there",
-            "their", "what", "so", "up", "out", "if", "about", "who", "get", "which", "go", "me", "when", "make", "can", "like", "time", "no",
-            "just", "him", "know", "take", "people", "into", "year", "your", "good", "some", "could", "them", "see", "other", "than", "then",
-            "now", "look", "only", "come", "its", "over", "think", "also", "back", "after", "use", "two", "how", "our", "work", "first", "well",
-            "way", "even", "new", "want", "because", "any", "these", "give", "day", "most", "us", "computer", "keyboard", "mouse", "screen",
-            "folder", "file", "save", "safe", "internet", "password", "secure", "type", "typing", "write", "organise", "organize", "click",
-            "cursor", "hack", "hacker", "account", "protect", "private", "personal", "address", "digital", "footprint", "document", "stranger"
-        ]);
-
         const qKeywords = {
             1: ['type', 'typing', 'write', 'enter', 'letters', 'words', 'text'],
             2: ['organise', 'organize', 'find', 'save', 'store', 'neat', 'tidy', 'lose', 'sort'],
@@ -281,6 +308,19 @@
             }
         }
 
+        function addPracticeRow() {
+            const container = document.getElementById('practice-rows-container');
+            const row = document.createElement('div');
+            row.className = 'practice-row';
+            row.innerHTML = `
+                <input type="text" placeholder="Word...">
+                <input type="text" placeholder="Correct spelling...">
+                <input type="text" placeholder="Correct spelling...">
+                <input type="text" placeholder="Correct spelling...">
+            `;
+            container.appendChild(row);
+        }
+
         function markStage1() {
             let score = 0;
             score += checkSentenceAnswer('q1', qKeywords[1]);
@@ -288,19 +328,6 @@
             score += checkSentenceAnswer('q3', qKeywords[3]);
             score += checkSentenceAnswer('q4', qKeywords[4]);
             score += checkSentenceAnswer('q5', qKeywords[5]);
-
-            // Scan text for spelling words
-            let flaggedWords = new Set();
-            for (let i = 1; i <= 5; i++) {
-                let text = document.getElementById('q' + i).value.toLowerCase();
-                let words = text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g,"").split(/\s+/);
-                
-                words.forEach(word => {
-                    if (word.length > 2 && !commonWords.has(word) && !/^\d+$/.test(word)) {
-                        flaggedWords.add(word);
-                    }
-                });
-            }
 
             // Lock input boxes and hide mark button
             for (let i = 1; i <= 5; i++) {
@@ -313,23 +340,8 @@
             scoreDisplay.classList.remove('hidden');
             scoreDisplay.innerText = `You scored ${score} out of 5!`;
 
-            // Populate spelling corrections box (if any words flagged)
-            const spagSection = document.getElementById('spag-section');
-            const container = document.getElementById('spag-inputs-container');
-            container.innerHTML = '';
-
-            if (flaggedWords.size > 0) {
-                flaggedWords.forEach(word => {
-                    let row = document.createElement('div');
-                    row.className = 'correction-row';
-                    row.innerHTML = `<span class="flagged-word">${word}</span> &rarr; <input type="text" placeholder="Type correct spelling here...">`;
-                    container.appendChild(row);
-                });
-                spagSection.classList.remove('hidden');
-            } else {
-                container.innerHTML = '<em>Fantastic! No unusual or misspelled words found in your answers.</em>';
-                spagSection.classList.remove('hidden');
-            }
+            // Reveal Lesson 2 Spelling Practice Box
+            document.getElementById('spag-section').classList.remove('hidden');
 
             // Reveal correct RAG Connect Task
             document.getElementById('task-red').classList.add('hidden');
