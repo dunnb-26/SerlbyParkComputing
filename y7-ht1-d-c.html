@@ -71,7 +71,7 @@
             gap: 15px;
             margin-top: 20px;
         }
-        .btn-mark {
+        .btn-mark, .btn-reset {
             flex: 1;
             padding: 15px;
             text-align: center;
@@ -80,11 +80,20 @@
             font-size: 1.1em;
             font-weight: bold;
             cursor: pointer;
-            background-color: #dfaa2b;
-            color: #1e3a8a;
             transition: background-color 0.2s;
         }
+        .btn-mark {
+            background-color: #dfaa2b;
+            color: #1e3a8a;
+        }
         .btn-mark:hover { background-color: #c99722; }
+
+        .btn-reset {
+            background-color: #d32f2f;
+            color: white;
+            flex: 0.3;
+        }
+        .btn-reset:hover { background-color: #b71c1c; }
 
         /* Spelling Practice Area */
         .spag-practice-box {
@@ -166,32 +175,33 @@
             <div id="demonstrate-stage" class="task-card">
                 <div class="task-title">Part 1: Demonstrate (Knowledge Check)</div>
                 <div class="instruction-box">
-                    Write full sentences to answer the 5 questions below. Any spelling mistakes will be underlined in red by your browser. When you click "Mark My Work", your score, spelling practice table, and Connect task will appear below.
+                    Write full sentences to answer the 5 questions below. Any spelling mistakes will be underlined in red by your browser. When you click "Mark My Work", your score, spelling practice table, and Connect task will appear below. Your progress is automatically saved.
                 </div>
 
                 <div class="question-group">
                     <label>1. Write a sentence explaining what you use a computer keyboard for:</label>
-                    <textarea id="q1" spellcheck="true" placeholder="Type your detailed answer here..."></textarea>
+                    <textarea id="q1" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
                 </div>
                 <div class="question-group">
                     <label>2. Why is it important to save your files inside correctly named folders?</label>
-                    <textarea id="q2" spellcheck="true" placeholder="Type your detailed answer here..."></textarea>
+                    <textarea id="q2" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
                 </div>
                 <div class="question-group">
                     <label>3. Write down one important rule for staying safe on the internet:</label>
-                    <textarea id="q3" spellcheck="true" placeholder="Type your detailed answer here..."></textarea>
+                    <textarea id="q3" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
                 </div>
                 <div class="question-group">
                     <label>4. Explain what you use a computer mouse for on the screen:</label>
-                    <textarea id="q4" spellcheck="true" placeholder="Type your detailed answer here..."></textarea>
+                    <textarea id="q4" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
                 </div>
                 <div class="question-group">
                     <label>5. Why is it important to keep your password a secret from other people?</label>
-                    <textarea id="q5" spellcheck="true" placeholder="Type your detailed answer here..."></textarea>
+                    <textarea id="q5" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
                 </div>
 
                 <div class="btn-row" id="stage1-buttons">
                     <button class="btn-mark" onclick="markStage1()">✅ Mark My Work & Open Lesson 2 Tasks</button>
+                    <button class="btn-reset" onclick="resetProgress()" title="Clear progress">🗑️ Reset</button>
                 </div>
 
                 <div id="score-display" class="hidden"></div>
@@ -213,22 +223,22 @@
                     </div>
                     <div id="practice-rows-container">
                         <div class="practice-row">
-                            <input type="text" placeholder="Word...">
-                            <input type="text" placeholder="Correct spelling...">
-                            <input type="text" placeholder="Correct spelling...">
-                            <input type="text" placeholder="Correct spelling...">
+                            <input type="text" class="spag-input" placeholder="Word...">
+                            <input type="text" class="spag-input" placeholder="Correct spelling...">
+                            <input type="text" class="spag-input" placeholder="Correct spelling...">
+                            <input type="text" class="spag-input" placeholder="Correct spelling...">
                         </div>
                         <div class="practice-row">
-                            <input type="text" placeholder="Word...">
-                            <input type="text" placeholder="Correct spelling...">
-                            <input type="text" placeholder="Correct spelling...">
-                            <input type="text" placeholder="Correct spelling...">
+                            <input type="text" class="spag-input" placeholder="Word...">
+                            <input type="text" class="spag-input" placeholder="Correct spelling...">
+                            <input type="text" class="spag-input" placeholder="Correct spelling...">
+                            <input type="text" class="spag-input" placeholder="Correct spelling...">
                         </div>
                         <div class="practice-row">
-                            <input type="text" placeholder="Word...">
-                            <input type="text" placeholder="Correct spelling...">
-                            <input type="text" placeholder="Correct spelling...">
-                            <input type="text" placeholder="Correct spelling...">
+                            <input type="text" class="spag-input" placeholder="Word...">
+                            <input type="text" class="spag-input" placeholder="Correct spelling...">
+                            <input type="text" class="spag-input" placeholder="Correct spelling...">
+                            <input type="text" class="spag-input" placeholder="Correct spelling...">
                         </div>
                     </div>
                     <button class="btn-add-word" onclick="addPracticeRow()">+ Add Another Word</button>
@@ -243,7 +253,7 @@
                 </div>
                 <div class="question-group">
                     <label>List 3 rules you should always follow to stay safe when using the internet:</label>
-                    <textarea placeholder="Type your list here..."></textarea>
+                    <textarea id="connect-red" class="persist-input" placeholder="Type your list here..."></textarea>
                 </div>
             </div>
 
@@ -254,7 +264,7 @@
                 </div>
                 <div class="question-group">
                     <label>Explain the difference between clicking "Save" and "Save As" when working on a document:</label>
-                    <textarea placeholder="Type your explanation here..."></textarea>
+                    <textarea id="connect-amber" class="persist-input" placeholder="Type your explanation here..."></textarea>
                 </div>
             </div>
 
@@ -265,7 +275,7 @@
                 </div>
                 <div class="question-group">
                     <label>Write a short paragraph explaining what a "digital footprint" is, and how you can make sure your footprint is positive:</label>
-                    <textarea placeholder="Type your response here..."></textarea>
+                    <textarea id="connect-green" class="persist-input" placeholder="Type your response here..."></textarea>
                 </div>
             </div>
 
@@ -308,17 +318,21 @@
             }
         }
 
-        function addPracticeRow() {
+        function addPracticeRow(word1 = '', word2 = '', word3 = '', word4 = '') {
             const container = document.getElementById('practice-rows-container');
             const row = document.createElement('div');
             row.className = 'practice-row';
             row.innerHTML = `
-                <input type="text" placeholder="Word...">
-                <input type="text" placeholder="Correct spelling...">
-                <input type="text" placeholder="Correct spelling...">
-                <input type="text" placeholder="Correct spelling...">
+                <input type="text" class="spag-input" value="${word1}" placeholder="Word...">
+                <input type="text" class="spag-input" value="${word2}" placeholder="Correct spelling...">
+                <input type="text" class="spag-input" value="${word3}" placeholder="Correct spelling...">
+                <input type="text" class="spag-input" value="${word4}" placeholder="Correct spelling...">
             `;
             container.appendChild(row);
+            // Re-attach listener to new inputs
+            row.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', saveToLocalStorage);
+            });
         }
 
         function markStage1() {
@@ -361,7 +375,135 @@
                 scoreDisplay.style.color = "#2e7d32";
                 document.getElementById('task-green').classList.remove('hidden');
             }
+
+            saveToLocalStorage();
         }
+
+        // --- LOCAL STORAGE PERSISTENCE ---
+        function saveToLocalStorage() {
+            try {
+                const data = {
+                    q1: document.getElementById('q1').value,
+                    q2: document.getElementById('q2').value,
+                    q3: document.getElementById('q3').value,
+                    q4: document.getElementById('q4').value,
+                    q5: document.getElementById('q5').value,
+                    q1_class: document.getElementById('q1').className,
+                    q2_class: document.getElementById('q2').className,
+                    q3_class: document.getElementById('q3').className,
+                    q4_class: document.getElementById('q4').className,
+                    q5_class: document.getElementById('q5').className,
+                    q1_disabled: document.getElementById('q1').disabled,
+                    buttons_hidden: document.getElementById('stage1-buttons').style.display === 'none',
+                    score_text: document.getElementById('score-display').innerText,
+                    score_bg: document.getElementById('score-display').style.backgroundColor,
+                    score_color: document.getElementById('score-display').style.color,
+                    score_hidden: document.getElementById('score-display').classList.contains('hidden'),
+                    spag_hidden: document.getElementById('spag-section').classList.contains('hidden'),
+                    red_hidden: document.getElementById('task-red').classList.contains('hidden'),
+                    amber_hidden: document.getElementById('task-amber').classList.contains('hidden'),
+                    green_hidden: document.getElementById('task-green').classList.contains('hidden'),
+                    connectRed: document.getElementById('connect-red').value,
+                    connectAmber: document.getElementById('connect-amber').value,
+                    connectGreen: document.getElementById('connect-green').value,
+                    spagRows: []
+                };
+
+                document.querySelectorAll('.practice-row').forEach(row => {
+                    const inputs = row.querySelectorAll('input');
+                    data.spagRows.push({
+                        w0: inputs[0].value,
+                        w1: inputs[1].value,
+                        w2: inputs[2].value,
+                        w3: inputs[3].value
+                    });
+                });
+
+                localStorage.setItem('y7_ht1_dnc_data', JSON.stringify(data));
+            } catch (e) {
+                console.log("Local storage restricted.");
+            }
+        }
+
+        function loadFromLocalStorage() {
+            try {
+                const saved = localStorage.getItem('y7_ht1_dnc_data');
+                if (!saved) return;
+                const data = JSON.parse(saved);
+
+                document.getElementById('q1').value = data.q1 || '';
+                document.getElementById('q2').value = data.q2 || '';
+                document.getElementById('q3').value = data.q3 || '';
+                document.getElementById('q4').value = data.q4 || '';
+                document.getElementById('q5').value = data.q5 || '';
+
+                if (data.q1_disabled) {
+                    for (let i = 1; i <= 5; i++) {
+                        document.getElementById('q' + i).disabled = true;
+                    }
+                }
+
+                if (data.q1_class) document.getElementById('q1').className = data.q1_class;
+                if (data.q2_class) document.getElementById('q2').className = data.q2_class;
+                if (data.q3_class) document.getElementById('q3').className = data.q3_class;
+                if (data.q4_class) document.getElementById('q4').className = data.q4_class;
+                if (data.q5_class) document.getElementById('q5').className = data.q5_class;
+
+                if (data.buttons_hidden) {
+                    document.getElementById('stage1-buttons').style.display = 'none';
+                }
+
+                if (!data.score_hidden) {
+                    const scoreDisplay = document.getElementById('score-display');
+                    scoreDisplay.classList.remove('hidden');
+                    scoreDisplay.innerText = data.score_text;
+                    scoreDisplay.style.backgroundColor = data.score_bg;
+                    scoreDisplay.style.color = data.score_color;
+                }
+
+                if (!data.spag_hidden) {
+                    document.getElementById('spag-section').classList.remove('hidden');
+                }
+
+                if (!data.red_hidden) document.getElementById('task-red').classList.remove('hidden');
+                if (!data.amber_hidden) document.getElementById('task-amber').classList.remove('hidden');
+                if (!data.green_hidden) document.getElementById('task-green').classList.remove('hidden');
+
+                document.getElementById('connect-red').value = data.connectRed || '';
+                document.getElementById('connect-amber').value = data.connectAmber || '';
+                document.getElementById('connect-green').value = data.connectGreen || '';
+
+                if (data.spagRows && data.spagRows.length > 0) {
+                    const container = document.getElementById('practice-rows-container');
+                    container.innerHTML = '';
+                    data.spagRows.forEach(row => {
+                        addPracticeRow(row.w0, row.w1, row.w2, row.w3);
+                    });
+                }
+            } catch (e) {
+                console.log("Local storage read blocked.");
+            }
+        }
+
+        function resetProgress() {
+            if (confirm("Are you sure you want to clear your answers and start over?")) {
+                localStorage.removeItem('y7_ht1_dnc_data');
+                window.location.reload();
+            }
+        }
+
+        // Attach auto-save listeners on load
+        window.onload = function() {
+            loadFromLocalStorage();
+
+            document.querySelectorAll('.persist-input').forEach(el => {
+                el.addEventListener('input', saveToLocalStorage);
+            });
+
+            document.querySelectorAll('.spag-input').forEach(el => {
+                el.addEventListener('input', saveToLocalStorage);
+            });
+        };
     </script>
 </body>
 </html>
