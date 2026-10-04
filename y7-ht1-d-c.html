@@ -208,14 +208,24 @@
     <script>
         // Enables the browser's native spell checker to highlight errors with red squiggles
         function runSpagCheck() {
+            // 1. Show the alert first so it doesn't steal focus later
+            alert("SPAG Check Enabled! Look for the red squiggly lines under your spelling mistakes and right-click them to fix.");
+
+            // 2. Turn on spellcheck and "nudge" the text for all 5 boxes
             for (let i = 1; i <= 5; i++) {
                 let box = document.getElementById('q' + i);
+                
+                // Turn on the browser's dictionary
                 box.setAttribute('spellcheck', 'true');
-                // Briefly focus and blur to force the browser to render the red squiggly lines
-                box.focus(); 
+                
+                // The Nudge: temporarily clear and replace the text to force the browser to scan it
+                let currentText = box.value;
+                box.value = ''; 
+                box.value = currentText; 
             }
-            document.getElementById('q1').focus(); // Return focus to the first box
-            alert("SPAG Check Enabled! Look for the red squiggly lines under your spelling mistakes and right-click them to fix.");
+            
+            // Return cursor to the first box
+            document.getElementById('q1').focus(); 
         }
 
         // Smart keyword scanner for long sentence answers
