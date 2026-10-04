@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Y7 HT1 - Demonstrate & Connect</title>
     <link rel="stylesheet" href="style.css">
+    
+    <!-- HTML to PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
         .task-container {
             max-width: 900px;
@@ -18,6 +22,7 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.08);
             border-top: 6px solid #1e3a8a;
             margin-bottom: 20px;
+            transition: all 0.3s ease;
         }
         
         /* RAG Task Colors */
@@ -65,7 +70,6 @@
             min-height: 80px;
         }
         
-        /* Readonly styling to look clean while keeping text active */
         textarea[readonly] {
             background-color: #fafafa;
             color: #333;
@@ -77,7 +81,7 @@
             gap: 15px;
             margin-top: 20px;
         }
-        .btn-mark, .btn-reset {
+        .btn-mark, .btn-spag {
             flex: 1;
             padding: 15px;
             text-align: center;
@@ -93,11 +97,41 @@
             color: #1e3a8a;
         }
         .btn-mark:hover { background-color: #c99722; }
+        
+        .btn-spag {
+            background-color: #607d8b;
+            color: white;
+        }
+        .btn-spag:hover { background-color: #455a64; }
 
+        /* Universal Action Buttons Area */
+        .action-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 40px auto;
+        }
+        .btn-pdf {
+            background-color: #217346;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-pdf:hover { background-color: #124d2d; }
+        
         .btn-reset {
             background-color: #d32f2f;
             color: white;
-            flex: 0.3;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
         }
         .btn-reset:hover { background-color: #b71c1c; }
 
@@ -133,6 +167,7 @@
             font-size: 0.95em;
             width: 100%;
             box-sizing: border-box;
+            background: white;
         }
         .btn-remove-row {
             background-color: #d32f2f;
@@ -159,6 +194,87 @@
             margin-top: 10px;
         }
         .btn-add-word:hover { background-color: #455a64; }
+
+        /* Teacher Verification Styles */
+        .teacher-verify-btn {
+            background-color: #607d8b;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .teacher-verify-btn:hover { background-color: #455a64; }
+        .teacher-verified {
+            border-top-color: #008f39 !important;
+            background-color: #f0fff0 !important;
+        }
+        .teacher-verified .task-title { color: #008f39 !important; }
+        .teacher-verified .instruction-box { border-left-color: #008f39 !important; }
+        .verified-badge { color: #008f39; font-size: 0.8em; margin-left: 10px; display: none; vertical-align: middle; }
+        .teacher-verified .verified-badge { display: inline-block; }
+
+        /* Secure Password Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 300px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-align: center;
+            border-top: 6px solid #1e3a8a;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .modal-btn-row {
+            display: flex;
+            gap: 10px;
+        }
+        .modal-btn-confirm {
+            flex: 1;
+            background-color: #1e3a8a;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .modal-btn-cancel {
+            flex: 1;
+            background-color: #ccc;
+            color: #333;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .modal-error {
+            color: #d32f2f;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            display: none;
+        }
 
         /* Marking Colors & Utility */
         .correct { border-color: #388e3c !important; background-color: #e8f5e9 !important; }
@@ -189,7 +305,7 @@
     </header>
 
     <main>
-        <div class="task-container">
+        <div class="task-container" id="pdf-content">
             
             <!-- STAGE 1: DEMONSTRATE TASK -->
             <div id="demonstrate-stage" class="task-card">
@@ -220,8 +336,8 @@
                 </div>
 
                 <div class="btn-row" id="stage1-buttons">
-                    <button class="btn-mark" onclick="markStage1()">✅ Mark My Work & Open Lesson 2 Tasks</button>
-                    <button class="btn-reset" onclick="resetProgress()" title="Clear progress">🗑️ Reset</button>
+                    <button class="btn-spag no-print" onclick="runSpagCheck()">🔍 SPAG Check</button>
+                    <button class="btn-mark no-print" onclick="markStage1()">✅ Mark My Work & Open Lesson 2 Tasks</button>
                 </div>
 
                 <div id="score-display" class="hidden"></div>
@@ -245,13 +361,13 @@
                     <div id="practice-rows-container">
                         <!-- Rows generated dynamically -->
                     </div>
-                    <button class="btn-add-word" onclick="addPracticeRow()">+ Add Another Word</button>
+                    <button class="btn-add-word no-print" onclick="addPracticeRow()">+ Add Another Word</button>
                 </div>
             </div>
 
             <!-- STAGE 2: CONNECT TASKS (Initially Hidden) -->
             <div id="task-red" class="task-card red-task hidden">
-                <div class="task-title">Part 2: Connect - RED TASK (Consolidation)</div>
+                <div class="task-title">Part 2: Connect - RED TASK (Consolidation) <span class="verified-badge">✅ Teacher Verified</span></div>
                 <div class="instruction-box">
                     Review the basics. Complete the task below after finishing your spelling practice above.
                 </div>
@@ -259,10 +375,13 @@
                     <label>List 3 rules you should always follow to stay safe when using the internet:</label>
                     <textarea id="connect-red" class="persist-input" placeholder="Type your list here..."></textarea>
                 </div>
+                <div style="text-align: right;">
+                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('red')">👨‍🏫 Teacher Verify</button>
+                </div>
             </div>
 
             <div id="task-amber" class="task-card amber-task hidden">
-                <div class="task-title">Part 2: Connect - AMBER TASK (Application)</div>
+                <div class="task-title">Part 2: Connect - AMBER TASK (Application) <span class="verified-badge">✅ Teacher Verified</span></div>
                 <div class="instruction-box">
                     Great effort! Connect your knowledge. Complete the task below after finishing your spelling practice above.
                 </div>
@@ -270,10 +389,13 @@
                     <label>Explain the difference between clicking "Save" and "Save As" when working on a document:</label>
                     <textarea id="connect-amber" class="persist-input" placeholder="Type your explanation here..."></textarea>
                 </div>
+                <div style="text-align: right;">
+                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('amber')">👨‍‍🏫 Teacher Verify</button>
+                </div>
             </div>
 
             <div id="task-green" class="task-card green-task hidden">
-                <div class="task-title">Part 2: Connect - GREEN TASK (Challenge)</div>
+                <div class="task-title">Part 2: Connect - GREEN TASK (Challenge) <span class="verified-badge">✅ Teacher Verified</span></div>
                 <div class="instruction-box">
                     Perfect score! Challenge task complete. Complete the task below after finishing your spelling practice above.
                 </div>
@@ -281,10 +403,32 @@
                     <label>Write a short paragraph explaining what a "digital footprint" is, and how you can make sure your footprint is positive:</label>
                     <textarea id="connect-green" class="persist-input" placeholder="Type your response here..."></textarea>
                 </div>
+                <div style="text-align: right;">
+                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('green')">👨‍🏫 Teacher Verify</button>
+                </div>
             </div>
 
         </div>
+
+        <!-- UNIVERSAL ACTION BUTTONS (PDF & RESET) -->
+        <div class="action-row" id="action-buttons">
+            <button class="btn-pdf no-print" onclick="downloadPDF()">📄 Download Work as PDF</button>
+            <button class="btn-reset no-print" onclick="resetProgress()">🗑️️ Reset Page</button>
+        </div>
     </main>
+
+    <!-- SECURE PASSWORD MODAL -->
+    <div class="modal-overlay" id="verify-modal">
+        <div class="modal-content">
+            <h3>Teacher Verification</h3>
+            <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
+            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter Passcode">
+            <div class="modal-btn-row">
+                <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
+                <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
+            </div>
+        </div>
+    </div>
     
     <footer>
         &copy; 2026 Delta Serlby Park - Computing Department
@@ -298,6 +442,17 @@
             4: ['click', 'point', 'select', 'move', 'drag', 'scroll', 'cursor', 'arrow'],
             5: ['hack', 'hacker', 'steal', 'delete', 'account', 'safe', 'secure', 'protect', 'log in', 'login', 'guess']
         };
+
+        function runSpagCheck() {
+            alert("SPAG Check Enabled! Look for the red squiggly lines under your spelling mistakes and right-click them to fix.");
+            for (let i = 1; i <= 5; i++) {
+                let box = document.getElementById('q' + i);
+                let currentText = box.value;
+                box.value = ''; 
+                box.value = currentText; 
+            }
+            document.getElementById('q1').focus(); 
+        }
 
         function checkSentenceAnswer(inputId, keywords) {
             const inputElement = document.getElementById(inputId);
@@ -331,7 +486,7 @@
                 <input type="text" class="spag-input" value="${word2}" placeholder="Correct spelling...">
                 <input type="text" class="spag-input" value="${word3}" placeholder="Correct spelling...">
                 <input type="text" class="spag-input" value="${word4}" placeholder="Correct spelling...">
-                <button type="button" class="btn-remove-row" onclick="removePracticeRow(this)" title="Remove row">❌</button>
+                <button type="button" class="btn-remove-row no-print" onclick="removePracticeRow(this)" title="Remove row">❌</button>
             `;
             container.appendChild(row);
 
@@ -355,18 +510,15 @@
             score += checkSentenceAnswer('q4', qKeywords[4]);
             score += checkSentenceAnswer('q5', qKeywords[5]);
 
-            // Set boxes to readonly instead of disabled so red spelling underlines remain visible
             for (let i = 1; i <= 5; i++) {
                 document.getElementById('q' + i).readOnly = true;
             }
             document.getElementById('stage1-buttons').style.display = 'none';
 
-            // Show Score
             const scoreDisplay = document.getElementById('score-display');
             scoreDisplay.classList.remove('hidden');
             scoreDisplay.innerText = `You scored ${score} out of 5!`;
 
-            // Reveal Lesson 2 Spelling Practice Box
             document.getElementById('spag-section').classList.remove('hidden');
 
             if (document.getElementById('practice-rows-container').children.length === 0) {
@@ -375,7 +527,6 @@
                 addPracticeRow();
             }
 
-            // Reveal correct RAG Connect Task
             document.getElementById('task-red').classList.add('hidden');
             document.getElementById('task-amber').classList.add('hidden');
             document.getElementById('task-green').classList.add('hidden');
@@ -395,6 +546,61 @@
             }
 
             saveToLocalStorage();
+        }
+
+        // --- TEACHER VERIFICATION MODAL LOGIC ---
+        let activeLevel = null;
+        function openVerifyModal(level) {
+            activeLevel = level;
+            document.getElementById('teacher-password-input').value = '';
+            document.getElementById('modal-error-msg').style.display = 'none';
+            document.getElementById('verify-modal').style.display = 'flex';
+            document.getElementById('teacher-password-input').focus();
+        }
+
+        function closeVerifyModal() {
+            document.getElementById('verify-modal').style.display = 'none';
+            activeLevel = null;
+        }
+
+        function submitVerify() {
+            const pass = document.getElementById('teacher-password-input').value;
+            if (pass === 'delta') {
+                if (activeLevel === 'red') {
+                    document.getElementById('task-red').classList.add('teacher-verified');
+                } else if (activeLevel === 'amber') {
+                    document.getElementById('task-amber').classList.add('teacher-verified');
+                } else if (activeLevel === 'green') {
+                    document.getElementById('task-green').classList.add('teacher-verified');
+                }
+                closeVerifyModal();
+                saveToLocalStorage();
+            } else {
+                document.getElementById('modal-error-msg').style.display = 'block';
+            }
+        }
+
+        // --- PDF GENERATION LOGIC ---
+        function downloadPDF() {
+            var btns = document.querySelectorAll('.no-print');
+            btns.forEach(b => b.style.display = 'none');
+            document.getElementById('action-buttons').style.display = 'none';
+
+            var textInputs = document.querySelectorAll('textarea');
+            textInputs.forEach(t => t.setAttribute('value', t.value));
+
+            var opt = {
+                margin:       0.3,
+                filename:     'Y7_HT1_Demonstrate_Connect.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(document.getElementById('pdf-content')).save().then(function() {
+                btns.forEach(b => b.style.display = 'inline-block');
+                document.getElementById('action-buttons').style.display = 'flex';
+            });
         }
 
         // --- LOCAL STORAGE PERSISTENCE ---
@@ -421,6 +627,9 @@
                     red_hidden: document.getElementById('task-red').classList.contains('hidden'),
                     amber_hidden: document.getElementById('task-amber').classList.contains('hidden'),
                     green_hidden: document.getElementById('task-green').classList.contains('hidden'),
+                    red_verified: document.getElementById('task-red').classList.contains('teacher-verified'),
+                    amber_verified: document.getElementById('task-amber').classList.contains('teacher-verified'),
+                    green_verified: document.getElementById('task-green').classList.contains('teacher-verified'),
                     connectRed: document.getElementById('connect-red').value,
                     connectAmber: document.getElementById('connect-amber').value,
                     connectGreen: document.getElementById('connect-green').value,
@@ -437,7 +646,7 @@
                     });
                 });
 
-                localStorage.setItem('y7_ht1_dnc_data', JSON.stringify(data));
+                localStorage.setItem('y7_ht1_dnc_complete_data', JSON.stringify(data));
             } catch (e) {
                 console.log("Local storage restricted.");
             }
@@ -445,7 +654,7 @@
 
         function loadFromLocalStorage() {
             try {
-                const saved = localStorage.getItem('y7_ht1_dnc_data');
+                const saved = localStorage.getItem('y7_ht1_dnc_complete_data');
                 if (!saved) return;
                 const data = JSON.parse(saved);
 
@@ -487,6 +696,10 @@
                 if (!data.amber_hidden) document.getElementById('task-amber').classList.remove('hidden');
                 if (!data.green_hidden) document.getElementById('task-green').classList.remove('hidden');
 
+                if (data.red_verified) document.getElementById('task-red').classList.add('teacher-verified');
+                if (data.amber_verified) document.getElementById('task-amber').classList.add('teacher-verified');
+                if (data.green_verified) document.getElementById('task-green').classList.add('teacher-verified');
+
                 document.getElementById('connect-red').value = data.connectRed || '';
                 document.getElementById('connect-amber').value = data.connectAmber || '';
                 document.getElementById('connect-green').value = data.connectGreen || '';
@@ -508,8 +721,8 @@
         }
 
         function resetProgress() {
-            if (confirm("Are you sure you want to clear your answers and start over?")) {
-                localStorage.removeItem('y7_ht1_dnc_data');
+            if (confirm("Are you sure you want to clear your answers and reset the page?")) {
+                localStorage.removeItem('y7_ht1_dnc_complete_data');
                 window.location.reload();
             }
         }
