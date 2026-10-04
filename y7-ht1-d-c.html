@@ -5,156 +5,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Y7 HT1 - Demonstrate & Connect</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Supabase Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .task-container {
-            max-width: 900px;
-            margin: 0 auto 40px auto;
-            padding: 20px;
+        /* Login Modal Styles */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 1000;
+            display: flex; justify-content: center; align-items: center;
         }
-        .task-card {
-            background: white;
-            border-radius: 8px;
-            padding: 30px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            border-top: 6px solid #1e3a8a;
-            margin-bottom: 20px;
+        .modal-content {
+            background: white; padding: 30px; border-radius: 8px; width: 350px;
+            text-align: center; border-top: 6px solid #dfaa2b;
         }
+        .modal-content input, .modal-content select {
+            width: 100%; padding: 12px; margin: 10px 0 20px 0;
+            font-size: 16px; border: 2px solid #ccc; border-radius: 4px; box-sizing: border-box;
+        }
+        .modal-btn {
+            background-color: #1e3a8a; color: white; border: none; padding: 15px;
+            width: 100%; border-radius: 6px; font-size: 1.1em; font-weight: bold; cursor: pointer;
+        }
+
+        .task-container { max-width: 900px; margin: 0 auto 40px auto; padding: 20px; }
+        .task-card { background: white; border-radius: 8px; padding: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #1e3a8a; margin-bottom: 20px; }
         
-        /* RAG Task Colors */
         .red-task { border-top-color: #d32f2f; }
         .amber-task { border-top-color: #f57c00; }
         .green-task { border-top-color: #388e3c; }
         
-        .task-title {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #1e3a8a;
-        }
+        .task-title { font-size: 1.5em; font-weight: bold; margin-bottom: 20px; color: #1e3a8a; }
         .red-task .task-title { color: #d32f2f; }
         .amber-task .task-title { color: #f57c00; }
         .green-task .task-title { color: #388e3c; }
 
-        .instruction-box {
-            background-color: #f8f9fa;
-            border-left: 4px solid #dfaa2b;
-            padding: 15px;
-            margin-bottom: 25px;
-            color: #555;
-            font-style: italic;
-        }
-
-        .question-group {
-            margin-bottom: 20px;
-        }
-        .question-group label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #333;
-        }
-        .question-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ccc;
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 16px;
-            box-sizing: border-box;
-            transition: all 0.3s;
-            resize: vertical;
-            min-height: 80px;
-        }
+        .instruction-box { background-color: #f8f9fa; border-left: 4px solid #dfaa2b; padding: 15px; margin-bottom: 25px; color: #555; font-style: italic; }
+        .question-group { margin-bottom: 20px; }
+        .question-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #333; }
+        .question-group textarea { width: 100%; padding: 12px; border: 2px solid #ccc; border-radius: 6px; font-family: inherit; font-size: 16px; box-sizing: border-box; resize: vertical; min-height: 80px; }
         
-        /* Action Buttons */
-        .btn-row {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        .btn-mark, .btn-spag {
-            flex: 1;
-            padding: 15px;
-            text-align: center;
-            border: none;
-            border-radius: 6px;
-            font-size: 1.1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .btn-mark {
-            background-color: #dfaa2b;
-            color: #1e3a8a;
-        }
-        .btn-mark:hover { background-color: #c99722; }
+        .btn-row { display: flex; gap: 15px; margin-top: 20px; }
+        .btn-mark, .btn-spag { flex: 1; padding: 15px; text-align: center; border: none; border-radius: 6px; font-size: 1.1em; font-weight: bold; cursor: pointer; }
+        .btn-mark { background-color: #dfaa2b; color: #1e3a8a; }
+        .btn-spag { background-color: #607d8b; color: white; }
+        .btn-submit-final { display: block; width: 100%; padding: 15px; background-color: #1e3a8a; color: white; border: none; border-radius: 6px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin-top: 20px; }
         
-        .btn-spag {
-            background-color: #607d8b;
-            color: white;
-        }
-        .btn-spag:hover { background-color: #455a64; }
-
-        /* Marking Colors */
         .correct { border-color: #388e3c !important; background-color: #e8f5e9; }
         .incorrect { border-color: #d32f2f !important; background-color: #ffebee; }
-        
-        /* Hidden Class */
         .hidden { display: none !important; }
 
-        #score-display {
-            font-size: 1.2em;
-            font-weight: bold;
-            text-align: center;
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 6px;
-        }
+        #score-display { font-size: 1.2em; font-weight: bold; text-align: center; margin-top: 20px; padding: 15px; border-radius: 6px; }
     </style>
 </head>
 <body>
+    <!-- Login Modal overlay -->
+    <div id="login-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 style="color: #1e3a8a; margin-top: 0;">Task Login</h2>
+            <p style="color: #666; font-size: 0.9em;">Enter your details to begin the task. Your progress is saved automatically.</p>
+            
+            <input type="text" id="login-name" placeholder="First & Last Name" required>
+            
+            <select id="login-class">
+                <option value="" disabled selected>Select your Class...</option>
+                <option value="7A">7A</option>
+                <option value="7B">7B</option>
+                <option value="7C">7C</option>
+            </select>
+            
+            <button class="modal-btn" onclick="startSession()">Start Lesson</button>
+        </div>
+    </div>
+
     <header>
-        <div class="header-left">
-            <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
-        </div>
-        <div class="header-center">
-            <h1>Year 7 Computing</h1>
-        </div>
-        <div class="header-right">
-            <a href="javascript:history.back()" class="back-btn">&larr; Back to Unit</a>
-        </div>
+        <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
+        <div class="header-center"><h1>Year 7 Computing</h1></div>
+        <div class="header-right"><a href="javascript:history.back()" class="back-btn">&larr; Back</a></div>
     </header>
 
     <main>
         <div class="task-container">
-            
-            <!-- STAGE 1: DEMONSTRATE TASK -->
+            <!-- STAGE 1 -->
             <div id="demonstrate-stage" class="task-card">
                 <div class="task-title">Part 1: Demonstrate (Knowledge Check)</div>
-                <div class="instruction-box">
-                    Write short, full sentences to answer the 5 questions below. Use the "SPAG Check" button to highlight spelling errors before marking. Your final score will determine your Connect task!
-                </div>
+                <div class="instruction-box">Write short, full sentences to answer the 5 questions below.</div>
 
-                <div class="question-group">
-                    <label>1. Write a sentence explaining what you use a computer keyboard for:</label>
-                    <textarea id="q1" spellcheck="false" placeholder="Type your sentence here..."></textarea>
-                </div>
-                <div class="question-group">
-                    <label>2. Why is it important to save your files inside correctly named folders?</label>
-                    <textarea id="q2" spellcheck="false" placeholder="Type your sentence here..."></textarea>
-                </div>
-                <div class="question-group">
-                    <label>3. Write down one important rule for staying safe on the internet:</label>
-                    <textarea id="q3" spellcheck="false" placeholder="Type your sentence here..."></textarea>
-                </div>
-                <div class="question-group">
-                    <label>4. Explain what you use a computer mouse for on the screen:</label>
-                    <textarea id="q4" spellcheck="false" placeholder="Type your sentence here..."></textarea>
-                </div>
-                <div class="question-group">
-                    <label>5. Why is it important to keep your password a secret from other people?</label>
-                    <textarea id="q5" spellcheck="false" placeholder="Type your sentence here..."></textarea>
-                </div>
+                <div class="question-group"><label>1. Write a sentence explaining what you use a computer keyboard for:</label><textarea id="q1" spellcheck="false" placeholder="Type your sentence here..."></textarea></div>
+                <div class="question-group"><label>2. Why is it important to save your files inside correctly named folders?</label><textarea id="q2" spellcheck="false" placeholder="Type your sentence here..."></textarea></div>
+                <div class="question-group"><label>3. Write down one important rule for staying safe on the internet:</label><textarea id="q3" spellcheck="false" placeholder="Type your sentence here..."></textarea></div>
+                <div class="question-group"><label>4. Explain what you use a computer mouse for on the screen:</label><textarea id="q4" spellcheck="false" placeholder="Type your sentence here..."></textarea></div>
+                <div class="question-group"><label>5. Why is it important to keep your password a secret from other people?</label><textarea id="q5" spellcheck="false" placeholder="Type your sentence here..."></textarea></div>
 
                 <div class="btn-row" id="stage1-buttons">
                     <button class="btn-spag" onclick="runSpagCheck()">🔍 SPAG Check</button>
@@ -163,132 +103,128 @@
                 <div id="score-display" class="hidden"></div>
             </div>
 
-            <!-- STAGE 2: CONNECT TASKS (Initially Hidden) -->
-            
+            <!-- STAGE 2 (RAG) -->
             <div id="task-red" class="task-card red-task hidden">
-                <div class="task-title">Part 2: Connect - RED TASK (Consolidation)</div>
-                <div class="instruction-box">
-                    Let's review the basics. Complete the task below to connect what we have learned this half term.
-                </div>
-                <div class="question-group">
-                    <label>List 3 rules you should always follow to stay safe when using the internet:</label>
-                    <textarea placeholder="Type your list here..."></textarea>
-                </div>
+                <div class="task-title">Part 2: Connect - RED TASK</div>
+                <div class="question-group"><label>List 3 rules you should always follow to stay safe when using the internet:</label><textarea id="ans-red" placeholder="Type your list here..."></textarea></div>
+                <button class="btn-submit-final" onclick="submitFinalWork()">💾 Save Final Answer</button>
             </div>
 
             <div id="task-amber" class="task-card amber-task hidden">
-                <div class="task-title">Part 2: Connect - AMBER TASK (Application)</div>
-                <div class="instruction-box">
-                    Great effort! Now let's connect your knowledge. Complete the task below.
-                </div>
-                <div class="question-group">
-                    <label>Explain the difference between clicking "Save" and "Save As" when working on a document:</label>
-                    <textarea placeholder="Type your explanation here..."></textarea>
-                </div>
+                <div class="task-title">Part 2: Connect - AMBER TASK</div>
+                <div class="question-group"><label>Explain the difference between clicking "Save" and "Save As" when working on a document:</label><textarea id="ans-amber" placeholder="Type your explanation here..."></textarea></div>
+                <button class="btn-submit-final" onclick="submitFinalWork()">💾 Save Final Answer</button>
             </div>
 
             <div id="task-green" class="task-card green-task hidden">
-                <div class="task-title">Part 2: Connect - GREEN TASK (Challenge)</div>
-                <div class="instruction-box">
-                    Perfect score! You are ready to connect these concepts to a wider challenge.
-                </div>
-                <div class="question-group">
-                    <label>Write a short paragraph explaining what a "digital footprint" is, and how you can make sure your footprint is positive:</label>
-                    <textarea placeholder="Type your response here..."></textarea>
-                </div>
+                <div class="task-title">Part 2: Connect - GREEN TASK</div>
+                <div class="question-group"><label>Write a short paragraph explaining what a "digital footprint" is, and how you can make sure your footprint is positive:</label><textarea id="ans-green" placeholder="Type your response here..."></textarea></div>
+                <button class="btn-submit-final" onclick="submitFinalWork()">💾 Save Final Answer</button>
             </div>
-
         </div>
     </main>
     
-    <footer>
-        &copy; 2026 Delta Serlby Park - Computing Department
-    </footer>
+    <footer>&copy; 2026 Delta Serlby Park - Computing Department</footer>
 
     <script>
-        // Enables the browser's native spell checker to highlight errors with red squiggles
-        function runSpagCheck() {
-            // Show alert first so it doesn't steal focus
-            alert("SPAG Check Enabled! Look for the red squiggly lines under your spelling mistakes and right-click them to fix.");
+        // --- DATABASE CONNECTION ---
+        const supabaseUrl = 'https://zqvrmmhiqxmghtxgjrtk.supabase.co';
+        const supabaseKey = 'sb_publishable_iD26_DKTKRUWP7Jj3giEPA_f2xd5OCW';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        let dbRecordId = null;
+        let globalScore = 0;
+        let assignedRagLevel = "";
 
+        async function startSession() {
+            const nameInput = document.getElementById('login-name').value.trim();
+            const classInput = document.getElementById('login-class').value;
+
+            if (nameInput === "" || classInput === "") {
+                alert("Please enter both your name and class to begin.");
+                return;
+            }
+
+            document.getElementById('login-modal').style.display = 'none';
+
+            // Create initial blank record in the database
+            const { data, error } = await supabase.from('dnc_responses').insert([
+                { student_name: nameInput, class_name: classInput, task_id: 'Y7-HT1', score: 0 }
+            ]).select();
+
+            if (data && data.length > 0) {
+                dbRecordId = data[0].id;
+            }
+        }
+
+        async function syncToDatabase(isFinal) {
+            if (!dbRecordId) return;
+
+            let finalRagAnswer = "";
+            if (assignedRagLevel === "Red Task") finalRagAnswer = document.getElementById('ans-red').value;
+            if (assignedRagLevel === "Amber Task") finalRagAnswer = document.getElementById('ans-amber').value;
+            if (assignedRagLevel === "Green Task") finalRagAnswer = document.getElementById('ans-green').value;
+
+            await supabase.from('dnc_responses').update({
+                q1: document.getElementById('q1').value,
+                q2: document.getElementById('q2').value,
+                q3: document.getElementById('q3').value,
+                q4: document.getElementById('q4').value,
+                q5: document.getElementById('q5').value,
+                score: globalScore,
+                rag_level: assignedRagLevel,
+                rag_answer: finalRagAnswer
+            }).eq('id', dbRecordId);
+
+            if (isFinal) {
+                alert("Task Complete! Your work has been successfully sent to the teacher dashboard.");
+            }
+        }
+
+        // --- MARKING LOGIC ---
+        function runSpagCheck() {
+            alert("SPAG Check Enabled! Look for the red squiggly lines.");
             for (let i = 1; i <= 5; i++) {
                 let box = document.getElementById('q' + i);
                 box.setAttribute('spellcheck', 'true');
-                
-                // The Nudge: temporarily clear and replace the text to force the browser to scan it
-                let currentText = box.value;
-                box.value = ''; 
-                box.value = currentText; 
+                let temp = box.value; box.value = ''; box.value = temp; 
             }
-            
-            // Return cursor to the first box
             document.getElementById('q1').focus(); 
         }
 
-        // Smart keyword scanner for long sentence answers
         function checkSentenceAnswer(inputId, keywords) {
-            const inputElement = document.getElementById(inputId);
-            const studentAnswer = inputElement.value.toLowerCase().trim();
-            
-            if (studentAnswer === "") {
-                inputElement.classList.add('incorrect');
-                inputElement.classList.remove('correct');
-                return 0;
-            }
-
-            // Checks if the student's long answer includes AT LEAST ONE of the target keywords
-            let isCorrect = keywords.some(keyword => studentAnswer.includes(keyword.toLowerCase()));
-
-            if (isCorrect) {
-                inputElement.classList.add('correct');
-                inputElement.classList.remove('incorrect');
-                return 1;
-            } else {
-                inputElement.classList.add('incorrect');
-                inputElement.classList.remove('correct');
-                return 0;
-            }
+            const el = document.getElementById(inputId);
+            const ans = el.value.toLowerCase().trim();
+            if (ans === "") { el.classList.add('incorrect'); return 0; }
+            if (keywords.some(k => ans.includes(k.toLowerCase()))) { el.classList.add('correct'); return 1; } 
+            else { el.classList.add('incorrect'); return 0; }
         }
 
         function markStage1() {
-            let score = 0;
-            
-            // Mark the 5 questions by scanning their sentences for these easy/acceptable keywords
-            score += checkSentenceAnswer('q1', ['type', 'typing', 'write', 'enter', 'letters', 'words', 'text']);
-            score += checkSentenceAnswer('q2', ['organise', 'organize', 'find', 'save', 'store', 'neat', 'tidy', 'lose', 'sort']);
-            score += checkSentenceAnswer('q3', ['stranger', 'tell', 'adult', 'password', 'private', 'personal', 'name', 'address', 'safe', 'careful']);
-            score += checkSentenceAnswer('q4', ['click', 'point', 'select', 'move', 'drag', 'scroll', 'cursor', 'arrow']);
-            score += checkSentenceAnswer('q5', ['hack', 'hacker', 'steal', 'delete', 'account', 'safe', 'secure', 'protect', 'log in', 'login', 'guess']);
+            globalScore = 0;
+            globalScore += checkSentenceAnswer('q1', ['type', 'typing', 'write', 'enter', 'letters', 'words', 'text']);
+            globalScore += checkSentenceAnswer('q2', ['organise', 'organize', 'find', 'save', 'store', 'neat', 'tidy', 'lose', 'sort']);
+            globalScore += checkSentenceAnswer('q3', ['stranger', 'tell', 'adult', 'password', 'private', 'personal', 'name', 'address', 'safe', 'careful']);
+            globalScore += checkSentenceAnswer('q4', ['click', 'point', 'select', 'move', 'drag', 'scroll', 'cursor', 'arrow']);
+            globalScore += checkSentenceAnswer('q5', ['hack', 'hacker', 'steal', 'delete', 'account', 'safe', 'secure', 'protect', 'log in', 'login', 'guess']);
 
-            // Disable inputs and hide buttons after marking
-            for (let i = 1; i <= 5; i++) {
-                document.getElementById('q' + i).disabled = true;
-            }
+            for (let i = 1; i <= 5; i++) document.getElementById('q' + i).disabled = true;
             document.getElementById('stage1-buttons').style.display = 'none';
 
-            // Show Score
             const scoreDisplay = document.getElementById('score-display');
             scoreDisplay.classList.remove('hidden');
-            scoreDisplay.innerText = `You scored ${score} out of 5!`;
+            scoreDisplay.innerText = `You scored ${globalScore} out of 5!`;
 
-            // Logic to reveal the differentiated task
-            document.getElementById('task-red').classList.add('hidden');
-            document.getElementById('task-amber').classList.add('hidden');
-            document.getElementById('task-green').classList.add('hidden');
+            if (globalScore <= 2) { assignedRagLevel = "Red Task"; document.getElementById('task-red').classList.remove('hidden'); scoreDisplay.style.backgroundColor = "#ffebee"; scoreDisplay.style.color = "#d32f2f"; }
+            else if (globalScore >= 3 && globalScore <= 4) { assignedRagLevel = "Amber Task"; document.getElementById('task-amber').classList.remove('hidden'); scoreDisplay.style.backgroundColor = "#fff3e0"; scoreDisplay.style.color = "#ef6c00"; }
+            else if (globalScore === 5) { assignedRagLevel = "Green Task"; document.getElementById('task-green').classList.remove('hidden'); scoreDisplay.style.backgroundColor = "#e8f5e9"; scoreDisplay.style.color = "#2e7d32"; }
 
-            if (score <= 2) {
-                scoreDisplay.style.backgroundColor = "#ffebee";
-                scoreDisplay.style.color = "#d32f2f";
-                document.getElementById('task-red').classList.remove('hidden');
-            } else if (score >= 3 && score <= 4) {
-                scoreDisplay.style.backgroundColor = "#fff3e0";
-                scoreDisplay.style.color = "#ef6c00";
-                document.getElementById('task-amber').classList.remove('hidden');
-            } else if (score === 5) {
-                scoreDisplay.style.backgroundColor = "#e8f5e9";
-                scoreDisplay.style.color = "#2e7d32";
-                document.getElementById('task-green').classList.remove('hidden');
-            }
+            // Silently sync score and Q1-Q5 to database
+            syncToDatabase(false);
+        }
+
+        function submitFinalWork() {
+            syncToDatabase(true);
         }
     </script>
 </body>
