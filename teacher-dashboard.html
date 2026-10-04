@@ -7,81 +7,16 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .dashboard-layout {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 20px;
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 0 20px;
-        }
-        .sidebar {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            border-top: 6px solid #1e3a8a;
-            height: fit-content;
-        }
-        .main-view {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            border-top: 6px solid #dfaa2b;
-        }
-        .student-btn {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 8px;
-            background: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            text-align: left;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .student-btn:hover, .student-btn.active {
-            background: #1e3a8a;
-            color: white;
-            border-color: #1e3a8a;
-        }
-        .score-badge {
-            float: right;
-            background: #dfaa2b;
-            color: #1e3a8a;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.85em;
-        }
-        select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
-        .answer-box {
-            background: #f8f9fa;
-            border: 2px solid #ccc;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            min-height: 40px;
-            color: #333;
-            font-family: inherit;
-        }
+        .dashboard-layout { display: grid; grid-template-columns: 300px 1fr; gap: 20px; max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+        .sidebar { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #1e3a8a; height: fit-content; }
+        .main-view { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #dfaa2b; }
+        .student-btn { display: block; width: 100%; padding: 10px; margin-bottom: 8px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; text-align: left; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .student-btn:hover, .student-btn.active { background: #1e3a8a; color: white; border-color: #1e3a8a; }
+        .score-badge { float: right; background: #dfaa2b; color: #1e3a8a; padding: 2px 8px; border-radius: 12px; font-size: 0.85em; }
+        select { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #ccc; }
+        .answer-box { background: #f8f9fa; border: 2px solid #ccc; padding: 15px; border-radius: 6px; margin-bottom: 15px; min-height: 40px; color: #333; font-family: inherit; }
         h3 { color: #1e3a8a; margin-top: 0; }
-        .rag-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            color: white;
-            border-radius: 4px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
+        .rag-badge { display: inline-block; padding: 5px 10px; color: white; border-radius: 4px; font-weight: bold; margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -98,7 +33,6 @@
     </header>
 
     <div class="dashboard-layout">
-        <!-- Sidebar: Student List -->
         <div class="sidebar">
             <h3>Class List</h3>
             <select id="class-filter" onchange="fetchStudents()">
@@ -112,26 +46,37 @@
             </div>
         </div>
 
-        <!-- Main View: Student Work -->
         <div class="main-view" id="work-view">
             <h2 style="color: #666; text-align: center; margin-top: 50px;">&larr; Select a student to view their work</h2>
         </div>
     </div>
 
     <script>
-        const supabaseUrl = 'https://zqvrmmhiqxmghtxgjrtk.supabase.co';
+        // Corrected URL spelling and updated API key
+        const supabaseUrl = 'https://zqvmrmhiqxmghtxgjrtk.supabase.co';
         const supabaseKey = 'sb_publishable_iD26_DKTKRUWP7Jj3giEPA_f2xd5OCW';
         
-        // Fixed: assigned to 'db' matching the query calls below
-        const db = window.supabase.createClient(supabaseUrl, supabaseKey);
+        let db = null;
+        try {
+            if (window.supabase) {
+                db = window.supabase.createClient(supabaseUrl, supabaseKey);
+            }
+        } catch (error) {
+            console.error("Database initialization failed.");
+        }
         
         let allRecords = [];
 
         async function fetchStudents() {
             const classFilter = document.getElementById('class-filter').value;
-            document.getElementById('student-list').innerHTML = "<p>Loading...</p>";
+            const listDiv = document.getElementById('student-list');
+            listDiv.innerHTML = "<p>Loading...</p>";
 
-            // Fixed: changed 'supabase.from' to 'db.from'
+            if (!db) {
+                listDiv.innerHTML = "<p style='color:red;'>Database connection error.</p>";
+                return;
+            }
+
             let query = db.from('dnc_responses').select('*').order('created_at', { ascending: false });
             if (classFilter !== "ALL") {
                 query = query.eq('class_name', classFilter);
@@ -139,7 +84,7 @@
 
             const { data, error } = await query;
             if (error) {
-                document.getElementById('student-list').innerHTML = `<p style="color:red">Error: ${error.message}</p>`;
+                listDiv.innerHTML = `<p style="color:red">Error: ${error.message}</p>`;
                 return;
             }
 
