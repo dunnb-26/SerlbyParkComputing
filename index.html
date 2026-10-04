@@ -5,18 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Delta Serlby Park - Computing</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Styling for the D&C Banner Button */
+        .dnc-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #dfaa2b; /* Delta Gold */
+            color: #1e3a8a; /* Delta Navy */
+            text-align: center;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .dnc-btn:hover {
+            background-color: #c99722;
+        }
+    </style>
 </head>
 <body>
     <header>
         <div class="header-left">
-            <!-- Logo is now a clickable home button -->
             <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
         </div>
-        
         <div class="header-center">
             <h1>Serlby Park Computing</h1>
         </div>
-        
         <div class="header-right"></div>
     </header>
 
@@ -29,8 +48,12 @@
 
     <main>
         <h2 id="year-title">Year 7 Curriculum</h2>
+        
+        <!-- Dynamic Demonstrate & Connect Banner -->
+        <div id="dnc-container"></div>
+
         <div id="content-grid" class="grid">
-            <!-- Cards will be dynamically injected here by the script -->
+            <!-- Cards injected via script -->
         </div>
     </main>
 
@@ -85,25 +108,26 @@
         };
 
         function loadYear(year) {
-            // Failsafe: if the memory asks for a year that doesn't exist anymore, force it to Year 7
-            if (!curriculumData[year]) {
-                year = 'year7';
-            }
+            if (!curriculumData[year]) year = 'year7';
 
             document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
-            
-            // Failsafe: only highlight the button if it actually exists on the page
             const activeBtn = document.getElementById('btn-' + year);
             if (activeBtn) activeBtn.classList.add('active');
 
             const titles = { year7: 'Year 7 Curriculum', year8: 'Year 8 Curriculum', year9: 'Year 9 Curriculum', gcse: 'GCSE Curriculum' };
             document.getElementById('year-title').innerText = titles[year];
 
+            const dncContainer = document.getElementById('dnc-container');
+            if (year === 'year7' || year === 'year8' || year === 'year9') {
+                const yearNum = year.replace('year', '');
+                dncContainer.innerHTML = `<button class="dnc-btn" onclick="window.location.href='y${yearNum}-dnc.html'">📝 View Year ${yearNum} Demonstrate & Connect Tasks</button>`;
+            } else {
+                dncContainer.innerHTML = '';
+            }
+
             try {
                 localStorage.setItem('lastViewedYearGroup', year);
-            } catch (error) {
-                console.log("Memory saving blocked by browser, ignoring.");
-            }
+            } catch (error) {}
 
             const grid = document.getElementById('content-grid');
             grid.innerHTML = ''; 
@@ -111,16 +135,10 @@
             curriculumData[year].forEach((unit, index) => {
                 const card = document.createElement('div');
                 card.className = 'card';
-                
                 const fileName = unit.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.html';
-                
-                card.onclick = () => {
-                    window.location.href = fileName;
-                };
+                card.onclick = () => { window.location.href = fileName; };
 
-                // Checks if the tab is GCSE. If yes, it removes the subtitle entirely. If no, it numbers the units.
                 let subtitleHtml = year === 'gcse' ? '' : `<div class="card-subtitle">UNIT ${index + 1} &bull; COMPUTING</div>`;
-
                 card.innerHTML = `
                     ${subtitleHtml}
                     <div class="card-title">${unit.title}</div>
@@ -135,13 +153,7 @@
 
         window.onload = () => {
             let savedYear = 'year7';
-            
-            try {
-                savedYear = localStorage.getItem('lastViewedYearGroup') || 'year7';
-            } catch (error) {
-                console.log("Memory reading blocked by browser.");
-            }
-            
+            try { savedYear = localStorage.getItem('lastViewedYearGroup') || 'year7'; } catch (error) {}
             loadYear(savedYear);
         };
     </script>
