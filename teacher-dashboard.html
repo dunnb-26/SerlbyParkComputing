@@ -92,7 +92,9 @@
         <div class="header-center">
             <h1>D&C Live Dashboard</h1>
         </div>
-        <div class="header-right"></div>
+        <div class="header-right">
+            <button onclick="fetchStudents()" style="background:#dfaa2b; color:#1e3a8a; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer;">↻ Refresh</button>
+        </div>
     </header>
 
     <div class="dashboard-layout">
@@ -118,8 +120,10 @@
 
     <script>
         const supabaseUrl = 'https://zqvrmmhiqxmghtxgjrtk.supabase.co';
-        const supabaseKey = 'sb_publishable_iD26_DKTKRUWP7Jj3giEPA_f2xd5OCW';
-       const db = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const supabaseKey = 'sb_publishable_iD26_DKTKRUWP7Jj3giEPA_f2xd5OCWeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpxdm1ybWhpcXhtZ2h0eGdqcnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExMTY3NDksImV4cCI6MjEwNjY5Mjc0OX0.sHAwiZA3teRC3LmrC3ts7yVol-SnvWoqP3aUu9kvxZ4';
+        
+        // Fixed: assigned to 'db' matching the query calls below
+        const db = window.supabase.createClient(supabaseUrl, supabaseKey);
         
         let allRecords = [];
 
@@ -127,7 +131,8 @@
             const classFilter = document.getElementById('class-filter').value;
             document.getElementById('student-list').innerHTML = "<p>Loading...</p>";
 
-            let query = supabase.from('dnc_responses').select('*').order('created_at', { ascending: false });
+            // Fixed: changed 'supabase.from' to 'db.from'
+            let query = db.from('dnc_responses').select('*').order('created_at', { ascending: false });
             if (classFilter !== "ALL") {
                 query = query.eq('class_name', classFilter);
             }
@@ -138,7 +143,7 @@
                 return;
             }
 
-            allRecords = data;
+            allRecords = data || [];
             renderSidebar();
         }
 
@@ -147,7 +152,7 @@
             listDiv.innerHTML = "";
 
             if (allRecords.length === 0) {
-                listDiv.innerHTML = "<p style='color: #666; font-size: 0.9em;'>No submissions yet.</p>";
+                listDiv.innerHTML = "<p style='color: #666; font-size: 0.9em;'>No submissions yet.<br><small>Students appear here once they log in and open the task page.</small></p>";
                 return;
             }
 
