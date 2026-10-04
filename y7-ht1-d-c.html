@@ -36,13 +36,18 @@
         .hidden { display: none !important; }
 
         #score-display { font-size: 1.2em; font-weight: bold; text-align: center; margin-top: 20px; padding: 15px; border-radius: 6px; }
+        
+        /* Loading overlay to hide blank boxes while data downloads */
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; justify-content: center; align-items: center; font-size: 1.5em; color: #1e3a8a; font-weight: bold; transition: opacity 0.5s; }
     </style>
 </head>
 <body>
+    <div id="loading-overlay">Loading your workspace...</div>
+
     <header>
         <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
         <div class="header-center"><h1>Year 7 Computing</h1></div>
-        <div class="header-right"><a href="javascript:history.back()" class="back-btn">&larr; Back</a></div>
+        <div class="header-right"><a href="javascript:history.back()" class="back-btn">&larr; Go Back</a></div>
     </header>
 
     <main>
@@ -89,38 +94,90 @@
     <footer>&copy; 2026 Delta Serlby Park - Computing Department</footer>
 
     <script>
-        // --- DATABASE CONNECTION ---
+        // --- FIXED DATABASE CONNECTION ---
         const supabaseUrl = 'https://zqvrmmhiqxmghtxgjrtk.supabase.co';
         const supabaseKey = 'sb_publishable_iD26_DKTKRUWP7Jj3giEPA_f2xd5OCWeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpxdm1ybWhpcXhtZ2h0eGdqcnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExMTY3NDksImV4cCI6MjEwNjY5Mjc0OX0.sHAwiZA3teRC3LmrC3ts7yVol-SnvWoqP3aUu9kvxZ4';
-        const db = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        let db = null;
+        try { if (window.supabase) db = window.supabase.createClient(supabaseUrl, supabaseKey); } catch (e) {}
         
         let dbRecordId = null;
         let globalScore = 0;
         let assignedRagLevel = "";
         
-        // Pull student details from the browser memory (saved during index.html login)
+        // Pull student details from the browser memory
         let studentName = localStorage.getItem('loggedInName');
         let className = localStorage.getItem('loggedInClass');
 
-        // Auto-start session on load
+        // Keywords mapped for visual marking restoration
+        const qKeywords = {
+            1: ['type', 'typing', 'write', 'enter', 'letters', 'words', 'text'],
+            2: ['organise', 'organize', 'find', 'save', 'store', 'neat', 'tidy', 'lose', 'sort'],
+            3: ['stranger', 'tell', 'adult', 'password', 'private', 'personal', 'name', 'address', 'safe', 'careful'],
+            4: ['click', 'point', 'select', 'move', 'drag', 'scroll', 'cursor', 'arrow'],
+            5: ['hack', 'hacker', 'steal', 'delete', 'account', 'safe', 'secure', 'protect', 'log in', 'login', 'guess']
+        };
+
+        // Auto-start session & restore data on load
         window.onload = async function() {
-            // Kick out users who bypassed the login screen
             if (!studentName || !className) {
                 alert("You are not logged in. Please return to the home page to log in.");
                 window.location.href = "index.html";
                 return;
             }
 
-            // Create initial blank record in the database quietly in the background
-            const { data, error } = await supabase.from('dnc_responses').insert([
-                { student_name: studentName, class_name: className, task_id: 'Y7-HT1', score: 0 }
-            ]).select();
+            if (!db) { alert("Database connection blocked. Progress cannot be saved."); return; }
+
+            // Check if student already has a saved session for this lesson
+            const { data, error } = await db.from('dnc_responses')
+                .select('*').eq('student_name', studentName).eq('class_name', className).eq('task_id', 'Y7-HT1');
 
             if (data && data.length > 0) {
-                dbRecordId = data[0].id;
+                // RESTORE THEIR WORK!
+                const record = data[0];
+                dbRecordId = record.id;
+                globalScore = record.score || 0;
+                assignedRagLevel = record.rag_level || "";
+
+                if(record.q1) document.getElementById('q1').value = record.q1;
+                if(record.q2) document.getElementById('q2').value = record.q2;
+                if(record.q3) document.getElementById('q3').value = record.q3;
+                if(record.q4) document.getElementById('q4').value = record.q4;
+                if(record.q5) document.getElementById('q5').value = record.q5;
+
+                // If they already clicked "Mark My Work" previously, lock the boxes and show the correct RAG task
+                if (assignedRagLevel !== "") {
+                    for (let i = 1; i <= 5; i++) {
+                        checkSentenceAnswer('q' + i, qKeywords[i]);
+                        document.getElementById('q' + i).disabled = true;
+                    }
+                    document.getElementById('stage1-buttons').style.display = 'none';
+
+                    const scoreDisplay = document.getElementById('score-display');
+                    scoreDisplay.classList.remove('hidden');
+                    scoreDisplay.innerText = `You scored ${globalScore} out of 5!`;
+
+                    if (globalScore <= 2) { assignedRagLevel = "Red Task"; document.getElementById('task-red').classList.remove('hidden'); scoreDisplay.style.backgroundColor = "#ffebee"; scoreDisplay.style.color = "#d32f2f"; if(record.rag_answer) document.getElementById('ans-red').value = record.rag_answer; }
+                    else if (globalScore >= 3 && globalScore <= 4) { assignedRagLevel = "Amber Task"; document.getElementById('task-amber').classList.remove('hidden'); scoreDisplay.style.backgroundColor = "#fff3e0"; scoreDisplay.style.color = "#ef6c00"; if(record.rag_answer) document.getElementById('ans-amber').value = record.rag_answer; }
+                    else if (globalScore === 5) { assignedRagLevel = "Green Task"; document.getElementById('task-green').classList.remove('hidden'); scoreDisplay.style.backgroundColor = "#e8f5e9"; scoreDisplay.style.color = "#2e7d32"; if(record.rag_answer) document.getElementById('ans-green').value = record.rag_answer; }
+                }
+            } else {
+                // If it is their first time opening the page, create a fresh record in the database
+                const { data: newData } = await db.from('dnc_responses').insert([
+                    { student_name: studentName, class_name: className, task_id: 'Y7-HT1', score: 0 }
+                ]).select();
+
+                if (newData && newData.length > 0) {
+                    dbRecordId = newData[0].id;
+                }
             }
+
+            // Remove the loading screen to reveal the loaded boxes
+            document.getElementById('loading-overlay').style.opacity = '0';
+            setTimeout(() => { document.getElementById('loading-overlay').style.display = 'none'; }, 500);
         };
 
+        // Quiet background sync triggered when a student clicks away from a text box
         async function syncToDatabase(isFinal) {
             if (!dbRecordId) return;
 
@@ -129,7 +186,7 @@
             if (assignedRagLevel === "Amber Task") finalRagAnswer = document.getElementById('ans-amber').value;
             if (assignedRagLevel === "Green Task") finalRagAnswer = document.getElementById('ans-green').value;
 
-            await supabase.from('dnc_responses').update({
+            await db.from('dnc_responses').update({
                 q1: document.getElementById('q1').value,
                 q2: document.getElementById('q2').value,
                 q3: document.getElementById('q3').value,
@@ -141,9 +198,14 @@
             }).eq('id', dbRecordId);
 
             if (isFinal) {
-                alert("Task Complete! Your work has been successfully sent to the teacher dashboard.");
+                alert("Task Complete! Your final answer has been sent to the teacher dashboard.");
             }
         }
+
+        // Attach Auto-Save to every text area (triggers when they click away from the box)
+        document.querySelectorAll('textarea').forEach(box => {
+            box.addEventListener('blur', () => syncToDatabase(false));
+        });
 
         // --- MARKING LOGIC ---
         function runSpagCheck() {
@@ -166,11 +228,11 @@
 
         function markStage1() {
             globalScore = 0;
-            globalScore += checkSentenceAnswer('q1', ['type', 'typing', 'write', 'enter', 'letters', 'words', 'text']);
-            globalScore += checkSentenceAnswer('q2', ['organise', 'organize', 'find', 'save', 'store', 'neat', 'tidy', 'lose', 'sort']);
-            globalScore += checkSentenceAnswer('q3', ['stranger', 'tell', 'adult', 'password', 'private', 'personal', 'name', 'address', 'safe', 'careful']);
-            globalScore += checkSentenceAnswer('q4', ['click', 'point', 'select', 'move', 'drag', 'scroll', 'cursor', 'arrow']);
-            globalScore += checkSentenceAnswer('q5', ['hack', 'hacker', 'steal', 'delete', 'account', 'safe', 'secure', 'protect', 'log in', 'login', 'guess']);
+            globalScore += checkSentenceAnswer('q1', qKeywords[1]);
+            globalScore += checkSentenceAnswer('q2', qKeywords[2]);
+            globalScore += checkSentenceAnswer('q3', qKeywords[3]);
+            globalScore += checkSentenceAnswer('q4', qKeywords[4]);
+            globalScore += checkSentenceAnswer('q5', qKeywords[5]);
 
             for (let i = 1; i <= 5; i++) document.getElementById('q' + i).disabled = true;
             document.getElementById('stage1-buttons').style.display = 'none';
@@ -183,7 +245,7 @@
             else if (globalScore >= 3 && globalScore <= 4) { assignedRagLevel = "Amber Task"; document.getElementById('task-amber').classList.remove('hidden'); scoreDisplay.style.backgroundColor = "#fff3e0"; scoreDisplay.style.color = "#ef6c00"; }
             else if (globalScore === 5) { assignedRagLevel = "Green Task"; document.getElementById('task-green').classList.remove('hidden'); scoreDisplay.style.backgroundColor = "#e8f5e9"; scoreDisplay.style.color = "#2e7d32"; }
 
-            // Silently sync score and Q1-Q5 to database
+            // Sync score and marked status to database immediately
             syncToDatabase(false);
         }
 
