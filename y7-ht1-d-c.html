@@ -76,6 +76,15 @@
             color: #333;
         }
 
+        /* Locked answers: remain editable to the browser's spellchecker so
+           red spelling underlines stay visible, while JavaScript prevents
+           the student from changing the answer after marking. */
+        textarea.spellcheck-locked {
+            background-color: #fafafa;
+            color: #333;
+            cursor: default;
+        }
+
         /* Action Buttons */
         .btn-row {
             display: flex;
@@ -471,6 +480,52 @@
             saveToLocalStorage();
         }
 
+        function lockSpellcheckTextarea(textarea) {
+            if (!textarea || textarea.dataset.spellcheckLocked === 'true') return;
+
+            textarea.dataset.spellcheckLocked = 'true';
+            textarea.classList.add('spellcheck-locked');
+
+            // Keep the textarea editable from the browser's point of view so
+            // its native red spelling underlines remain active.
+            textarea.readOnly = false;
+
+            // Block every normal way a student could change the answer.
+            textarea.addEventListener('beforeinput', function(e) {
+                e.preventDefault();
+            });
+            textarea.addEventListener('paste', function(e) {
+                e.preventDefault();
+            });
+            textarea.addEventListener('cut', function(e) {
+                e.preventDefault();
+            });
+            textarea.addEventListener('drop', function(e) {
+                e.preventDefault();
+            });
+            textarea.addEventListener('keydown', function(e) {
+                // Allow navigation, selection and copying, but block keys that
+                // could alter the answer.
+                const allowed = [
+                    'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+                    'Home', 'End', 'PageUp', 'PageDown', 'Tab', 'Escape'
+                ];
+                const editingKey = e.key.length === 1 ||
+                    ['Backspace', 'Delete', 'Enter'].includes(e.key);
+
+                if (editingKey && !allowed.includes(e.key) &&
+                    !(e.ctrlKey || e.metaKey) && !e.altKey) {
+                    e.preventDefault();
+                }
+
+                // Block Ctrl/Cmd shortcuts which modify text, but allow copy.
+                if ((e.ctrlKey || e.metaKey) &&
+                    ['v', 'x', 'z', 'y', 'a'].includes(e.key.toLowerCase())) {
+                    e.preventDefault();
+                }
+            });
+        }
+
         function markStage1() {
             let score = 0;
             score += checkSentenceAnswer('q1', qKeywords[1]);
@@ -479,9 +534,11 @@
             score += checkSentenceAnswer('q4', qKeywords[4]);
             score += checkSentenceAnswer('q5', qKeywords[5]);
 
-            // Set to readOnly instead of disabled so browser red spelling underlines remain visible
+            // Do NOT use readonly/disabled here. Some versions of Chrome/Edge
+            // remove native spellcheck underlines from readonly textareas.
+            // Instead, keep spellcheck active and lock the fields with JS.
             for (let i = 1; i <= 5; i++) {
-                document.getElementById('q' + i).readOnly = true;
+                lockSpellcheckTextarea(document.getElementById('q' + i));
             }
             document.getElementById('stage1-buttons').style.display = 'none';
 
@@ -590,7 +647,7 @@
                     q3_class: document.getElementById('q3').className,
                     q4_class: document.getElementById('q4').className,
                     q5_class: document.getElementById('q5').className,
-                    q1_readonly: document.getElementById('q1').readOnly,
+                    q1_readonly: document.getElementById('q1').dataset.spellcheckLocked === 'true',
                     buttons_hidden: document.getElementById('stage1-buttons').style.display === 'none',
                     score_text: document.getElementById('score-display').innerText,
                     score_bg: document.getElementById('score-display').style.backgroundColor,
@@ -639,7 +696,7 @@
 
                 if (data.q1_readonly) {
                     for (let i = 1; i <= 5; i++) {
-                        document.getElementById('q' + i).readOnly = true;
+                        lockSpellcheckTextarea(document.getElementById('q' + i));
                     }
                 }
 
