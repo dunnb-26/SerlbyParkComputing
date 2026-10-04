@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Teacher Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            border-top: 6px solid #1e3a8a;
+            height: fit-content;
+        }
+        .main-view {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            border-top: 6px solid #dfaa2b;
+        }
+        .student-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: left;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .student-btn:hover, .student-btn.active {
+            background: #1e3a8a;
+            color: white;
+            border-color: #1e3a8a;
+        }
+        .score-badge {
+            float: right;
+            background: #dfaa2b;
+            color: #1e3a8a;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .answer-box {
+            background: #f8f9fa;
+            border: 2px solid #ccc;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            min-height: 40px;
+            color: #333;
+            font-family: inherit;
+        }
+        h3 { color: #1e3a8a; margin-top: 0; }
+        .rag-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            color: white;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <a href="index.html"><img src="logo.jpg" alt="Logo"></a>
+        </div>
+        <div class="header-center">
+            <h1>D&C Live Dashboard</h1>
+        </div>
+        <div class="header-right"></div>
+    </header>
+
+    <div class="dashboard-layout">
+        <!-- Sidebar: Student List -->
+        <div class="sidebar">
+            <h3>Class List</h3>
+            <select id="class-filter" onchange="fetchStudents()">
+                <option value="ALL">All Classes</option>
+                <option value="7A">7A</option>
+                <option value="7B">7B</option>
+                <option value="7C">7C</option>
+            </select>
+            <div id="student-list">
+                <p style="color: #666; font-size: 0.9em;">Loading students...</p>
+            </div>
+        </div>
+
+        <!-- Main View: Student Work -->
+        <div class="main-view" id="work-view">
+            <h2 style="color: #666; text-align: center; margin-top: 50px;">&larr; Select a student to view their work</h2>
+        </div>
+    </div>
+
+    <script>
+        const supabaseUrl = 'https://zqvrmmhiqxmghtxgjrtk.supabase.co';
+        const supabaseKey = 'sb_publishable_iD26_DKTKRUWP7Jj3giEPA_f2xd5OCW';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        let allRecords = [];
+
+        async function fetchStudents() {
+            const classFilter = document.getElementById('class-filter').value;
+            document.getElementById('student-list').innerHTML = "<p>Loading...</p>";
+
+            let query = supabase.from('dnc_responses').select('*').order('created_at', { ascending: false });
+            if (classFilter !== "ALL") {
+                query = query.eq('class_name', classFilter);
+            }
+
+            const { data, error } = await query;
+            if (error) {
+                document.getElementById('student-list').innerHTML = `<p style="color:red">Error: ${error.message}</p>`;
+                return;
+            }
+
+            allRecords = data;
+            renderSidebar();
+        }
+
+        function renderSidebar() {
+            const listDiv = document.getElementById('student-list');
+            listDiv.innerHTML = "";
+
+            if (allRecords.length === 0) {
+                listDiv.innerHTML = "<p style='color: #666; font-size: 0.9em;'>No submissions yet.</p>";
+                return;
+            }
+
+            allRecords.forEach((record, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'student-btn';
+                btn.innerHTML = `${record.student_name} <span class="score-badge">${record.score || 0}/5</span>`;
+                btn.onclick = () => {
+                    document.querySelectorAll('.student-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    viewStudentWork(index);
+                };
+                listDiv.appendChild(btn);
+            });
+        }
+
+        function viewStudentWork(index) {
+            const record = allRecords[index];
+            const viewDiv = document.getElementById('work-view');
+            
+            let ragColor = "#666";
+            if(record.rag_level === "Red Task") ragColor = "#d32f2f";
+            if(record.rag_level === "Amber Task") ragColor = "#f57c00";
+            if(record.rag_level === "Green Task") ragColor = "#388e3c";
+
+            viewDiv.innerHTML = `
+                <div style="border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px;">
+                    <h2 style="margin: 0; color: #1e3a8a;">${record.student_name} - ${record.class_name}</h2>
+                    <p style="margin: 5px 0 0 0; color: #666;">Task: ${record.task_id} | Score: ${record.score}/5</p>
+                </div>
+
+                <h3>Demonstrate Phase</h3>
+                <p><strong>1. Keyboard:</strong></p>
+                <div class="answer-box">${record.q1 || "(No answer provided)"}</div>
+                
+                <p><strong>2. File Management:</strong></p>
+                <div class="answer-box">${record.q2 || "(No answer provided)"}</div>
+                
+                <p><strong>3. E-Safety Rule:</strong></p>
+                <div class="answer-box">${record.q3 || "(No answer provided)"}</div>
+                
+                <p><strong>4. Mouse:</strong></p>
+                <div class="answer-box">${record.q4 || "(No answer provided)"}</div>
+                
+                <p><strong>5. Passwords:</strong></p>
+                <div class="answer-box">${record.q5 || "(No answer provided)"}</div>
+
+                <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 0;">
+
+                <h3>Connect Phase</h3>
+                <div class="rag-badge" style="background-color: ${ragColor};">${record.rag_level || "Not Reached"}</div>
+                <div class="answer-box" style="min-height: 100px;">${record.rag_answer || "(No answer provided)"}</div>
+            `;
+        }
+
+        // Fetch immediately on load
+        fetchStudents();
+    </script>
+</body>
+</html>
