@@ -70,15 +70,7 @@
             min-height: 80px;
         }
         
-        /* Readonly keeps red underlines visible while locking edits */
-        textarea[readonly] {
-            background-color: #fafafa;
-            color: #333;
-        }
-
-        /* Locked answers: remain editable to the browser's spellchecker so
-           red spelling underlines stay visible, while JavaScript prevents
-           the student from changing the answer after marking. */
+        /* Locked answer styling: keeps red spelling underlines visible while preventing edits */
         textarea.spellcheck-locked {
             background-color: #fafafa;
             color: #333;
@@ -106,7 +98,7 @@
         }
         .btn-mark:hover { background-color: #c99722; }
 
-        /* Universal Action Buttons Area */
+        /* Universal Action Buttons Area (PDF & Reset) */
         .action-row {
             display: flex;
             justify-content: center;
@@ -122,8 +114,22 @@
             font-size: 1.1em;
             font-weight: bold;
             cursor: pointer;
+            transition: background-color 0.2s;
         }
         .btn-pdf:hover { background-color: #124d2d; }
+
+        .btn-reset {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-reset:hover { background-color: #b71c1c; }
 
         /* Spelling Practice Area */
         .spag-practice-box {
@@ -485,12 +491,11 @@
 
             textarea.dataset.spellcheckLocked = 'true';
             textarea.classList.add('spellcheck-locked');
-
-            // Keep the textarea editable from the browser's point of view so
-            // its native red spelling underlines remain active.
+            
+            // Keep editable for the browser spellchecker so red underlines remain active
             textarea.readOnly = false;
 
-            // Block every normal way a student could change the answer.
+            // Block modifications while allowing selection, copying, and arrow navigation
             textarea.addEventListener('beforeinput', function(e) {
                 e.preventDefault();
             });
@@ -504,23 +509,14 @@
                 e.preventDefault();
             });
             textarea.addEventListener('keydown', function(e) {
-                // Allow navigation, selection and copying, but block keys that
-                // could alter the answer.
-                const allowed = [
-                    'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
-                    'Home', 'End', 'PageUp', 'PageDown', 'Tab', 'Escape'
-                ];
-                const editingKey = e.key.length === 1 ||
-                    ['Backspace', 'Delete', 'Enter'].includes(e.key);
+                const allowed = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown', 'Tab', 'Escape'];
+                const editingKey = e.key.length === 1 || ['Backspace', 'Delete', 'Enter'].includes(e.key);
 
-                if (editingKey && !allowed.includes(e.key) &&
-                    !(e.ctrlKey || e.metaKey) && !e.altKey) {
+                if (editingKey && !allowed.includes(e.key) && !(e.ctrlKey || e.metaKey) && !e.altKey) {
                     e.preventDefault();
                 }
 
-                // Block Ctrl/Cmd shortcuts which modify text, but allow copy.
-                if ((e.ctrlKey || e.metaKey) &&
-                    ['v', 'x', 'z', 'y', 'a'].includes(e.key.toLowerCase())) {
+                if ((e.ctrlKey || e.metaKey) && ['v', 'x', 'z', 'y', 'a'].includes(e.key.toLowerCase())) {
                     e.preventDefault();
                 }
             });
@@ -534,9 +530,7 @@
             score += checkSentenceAnswer('q4', qKeywords[4]);
             score += checkSentenceAnswer('q5', qKeywords[5]);
 
-            // Do NOT use readonly/disabled here. Some versions of Chrome/Edge
-            // remove native spellcheck underlines from readonly textareas.
-            // Instead, keep spellcheck active and lock the fields with JS.
+            // Lock inputs non-destructively so native red spelling underlines stay visible
             for (let i = 1; i <= 5; i++) {
                 lockSpellcheckTextarea(document.getElementById('q' + i));
             }
@@ -647,7 +641,7 @@
                     q3_class: document.getElementById('q3').className,
                     q4_class: document.getElementById('q4').className,
                     q5_class: document.getElementById('q5').className,
-                    q1_readonly: document.getElementById('q1').dataset.spellcheckLocked === 'true',
+                    q1_locked: document.getElementById('q1').dataset.spellcheckLocked === 'true',
                     buttons_hidden: document.getElementById('stage1-buttons').style.display === 'none',
                     score_text: document.getElementById('score-display').innerText,
                     score_bg: document.getElementById('score-display').style.backgroundColor,
@@ -694,7 +688,7 @@
                 document.getElementById('q4').value = data.q4 || '';
                 document.getElementById('q5').value = data.q5 || '';
 
-                if (data.q1_readonly) {
+                if (data.q1_locked) {
                     for (let i = 1; i <= 5; i++) {
                         lockSpellcheckTextarea(document.getElementById('q' + i));
                     }
