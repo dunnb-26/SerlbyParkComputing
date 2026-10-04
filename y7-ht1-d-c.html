@@ -305,7 +305,7 @@
             
             <!-- STAGE 1: DEMONSTRATE TASK -->
             <div id="demonstrate-stage" class="task-card">
-                <div class="task-title">Part 1: Demonstrate</div>
+                <div class="task-title">Part 1: Demonstrate (Knowledge Check)</div>
                 <div class="instruction-box">
                     Write full sentences to answer the 5 questions below. Browser spellcheck will underline any spelling errors in red as you type. When you click "Mark My Work", your score and spelling table will appear below. Your progress is automatically saved.
                 </div>
@@ -332,7 +332,7 @@
                 </div>
 
                 <div class="btn-row" id="stage1-buttons">
-                    <button class="btn-mark no-print" onclick="markStage1()">✅ Mark My Work</button>
+                    <button class="btn-mark no-print" onclick="markStage1()">✅ Mark My Work & Open Lesson 2 Tasks</button>
                 </div>
 
                 <div id="score-display" class="hidden"></div>
@@ -405,11 +405,11 @@
 
         </div>
 
-        <!-- UNIVERSAL PDF  BUTTON -->
-    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Work</button>
-        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
-    </div>
+        <!-- UNIVERSAL ACTION BUTTONS (PDF & RESET) -->
+        <div class="action-row" id="action-buttons">
+            <button class="btn-pdf no-print" onclick="downloadPDF()">📄 Download Work as PDF</button>
+            <button class="btn-reset no-print" onclick="resetProgress()">🗑️ Reset Page</button>
+        </div>
     </main>
 
     <!-- SECURE PASSWORD MODAL -->
@@ -492,10 +492,8 @@
             textarea.dataset.spellcheckLocked = 'true';
             textarea.classList.add('spellcheck-locked');
             
-            // Keep editable for the browser spellchecker so red underlines remain active
             textarea.readOnly = false;
 
-            // Block modifications while allowing selection, copying, and arrow navigation
             textarea.addEventListener('beforeinput', function(e) {
                 e.preventDefault();
             });
@@ -530,18 +528,15 @@
             score += checkSentenceAnswer('q4', qKeywords[4]);
             score += checkSentenceAnswer('q5', qKeywords[5]);
 
-            // Lock inputs non-destructively so native red spelling underlines stay visible
             for (let i = 1; i <= 5; i++) {
                 lockSpellcheckTextarea(document.getElementById('q' + i));
             }
             document.getElementById('stage1-buttons').style.display = 'none';
 
-            // Show Score
             const scoreDisplay = document.getElementById('score-display');
             scoreDisplay.classList.remove('hidden');
             scoreDisplay.innerText = `You scored ${score} out of 5!`;
 
-            // Reveal Spelling Practice Box
             document.getElementById('spag-section').classList.remove('hidden');
 
             if (document.getElementById('practice-rows-container').children.length === 0) {
@@ -550,7 +545,6 @@
                 addPracticeRow();
             }
 
-            // Reveal correct RAG Connect Task
             document.getElementById('task-red').classList.add('hidden');
             document.getElementById('task-amber').classList.add('hidden');
             document.getElementById('task-green').classList.add('hidden');
@@ -749,6 +743,11 @@
                 localStorage.removeItem('y7_ht1_full_data');
                 window.location.reload();
             }
+        }
+        
+        // Alias so both clearData() and resetProgress() work seamlessly
+        function clearData() {
+            resetProgress();
         }
 
         window.onload = function() {
