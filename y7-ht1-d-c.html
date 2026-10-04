@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Y7 HT1 - Demonstrate & Connect</title>
     <link rel="stylesheet" href="style.css">
+    
+    <!-- HTML to PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
         .task-container {
             max-width: 900px;
@@ -18,6 +22,7 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.08);
             border-top: 6px solid #1e3a8a;
             margin-bottom: 20px;
+            transition: all 0.3s ease;
         }
         
         /* RAG Task Colors */
@@ -65,19 +70,18 @@
             min-height: 80px;
         }
         
-        /* Readonly styling to look clean while keeping text active */
         textarea[readonly] {
             background-color: #fafafa;
             color: #333;
         }
-
+        
         /* Action Buttons */
         .btn-row {
             display: flex;
             gap: 15px;
             margin-top: 20px;
         }
-        .btn-mark, .btn-reset {
+        .btn-mark, .btn-spag {
             flex: 1;
             padding: 15px;
             text-align: center;
@@ -86,83 +90,133 @@
             font-size: 1.1em;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.2s;
         }
         .btn-mark {
             background-color: #dfaa2b;
             color: #1e3a8a;
         }
         .btn-mark:hover { background-color: #c99722; }
+        
+        .btn-spag {
+            background-color: #607d8b;
+            color: white;
+        }
+        .btn-spag:hover { background-color: #455a64; }
 
+        /* Universal Action Buttons Area */
+        .action-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 40px auto;
+        }
+        .btn-pdf {
+            background-color: #217346;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-pdf:hover { background-color: #124d2d; }
+        
         .btn-reset {
             background-color: #d32f2f;
             color: white;
-            flex: 0.3;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
         }
         .btn-reset:hover { background-color: #b71c1c; }
 
-        /* Spelling Practice Area */
-        .spag-practice-box {
-            background-color: #fff3e0;
-            border: 2px solid #f57c00;
-            border-radius: 6px;
-            padding: 20px;
-            margin-top: 15px;
-        }
-        .practice-header {
-            font-weight: bold;
-            color: #e65100;
-            font-size: 0.95em;
-            margin-bottom: 8px;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr 40px;
-            gap: 10px;
-            text-align: center;
-        }
-        .practice-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr 40px;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .practice-row input {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 0.95em;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .btn-remove-row {
-            background-color: #d32f2f;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            height: 38px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .btn-remove-row:hover { background-color: #b71c1c; }
-
-        .btn-add-word {
+        /* Teacher Verification Styles */
+        .teacher-verify-btn {
             background-color: #607d8b;
             color: white;
             border: none;
-            padding: 10px 18px;
+            padding: 8px 15px;
             border-radius: 4px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
             margin-top: 10px;
         }
-        .btn-add-word:hover { background-color: #455a64; }
+        .teacher-verify-btn:hover { background-color: #455a64; }
+        .teacher-verified {
+            border-top-color: #008f39 !important;
+            background-color: #f0fff0 !important;
+        }
+        .teacher-verified .task-title { color: #008f39 !important; }
+        .teacher-verified .instruction-box { border-left-color: #008f39 !important; }
+        .verified-badge { color: #008f39; font-size: 0.8em; margin-left: 10px; display: none; vertical-align: middle; }
+        .teacher-verified .verified-badge { display: inline-block; }
 
-        /* Marking Colors & Utility */
-        .correct { border-color: #388e3c !important; background-color: #e8f5e9 !important; }
-        .incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; }
+        /* Secure Password Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 300px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-align: center;
+            border-top: 6px solid #1e3a8a;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .modal-btn-row {
+            display: flex;
+            gap: 10px;
+        }
+        .modal-btn-confirm {
+            flex: 1;
+            background-color: #1e3a8a;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .modal-btn-cancel {
+            flex: 1;
+            background-color: #ccc;
+            color: #333;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .modal-error {
+            color: #d32f2f;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            display: none;
+        }
+
+        .correct { border-color: #388e3c !important; background-color: #e8f5e9; }
+        .incorrect { border-color: #d32f2f !important; background-color: #ffebee; }
         .hidden { display: none !important; }
 
         #score-display {
@@ -189,102 +243,99 @@
     </header>
 
     <main>
-        <div class="task-container">
+        <div class="task-container" id="pdf-content">
             
-            <!-- STAGE 1: DEMONSTRATE TASK -->
+            <!-- STAGE 1 -->
             <div id="demonstrate-stage" class="task-card">
                 <div class="task-title">Part 1: Demonstrate (Knowledge Check)</div>
                 <div class="instruction-box">
-                    Write full sentences to answer the 5 questions below. Any spelling mistakes will be underlined in red by your browser. When you click "Mark My Work", your score, spelling practice table, and Connect task will appear below. Your progress is automatically saved.
+                    Write short, full sentences to answer the 5 questions below. Click the <strong>"SPAG Check"</strong> button to automatically scan and highlight spelling errors across all boxes.
                 </div>
 
                 <div class="question-group">
                     <label>1. Write a sentence explaining what you use a computer keyboard for:</label>
-                    <textarea id="q1" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <textarea id="q1" class="persist-input" spellcheck="true" placeholder="Type your sentence here..."></textarea>
                 </div>
                 <div class="question-group">
                     <label>2. Why is it important to save your files inside correctly named folders?</label>
-                    <textarea id="q2" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <textarea id="q2" class="persist-input" spellcheck="true" placeholder="Type your sentence here..."></textarea>
                 </div>
                 <div class="question-group">
                     <label>3. Write down one important rule for staying safe on the internet:</label>
-                    <textarea id="q3" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <textarea id="q3" class="persist-input" spellcheck="true" placeholder="Type your sentence here..."></textarea>
                 </div>
                 <div class="question-group">
                     <label>4. Explain what you use a computer mouse for on the screen:</label>
-                    <textarea id="q4" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <textarea id="q4" class="persist-input" spellcheck="true" placeholder="Type your sentence here..."></textarea>
                 </div>
                 <div class="question-group">
                     <label>5. Why is it important to keep your password a secret from other people?</label>
-                    <textarea id="q5" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <textarea id="q5" class="persist-input" spellcheck="true" placeholder="Type your sentence here..."></textarea>
                 </div>
 
                 <div class="btn-row" id="stage1-buttons">
-                    <button class="btn-mark" onclick="markStage1()">✅ Mark My Work & Open Lesson 2 Tasks</button>
-                    <button class="btn-reset" onclick="resetProgress()" title="Clear progress">🗑️ Reset</button>
+                    <button class="btn-spag no-print" onclick="runSpagCheck()">🔍 SPAG Check</button>
+                    <button class="btn-mark no-print" onclick="markStage1()">✅ Mark My Work</button>
                 </div>
 
                 <div id="score-display" class="hidden"></div>
             </div>
 
-            <!-- LESSON 2: SPELLING PRACTICE BOX (Initially Hidden) -->
-            <div id="spag-section" class="task-card hidden" style="border-top-color: #f57c00;">
-                <div class="task-title" style="color: #e65100;">Spelling Corrections & Practice</div>
-                <div class="instruction-box">
-                    Look at any words in your Demonstrate answers above that have red underlines. Type each misspelled word in the first column, and practice spelling it correctly **3 times** across the next three columns. If you had no spelling mistakes, you can remove the rows using the ❌ button.
+            <!-- STAGE 2 (RAG CONNECT TASKS) -->
+            <div id="task-red" class="task-card red-task hidden" id="card-red">
+                <div class="task-title">Part 2: Connect - RED TASK <span class="verified-badge">✅ Teacher Verified</span></div>
+                <div class="instruction-box">List 3 rules you should always follow to stay safe when using the internet:</div>
+                <div class="question-group">
+                    <textarea id="ans-red" class="persist-input" spellcheck="true" placeholder="Type your list here..."></textarea>
                 </div>
-                
-                <div class="spag-practice-box">
-                    <div class="practice-header">
-                        <div>Misspelled Word</div>
-                        <div>Attempt 1</div>
-                        <div>Attempt 2</div>
-                        <div>Attempt 3</div>
-                        <div></div>
-                    </div>
-                    <div id="practice-rows-container">
-                        <!-- Rows generated dynamically -->
-                    </div>
-                    <button class="btn-add-word" onclick="addPracticeRow()">+ Add Another Word</button>
+                <div style="text-align: right;">
+                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('red')">👨‍🏫 Teacher Verify</button>
                 </div>
             </div>
 
-            <!-- STAGE 2: CONNECT TASKS (Initially Hidden) -->
-            <div id="task-red" class="task-card red-task hidden">
-                <div class="task-title">Part 2: Connect - RED TASK (Consolidation)</div>
-                <div class="instruction-box">
-                    Review the basics. Complete the task below after finishing your spelling practice above.
-                </div>
+            <div id="task-amber" class="task-card amber-task hidden" id="card-amber">
+                <div class="task-title">Part 2: Connect - AMBER TASK <span class="verified-badge">✅ Teacher Verified</span></div>
+                <div class="instruction-box">Explain the difference between clicking "Save" and "Save As" when working on a document:</div>
                 <div class="question-group">
-                    <label>List 3 rules you should always follow to stay safe when using the internet:</label>
-                    <textarea id="connect-red" class="persist-input" placeholder="Type your list here..."></textarea>
+                    <textarea id="ans-amber" class="persist-input" spellcheck="true" placeholder="Type your explanation here..."></textarea>
+                </div>
+                <div style="text-align: right;">
+                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('amber')">👨‍🏫 Teacher Verify</button>
                 </div>
             </div>
 
-            <div id="task-amber" class="task-card amber-task hidden">
-                <div class="task-title">Part 2: Connect - AMBER TASK (Application)</div>
-                <div class="instruction-box">
-                    Great effort! Connect your knowledge. Complete the task below after finishing your spelling practice above.
-                </div>
+            <div id="task-green" class="task-card green-task hidden" id="card-green">
+                <div class="task-title">Part 2: Connect - GREEN TASK <span class="verified-badge">✅ Teacher Verified</span></div>
+                <div class="instruction-box">Write a short paragraph explaining what a "digital footprint" is, and how you can make sure your footprint is positive:</div>
                 <div class="question-group">
-                    <label>Explain the difference between clicking "Save" and "Save As" when working on a document:</label>
-                    <textarea id="connect-amber" class="persist-input" placeholder="Type your explanation here..."></textarea>
+                    <textarea id="ans-green" class="persist-input" spellcheck="true" placeholder="Type your response here..."></textarea>
                 </div>
-            </div>
-
-            <div id="task-green" class="task-card green-task hidden">
-                <div class="task-title">Part 2: Connect - GREEN TASK (Challenge)</div>
-                <div class="instruction-box">
-                    Perfect score! Challenge task complete. Complete the task below after finishing your spelling practice above.
-                </div>
-                <div class="question-group">
-                    <label>Write a short paragraph explaining what a "digital footprint" is, and how you can make sure your footprint is positive:</label>
-                    <textarea id="connect-green" class="persist-input" placeholder="Type your response here..."></textarea>
+                <div style="text-align: right;">
+                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('green')">👨‍🏫 Teacher Verify</button>
                 </div>
             </div>
 
         </div>
+
+        <!-- UNIVERSAL ACTION BUTTONS (PDF & RESET) -->
+        <div class="action-row" id="action-buttons">
+            <button class="btn-pdf no-print" onclick="downloadPDF()">📄 Download Work as PDF</button>
+            <button class="btn-reset no-print" onclick="resetProgress()">🗑️ Reset Page</button>
+        </div>
     </main>
+
+    <!-- SECURE PASSWORD MODAL -->
+    <div class="modal-overlay" id="verify-modal">
+        <div class="modal-content">
+            <h3>Teacher Verification</h3>
+            <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
+            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter Passcode">
+            <div class="modal-btn-row">
+                <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
+                <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
+            </div>
+        </div>
+    </div>
     
     <footer>
         &copy; 2026 Delta Serlby Park - Computing Department
@@ -299,52 +350,26 @@
             5: ['hack', 'hacker', 'steal', 'delete', 'account', 'safe', 'secure', 'protect', 'log in', 'login', 'guess']
         };
 
+        function runSpagCheck() {
+            for (let i = 1; i <= 5; i++) {
+                let box = document.getElementById('q' + i);
+                if (box) box.focus();
+            }
+            document.getElementById('q1').focus();
+            alert("SPAG Check active! Look for red squiggly lines under your spelling mistakes across all boxes and right-click them to fix.");
+        }
+
         function checkSentenceAnswer(inputId, keywords) {
-            const inputElement = document.getElementById(inputId);
-            const studentAnswer = inputElement.value.toLowerCase().trim();
-            
-            if (studentAnswer === "") {
-                inputElement.classList.add('incorrect');
-                inputElement.classList.remove('correct');
-                return 0;
+            const el = document.getElementById(inputId);
+            const ans = el.value.toLowerCase().trim();
+            if (ans === "") { el.classList.add('incorrect'); return 0; }
+            if (keywords.some(k => ans.includes(k.toLowerCase()))) { 
+                el.classList.add('correct'); 
+                return 1; 
+            } else { 
+                el.classList.add('incorrect'); 
+                return 0; 
             }
-
-            let isCorrect = keywords.some(keyword => studentAnswer.includes(keyword.toLowerCase()));
-
-            if (isCorrect) {
-                inputElement.classList.add('correct');
-                inputElement.classList.remove('incorrect');
-                return 1;
-            } else {
-                inputElement.classList.add('incorrect');
-                inputElement.classList.remove('correct');
-                return 0;
-            }
-        }
-
-        function addPracticeRow(word1 = '', word2 = '', word3 = '', word4 = '') {
-            const container = document.getElementById('practice-rows-container');
-            const row = document.createElement('div');
-            row.className = 'practice-row';
-            row.innerHTML = `
-                <input type="text" class="spag-input" value="${word1}" placeholder="Word...">
-                <input type="text" class="spag-input" value="${word2}" placeholder="Correct spelling...">
-                <input type="text" class="spag-input" value="${word3}" placeholder="Correct spelling...">
-                <input type="text" class="spag-input" value="${word4}" placeholder="Correct spelling...">
-                <button type="button" class="btn-remove-row" onclick="removePracticeRow(this)" title="Remove row">❌</button>
-            `;
-            container.appendChild(row);
-
-            row.querySelectorAll('input').forEach(input => {
-                input.addEventListener('input', saveToLocalStorage);
-            });
-            saveToLocalStorage();
-        }
-
-        function removePracticeRow(button) {
-            const row = button.parentElement;
-            row.remove();
-            saveToLocalStorage();
         }
 
         function markStage1() {
@@ -355,46 +380,89 @@
             score += checkSentenceAnswer('q4', qKeywords[4]);
             score += checkSentenceAnswer('q5', qKeywords[5]);
 
-            // Set boxes to readonly instead of disabled so red spelling underlines remain visible
             for (let i = 1; i <= 5; i++) {
                 document.getElementById('q' + i).readOnly = true;
             }
             document.getElementById('stage1-buttons').style.display = 'none';
 
-            // Show Score
             const scoreDisplay = document.getElementById('score-display');
             scoreDisplay.classList.remove('hidden');
             scoreDisplay.innerText = `You scored ${score} out of 5!`;
 
-            // Reveal Lesson 2 Spelling Practice Box
-            document.getElementById('spag-section').classList.remove('hidden');
-
-            if (document.getElementById('practice-rows-container').children.length === 0) {
-                addPracticeRow();
-                addPracticeRow();
-                addPracticeRow();
-            }
-
-            // Reveal correct RAG Connect Task
             document.getElementById('task-red').classList.add('hidden');
             document.getElementById('task-amber').classList.add('hidden');
             document.getElementById('task-green').classList.add('hidden');
 
             if (score <= 2) {
+                document.getElementById('task-red').classList.remove('hidden');
                 scoreDisplay.style.backgroundColor = "#ffebee";
                 scoreDisplay.style.color = "#d32f2f";
-                document.getElementById('task-red').classList.remove('hidden');
             } else if (score >= 3 && score <= 4) {
+                document.getElementById('task-amber').classList.remove('hidden');
                 scoreDisplay.style.backgroundColor = "#fff3e0";
                 scoreDisplay.style.color = "#ef6c00";
-                document.getElementById('task-amber').classList.remove('hidden');
             } else if (score === 5) {
+                document.getElementById('task-green').classList.remove('hidden');
                 scoreDisplay.style.backgroundColor = "#e8f5e9";
                 scoreDisplay.style.color = "#2e7d32";
-                document.getElementById('task-green').classList.remove('hidden');
             }
 
             saveToLocalStorage();
+        }
+
+        // --- TEACHER VERIFICATION MODAL LOGIC ---
+        let activeLevel = null;
+        function openVerifyModal(level) {
+            activeLevel = level;
+            document.getElementById('teacher-password-input').value = '';
+            document.getElementById('modal-error-msg').style.display = 'none';
+            document.getElementById('verify-modal').style.display = 'flex';
+            document.getElementById('teacher-password-input').focus();
+        }
+
+        function closeVerifyModal() {
+            document.getElementById('verify-modal').style.display = 'none';
+            activeLevel = null;
+        }
+
+        function submitVerify() {
+            const pass = document.getElementById('teacher-password-input').value;
+            if (pass === 'delta') {
+                if (activeLevel === 'red') {
+                    document.getElementById('task-red').classList.add('teacher-verified');
+                } else if (activeLevel === 'amber') {
+                    document.getElementById('task-amber').classList.add('teacher-verified');
+                } else if (activeLevel === 'green') {
+                    document.getElementById('task-green').classList.add('teacher-verified');
+                }
+                closeVerifyModal();
+                saveToLocalStorage();
+            } else {
+                document.getElementById('modal-error-msg').style.display = 'block';
+            }
+        }
+
+        // --- PDF GENERATION LOGIC ---
+        function downloadPDF() {
+            var btns = document.querySelectorAll('.no-print');
+            btns.forEach(b => b.style.display = 'none');
+            document.getElementById('action-buttons').style.display = 'none';
+
+            var textInputs = document.querySelectorAll('textarea');
+            textInputs.forEach(t => t.setAttribute('value', t.value));
+
+            var opt = {
+                margin:       0.3,
+                filename:     'Y7_HT1_Demonstrate_Connect.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(document.getElementById('pdf-content')).save().then(function() {
+                btns.forEach(b => b.style.display = 'inline-block');
+                document.getElementById('action-buttons').style.display = 'flex';
+            });
         }
 
         // --- LOCAL STORAGE PERSISTENCE ---
@@ -417,27 +485,17 @@
                     score_bg: document.getElementById('score-display').style.backgroundColor,
                     score_color: document.getElementById('score-display').style.color,
                     score_hidden: document.getElementById('score-display').classList.contains('hidden'),
-                    spag_hidden: document.getElementById('spag-section').classList.contains('hidden'),
                     red_hidden: document.getElementById('task-red').classList.contains('hidden'),
                     amber_hidden: document.getElementById('task-amber').classList.contains('hidden'),
                     green_hidden: document.getElementById('task-green').classList.contains('hidden'),
-                    connectRed: document.getElementById('connect-red').value,
-                    connectAmber: document.getElementById('connect-amber').value,
-                    connectGreen: document.getElementById('connect-green').value,
-                    spagRows: []
+                    red_verified: document.getElementById('task-red').classList.contains('teacher-verified'),
+                    amber_verified: document.getElementById('task-amber').classList.contains('teacher-verified'),
+                    green_verified: document.getElementById('task-green').classList.contains('teacher-verified'),
+                    connectRed: document.getElementById('ans-red').value,
+                    connectAmber: document.getElementById('ans-amber').value,
+                    connectGreen: document.getElementById('ans-green').value
                 };
-
-                document.querySelectorAll('.practice-row').forEach(row => {
-                    const inputs = row.querySelectorAll('input');
-                    data.spagRows.push({
-                        w0: inputs[0].value,
-                        w1: inputs[1].value,
-                        w2: inputs[2].value,
-                        w3: inputs[3].value
-                    });
-                });
-
-                localStorage.setItem('y7_ht1_dnc_data', JSON.stringify(data));
+                localStorage.setItem('y7_ht1_dnc_saved', JSON.stringify(data));
             } catch (e) {
                 console.log("Local storage restricted.");
             }
@@ -445,7 +503,7 @@
 
         function loadFromLocalStorage() {
             try {
-                const saved = localStorage.getItem('y7_ht1_dnc_data');
+                const saved = localStorage.getItem('y7_ht1_dnc_saved');
                 if (!saved) return;
                 const data = JSON.parse(saved);
 
@@ -479,37 +537,25 @@
                     scoreDisplay.style.color = data.score_color;
                 }
 
-                if (!data.spag_hidden) {
-                    document.getElementById('spag-section').classList.remove('hidden');
-                }
-
                 if (!data.red_hidden) document.getElementById('task-red').classList.remove('hidden');
                 if (!data.amber_hidden) document.getElementById('task-amber').classList.remove('hidden');
                 if (!data.green_hidden) document.getElementById('task-green').classList.remove('hidden');
 
-                document.getElementById('connect-red').value = data.connectRed || '';
-                document.getElementById('connect-amber').value = data.connectAmber || '';
-                document.getElementById('connect-green').value = data.connectGreen || '';
+                if (data.red_verified) document.getElementById('task-red').classList.add('teacher-verified');
+                if (data.amber_verified) document.getElementById('task-amber').classList.add('teacher-verified');
+                if (data.green_verified) document.getElementById('task-green').classList.add('teacher-verified');
 
-                const container = document.getElementById('practice-rows-container');
-                container.innerHTML = '';
-                if (data.spagRows && data.spagRows.length > 0) {
-                    data.spagRows.forEach(row => {
-                        addPracticeRow(row.w0, row.w1, row.w2, row.w3);
-                    });
-                } else {
-                    addPracticeRow();
-                    addPracticeRow();
-                    addPracticeRow();
-                }
+                document.getElementById('ans-red').value = data.connectRed || '';
+                document.getElementById('ans-amber').value = data.connectAmber || '';
+                document.getElementById('ans-green').value = data.connectGreen || '';
             } catch (e) {
                 console.log("Local storage read blocked.");
             }
         }
 
         function resetProgress() {
-            if (confirm("Are you sure you want to clear your answers and start over?")) {
-                localStorage.removeItem('y7_ht1_dnc_data');
+            if (confirm("Are you sure you want to clear your answers and reset the page?")) {
+                localStorage.removeItem('y7_ht1_dnc_saved');
                 window.location.reload();
             }
         }
@@ -517,17 +563,7 @@
         window.onload = function() {
             loadFromLocalStorage();
 
-            if (document.getElementById('practice-rows-container').children.length === 0) {
-                addPracticeRow();
-                addPracticeRow();
-                addPracticeRow();
-            }
-
             document.querySelectorAll('.persist-input').forEach(el => {
-                el.addEventListener('input', saveToLocalStorage);
-            });
-
-            document.querySelectorAll('.spag-input').forEach(el => {
                 el.addEventListener('input', saveToLocalStorage);
             });
         };
