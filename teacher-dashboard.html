@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Teacher Dashboard</title>
+    <title>Teacher Dashboard - Live Tracker</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -13,7 +13,7 @@
         .student-btn { display: block; width: 100%; padding: 10px; margin-bottom: 8px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; text-align: left; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .student-btn:hover, .student-btn.active { background: #1e3a8a; color: white; border-color: #1e3a8a; }
         .score-badge { float: right; background: #dfaa2b; color: #1e3a8a; padding: 2px 8px; border-radius: 12px; font-size: 0.85em; }
-        select { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #ccc; }
+        select { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #ccc; font-weight: bold; }
         .answer-box { background: #f8f9fa; border: 2px solid #ccc; padding: 15px; border-radius: 6px; margin-bottom: 15px; min-height: 40px; color: #333; font-family: inherit; }
         h3 { color: #1e3a8a; margin-top: 0; }
         .rag-badge { display: inline-block; padding: 5px 10px; color: white; border-radius: 4px; font-weight: bold; margin-bottom: 15px; }
@@ -25,7 +25,7 @@
             <a href="index.html"><img src="logo.jpg" alt="Logo"></a>
         </div>
         <div class="header-center">
-            <h1>D&C Live Dashboard</h1>
+            <h1>Teacher Dashboard</h1>
         </div>
         <div class="header-right">
             <button onclick="fetchStudents()" style="background:#dfaa2b; color:#1e3a8a; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer;">↻ Refresh</button>
@@ -33,37 +33,49 @@
     </header>
 
     <div class="dashboard-layout">
+        <!-- Sidebar: 12 Class Filters -->
         <div class="sidebar">
             <h3>Class List</h3>
             <select id="class-filter" onchange="fetchStudents()">
                 <option value="ALL">All Classes</option>
-                <option value="7A">7A</option>
-                <option value="7B">7B</option>
-                <option value="7C">7C</option>
+                <optgroup label="Year 7">
+                    <option value="7x1">7x1</option>
+                    <option value="7x2">7x2</option>
+                    <option value="7y1">7y1</option>
+                    <option value="7y2">7y2</option>
+                </optgroup>
+                <optgroup label="Year 8">
+                    <option value="8x1">8x1</option>
+                    <option value="8x2">8x2</option>
+                    <option value="8y1">8y1</option>
+                    <option value="8y2">8y2</option>
+                </optgroup>
+                <optgroup label="Year 9">
+                    <option value="9x1">9x1</option>
+                    <option value="9x2">9x2</option>
+                    <option value="9y1">9y1</option>
+                    <option value="9y2">9y2</option>
+                </optgroup>
             </select>
-            <div id="student-list">
+            
+            <div id="student-list" style="margin-top: 20px;">
                 <p style="color: #666; font-size: 0.9em;">Loading students...</p>
             </div>
         </div>
 
+        <!-- Main View: Dynamic Work Render -->
         <div class="main-view" id="work-view">
             <h2 style="color: #666; text-align: center; margin-top: 50px;">&larr; Select a student to view their work</h2>
         </div>
     </div>
 
     <script>
-        // Corrected URL spelling and updated API key
+        // Supabase Connection
         const supabaseUrl = 'https://zqvmrmhiqxmghtxgjrtk.supabase.co';
         const supabaseKey = 'sb_publishable_iD26_DKTKRUWP7Jj3giEPA_f2xd5OCW';
         
         let db = null;
-        try {
-            if (window.supabase) {
-                db = window.supabase.createClient(supabaseUrl, supabaseKey);
-            }
-        } catch (error) {
-            console.error("Database initialization failed.");
-        }
+        try { if (window.supabase) db = window.supabase.createClient(supabaseUrl, supabaseKey); } catch (e) { console.error("DB init failed"); }
         
         let allRecords = [];
 
@@ -72,21 +84,13 @@
             const listDiv = document.getElementById('student-list');
             listDiv.innerHTML = "<p>Loading...</p>";
 
-            if (!db) {
-                listDiv.innerHTML = "<p style='color:red;'>Database connection error.</p>";
-                return;
-            }
+            if (!db) { listDiv.innerHTML = "<p style='color:red;'>Database connection error.</p>"; return; }
 
             let query = db.from('dnc_responses').select('*').order('created_at', { ascending: false });
-            if (classFilter !== "ALL") {
-                query = query.eq('class_name', classFilter);
-            }
+            if (classFilter !== "ALL") query = query.eq('class_name', classFilter);
 
             const { data, error } = await query;
-            if (error) {
-                listDiv.innerHTML = `<p style="color:red">Error: ${error.message}</p>`;
-                return;
-            }
+            if (error) { listDiv.innerHTML = `<p style="color:red">Error: ${error.message}</p>`; return; }
 
             allRecords = data || [];
             renderSidebar();
@@ -97,14 +101,16 @@
             listDiv.innerHTML = "";
 
             if (allRecords.length === 0) {
-                listDiv.innerHTML = "<p style='color: #666; font-size: 0.9em;'>No submissions yet.<br><small>Students appear here once they log in and open the task page.</small></p>";
+                listDiv.innerHTML = "<p style='color: #666; font-size: 0.9em;'>No submissions found for this class.</p>";
                 return;
             }
 
             allRecords.forEach((record, index) => {
                 const btn = document.createElement('button');
                 btn.className = 'student-btn';
-                btn.innerHTML = `${record.student_name} <span class="score-badge">${record.score || 0}/5</span>`;
+                let scoreHtml = record.score !== null && record.score !== undefined ? `<span class="score-badge">${record.score}</span>` : '';
+                btn.innerHTML = `${record.student_name} <br><small style="color:#555; font-weight:normal;">Task: ${record.task_id}</small> ${scoreHtml}`;
+                
                 btn.onclick = () => {
                     document.querySelectorAll('.student-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
@@ -118,43 +124,55 @@
             const record = allRecords[index];
             const viewDiv = document.getElementById('work-view');
             
-            let ragColor = "#666";
-            if(record.rag_level === "Red Task") ragColor = "#d32f2f";
-            if(record.rag_level === "Amber Task") ragColor = "#f57c00";
-            if(record.rag_level === "Green Task") ragColor = "#388e3c";
-
-            viewDiv.innerHTML = `
+            // 1. Dynamic Header
+            let html = `
                 <div style="border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px;">
                     <h2 style="margin: 0; color: #1e3a8a;">${record.student_name} - ${record.class_name}</h2>
-                    <p style="margin: 5px 0 0 0; color: #666;">Task: ${record.task_id} | Score: ${record.score}/5</p>
+                    <p style="margin: 5px 0 0 0; color: #666; font-size: 1.1em;">
+                        Lesson: <strong>${record.task_id}</strong> 
+                        ${record.score !== null && record.score !== undefined ? `| Score: <strong>${record.score}</strong>` : ''}
+                    </p>
                 </div>
-
-                <h3>Demonstrate Phase</h3>
-                <p><strong>1. Keyboard:</strong></p>
-                <div class="answer-box">${record.q1 || "(No answer provided)"}</div>
-                
-                <p><strong>2. File Management:</strong></p>
-                <div class="answer-box">${record.q2 || "(No answer provided)"}</div>
-                
-                <p><strong>3. E-Safety Rule:</strong></p>
-                <div class="answer-box">${record.q3 || "(No answer provided)"}</div>
-                
-                <p><strong>4. Mouse:</strong></p>
-                <div class="answer-box">${record.q4 || "(No answer provided)"}</div>
-                
-                <p><strong>5. Passwords:</strong></p>
-                <div class="answer-box">${record.q5 || "(No answer provided)"}</div>
-
-                <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 0;">
-
-                <h3>Connect Phase</h3>
-                <div class="rag-badge" style="background-color: ${ragColor};">${record.rag_level || "Not Reached"}</div>
-                <div class="answer-box" style="min-height: 100px;">${record.rag_answer || "(No answer provided)"}</div>
             `;
+
+            let hasContent = false;
+
+            // 2. Universal Text Question Scanner (Checks for up to 10 questions automatically)
+            for (let i = 1; i <= 10; i++) {
+                if (record['q' + i]) {
+                    if (!hasContent) { html += `<h3>Submitted Answers</h3>`; hasContent = true; }
+                    html += `<p><strong>Question ${i}:</strong></p><div class="answer-box">${record['q' + i]}</div>`;
+                }
+            }
+
+            // 3. RAG/Differentiated Task Scanner
+            if (record.rag_level) {
+                let ragColor = "#666";
+                if(record.rag_level.includes("Red") || record.rag_level === "Maroon") ragColor = "#d32f2f";
+                if(record.rag_level.includes("Amber")) ragColor = "#f57c00";
+                if(record.rag_level.includes("Green")) ragColor = "#388e3c";
+                if(record.rag_level === "Navy") ragColor = "#1e3a8a";
+
+                if (hasContent) html += `<hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 0;">`;
+                html += `<h3>Extended Task</h3>`;
+                html += `<div class="rag-badge" style="background-color: ${ragColor};">${record.rag_level}</div>`;
+                if (record.rag_answer) {
+                    html += `<div class="answer-box" style="min-height: 100px;">${record.rag_answer}</div>`;
+                } else {
+                    html += `<p style="color:#666; font-style:italic;">Level assigned but no final written answer saved.</p>`;
+                }
+                hasContent = true;
+            }
+
+            // 4. Empty State Catch
+            if (!hasContent) {
+                html += `<p style="color:#666; font-style:italic;">Student has opened this lesson but hasn't submitted any typed text yet.</p>`;
+            }
+
+            viewDiv.innerHTML = html;
         }
 
-        // Fetch immediately on load
-        fetchStudents();
+        window.onload = () => { fetchStudents(); };
     </script>
 </body>
 </html>
