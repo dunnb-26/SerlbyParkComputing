@@ -17,9 +17,6 @@
         
         select { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #ccc; font-weight: bold; }
         
-        .lesson-btn { display: inline-block; padding: 15px 25px; margin: 10px 10px 10px 0; background: #f0f4f8; border: 2px solid #1e3a8a; color: #1e3a8a; border-radius: 8px; font-weight: bold; font-size: 1.1em; cursor: pointer; transition: 0.2s; }
-        .lesson-btn:hover { background: #1e3a8a; color: white; }
-        
         /* The viewing window for the student pages */
         iframe { flex-grow: 1; width: 100%; border: 2px solid #eee; border-radius: 8px; background: #f8f9fa; }
     </style>
@@ -52,21 +49,11 @@
 
         <!-- Main View: Dynamic Iframe Window -->
         <div class="main-view" id="work-view">
-            <h2 style="color: #666; text-align: center; margin-top: 50px;">&larr; Select a student to view their portfolio</h2>
+            <h2 style="color: #666; text-align: center; margin-top: 50px;">&larr; Select a student to log in to their profile</h2>
         </div>
     </div>
 
     <script>
-        // --- MASTER LESSON DIRECTORY ---
-        // Add all future lessons here so the dashboard knows which HTML file to open!
-        const taskMap = {
-            'Y7 HT1 D&C': 'y7-ht1-d-c.html',
-            'Y8-HT1': 'y8-ht1-d-c.html',
-            'Y9-HT1': 'y9-ht1-d-c.html',
-            'Word Processing': 'word-processing.html',
-            'File Management': 'file-management-and-researching.html'
-        };
-
         const supabaseUrl = 'https://zqvmrmhiqxmghtxgjrtk.supabase.co';
         const supabaseKey = 'sb_publishable_iD26_DKTKRUWP7Jj3giEPA_f2xd5OCW';
         let db = null;
@@ -108,82 +95,56 @@
             studentNames.forEach(name => {
                 const btn = document.createElement('button');
                 btn.className = 'student-btn';
-                btn.innerHTML = `${name} <span class="lesson-count-badge">${uniqueStudents[name].length} Lessons</span>`;
+                // Grabs the exact class name from their first database record
+                const className = uniqueStudents[name][0].class_name;
+                
+                btn.innerHTML = `${name} <span class="lesson-count-badge">${uniqueStudents[name].length} Active Files</span>`;
+                
                 btn.onclick = () => {
                     document.querySelectorAll('.student-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    showLessonMenu(name);
+                    openStudentHome(name, className);
                 };
                 listDiv.appendChild(btn);
             });
         }
 
-        function showLessonMenu(studentName) {
-            const studentWork = uniqueStudents[studentName];
-            const className = studentWork[0].class_name;
+        function openStudentHome(studentName, className) {
             const viewDiv = document.getElementById('work-view');
-            
-            let html = `
-                <div style="border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 20px;">
-                    <h1 style="margin: 0; color: #1e3a8a;">${studentName}</h1>
-                    <p style="margin: 5px 0 0 0; color: #666; font-size: 1.1em; font-weight: bold;">Class: ${className}</p>
-                    <p style="color: #555; margin-top: 15px;">Select a lesson below to view their live work:</p>
-                </div>
-                <div style="overflow-y: auto;">
-            `;
 
-            studentWork.forEach(record => {
-                html += `<button class="lesson-btn" onclick="openLiveView('${studentName}', '${className}', '${record.task_id}')">${record.task_id}</button>`;
-            });
-
-            html += `</div>`;
-            viewDiv.innerHTML = html;
-        }
-
-        function openLiveView(studentName, className, taskId) {
-            const viewDiv = document.getElementById('work-view');
-            const filename = taskMap[taskId];
-
-            // Set browser memory so the iframe thinks the student is logged in
+            // Set browser memory so the iframe thinks the student is logged in perfectly
             localStorage.setItem('studentName', studentName);
             localStorage.setItem('className', className);
             localStorage.setItem('loggedInName', studentName);
             localStorage.setItem('loggedInClass', className);
 
-            if (filename) {
-                viewDiv.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 15px; flex-shrink: 0;">
-                        <div>
-                            <h2 style="margin: 0; color: #1e3a8a;">${studentName} - ${taskId}</h2>
-                            <p style="margin: 0; color: #dfaa2b; font-weight: bold;">Over-The-Shoulder View</p>
-                        </div>
-                        <button onclick="showLessonMenu('${studentName}')" style="padding: 10px 20px; background: #eee; border: 1px solid #ccc; font-weight:bold; cursor: pointer; border-radius: 4px;">&larr; Back to Menu</button>
+            viewDiv.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 15px; flex-shrink: 0;">
+                    <div>
+                        <h2 style="margin: 0; color: #1e3a8a;">${studentName}'s Workspace</h2>
+                        <p style="margin: 0; color: #dfaa2b; font-weight: bold;">Class: ${className}</p>
                     </div>
-                    <iframe src="${filename}" onload="lockStudentInputs(this)"></iframe>
-                `;
-            } else {
-                viewDiv.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 15px; flex-shrink: 0;">
-                        <div>
-                            <h2 style="margin: 0; color: #d32f2f;">Lesson Not Linked</h2>
-                            <p style="margin: 0; color: #666;">Task ID: ${taskId}</p>
-                        </div>
-                        <button onclick="showLessonMenu('${studentName}')" style="padding: 10px 20px; background: #eee; border: 1px solid #ccc; font-weight:bold; cursor: pointer; border-radius: 4px;">&larr; Back to Menu</button>
-                    </div>
-                    <div class="answer-box">
-                        To view this lesson visually, add <strong>'${taskId}': 'filename.html'</strong> to the <em>taskMap</em> directory at the top of your Teacher Dashboard code.
-                    </div>
-                `;
-            }
+                </div>
+                
+                <!-- This directly loads the website's index page right inside the dashboard -->
+                <iframe src="index.html" onload="lockStudentInputs(this)"></iframe>
+            `;
         }
 
         function lockStudentInputs(iframe) {
             try {
                 const doc = iframe.contentWindow.document;
-                // Lock all text boxes so the teacher can't accidentally edit them
+                
+                // 1. Force the index page login gate to close, bypassing security for the teacher
+                const loginGate = doc.getElementById('login-gate');
+                if (loginGate) {
+                    loginGate.style.display = 'none';
+                    doc.body.classList.remove('locked');
+                }
+
+                // 2. Lock all text boxes so the teacher can't accidentally edit them as they browse
                 doc.querySelectorAll('input[type="text"], textarea').forEach(el => el.readOnly = true);
-                // Hide all standard submission/reset buttons, but leave Teacher Verify buttons active if you want to click them!
-                doc.querySelectorAll('button:not(.teacher-verify-btn)').forEach(el => el.style.display = 'none');
+                
             } catch(e) {
                 console.log("Iframe cross-origin lockdown bypassed.");
             }
