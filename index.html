@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Delta Serlby Park - Computing</title>
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Supabase Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
-        /* New Splash Screen / Login Gate */
+        /* Splash Screen / Login Gate */
         #login-gate {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -25,7 +29,7 @@
             text-align: center;
             width: 90%;
             max-width: 400px;
-            border-top: 8px solid #dfaa2b; /* Delta Gold */
+            border-top: 8px solid #dfaa2b; 
         }
         .gate-card img {
             max-width: 150px;
@@ -48,23 +52,24 @@
             cursor: pointer;
             transition: transform 0.1s, background-color 0.2s;
         }
-        .btn-student {
-            background-color: #dfaa2b;
-            color: #1e3a8a;
-        }
+        .btn-student { background-color: #dfaa2b; color: #1e3a8a; }
         .btn-student:hover { background-color: #c99722; }
         
-        .btn-teacher {
-            background-color: #f8f9fa;
-            color: #555;
-            border: 2px solid #ccc;
-        }
+        .btn-teacher { background-color: #f8f9fa; color: #555; border: 2px solid #ccc; }
         .btn-teacher:hover { background-color: #e2e6ea; }
 
-        /* Hide the main site initially to prevent scrolling while the gate is active */
-        body.locked {
-            overflow: hidden;
+        .gate-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+            text-align: center;
         }
+
+        body.locked { overflow: hidden; }
 
         /* D&C Banner */
         .dnc-btn {
@@ -94,8 +99,20 @@
             <img src="logo.jpg" alt="Delta Serlby Park Logo">
             <h2>Welcome to Computing</h2>
             
-            <button class="role-btn btn-student" onclick="studentLogin()">🎓 I am a Student</button>
-            <button class="role-btn btn-teacher" onclick="teacherLogin()">👨‍‍🏫 I am a Teacher</button>
+            <!-- Default View: Pick Role -->
+            <div id="role-selection">
+                <button class="role-btn btn-student" onclick="showStudentForm()">🎓 I am a Student</button>
+                <button class="role-btn btn-teacher" onclick="teacherLogin()">👨‍‍🏫 I am a Teacher</button>
+            </div>
+
+            <!-- Hidden View: Student Login Form -->
+            <div id="student-login-form" style="display: none;">
+                <input type="text" id="student-username" class="gate-input" placeholder="Username">
+                <input type="password" id="student-pin" class="gate-input" placeholder="4-Digit PIN" maxlength="4">
+                
+                <button class="role-btn btn-student" onclick="processStudentLogin()">Log In</button>
+                <button class="role-btn btn-teacher" onclick="hideStudentForm()">Cancel</button>
+            </div>
         </div>
     </div>
 
@@ -128,25 +145,74 @@
     </footer>
 
     <script>
+        // --- DATABASE CONNECTION ---
+        const supabaseUrl = 'https://zqvrmmhiqxmghtxgjrtk.supabase.co';
+        const supabaseKey = 'sb_publishable_iD26_DKTKRUWP7Jj3giEPA_f2xd5OCW';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
         // --- LOGIN LOGIC ---
-        function studentLogin() {
-            // Unlock the page visually
-            document.getElementById('login-gate').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('login-gate').style.display = 'none';
-                document.body.classList.remove('locked');
-            }, 500);
+        function showStudentForm() {
+            document.getElementById('role-selection').style.display = 'none';
+            document.getElementById('student-login-form').style.display = 'block';
+        }
+
+        function hideStudentForm() {
+            document.getElementById('student-login-form').style.display = 'none';
+            document.getElementById('role-selection').style.display = 'block';
+            document.getElementById('student-username').value = "";
+            document.getElementById('student-pin').value = "";
+        }
+
+        async function processStudentLogin() {
+            const user = document.getElementById('student-username').value.trim();
+            const pin = document.getElementById('student-pin').value.trim();
+
+            if (user === "" || pin === "") {
+                alert("Please enter both your Username and PIN.");
+                return;
+            }
+
+            // Check Supabase for match
+            const { data, error } = await supabase
+                .from('students')
+                .select('*')
+                .eq('username', user)
+                .eq('pin', pin);
+
+            if (error) {
+                alert("Database connection error.");
+                return;
+            }
+
+            if (data && data.length > 0) {
+                // Success! Save their real name and class to memory for lesson auto-fill
+                localStorage.setItem('loggedInName', data[0].full_name);
+                localStorage.setItem('loggedInClass', data[0].class_name);
+                
+                // Unlock the page visually
+                document.getElementById('login-gate').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('login-gate').style.display = 'none';
+                    document.body.classList.remove('locked');
+                }, 500);
+            } else {
+                alert("Incorrect Username or PIN.");
+            }
         }
 
         function teacherLogin() {
             const passcode = prompt("Enter Teacher Passcode to access Dashboard:");
             if (passcode === "2525" || passcode === "delta") {
-                // If correct, redirect straight to the new live database dashboard
                 window.location.href = "teacher-dashboard.html";
             } else if (passcode !== null) {
                 alert("Incorrect passcode. Access denied.");
             }
         }
+
+        // Allow pressing Enter key to login
+        document.getElementById('student-pin').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') processStudentLogin();
+        });
 
         // --- CURRICULUM LOGIC ---
         const curriculumData = {
