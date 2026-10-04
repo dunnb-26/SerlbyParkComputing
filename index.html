@@ -10,102 +10,55 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* Splash Screen / Login Gate */
         #login-gate {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, #1e3a8a 0%, #0d1b42 100%);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            z-index: 9999; display: flex; justify-content: center; align-items: center;
             transition: opacity 0.5s ease;
         }
         .gate-card {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            text-align: center;
-            width: 90%;
-            max-width: 400px;
-            border-top: 8px solid #dfaa2b; 
+            background: white; padding: 40px; border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center;
+            width: 90%; max-width: 400px; border-top: 8px solid #dfaa2b; 
         }
-        .gate-card img {
-            max-width: 150px;
-            margin-bottom: 20px;
-        }
-        .gate-card h2 {
-            color: #1e3a8a;
-            margin-top: 0;
-            margin-bottom: 30px;
-        }
+        .gate-card img { max-width: 150px; margin-bottom: 20px; }
+        .gate-card h2 { color: #1e3a8a; margin-top: 0; margin-bottom: 30px; }
         .role-btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 15px;
-            font-size: 1.2em;
-            font-weight: bold;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: transform 0.1s, background-color 0.2s;
+            display: block; width: 100%; padding: 15px; margin-bottom: 15px;
+            font-size: 1.2em; font-weight: bold; border: none; border-radius: 6px;
+            cursor: pointer; transition: transform 0.1s, background-color 0.2s;
         }
         .btn-student { background-color: #dfaa2b; color: #1e3a8a; }
         .btn-student:hover { background-color: #c99722; }
-        
         .btn-teacher { background-color: #f8f9fa; color: #555; border: 2px solid #ccc; }
         .btn-teacher:hover { background-color: #e2e6ea; }
-
         .gate-input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 2px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
-            box-sizing: border-box;
-            text-align: center;
+            width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #ccc;
+            border-radius: 6px; font-size: 16px; box-sizing: border-box; text-align: center;
         }
-
         body.locked { overflow: hidden; }
 
-        /* D&C Banner */
         .dnc-btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            background-color: #dfaa2b; 
-            color: #1e3a8a; 
-            text-align: center;
-            border: none;
-            border-radius: 6px;
-            font-size: 1.2em;
-            font-weight: bold;
-            cursor: pointer;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: background-color 0.2s, transform 0.1s;
+            display: block; width: 100%; padding: 15px; background-color: #dfaa2b; 
+            color: #1e3a8a; text-align: center; border: none; border-radius: 6px;
+            font-size: 1.2em; font-weight: bold; cursor: pointer; margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: background-color 0.2s, transform 0.1s;
         }
         .dnc-btn:hover { background-color: #c99722; }
     </style>
 </head>
 <body class="locked">
 
-    <!-- THE LOGIN GATE -->
     <div id="login-gate">
         <div class="gate-card">
             <img src="logo.jpg" alt="Delta Serlby Park Logo">
             <h2>Welcome to Computing</h2>
             
-            <!-- Default View: Pick Role -->
             <div id="role-selection">
                 <button class="role-btn btn-student" onclick="showStudentForm()">🎓 I am a Student</button>
                 <button class="role-btn btn-teacher" onclick="teacherLogin()">👨‍‍🏫 I am a Teacher</button>
             </div>
 
-            <!-- Hidden View: Student Login Form -->
             <div id="student-login-form" style="display: none;">
                 <input type="text" id="student-username" class="gate-input" placeholder="Username">
                 <input type="password" id="student-pin" class="gate-input" placeholder="4-Digit PIN" maxlength="4">
@@ -116,14 +69,9 @@
         </div>
     </div>
 
-    <!-- MAIN WEBSITE CONTENT -->
     <header>
-        <div class="header-left">
-            <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
-        </div>
-        <div class="header-center">
-            <h1>Serlby Park Computing</h1>
-        </div>
+        <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
+        <div class="header-center"><h1>Serlby Park Computing</h1></div>
         <div class="header-right"></div>
     </header>
 
@@ -145,10 +93,14 @@
     </footer>
 
     <script>
-        // --- DATABASE CONNECTION ---
+        // --- FIXED DATABASE CONNECTION ---
         const supabaseUrl = 'https://zqvrmmhiqxmghtxgjrtk.supabase.co';
         const supabaseKey = 'sb_publishable_iD26_DKTKRUWP7Jj3giEPA_f2xd5OCW';
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        let db = null;
+        if (window.supabase) {
+            db = window.supabase.createClient(supabaseUrl, supabaseKey);
+        }
 
         // --- LOGIN LOGIC ---
         function showStudentForm() {
@@ -172,8 +124,12 @@
                 return;
             }
 
-            // Check Supabase for match
-            const { data, error } = await supabase
+            if (!db) {
+                alert("The database is currently blocked by your network. Please refresh the page.");
+                return;
+            }
+
+            const { data, error } = await db
                 .from('students')
                 .select('*')
                 .eq('username', user)
@@ -185,11 +141,9 @@
             }
 
             if (data && data.length > 0) {
-                // Success! Save their real name and class to memory for lesson auto-fill
                 localStorage.setItem('loggedInName', data[0].full_name);
                 localStorage.setItem('loggedInClass', data[0].class_name);
                 
-                // Unlock the page visually
                 document.getElementById('login-gate').style.opacity = '0';
                 setTimeout(() => {
                     document.getElementById('login-gate').style.display = 'none';
@@ -209,7 +163,6 @@
             }
         }
 
-        // Allow pressing Enter key to login
         document.getElementById('student-pin').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') processStudentLogin();
         });
@@ -273,7 +226,6 @@
             const titles = { year7: 'Year 7 Curriculum', year8: 'Year 8 Curriculum', year9: 'Year 9 Curriculum', gcse: 'GCSE Curriculum' };
             document.getElementById('year-title').innerText = titles[year];
 
-            // Dynamic Demonstrate & Connect Banner Logic
             const dncContainer = document.getElementById('dnc-container');
             if (year === 'year7' || year === 'year8' || year === 'year9') {
                 const yearNum = year.replace('year', ''); 
@@ -294,15 +246,10 @@
             curriculumData[year].forEach((unit, index) => {
                 const card = document.createElement('div');
                 card.className = 'card';
-                
                 const fileName = unit.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.html';
-                
-                card.onclick = () => {
-                    window.location.href = fileName;
-                };
+                card.onclick = () => { window.location.href = fileName; };
 
                 let subtitleHtml = year === 'gcse' ? '' : `<div class="card-subtitle">UNIT ${index + 1} &bull; COMPUTING</div>`;
-
                 card.innerHTML = `
                     ${subtitleHtml}
                     <div class="card-title">${unit.title}</div>
@@ -319,9 +266,7 @@
             let savedYear = 'year7';
             try {
                 savedYear = localStorage.getItem('lastViewedYearGroup') || 'year7';
-            } catch (error) {
-                console.log("Memory reading blocked by browser.");
-            }
+            } catch (error) {}
             loadYear(savedYear);
         };
     </script>
