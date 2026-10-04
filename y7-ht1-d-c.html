@@ -23,6 +23,7 @@
             border-top: 6px solid #1e3a8a;
             margin-bottom: 20px;
             transition: all 0.3s ease;
+            page-break-inside: avoid;
         }
         
         /* RAG Task Colors */
@@ -131,7 +132,7 @@
         }
         .btn-reset:hover { background-color: #b71c1c; }
 
-        /* Spelling Practice Area (Restored to 3 Attempts) */
+        /* Spelling Practice Area */
         .spag-practice-box {
             background-color: #fff3e0;
             border: 2px solid #f57c00;
@@ -361,7 +362,7 @@
             </div>
 
             <!-- STAGE 2: CONNECT TASKS (Initially Hidden) -->
-            <div id="task-red" class="task-card red-task hidden">
+            <div id="task-red" class="task-card red-task hidden" id="card-red">
                 <div class="task-title">Part 2: Connect - RED TASK (Consolidation) <span class="verified-badge">✅ Teacher Verified</span></div>
                 <div class="instruction-box">
                     Review the basics. Complete the task below after finishing your spelling practice above.
@@ -375,7 +376,7 @@
                 </div>
             </div>
 
-            <div id="task-amber" class="task-card amber-task hidden">
+            <div id="task-amber" class="task-card amber-task hidden" id="card-amber">
                 <div class="task-title">Part 2: Connect - AMBER TASK (Application) <span class="verified-badge">✅ Teacher Verified</span></div>
                 <div class="instruction-box">
                     Great effort! Connect your knowledge. Complete the task below after finishing your spelling practice above.
@@ -389,7 +390,7 @@
                 </div>
             </div>
 
-            <div id="task-green" class="task-card green-task hidden">
+            <div id="task-green" class="task-card green-task hidden" id="card-green">
                 <div class="task-title">Part 2: Connect - GREEN TASK (Challenge) <span class="verified-badge">✅ Teacher Verified</span></div>
                 <div class="instruction-box">
                     Perfect score! Challenge task complete. Complete the task below after finishing your spelling practice above.
@@ -405,10 +406,10 @@
 
         </div>
 
-        <!-- UNIVERSAL ACTION BUTTONS (PDF & RESET) -->
-        <div class="action-row" id="action-buttons">
-            <button class="btn-pdf no-print" onclick="downloadPDF()">📄 Download Work as PDF</button>
-            <button class="btn-reset no-print" onclick="clearData()">🗑️ Reset Page</button>
+        <!-- UNIVERSAL ACTION BUTTONS (PDF & RESET - Hidden until marked) -->
+        <div class="action-row hidden" id="action-buttons">
+            <button class="btn-pdf" onclick="downloadPDF()">📄 Download Work as PDF</button>
+            <button class="btn-reset" onclick="clearData()">🗑️ Reset Page</button>
         </div>
     </main>
 
@@ -494,18 +495,10 @@
             
             textarea.readOnly = false;
 
-            textarea.addEventListener('beforeinput', function(e) {
-                e.preventDefault();
-            });
-            textarea.addEventListener('paste', function(e) {
-                e.preventDefault();
-            });
-            textarea.addEventListener('cut', function(e) {
-                e.preventDefault();
-            });
-            textarea.addEventListener('drop', function(e) {
-                e.preventDefault();
-            });
+            textarea.addEventListener('beforeinput', function(e) { e.preventDefault(); });
+            textarea.addEventListener('paste', function(e) { e.preventDefault(); });
+            textarea.addEventListener('cut', function(e) { e.preventDefault(); });
+            textarea.addEventListener('drop', function(e) { e.preventDefault(); });
             textarea.addEventListener('keydown', function(e) {
                 const allowed = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown', 'Tab', 'Escape'];
                 const editingKey = e.key.length === 1 || ['Backspace', 'Delete', 'Enter'].includes(e.key);
@@ -539,8 +532,9 @@
 
             document.getElementById('spag-section').classList.remove('hidden');
 
-            // Default to 1 row when revealed
             if (document.getElementById('practice-rows-container').children.length === 0) {
+                addPracticeRow();
+                addPracticeRow();
                 addPracticeRow();
             }
 
@@ -561,6 +555,9 @@
                 scoreDisplay.style.color = "#2e7d32";
                 document.getElementById('task-green').classList.remove('hidden');
             }
+
+            // Reveal the action row (PDF & Reset buttons) once marked
+            document.getElementById('action-buttons').classList.remove('hidden');
 
             saveToLocalStorage();
         }
@@ -597,26 +594,42 @@
             }
         }
 
-        // --- PDF GENERATION LOGIC ---
+        document.getElementById('teacher-password-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') submitVerify();
+        });
+
+        // --- BULLETPROOF PDF GENERATION LOGIC ---
         function downloadPDF() {
-            var btns = document.querySelectorAll('.no-print');
-            btns.forEach(b => b.style.display = 'none');
+            var buttonsToHide = document.querySelectorAll('.no-print');
+            for(var b = 0; b < buttonsToHide.length; b++) buttonsToHide[b].style.display = 'none';
             document.getElementById('action-buttons').style.display = 'none';
 
-            var textInputs = document.querySelectorAll('textarea');
-            textInputs.forEach(t => t.setAttribute('value', t.value));
+            var textInputs = document.querySelectorAll('input[type="text"]');
+            for (var i = 0; i < textInputs.length; i++) {
+                textInputs[i].setAttribute('value', textInputs[i].value);
+            }
+
+            var textAreas = document.querySelectorAll('textarea');
+            for (var j = 0; j < textAreas.length; j++) {
+                textAreas[j].innerHTML = textAreas[j].value;
+                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
+            }
+
+            var element = document.getElementById('pdf-content');
 
             var opt = {
                 margin:       0.3,
                 filename:     'Y7_HT1_Demonstrate_Connect.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
             };
 
-            html2pdf().set(opt).from(document.getElementById('pdf-content')).save().then(function() {
-                btns.forEach(b => b.style.display = 'inline-block');
+            html2pdf().set(opt).from(element).save().then(function() {
+                for(var b = 0; b < buttonsToHide.length; b++) buttonsToHide[b].style.display = 'block';
                 document.getElementById('action-buttons').style.display = 'flex';
+                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
             });
         }
 
@@ -636,6 +649,7 @@
                     q5_class: document.getElementById('q5').className,
                     q1_locked: document.getElementById('q1').dataset.spellcheckLocked === 'true',
                     buttons_hidden: document.getElementById('stage1-buttons').style.display === 'none',
+                    actions_hidden: document.getElementById('action-buttons').classList.contains('hidden'),
                     score_text: document.getElementById('score-display').innerText,
                     score_bg: document.getElementById('score-display').style.backgroundColor,
                     score_color: document.getElementById('score-display').style.color,
@@ -697,6 +711,10 @@
                     document.getElementById('stage1-buttons').style.display = 'none';
                 }
 
+                if (data.actions_hidden === false) {
+                    document.getElementById('action-buttons').classList.remove('hidden');
+                }
+
                 if (!data.score_hidden) {
                     const scoreDisplay = document.getElementById('score-display');
                     scoreDisplay.classList.remove('hidden');
@@ -728,7 +746,9 @@
                         addPracticeRow(row.w0, row.w1, row.w2, row.w3);
                     });
                 } else {
-                    addPracticeRow(); // Default to 1 row
+                    addPracticeRow();
+                    addPracticeRow();
+                    addPracticeRow();
                 }
             } catch (e) {
                 console.log("Local storage read blocked.");
@@ -746,7 +766,9 @@
             loadFromLocalStorage();
 
             if (document.getElementById('practice-rows-container').children.length === 0) {
-                addPracticeRow(); // Default to 1 row
+                addPracticeRow();
+                addPracticeRow();
+                addPracticeRow();
             }
 
             document.querySelectorAll('.persist-input').forEach(el => {
