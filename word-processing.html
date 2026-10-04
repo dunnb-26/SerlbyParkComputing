@@ -126,7 +126,6 @@
 
     <!-- PDF & SUBMIT -->
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf" onclick="manualSave()">💾 Save & Submit Work</button>
         <button class="btn-pdf no-print" style="background-color: #666;" onclick="downloadPDF()">📄 Download PDF</button>
     </div>
 
@@ -153,7 +152,7 @@
         try { if (window.supabase) db = window.supabase.createClient(supabaseUrl, supabaseKey); } catch (e) {}
         
         let dbRecordId = null;
-        const currentTaskId = 'Word Processing';
+        const currentTaskId = 'Word-Processing';
         
         let studentName = localStorage.getItem('loggedInName');
         let className = localStorage.getItem('loggedInClass');
@@ -232,8 +231,9 @@
             document.getElementById('loading-overlay').style.display = 'none';
         };
 
-        let saveTimeout;
-        async function syncToDatabase(isFinal) {
+        // --- SILENT BACKGROUND AUTO-SAVE ---
+        let autoSaveTimeout;
+        async function syncToDatabase() {
             if (!dbRecordId || !db) return;
             await db.from('dnc_responses').update({
                 keywords: compileGroup(['kw1', 'kw2', 'kw3', 'kw4']),
@@ -244,16 +244,19 @@
                 navy: getTaskData('card-navy', 'img-navy'),
                 takeaways: compileGroup(['t1', 't2', 't3'])
             }).eq('id', dbRecordId);
-
-            if (isFinal) alert("Work Saved Successfully!");
+            
+            console.log("Work auto-saved in the background!");
         }
 
+        // Attach silent listener to inputs (Triggers save 1 second after typing stops)
         document.querySelectorAll('.auto-input').forEach(box => {
-            box.addEventListener('input', () => { clearTimeout(saveTimeout); saveTimeout = setTimeout(() => { syncToDatabase(false); }, 1000); });
+            box.addEventListener('input', () => { 
+                clearTimeout(autoSaveTimeout); 
+                autoSaveTimeout = setTimeout(() => { syncToDatabase(); }, 1000); 
+            });
         });
-        function manualSave() { syncToDatabase(true); }
 
-        /* --- IMAGE COMPRESSOR (Prevents Database Overload) --- */
+        /* --- IMAGE COMPRESSOR & AUTO-SAVE (Prevents Database Overload) --- */
         document.addEventListener('paste', function(e) {
             var active = document.activeElement;
             var targetImgId = null, targetTextId = null;
@@ -288,21 +291,22 @@
                     document.getElementById(imgId).src = dataUrl;
                     document.getElementById(imgId).style.display = 'block';
                     document.getElementById(textId).style.display = 'none'; 
-                    syncToDatabase(false); // Auto-save after paste!
+                    syncToDatabase(); // Auto-save after paste!
                 }
                 img.src = event.target.result;
             };
             reader.readAsDataURL(file);
         }
 
-        /* --- TEACHER VERIFY MODAL --- */
+        /* --- TEACHER VERIFY MODAL & AUTO-SAVE --- */
         var activeTask = null;
         function openVerifyModal(task) { activeTask = task; document.getElementById('verify-modal').style.display = 'flex'; document.getElementById('teacher-password-input').focus(); }
         function closeVerifyModal() { document.getElementById('verify-modal').style.display = 'none'; }
         function submitVerify() {
             if (document.getElementById('teacher-password-input').value === "delta") {
                 document.getElementById('card-' + activeTask).classList.toggle('teacher-verified');
-                closeVerifyModal(); syncToDatabase(false);
+                closeVerifyModal(); 
+                syncToDatabase(); // Auto-save when teacher verifies!
             } else { document.getElementById('modal-error-msg').style.display = 'block'; }
         }
 
