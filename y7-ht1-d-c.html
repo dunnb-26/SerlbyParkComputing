@@ -61,7 +61,6 @@
             font-family: inherit;
             font-size: 16px;
             box-sizing: border-box;
-            transition: all 0.3s;
             resize: vertical;
             min-height: 80px;
         }
@@ -81,7 +80,6 @@
             font-size: 1.1em;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.2s;
         }
         .btn-mark {
             background-color: #dfaa2b;
@@ -95,34 +93,48 @@
         }
         .btn-spag:hover { background-color: #455a64; }
 
-        /* Spelling Error Box Styling */
-        .spag-feedback-box {
-            background-color: #fff3e0;
-            border: 2px dashed #f57c00;
-            border-radius: 6px;
+        .btn-submit-final {
+            display: block;
+            width: 100%;
             padding: 15px;
+            background-color: #1e3a8a;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
             margin-top: 20px;
         }
-        .spag-feedback-box h4 {
-            margin-top: 0;
-            color: #e65100;
+
+        /* Spelling Correction Box */
+        .spag-correction-box {
+            background-color: #fff3e0;
+            border: 2px solid #f57c00;
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 20px;
         }
-        .error-tag {
-            display: inline-block;
-            background-color: #ffebee;
-            color: #c62828;
-            border: 1px solid #ef9a9a;
-            padding: 4px 10px;
-            border-radius: 4px;
-            margin: 4px;
+        .correction-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .correction-row span {
             font-weight: bold;
+            color: #d32f2f;
+            min-width: 120px;
+        }
+        .correction-row input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
 
-        /* Marking Colors */
         .correct { border-color: #388e3c !important; background-color: #e8f5e9; }
         .incorrect { border-color: #d32f2f !important; background-color: #ffebee; }
-        
-        /* Hidden Class */
         .hidden { display: none !important; }
 
         #score-display {
@@ -137,93 +149,81 @@
 </head>
 <body>
     <header>
-        <div class="header-left">
-            <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
-        </div>
-        <div class="header-center">
-            <h1>Year 7 Computing</h1>
-        </div>
-        <div class="header-right">
-            <a href="javascript:history.back()" class="back-btn">&larr; Back to Unit</a>
-        </div>
+        <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
+        <div class="header-center"><h1>Year 7 Computing</h1></div>
+        <div class="header-right"><a href="javascript:history.back()" class="back-btn">&larr; Go Back</a></div>
     </header>
 
     <main>
         <div class="task-container">
             
-            <!-- STAGE 1: DEMONSTRATE TASK -->
+            <!-- STAGE 1 -->
             <div id="demonstrate-stage" class="task-card">
                 <div class="task-title">Part 1: Demonstrate (Knowledge Check)</div>
                 <div class="instruction-box">
-                    Write full sentences to answer the 5 questions below. Click "SPAG Check" to highlight errors and list any unknown/misspelled words at the bottom.
+                    Write short, full sentences to answer the 5 questions below. When you click "Mark My Work", the system will check your answers and flag any spelling errors for you to correct.
                 </div>
 
                 <div class="question-group">
-                    <label>1. Explain what the CPU does inside a computer system:</label>
-                    <textarea id="q1" spellcheck="true" placeholder="Type your detailed answer here..."></textarea>
+                    <label>1. Write a sentence explaining what you use a computer keyboard for:</label>
+                    <textarea id="q1" placeholder="Type your sentence here..."></textarea>
                 </div>
                 <div class="question-group">
-                    <label>2. Describe the difference between an input device and an output device:</label>
-                    <textarea id="q2" spellcheck="true" placeholder="Type your detailed answer here..."></textarea>
+                    <label>2. Why is it important to save your files inside correctly named folders?</label>
+                    <textarea id="q2" placeholder="Type your sentence here..."></textarea>
                 </div>
                 <div class="question-group">
-                    <label>3. Explain what software is and give one example:</label>
-                    <textarea id="q3" spellcheck="true" placeholder="Type your detailed answer here..."></textarea>
+                    <label>3. Write down one important rule for staying safe on the internet:</label>
+                    <textarea id="q3" placeholder="Type your sentence here..."></textarea>
                 </div>
                 <div class="question-group">
-                    <label>4. Describe the main difference between the World Wide Web and the Internet:</label>
-                    <textarea id="q4" spellcheck="true" placeholder="Type your detailed answer here..."></textarea>
+                    <label>4. Explain what you use a computer mouse for on the screen:</label>
+                    <textarea id="q4" placeholder="Type your sentence here..."></textarea>
                 </div>
                 <div class="question-group">
-                    <label>5. Discuss why it is important to keep your passwords secure and how you can make a strong one:</label>
-                    <textarea id="q5" spellcheck="true" placeholder="Type your detailed answer here..."></textarea>
+                    <label>5. Why is it important to keep your password a secret from other people?</label>
+                    <textarea id="q5" placeholder="Type your sentence here..."></textarea>
                 </div>
 
                 <div class="btn-row" id="stage1-buttons">
-                    <button class="btn-spag" onclick="runSpagCheck()">🔍 Run SPAG & Word Check</button>
-                    <button class="btn-mark" onclick="markStage1()">✅ Mark My Work</button>
+                    <button class="btn-mark" onclick="markStage1()">✅ Mark My Work & Check SPAG</button>
                 </div>
 
-                <!-- Extracted Misspelled Words List -->
-                <div id="spag-results" class="spag-feedback-box hidden">
-                    <h4>Words to Practice (Write these 3 times below):</h4>
-                    <p>The following words from your answers were flagged as unusual or potentially misspelled:</p>
-                    <div id="error-tags-container"></div>
+                <!-- Dynamic Spelling Correction Area -->
+                <div id="spag-section" class="spag-correction-box hidden">
+                    <h3>⚠️ Spelling Corrections Required</h3>
+                    <p>The following words from your answers were flagged as potentially misspelled. Please type the correct spelling next to them:</p>
+                    <div id="spag-inputs-container"></div>
+                    <button class="btn-submit-final" onclick="proceedToConnect()">Continue to Connect Task &rarr;</button>
                 </div>
 
                 <div id="score-display" class="hidden"></div>
             </div>
 
-            <!-- STAGE 2: CONNECT TASKS (Initially Hidden) -->
+            <!-- STAGE 2 (RAG) -->
             <div id="task-red" class="task-card red-task hidden">
-                <div class="task-title">Part 2: Connect - RED TASK (Consolidation)</div>
-                <div class="instruction-box">
-                    Review the basics and practice any flagged spelling words 3 times each.
-                </div>
+                <div class="task-title">Part 2: Connect - RED TASK</div>
+                <div class="instruction-box">Let's review the basics. Complete the task below.</div>
                 <div class="question-group">
-                    <label>List 3 input devices and 3 output devices used in a computer system:</label>
+                    <label>List 3 rules you should always follow to stay safe when using the internet:</label>
                     <textarea placeholder="Type your list here..."></textarea>
                 </div>
             </div>
 
             <div id="task-amber" class="task-card amber-task hidden">
-                <div class="task-title">Part 2: Connect - AMBER TASK (Application)</div>
-                <div class="instruction-box">
-                    Connect your knowledge and practice any flagged spelling words 3 times each.
-                </div>
+                <div class="task-title">Part 2: Connect - AMBER TASK</div>
+                <div class="instruction-box">Great effort! Complete the task below.</div>
                 <div class="question-group">
-                    <label>Explain how hardware and software work together to allow you to play a video game:</label>
+                    <label>Explain the difference between clicking "Save" and "Save As" when working on a document:</label>
                     <textarea placeholder="Type your explanation here..."></textarea>
                 </div>
             </div>
 
             <div id="task-green" class="task-card green-task hidden">
-                <div class="task-title">Part 2: Connect - GREEN TASK (Challenge)</div>
-                <div class="instruction-box">
-                    Challenge task complete with spelling corrections.
-                </div>
+                <div class="task-title">Part 2: Connect - GREEN TASK</div>
+                <div class="instruction-box">Perfect score! Complete the challenge below.</div>
                 <div class="question-group">
-                    <label>Write a short paragraph explaining the risks of sharing personal information online, and create 3 rules for staying safe:</label>
+                    <label>Write a short paragraph explaining what a "digital footprint" is, and how you can make sure your footprint is positive:</label>
                     <textarea placeholder="Type your response here..."></textarea>
                 </div>
             </div>
@@ -231,120 +231,108 @@
         </div>
     </main>
     
-    <footer>
-        &copy; 2026 Delta Serlby Park - Computing Department
-    </footer>
+    <footer>&copy; 2026 Delta Serlby Park - Computing Department</footer>
 
     <script>
-        // Basic dictionary / common word whitelist for testing 
-        const commonWords = new Set([
+        const qKeywords = {
+            1: ['type', 'typing', 'write', 'enter', 'letters', 'words', 'text'],
+            2: ['organise', 'organize', 'find', 'save', 'store', 'neat', 'tidy', 'lose', 'sort'],
+            3: ['stranger', 'tell', 'adult', 'password', 'private', 'personal', 'name', 'address', 'safe', 'careful'],
+            4: ['click', 'point', 'select', 'move', 'drag', 'scroll', 'cursor', 'arrow'],
+            5: ['hack', 'hacker', 'steal', 'delete', 'account', 'safe', 'secure', 'protect', 'log in', 'login', 'guess']
+        };
+
+        // Standard dictionary & computing whitelist for spell checking
+        const commonDictionary = new Set([
             "the", "be", "to", "of", "and", "a", "in", "that", "have", "i", "it", "for", "not", "on", "with", "he", "as", "you", "do", "at",
             "this", "but", "his", "by", "from", "they", "we", "say", "her", "she", "or", "an", "will", "my", "one", "all", "would", "there",
             "their", "what", "so", "up", "out", "if", "about", "who", "get", "which", "go", "me", "when", "make", "can", "like", "time", "no",
             "just", "him", "know", "take", "people", "into", "year", "your", "good", "some", "could", "them", "see", "other", "than", "then",
             "now", "look", "only", "come", "its", "over", "think", "also", "back", "after", "use", "two", "how", "our", "work", "first", "well",
-            "way", "even", "new", "want", "because", "any", "these", "give", "day", "most", "us", "cpu", "computer", "system", "process",
-            "input", "output", "device", "software", "hardware", "internet", "world", "wide", "web", "password", "secure", "hack", "safe"
+            "way", "even", "new", "want", "because", "any", "these", "give", "day", "most", "us", "computer", "keyboard", "mouse", "screen",
+            "folder", "file", "save", "safe", "internet", "password", "secure", "type", "typing", "write", "organise", "organize", "click",
+            "cursor", "hack", "hacker", "account", "protect", "private", "personal", "address", "digital", "footprint", "document"
         ]);
 
-        function runSpagCheck() {
-            let flaggedWords = new Set();
+        let globalScore = 0;
+        let assignedRagLevel = "";
 
-            // Gather all text from boxes 1 to 5
+        function checkSentenceAnswer(inputId, keywords) {
+            const el = document.getElementById(inputId);
+            const ans = el.value.toLowerCase().trim();
+            if (ans === "") { el.classList.add('incorrect'); return 0; }
+            if (keywords.some(k => ans.includes(k.toLowerCase()))) { 
+                el.classList.add('correct'); 
+                return 1; 
+            } else { 
+                el.classList.add('incorrect'); 
+                return 0; 
+            }
+        }
+
+        function markStage1() {
+            globalScore = 0;
+            globalScore += checkSentenceAnswer('q1', qKeywords[1]);
+            globalScore += checkSentenceAnswer('q2', qKeywords[2]);
+            globalScore += checkSentenceAnswer('q3', qKeywords[3]);
+            globalScore += checkSentenceAnswer('q4', qKeywords[4]);
+            globalScore += checkSentenceAnswer('q5', qKeywords[5]);
+
+            // Scan text for potential spelling mistakes
+            let flaggedWords = new Set();
             for (let i = 1; i <= 5; i++) {
-                let box = document.getElementById('q' + i);
-                let text = box.value.toLowerCase();
-                
-                // Clean punctuation and split into individual words
-                let words = text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g,"").split(/\s+/);
+                let text = document.getElementById('q' + i).value.toLowerCase();
+                let words = text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "").split(/\s+/);
                 
                 words.forEach(word => {
-                    // Check if word has length > 2 and is not in our common whitelist/dictionary
-                    if (word.length > 2 && !commonWords.has(word) && !/^\d+$/.test(word)) {
+                    if (word.length > 3 && !commonDictionary.has(word) && !/^\d+$/.test(word)) {
                         flaggedWords.add(word);
                     }
                 });
             }
 
-            // Display the results box
-            const resultsBox = document.getElementById('spag-results');
-            const tagsContainer = document.getElementById('error-tags-container');
-            tagsContainer.innerHTML = '';
-
-            if (flaggedWords.size > 0) {
-                resultsBox.classList.remove('hidden');
-                flaggedWords.forEach(word => {
-                    let tag = document.createElement('span');
-                    tag.className = 'error-tag';
-                    tag.innerText = word;
-                    tagsContainer.appendChild(tag);
-                });
-            } else {
-                resultsBox.classList.remove('hidden');
-                tagsContainer.innerHTML = '<em>Fantastic! No obvious spelling errors or unrecognized words found.</em>';
-            }
-
-            alert("SPAG & Word Check complete! Check the box below for any extracted words to practice.");
-        }
-
-        // Smart keyword scanner for long sentence answers
-        function checkSentenceAnswer(inputId, keywords) {
-            const inputElement = document.getElementById(inputId);
-            const studentAnswer = inputElement.value.toLowerCase().trim();
-            
-            if (studentAnswer === "") {
-                inputElement.classList.add('incorrect');
-                inputElement.classList.remove('correct');
-                return 0;
-            }
-
-            let isCorrect = keywords.some(keyword => studentAnswer.includes(keyword.toLowerCase()));
-
-            if (isCorrect) {
-                inputElement.classList.add('correct');
-                inputElement.classList.remove('incorrect');
-                return 1;
-            } else {
-                inputElement.classList.add('incorrect');
-                inputElement.classList.remove('correct');
-                return 0;
-            }
-        }
-
-        function markStage1() {
-            let score = 0;
-            
-            score += checkSentenceAnswer('q1', ['process', 'brain', 'fetch', 'decode', 'execute', 'calculate']);
-            score += checkSentenceAnswer('q2', ['in', 'out', 'enter', 'display', 'screen', 'keyboard']);
-            score += checkSentenceAnswer('q3', ['program', 'app', 'code', 'instruction', 'browser', 'word']);
-            score += checkSentenceAnswer('q4', ['network', 'page', 'website', 'infrastructure', 'connect']);
-            score += checkSentenceAnswer('q5', ['safe', 'hack', 'steal', 'symbol', 'number', 'long', 'upper']);
-
-            for (let i = 1; i <= 5; i++) {
-                document.getElementById('q' + i).disabled = true;
-            }
+            // Disable input boxes and hide mark button
+            for (let i = 1; i <= 5; i++) document.getElementById('q' + i).disabled = true;
             document.getElementById('stage1-buttons').style.display = 'none';
+
+            // If spelling errors are found, show correction box before revealing RAG task
+            if (flaggedWords.size > 0) {
+                const container = document.getElementById('spag-inputs-container');
+                container.innerHTML = '';
+                flaggedWords.forEach(word => {
+                    let row = document.createElement('div');
+                    row.className = 'correction-row';
+                    row.innerHTML = `<span>${word}</span> &rarr; <input type="text" placeholder="Type correct spelling...">`;
+                    container.appendChild(row);
+                });
+                document.getElementById('spag-section').classList.remove('hidden');
+            } else {
+                proceedToConnect();
+            }
+        }
+
+        function proceedToConnect() {
+            document.getElementById('spag-section').classList.add('hidden');
 
             const scoreDisplay = document.getElementById('score-display');
             scoreDisplay.classList.remove('hidden');
-            scoreDisplay.innerText = `You scored ${score} out of 5!`;
+            scoreDisplay.innerText = `You scored ${globalScore} out of 5!`;
 
-            document.getElementById('task-red').classList.add('hidden');
-            document.getElementById('task-amber').classList.add('hidden');
-            document.getElementById('task-green').classList.add('hidden');
-
-            if (score <= 2) {
+            if (globalScore <= 2) {
+                assignedRagLevel = "Red Task";
+                document.getElementById('task-red').classList.remove('hidden');
                 scoreDisplay.style.backgroundColor = "#ffebee";
                 scoreDisplay.style.color = "#d32f2f";
-                document.getElementById('task-red').classList.remove('hidden');
-            } else if (score >= 3 && score <= 4) {
+            } else if (globalScore >= 3 && globalScore <= 4) {
+                assignedRagLevel = "Amber Task";
+                document.getElementById('task-amber').classList.remove('hidden');
                 scoreDisplay.style.backgroundColor = "#fff3e0";
                 scoreDisplay.style.color = "#ef6c00";
-                document.getElementById('task-amber').classList.remove('hidden');
-            } else if (score === 5) {
+            } else if (globalScore === 5) {
+                assignedRagLevel = "Green Task";
+                document.getElementById('task-green').classList.remove('hidden');
                 scoreDisplay.style.backgroundColor = "#e8f5e9";
                 scoreDisplay.style.color = "#2e7d32";
-                document.getElementById('task-green').classList.remove('hidden');
             }
         }
     </script>
