@@ -5,11 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Delta Serlby Park - Computing</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Styling for the new D&C Banner Button */
+        .dnc-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #dfaa2b; /* Delta Gold */
+            color: #1e3a8a; /* Delta Navy */
+            text-align: center;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .dnc-btn:hover {
+            background-color: #c99722;
+        }
+        .dnc-btn:active {
+            transform: scale(0.99);
+        }
+    </style>
 </head>
 <body>
     <header>
         <div class="header-left">
-            <!-- Logo is now a clickable home button -->
             <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
         </div>
         
@@ -29,6 +53,10 @@
 
     <main>
         <h2 id="year-title">Year 7 Curriculum</h2>
+        
+        <!-- This container holds the dynamic D&C button -->
+        <div id="dnc-container"></div>
+
         <div id="content-grid" class="grid">
             <!-- Cards will be dynamically injected here by the script -->
         </div>
@@ -98,6 +126,16 @@
 
             const titles = { year7: 'Year 7 Curriculum', year8: 'Year 8 Curriculum', year9: 'Year 9 Curriculum', gcse: 'GCSE Curriculum' };
             document.getElementById('year-title').innerText = titles[year];
+
+            // Dynamic Demonstrate & Connect Banner Logic
+            const dncContainer = document.getElementById('dnc-container');
+            if (year === 'year7' || year === 'year8' || year === 'year9') {
+                const yearNum = year.replace('year', ''); // Extracts just the number "7", "8", or "9"
+                dncContainer.innerHTML = `<button class="dnc-btn" onclick="window.location.href='y${yearNum}-dnc.html'">📝 View Year ${yearNum} Demonstrate & Connect Tasks</button>`;
+            } else {
+                // Hides the button when the GCSE tab is clicked
+                dncContainer.innerHTML = '';
+            }
 
             try {
                 localStorage.setItem('lastViewedYearGroup', year);
