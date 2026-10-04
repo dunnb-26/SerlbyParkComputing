@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Y7 HT1 - Demonstrate & Connect</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .task-container {
+            max-width: 900px;
+            margin: 0 auto 40px auto;
+            padding: 20px;
+        }
+        .task-card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            border-top: 6px solid #1e3a8a;
+            margin-bottom: 20px;
+        }
+        
+        /* RAG Task Colors */
+        .red-task { border-top-color: #d32f2f; }
+        .amber-task { border-top-color: #f57c00; }
+        .green-task { border-top-color: #388e3c; }
+        
+        .task-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #1e3a8a;
+        }
+        .red-task .task-title { color: #d32f2f; }
+        .amber-task .task-title { color: #f57c00; }
+        .green-task .task-title { color: #388e3c; }
+
+        .instruction-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #dfaa2b;
+            padding: 15px;
+            margin-bottom: 25px;
+            color: #555;
+            font-style: italic;
+        }
+
+        .question-group {
+            margin-bottom: 20px;
+        }
+        .question-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .question-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: all 0.3s;
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        /* Action Buttons */
+        .btn-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .btn-mark, .btn-spag {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-mark {
+            background-color: #dfaa2b;
+            color: #1e3a8a;
+        }
+        .btn-mark:hover { background-color: #c99722; }
+        
+        .btn-spag {
+            background-color: #607d8b;
+            color: white;
+        }
+        .btn-spag:hover { background-color: #455a64; }
+
+        /* Marking Colors */
+        .correct { border-color: #388e3c !important; background-color: #e8f5e9; }
+        .incorrect { border-color: #d32f2f !important; background-color: #ffebee; }
+        
+        /* Hidden Class */
+        .hidden { display: none !important; }
+
+        #score-display {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
+        </div>
+        <div class="header-center">
+            <h1>Year 7 Computing</h1>
+        </div>
+        <div class="header-right">
+            <a href="javascript:history.back()" class="back-btn">&larr; Back to Unit</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="task-container">
+            
+            <!-- STAGE 1: DEMONSTRATE TASK -->
+            <div id="demonstrate-stage" class="task-card">
+                <div class="task-title">Part 1: Demonstrate (Knowledge Check)</div>
+                <div class="instruction-box">
+                    Write full sentences to answer the 5 questions below. Use the "SPAG Check" button to highlight spelling errors before marking. Your final score will determine your Connect task!
+                </div>
+
+                <div class="question-group">
+                    <label>1. Explain what the CPU does inside a computer system:</label>
+                    <textarea id="q1" spellcheck="false" placeholder="Type your detailed answer here..."></textarea>
+                </div>
+                <div class="question-group">
+                    <label>2. Describe the difference between an input device and an output device:</label>
+                    <textarea id="q2" spellcheck="false" placeholder="Type your detailed answer here..."></textarea>
+                </div>
+                <div class="question-group">
+                    <label>3. Explain what software is and give one example:</label>
+                    <textarea id="q3" spellcheck="false" placeholder="Type your detailed answer here..."></textarea>
+                </div>
+                <div class="question-group">
+                    <label>4. Describe the main difference between the World Wide Web and the Internet:</label>
+                    <textarea id="q4" spellcheck="false" placeholder="Type your detailed answer here..."></textarea>
+                </div>
+                <div class="question-group">
+                    <label>5. Discuss why it is important to keep your passwords secure and how you can make a strong one:</label>
+                    <textarea id="q5" spellcheck="false" placeholder="Type your detailed answer here..."></textarea>
+                </div>
+
+                <div class="btn-row" id="stage1-buttons">
+                    <button class="btn-spag" onclick="runSpagCheck()">🔍 SPAG Check</button>
+                    <button class="btn-mark" onclick="markStage1()">✅ Mark My Work</button>
+                </div>
+                <div id="score-display" class="hidden"></div>
+            </div>
+
+            <!-- STAGE 2: CONNECT TASKS (Initially Hidden) -->
+            
+            <div id="task-red" class="task-card red-task hidden">
+                <div class="task-title">Part 2: Connect - RED TASK (Consolidation)</div>
+                <div class="instruction-box">
+                    Let's review the basics. Complete the task below to connect what we have learned this half term.
+                </div>
+                <div class="question-group">
+                    <label>List 3 input devices and 3 output devices used in a computer system:</label>
+                    <textarea placeholder="Type your list here..."></textarea>
+                </div>
+            </div>
+
+            <div id="task-amber" class="task-card amber-task hidden">
+                <div class="task-title">Part 2: Connect - AMBER TASK (Application)</div>
+                <div class="instruction-box">
+                    Great effort! Now let's connect your knowledge. Complete the task below.
+                </div>
+                <div class="question-group">
+                    <label>Explain how hardware and software work together to allow you to play a video game:</label>
+                    <textarea placeholder="Type your explanation here..."></textarea>
+                </div>
+            </div>
+
+            <div id="task-green" class="task-card green-task hidden">
+                <div class="task-title">Part 2: Connect - GREEN TASK (Challenge)</div>
+                <div class="instruction-box">
+                    Perfect score! You are ready to connect these concepts to a wider challenge.
+                </div>
+                <div class="question-group">
+                    <label>Write a short paragraph explaining the risks of sharing personal information online, and create 3 rules for staying safe:</label>
+                    <textarea placeholder="Type your response here..."></textarea>
+                </div>
+            </div>
+
+        </div>
+    </main>
+    
+    <footer>
+        &copy; 2026 Delta Serlby Park - Computing Department
+    </footer>
+
+    <script>
+        // Enables the browser's native spell checker to highlight errors with red squiggles
+        function runSpagCheck() {
+            for (let i = 1; i <= 5; i++) {
+                let box = document.getElementById('q' + i);
+                box.setAttribute('spellcheck', 'true');
+                // Briefly focus and blur to force the browser to render the red squiggly lines
+                box.focus(); 
+            }
+            document.getElementById('q1').focus(); // Return focus to the first box
+            alert("SPAG Check Enabled! Look for the red squiggly lines under your spelling mistakes and right-click them to fix.");
+        }
+
+        // Smart keyword scanner for long sentence answers
+        function checkSentenceAnswer(inputId, keywords) {
+            const inputElement = document.getElementById(inputId);
+            const studentAnswer = inputElement.value.toLowerCase().trim();
+            
+            if (studentAnswer === "") {
+                inputElement.classList.add('incorrect');
+                inputElement.classList.remove('correct');
+                return 0;
+            }
+
+            // Checks if the student's long answer includes AT LEAST ONE of the target keywords
+            let isCorrect = keywords.some(keyword => studentAnswer.includes(keyword.toLowerCase()));
+
+            if (isCorrect) {
+                inputElement.classList.add('correct');
+                inputElement.classList.remove('incorrect');
+                return 1;
+            } else {
+                inputElement.classList.add('incorrect');
+                inputElement.classList.remove('correct');
+                return 0;
+            }
+        }
+
+        function markStage1() {
+            let score = 0;
+            
+            // Mark the 5 questions by scanning their sentences for these acceptable keywords
+            score += checkSentenceAnswer('q1', ['process', 'brain', 'fetch', 'decode', 'execute', 'calculate']);
+            score += checkSentenceAnswer('q2', ['in', 'out', 'enter', 'display', 'screen', 'keyboard']);
+            score += checkSentenceAnswer('q3', ['program', 'app', 'code', 'instruction', 'browser', 'word']);
+            score += checkSentenceAnswer('q4', ['network', 'page', 'website', 'infrastructure', 'connect']);
+            score += checkSentenceAnswer('q5', ['safe', 'hack', 'steal', 'symbol', 'number', 'long', 'upper']);
+
+            // Disable inputs and hide buttons after marking
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById('q' + i).disabled = true;
+            }
+            document.getElementById('stage1-buttons').style.display = 'none';
+
+            // Show Score
+            const scoreDisplay = document.getElementById('score-display');
+            scoreDisplay.classList.remove('hidden');
+            scoreDisplay.innerText = `You scored ${score} out of 5!`;
+
+            // Logic to reveal the differentiated task
+            document.getElementById('task-red').classList.add('hidden');
+            document.getElementById('task-amber').classList.add('hidden');
+            document.getElementById('task-green').classList.add('hidden');
+
+            if (score <= 2) {
+                scoreDisplay.style.backgroundColor = "#ffebee";
+                scoreDisplay.style.color = "#d32f2f";
+                document.getElementById('task-red').classList.remove('hidden');
+            } else if (score >= 3 && score <= 4) {
+                scoreDisplay.style.backgroundColor = "#fff3e0";
+                scoreDisplay.style.color = "#ef6c00";
+                document.getElementById('task-amber').classList.remove('hidden');
+            } else if (score === 5) {
+                scoreDisplay.style.backgroundColor = "#e8f5e9";
+                scoreDisplay.style.color = "#2e7d32";
+                document.getElementById('task-green').classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
