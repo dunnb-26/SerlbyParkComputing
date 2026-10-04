@@ -95,6 +95,29 @@
         }
         .btn-spag:hover { background-color: #455a64; }
 
+        /* Spelling Error Box Styling */
+        .spag-feedback-box {
+            background-color: #fff3e0;
+            border: 2px dashed #f57c00;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .spag-feedback-box h4 {
+            margin-top: 0;
+            color: #e65100;
+        }
+        .error-tag {
+            display: inline-block;
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+            padding: 4px 10px;
+            border-radius: 4px;
+            margin: 4px;
+            font-weight: bold;
+        }
+
         /* Marking Colors */
         .correct { border-color: #388e3c !important; background-color: #e8f5e9; }
         .incorrect { border-color: #d32f2f !important; background-color: #ffebee; }
@@ -132,43 +155,50 @@
             <div id="demonstrate-stage" class="task-card">
                 <div class="task-title">Part 1: Demonstrate (Knowledge Check)</div>
                 <div class="instruction-box">
-                    Write full sentences to answer the 5 questions below. Use the "SPAG Check" button to highlight spelling errors before marking. Your final score will determine your Connect task!
+                    Write full sentences to answer the 5 questions below. Click "SPAG Check" to highlight errors and list any unknown/misspelled words at the bottom.
                 </div>
 
                 <div class="question-group">
                     <label>1. Explain what the CPU does inside a computer system:</label>
-                    <textarea id="q1" spellcheck="false" placeholder="Type your detailed answer here..."></textarea>
+                    <textarea id="q1" spellcheck="true" placeholder="Type your detailed answer here..."></textarea>
                 </div>
                 <div class="question-group">
                     <label>2. Describe the difference between an input device and an output device:</label>
-                    <textarea id="q2" spellcheck="false" placeholder="Type your detailed answer here..."></textarea>
+                    <textarea id="q2" spellcheck="true" placeholder="Type your detailed answer here..."></textarea>
                 </div>
                 <div class="question-group">
                     <label>3. Explain what software is and give one example:</label>
-                    <textarea id="q3" spellcheck="false" placeholder="Type your detailed answer here..."></textarea>
+                    <textarea id="q3" spellcheck="true" placeholder="Type your detailed answer here..."></textarea>
                 </div>
                 <div class="question-group">
                     <label>4. Describe the main difference between the World Wide Web and the Internet:</label>
-                    <textarea id="q4" spellcheck="false" placeholder="Type your detailed answer here..."></textarea>
+                    <textarea id="q4" spellcheck="true" placeholder="Type your detailed answer here..."></textarea>
                 </div>
                 <div class="question-group">
                     <label>5. Discuss why it is important to keep your passwords secure and how you can make a strong one:</label>
-                    <textarea id="q5" spellcheck="false" placeholder="Type your detailed answer here..."></textarea>
+                    <textarea id="q5" spellcheck="true" placeholder="Type your detailed answer here..."></textarea>
                 </div>
 
                 <div class="btn-row" id="stage1-buttons">
-                    <button class="btn-spag" onclick="runSpagCheck()">🔍 SPAG Check</button>
+                    <button class="btn-spag" onclick="runSpagCheck()">🔍 Run SPAG & Word Check</button>
                     <button class="btn-mark" onclick="markStage1()">✅ Mark My Work</button>
                 </div>
+
+                <!-- Extracted Misspelled Words List -->
+                <div id="spag-results" class="spag-feedback-box hidden">
+                    <h4>Words to Practice (Write these 3 times below):</h4>
+                    <p>The following words from your answers were flagged as unusual or potentially misspelled:</p>
+                    <div id="error-tags-container"></div>
+                </div>
+
                 <div id="score-display" class="hidden"></div>
             </div>
 
             <!-- STAGE 2: CONNECT TASKS (Initially Hidden) -->
-            
             <div id="task-red" class="task-card red-task hidden">
                 <div class="task-title">Part 2: Connect - RED TASK (Consolidation)</div>
                 <div class="instruction-box">
-                    Let's review the basics. Complete the task below to connect what we have learned this half term.
+                    Review the basics and practice any flagged spelling words 3 times each.
                 </div>
                 <div class="question-group">
                     <label>List 3 input devices and 3 output devices used in a computer system:</label>
@@ -179,7 +209,7 @@
             <div id="task-amber" class="task-card amber-task hidden">
                 <div class="task-title">Part 2: Connect - AMBER TASK (Application)</div>
                 <div class="instruction-box">
-                    Great effort! Now let's connect your knowledge. Complete the task below.
+                    Connect your knowledge and practice any flagged spelling words 3 times each.
                 </div>
                 <div class="question-group">
                     <label>Explain how hardware and software work together to allow you to play a video game:</label>
@@ -190,7 +220,7 @@
             <div id="task-green" class="task-card green-task hidden">
                 <div class="task-title">Part 2: Connect - GREEN TASK (Challenge)</div>
                 <div class="instruction-box">
-                    Perfect score! You are ready to connect these concepts to a wider challenge.
+                    Challenge task complete with spelling corrections.
                 </div>
                 <div class="question-group">
                     <label>Write a short paragraph explaining the risks of sharing personal information online, and create 3 rules for staying safe:</label>
@@ -206,26 +236,55 @@
     </footer>
 
     <script>
-        // Enables the browser's native spell checker to highlight errors with red squiggles
-        function runSpagCheck() {
-            // 1. Show the alert first so it doesn't steal focus later
-            alert("SPAG Check Enabled! Look for the red squiggly lines under your spelling mistakes and right-click them to fix.");
+        // Basic dictionary / common word whitelist for testing 
+        const commonWords = new Set([
+            "the", "be", "to", "of", "and", "a", "in", "that", "have", "i", "it", "for", "not", "on", "with", "he", "as", "you", "do", "at",
+            "this", "but", "his", "by", "from", "they", "we", "say", "her", "she", "or", "an", "will", "my", "one", "all", "would", "there",
+            "their", "what", "so", "up", "out", "if", "about", "who", "get", "which", "go", "me", "when", "make", "can", "like", "time", "no",
+            "just", "him", "know", "take", "people", "into", "year", "your", "good", "some", "could", "them", "see", "other", "than", "then",
+            "now", "look", "only", "come", "its", "over", "think", "also", "back", "after", "use", "two", "how", "our", "work", "first", "well",
+            "way", "even", "new", "want", "because", "any", "these", "give", "day", "most", "us", "cpu", "computer", "system", "process",
+            "input", "output", "device", "software", "hardware", "internet", "world", "wide", "web", "password", "secure", "hack", "safe"
+        ]);
 
-            // 2. Turn on spellcheck and "nudge" the text for all 5 boxes
+        function runSpagCheck() {
+            let flaggedWords = new Set();
+
+            // Gather all text from boxes 1 to 5
             for (let i = 1; i <= 5; i++) {
                 let box = document.getElementById('q' + i);
+                let text = box.value.toLowerCase();
                 
-                // Turn on the browser's dictionary
-                box.setAttribute('spellcheck', 'true');
+                // Clean punctuation and split into individual words
+                let words = text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g,"").split(/\s+/);
                 
-                // The Nudge: temporarily clear and replace the text to force the browser to scan it
-                let currentText = box.value;
-                box.value = ''; 
-                box.value = currentText; 
+                words.forEach(word => {
+                    // Check if word has length > 2 and is not in our common whitelist/dictionary
+                    if (word.length > 2 && !commonWords.has(word) && !/^\d+$/.test(word)) {
+                        flaggedWords.add(word);
+                    }
+                });
             }
-            
-            // Return cursor to the first box
-            document.getElementById('q1').focus(); 
+
+            // Display the results box
+            const resultsBox = document.getElementById('spag-results');
+            const tagsContainer = document.getElementById('error-tags-container');
+            tagsContainer.innerHTML = '';
+
+            if (flaggedWords.size > 0) {
+                resultsBox.classList.remove('hidden');
+                flaggedWords.forEach(word => {
+                    let tag = document.createElement('span');
+                    tag.className = 'error-tag';
+                    tag.innerText = word;
+                    tagsContainer.appendChild(tag);
+                });
+            } else {
+                resultsBox.classList.remove('hidden');
+                tagsContainer.innerHTML = '<em>Fantastic! No obvious spelling errors or unrecognized words found.</em>';
+            }
+
+            alert("SPAG & Word Check complete! Check the box below for any extracted words to practice.");
         }
 
         // Smart keyword scanner for long sentence answers
@@ -239,7 +298,6 @@
                 return 0;
             }
 
-            // Checks if the student's long answer includes AT LEAST ONE of the target keywords
             let isCorrect = keywords.some(keyword => studentAnswer.includes(keyword.toLowerCase()));
 
             if (isCorrect) {
@@ -256,25 +314,21 @@
         function markStage1() {
             let score = 0;
             
-            // Mark the 5 questions by scanning their sentences for these acceptable keywords
             score += checkSentenceAnswer('q1', ['process', 'brain', 'fetch', 'decode', 'execute', 'calculate']);
             score += checkSentenceAnswer('q2', ['in', 'out', 'enter', 'display', 'screen', 'keyboard']);
             score += checkSentenceAnswer('q3', ['program', 'app', 'code', 'instruction', 'browser', 'word']);
             score += checkSentenceAnswer('q4', ['network', 'page', 'website', 'infrastructure', 'connect']);
             score += checkSentenceAnswer('q5', ['safe', 'hack', 'steal', 'symbol', 'number', 'long', 'upper']);
 
-            // Disable inputs and hide buttons after marking
             for (let i = 1; i <= 5; i++) {
                 document.getElementById('q' + i).disabled = true;
             }
             document.getElementById('stage1-buttons').style.display = 'none';
 
-            // Show Score
             const scoreDisplay = document.getElementById('score-display');
             scoreDisplay.classList.remove('hidden');
             scoreDisplay.innerText = `You scored ${score} out of 5!`;
 
-            // Logic to reveal the differentiated task
             document.getElementById('task-red').classList.add('hidden');
             document.getElementById('task-amber').classList.add('hidden');
             document.getElementById('task-green').classList.add('hidden');
