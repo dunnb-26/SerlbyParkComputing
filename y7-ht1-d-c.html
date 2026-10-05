@@ -23,7 +23,6 @@
             border-top: 6px solid #1e3a8a;
             margin-bottom: 20px;
             transition: all 0.3s ease;
-            page-break-inside: avoid;
         }
         
         /* RAG Task Colors */
@@ -192,7 +191,7 @@
         }
         .btn-add-word:hover { background-color: #455a64; }
 
-        /* Teacher Verification Styles */
+        /* Teacher Verification & Override Styles */
         .teacher-verify-btn {
             background-color: #607d8b;
             color: white;
@@ -205,6 +204,20 @@
             margin-top: 10px;
         }
         .teacher-verify-btn:hover { background-color: #455a64; }
+
+        .teacher-override-btn {
+            background-color: #9e9e9e;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        .teacher-override-btn:hover { background-color: #757575; }
+
         .teacher-verified {
             border-top-color: #008f39 !important;
             background-color: #f0fff0 !important;
@@ -314,22 +327,37 @@
                 <div class="question-group">
                     <label>1. Write a sentence explaining what you use a computer keyboard for:</label>
                     <textarea id="q1" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <div style="text-align: right;">
+                        <button id="override-q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('q1')">👨‍🏫 Override Score</button>
+                    </div>
                 </div>
                 <div class="question-group">
                     <label>2. Why is it important to save your files inside correctly named folders?</label>
                     <textarea id="q2" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <div style="text-align: right;">
+                        <button id="override-q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('q2')">👨‍🏫 Override Score</button>
+                    </div>
                 </div>
                 <div class="question-group">
                     <label>3. Write down one important rule for staying safe on the internet:</label>
                     <textarea id="q3" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <div style="text-align: right;">
+                        <button id="override-q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('q3')">👨‍🏫 Override Score</button>
+                    </div>
                 </div>
                 <div class="question-group">
                     <label>4. Explain what you use a computer mouse for on the screen:</label>
                     <textarea id="q4" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <div style="text-align: right;">
+                        <button id="override-q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('q4')">👨‍🏫 Override Score</button>
+                    </div>
                 </div>
                 <div class="question-group">
                     <label>5. Why is it important to keep your password a secret from other people?</label>
                     <textarea id="q5" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <div style="text-align: right;">
+                        <button id="override-q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('q5')">👨‍🏫 Override Score</button>
+                    </div>
                 </div>
 
                 <div class="btn-row" id="stage1-buttons">
@@ -363,7 +391,7 @@
 
             <!-- STAGE 2: CONNECT TASKS (Initially Hidden) -->
             <div id="task-red" class="task-card red-task hidden" id="card-red">
-                <div class="task-title">Part 2: Connect - RED TASK<span class="verified-badge">✅ Teacher Verified</span></div>
+                <div class="task-title">Part 2: Connect - RED TASK (Consolidation) <span class="verified-badge">✅ Teacher Verified</span></div>
                 <div class="instruction-box">
                     Review the basics. Complete the task below after finishing your spelling practice above.
                 </div>
@@ -377,7 +405,7 @@
             </div>
 
             <div id="task-amber" class="task-card amber-task hidden" id="card-amber">
-                <div class="task-title">Part 2: Connect - AMBER TASK<span class="verified-badge">✅ Teacher Verified</span></div>
+                <div class="task-title">Part 2: Connect - AMBER TASK (Application) <span class="verified-badge">✅ Teacher Verified</span></div>
                 <div class="instruction-box">
                     Great effort! Connect your knowledge. Complete the task below after finishing your spelling practice above.
                 </div>
@@ -391,7 +419,7 @@
             </div>
 
             <div id="task-green" class="task-card green-task hidden" id="card-green">
-                <div class="task-title">Part 2: Connect - GREEN TASK<span class="verified-badge">✅ Teacher Verified</span></div>
+                <div class="task-title">Part 2: Connect - GREEN TASK (Challenge) <span class="verified-badge">✅ Teacher Verified</span></div>
                 <div class="instruction-box">
                     Perfect score! Challenge task complete. Complete the task below after finishing your spelling practice above.
                 </div>
@@ -408,8 +436,8 @@
 
         <!-- UNIVERSAL ACTION BUTTONS (PDF & RESET - Hidden until marked) -->
         <div class="action-row hidden" id="action-buttons">
-            <button class="btn-pdf" onclick="downloadPDF()">📄 Download Work</button>
-            <button class="btn-reset" onclick="clearData()">Reset Page</button>
+            <button class="btn-pdf" onclick="downloadPDF()">📄 Download Work as PDF</button>
+            <button class="btn-reset" onclick="clearData()">🗑️ Reset Page</button>
         </div>
     </main>
 
@@ -454,11 +482,9 @@
             if (isCorrect) {
                 inputElement.classList.add('correct');
                 inputElement.classList.remove('incorrect');
-                return 1;
             } else {
                 inputElement.classList.add('incorrect');
                 inputElement.classList.remove('correct');
-                return 0;
             }
         }
 
@@ -513,55 +539,68 @@
             });
         }
 
-        function markStage1() {
-            let score = 0;
-            score += checkSentenceAnswer('q1', qKeywords[1]);
-            score += checkSentenceAnswer('q2', qKeywords[2]);
-            score += checkSentenceAnswer('q3', qKeywords[3]);
-            score += checkSentenceAnswer('q4', qKeywords[4]);
-            score += checkSentenceAnswer('q5', qKeywords[5]);
-
+        function recalculateScore() {
+            let newScore = 0;
             for (let i = 1; i <= 5; i++) {
-                lockSpellcheckTextarea(document.getElementById('q' + i));
+                if (document.getElementById('q' + i).classList.contains('correct')) {
+                    newScore++;
+                }
             }
-            document.getElementById('stage1-buttons').style.display = 'none';
 
             const scoreDisplay = document.getElementById('score-display');
             scoreDisplay.classList.remove('hidden');
-            scoreDisplay.innerText = `You scored ${score} out of 5!`;
+            scoreDisplay.innerText = `You scored ${newScore} out of 5!`;
 
-            document.getElementById('spag-section').classList.remove('hidden');
-
-            // Default to exactly 1 row when revealed if none exist
-            if (document.getElementById('practice-rows-container').children.length === 0) {
-                addPracticeRow();
-            }
-
+            // Hide all task cards initially
             document.getElementById('task-red').classList.add('hidden');
             document.getElementById('task-amber').classList.add('hidden');
             document.getElementById('task-green').classList.add('hidden');
 
-            if (score <= 2) {
+            // Reveal appropriate task card based on dynamic score
+            if (newScore <= 2) {
                 scoreDisplay.style.backgroundColor = "#ffebee";
                 scoreDisplay.style.color = "#d32f2f";
                 document.getElementById('task-red').classList.remove('hidden');
-            } else if (score >= 3 && score <= 4) {
+            } else if (newScore >= 3 && newScore <= 4) {
                 scoreDisplay.style.backgroundColor = "#fff3e0";
                 scoreDisplay.style.color = "#ef6c00";
                 document.getElementById('task-amber').classList.remove('hidden');
-            } else if (score === 5) {
+            } else if (newScore === 5) {
                 scoreDisplay.style.backgroundColor = "#e8f5e9";
                 scoreDisplay.style.color = "#2e7d32";
                 document.getElementById('task-green').classList.remove('hidden');
             }
 
-            // Reveal action buttons (PDF & Reset) once marked
             document.getElementById('action-buttons').classList.remove('hidden');
+        }
 
+        function markStage1() {
+            // Apply grading logic
+            checkSentenceAnswer('q1', qKeywords[1]);
+            checkSentenceAnswer('q2', qKeywords[2]);
+            checkSentenceAnswer('q3', qKeywords[3]);
+            checkSentenceAnswer('q4', qKeywords[4]);
+            checkSentenceAnswer('q5', qKeywords[5]);
+
+            // Lock text areas and show override buttons
+            for (let i = 1; i <= 5; i++) {
+                lockSpellcheckTextarea(document.getElementById('q' + i));
+                document.getElementById('override-q' + i).classList.remove('hidden');
+            }
+            document.getElementById('stage1-buttons').style.display = 'none';
+
+            // Reveal spelling section
+            document.getElementById('spag-section').classList.remove('hidden');
+            if (document.getElementById('practice-rows-container').children.length === 0) {
+                addPracticeRow();
+            }
+
+            // Centralized calculation updates the UI, Score, and shows the PDF buttons
+            recalculateScore();
             saveToLocalStorage();
         }
 
-        // --- TEACHER VERIFICATION MODAL LOGIC ---
+        // --- TEACHER VERIFICATION & OVERRIDE MODAL LOGIC ---
         let activeLevel = null;
         function openVerifyModal(level) {
             activeLevel = level;
@@ -579,12 +618,20 @@
         function submitVerify() {
             const pass = document.getElementById('teacher-password-input').value;
             if (pass === '2525') {
-                if (activeLevel === 'red') {
-                    document.getElementById('task-red').classList.add('teacher-verified');
-                } else if (activeLevel === 'amber') {
-                    document.getElementById('task-amber').classList.add('teacher-verified');
-                } else if (activeLevel === 'green') {
-                    document.getElementById('task-green').classList.add('teacher-verified');
+                if (activeLevel === 'red' || activeLevel === 'amber' || activeLevel === 'green') {
+                    // Task Verification Logic
+                    document.getElementById('task-' + activeLevel).classList.add('teacher-verified');
+                } else if (activeLevel.startsWith('q')) {
+                    // Question Override Logic (Toggles correct/incorrect)
+                    let el = document.getElementById(activeLevel);
+                    if (el.classList.contains('incorrect')) {
+                        el.classList.remove('incorrect');
+                        el.classList.add('correct');
+                    } else {
+                        el.classList.remove('correct');
+                        el.classList.add('incorrect');
+                    }
+                    recalculateScore(); // Instantly adjusts the score and the Connect task below
                 }
                 closeVerifyModal();
                 saveToLocalStorage();
@@ -649,14 +696,7 @@
                     q1_locked: document.getElementById('q1').dataset.spellcheckLocked === 'true',
                     buttons_hidden: document.getElementById('stage1-buttons').style.display === 'none',
                     actions_hidden: document.getElementById('action-buttons').classList.contains('hidden'),
-                    score_text: document.getElementById('score-display').innerText,
-                    score_bg: document.getElementById('score-display').style.backgroundColor,
-                    score_color: document.getElementById('score-display').style.color,
-                    score_hidden: document.getElementById('score-display').classList.contains('hidden'),
                     spag_hidden: document.getElementById('spag-section').classList.contains('hidden'),
-                    red_hidden: document.getElementById('task-red').classList.contains('hidden'),
-                    amber_hidden: document.getElementById('task-amber').classList.contains('hidden'),
-                    green_hidden: document.getElementById('task-green').classList.contains('hidden'),
                     red_verified: document.getElementById('task-red').classList.contains('teacher-verified'),
                     amber_verified: document.getElementById('task-amber').classList.contains('teacher-verified'),
                     green_verified: document.getElementById('task-green').classList.contains('teacher-verified'),
@@ -694,17 +734,18 @@
                 document.getElementById('q4').value = data.q4 || '';
                 document.getElementById('q5').value = data.q5 || '';
 
-                if (data.q1_locked) {
-                    for (let i = 1; i <= 5; i++) {
-                        lockSpellcheckTextarea(document.getElementById('q' + i));
-                    }
-                }
-
                 if (data.q1_class) document.getElementById('q1').className = data.q1_class;
                 if (data.q2_class) document.getElementById('q2').className = data.q2_class;
                 if (data.q3_class) document.getElementById('q3').className = data.q3_class;
                 if (data.q4_class) document.getElementById('q4').className = data.q4_class;
                 if (data.q5_class) document.getElementById('q5').className = data.q5_class;
+
+                if (data.q1_locked) {
+                    for (let i = 1; i <= 5; i++) {
+                        lockSpellcheckTextarea(document.getElementById('q' + i));
+                        document.getElementById('override-q' + i).classList.remove('hidden');
+                    }
+                }
 
                 if (data.buttons_hidden) {
                     document.getElementById('stage1-buttons').style.display = 'none';
@@ -714,21 +755,9 @@
                     document.getElementById('action-buttons').classList.remove('hidden');
                 }
 
-                if (!data.score_hidden) {
-                    const scoreDisplay = document.getElementById('score-display');
-                    scoreDisplay.classList.remove('hidden');
-                    scoreDisplay.innerText = data.score_text;
-                    scoreDisplay.style.backgroundColor = data.score_bg;
-                    scoreDisplay.style.color = data.score_color;
-                }
-
                 if (!data.spag_hidden) {
                     document.getElementById('spag-section').classList.remove('hidden');
                 }
-
-                if (!data.red_hidden) document.getElementById('task-red').classList.remove('hidden');
-                if (!data.amber_hidden) document.getElementById('task-amber').classList.remove('hidden');
-                if (!data.green_hidden) document.getElementById('task-green').classList.remove('hidden');
 
                 if (data.red_verified) document.getElementById('task-red').classList.add('teacher-verified');
                 if (data.amber_verified) document.getElementById('task-amber').classList.add('teacher-verified');
@@ -745,7 +774,12 @@
                         addPracticeRow(row.w0, row.w1, row.w2, row.w3);
                     });
                 } else {
-                    addPracticeRow(); // Default to 1 clean row
+                    addPracticeRow(); 
+                }
+
+                // Ensures the correct RAG task is shown based on the saved classes
+                if (data.q1_locked) {
+                    recalculateScore();
                 }
             } catch (e) {
                 console.log("Local storage read blocked.");
@@ -763,7 +797,7 @@
             loadFromLocalStorage();
 
             if (document.getElementById('practice-rows-container').children.length === 0) {
-                addPracticeRow(); // Default to 1 clean row
+                addPracticeRow();
             }
 
             document.querySelectorAll('.persist-input').forEach(el => {
