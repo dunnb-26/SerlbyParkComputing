@@ -48,7 +48,7 @@
             align-items: center;
         }
         .btn-ms-form {
-            background-color: #0078d4; /* Microsoft Blue */
+            background-color: #0078d4;
             color: white;
             text-decoration: none;
             padding: 8px 14px;
@@ -261,4 +261,71 @@
         <div class="score-item">Task 1: <span id="score-t1">0</span>/5</div>
         <div class="score-item">Task 2: <span id="score-t2">0</span>/5</div>
         <div class="score-item">Task 3: <span id="score-t3">0</span>/5</div>
-        <div class="score-item">Task 4: <span id="score-t
+        <div class="score-item">Task 4: <span id="score-t4">0</span>/5</div>
+        <div class="score-item" style="color: var(--maroon);">TOTAL SCORE: <span id="total-score" style="color: var(--maroon);">0</span>/20</div>
+        <div class="scoreboard-actions">
+            <!-- Updated button linking to Javascript -->
+            <button class="btn-ms-form" onclick="submitPythonScore()">📋 Submit Scores</button>
+            <button class="btn-clear-scores" onclick="clearScores()">Reset Progress</button>
+        </div>
+    </div>
+
+    <main>
+        <div class="ide-container">
+            <!-- COLUMN 1: Task Selection & Instructions / Block Bank -->
+            <div class="ide-panel">
+                <h3>1. Instructions</h3>
+                
+                <select id="task-selector" onchange="switchTask()">
+                    <option value="t1">Task 1 (Sequence Blocks)</option>
+                    <option value="t2">Task 2 (Cinema Snack Bar)</option>
+                    <option value="t3">Task 3 (Arcade Score Checker)</option>
+                    <option value="t4">Task 4 (Canteen Queue Processor)</option>
+                </select>
+
+                <div id="instruction-panel"></div>
+            </div>
+
+            <!-- COLUMN 2: Interactive Code Editor -->
+            <div class="ide-panel editor-panel">
+                <h3 style="color: #007acc;">2. Code Editor</h3>
+                <p style="font-size: 13px; color: #666; margin-top: 0;">Write or assemble your Python solution below:</p>
+                
+                <textarea id="python-code"></textarea>
+                
+                <button class="btn-run" onclick="runPython()">▶ Run Code & Mark</button>
+            </div>
+
+            <!-- COLUMN 3: Terminal Output & Feedback -->
+            <div class="ide-panel output-panel">
+                <h3 style="color: var(--maroon);">3. Terminal Output</h3>
+                <p style="font-size: 13px; color: #666; margin-top: 0;">View program feedback and results:</p>
+                
+                <div id="output"></div>
+                
+                <div id="feedback" class="feedback-box">
+                    Awaiting code execution...
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        &copy; 2026 Delta Serlby Park - Computing Department
+    </footer>
+
+    <script>
+        // GLOBAL ERROR CATCHER - Prevents the page from going fully blank
+        window.onerror = function(msg, url, line) {
+            var panel = document.getElementById("instruction-panel");
+            if (panel) panel.innerHTML = "<h3 style='color:#d32f2f;'>⚠️ Network Alert</h3><p>Your school filter is blocking an external script.</p><p>" + msg + "</p>";
+            return false;
+        };
+
+        var editor = null;
+        let taskCodes = {
+            "t1": "# Task 1: Use the block bank on the left.\n\n",
+            "t2": "# Task 2: Cinema Snack Bar Calculator\n\n",
+            "t3": "# Task 3: Arcade Game Score Checker\n\n",
+            "t4": "# Task 4: Canteen Queue Processor\n\n"
+        };
