@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Y9 HT1 - Demonstrate & Connect (Python)</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- HTML to PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        .task-container {
+            max-width: 900px;
+            margin: 0 auto 40px auto;
+            padding: 20px;
+        }
+        .task-card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            border-top: 6px solid #1e3a8a;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        /* RAG Task Colors */
+        .red-task { border-top-color: #d32f2f; }
+        .amber-task { border-top-color: #f57c00; }
+        .green-task { border-top-color: #388e3c; }
+        
+        .task-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #1e3a8a;
+        }
+        .red-task .task-title { color: #d32f2f; }
+        .amber-task .task-title { color: #f57c00; }
+        .green-task .task-title { color: #388e3c; }
+
+        .instruction-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #dfaa2b;
+            padding: 15px;
+            margin-bottom: 25px;
+            color: #555;
+            font-style: italic;
+        }
+
+        .question-group {
+            margin-bottom: 20px;
+        }
+        .question-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .question-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 16px;
+            box-sizing: border-box;
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        /* Locked answer styling: keeps red spelling underlines visible while preventing edits */
+        textarea.spellcheck-locked {
+            background-color: #fafafa;
+            color: #333;
+            cursor: default;
+        }
+
+        /* Action Buttons */
+        .btn-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .btn-mark {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: #dfaa2b;
+            color: #1e3a8a;
+            transition: background-color 0.2s;
+        }
+        .btn-mark:hover { background-color: #c99722; }
+
+        /* Universal Action Buttons Area (PDF & Reset) */
+        .action-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 40px auto;
+        }
+        .btn-pdf {
+            background-color: #217346;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-pdf:hover { background-color: #124d2d; }
+
+        .btn-reset {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 15px 25px;
