@@ -3,688 +3,472 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lesson 2 - Character Creation</title>
-    
+    <title>Binary Conversions</title>
+    <link rel="stylesheet" href="style.css">
+
     <!-- HTML to PDF Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        :root {
-            /* Delta Serlby Park Color Scheme */
-            --navy: #1B1464; 
-            --yellow: #F7931D;
-            --maroon: #822433;
-            --bg-color: #f4f6f8;
-            --text-color: #333;
-            --btn-gold: #e2a829;
-        }
-
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            margin: 0; 
-            padding: 0; 
-            background-color: var(--bg-color); 
-            color: var(--text-color); 
-        }
-
-        header { 
-            background-color: var(--navy); 
-            color: white; 
-            padding: 20px; 
-            display: grid; 
-            grid-template-columns: 1fr auto 1fr; 
-            align-items: center; 
-            border-bottom: 6px solid var(--maroon); 
-        }
-
-        .header-left { display: flex; justify-content: flex-start; }
-        .header-center { text-align: center; }
-        .header-right { display: flex; justify-content: flex-end; align-items: center; }
-
-        header img { 
-            height: 80px; 
-            background-color: white; 
-            border-radius: 8px; 
-            padding: 5px;
-        }
-
-        header h1 { 
-            margin: 0; 
-            font-size: 28px; 
-            letter-spacing: 1px;
-        }
- .task-plenary { border-top: 6px solid #673ab7; } 
-        .task-plenary h2 { color: #673ab7; margin-top: 0; }
-        .back-btn {
-            background-color: var(--yellow);
-            color: var(--navy);
-            text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-weight: bold;
-            transition: transform 0.2s;
-        }
-        .back-btn:hover { transform: scale(1.05); }
-
-        /* Scoreboard Banner */
-        .scoreboard {
-            max-width: 1450px;
-            margin: 20px auto 0 auto;
-            padding: 15px 25px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            border-top: 5px solid var(--maroon);
-            font-weight: bold;
-            color: var(--navy);
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        .score-item { text-align: center; font-size: 0.95em; }
-        .score-item span {
-            display: block;
-            font-size: 1.2em;
-            color: #666;
-            margin-top: 5px;
-        }
-        .status-started { color: #388e3c !important; font-weight: bold; }
-
-        /* Task Card Styling for Prep Section */
+        /* Task Container Styling */
+        .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
+        
         .task-card { 
             background: white; 
             border-radius: 8px; 
             padding: 25px; 
-            margin: 30px auto 20px auto; 
-            max-width: 900px; 
+            margin-bottom: 30px; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-            page-break-inside: avoid; 
-            box-sizing: border-box;
+            page-break-inside: avoid; /* Stops the PDF from cutting cards in half! */
         }
+        
+        /* Section Header Colors */
         .task-prep { border-top: 6px solid #607d8b; } 
         .task-prep h2 { color: #607d8b; margin-top: 0; }
+        
+        .task-plenary { border-top: 6px solid #673ab7; } 
+        .task-plenary h2 { color: #673ab7; margin-top: 0; }
 
+        /* RAGB Colors */
+        .task-maroon { border-top: 6px solid #800000; }
+        .task-maroon h2 { color: #800000; margin-top: 0; }
+        .task-maroon .instruction-box { border-left: 4px solid #800000; }
+
+        .task-amber { border-top: 6px solid #ffb300; }
+        .task-amber h2 { color: #ffb300; margin-top: 0; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
+        .task-amber .instruction-box { border-left: 4px solid #ffb300; }
+
+        .task-green { border-top: 6px solid #008f39; }
+        .task-green h2 { color: #008f39; margin-top: 0; }
+        .task-green .instruction-box { border-left: 4px solid #008f39; }
+
+        .task-navy { border-top: 6px solid #1e3a8a; }
+        .task-navy h2 { color: #1e3a8a; margin-top: 0; }
+        .task-navy .instruction-box { border-left: 4px solid #1e3a8a; }
+
+        /* Common Elements */
+        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; text-align: center; }
+        
         /* Inputs & Textareas */
         .question-row { margin-bottom: 20px; }
         .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
-        .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit; }
+        
+        .auto-input { 
+            width: 100%; 
+            max-width: 350px; /* Keeps the number boxes from stretching too wide */
+            padding: 12px; 
+            font-size: 16px; 
+            border: 2px solid #ccc; 
+            border-radius: 4px; 
+            transition: all 0.3s ease; 
+            box-sizing: border-box; 
+            background-color: white; 
+            font-family: inherit; /* Uses standard readable font */
+        }
         .auto-input:focus { outline: none; border-color: #666; }
-        textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; }
+        textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; max-width: 100%; }
 
-        /* 3-Column Layout for Simulator */
-        .ide-container {
-            display: grid;
-            grid-template-columns: 1fr 1.5fr 1fr;
-            gap: 20px;
-            max-width: 1450px;
-            margin: 20px auto;
-            padding: 0 20px;
-        }
+        /* Helper Headings for Binary */
+        .helper-headings { display: flex; gap: 4px; max-width: 250px; margin-bottom: 4px; }
+        .helper-headings span { flex: 1; text-align: center; font-size: 11px; font-weight: bold; color: #666; background: #e9ecef; border-radius: 2px; padding: 2px 0; }
+        .helper-headings-8bit { max-width: 400px; }
 
-        @media (max-width: 1100px) {
-            .ide-container { grid-template-columns: 1fr; }
-        }
-
-        .ide-panel {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border-top: 5px solid var(--navy);
-            display: flex;
-            flex-direction: column;
-        }
+        /* Correct & Incorrect Answer Styling */
+        .input-correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
+        .input-incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
         
-        .editor-panel { border-top-color: #217346; align-items: center; } 
-        .output-panel { border-top-color: var(--maroon); }
-
-        .ide-panel h3 {
-            margin-top: 0;
-            color: var(--navy);
-            text-transform: uppercase;
-            font-size: 1.1em;
-        }
-
-        select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            font-size: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-family: inherit;
-        }
-
-        #instruction-panel {
-            background-color: #f8f9fa;
-            border-left: 4px solid var(--navy);
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 0 4px 4px 0;
-            font-family: inherit;
-            font-size: 14px;
-            color: #333;
-            flex-grow: 1;
-            line-height: 1.6;
-        }
-
-        /* Excel-Style Pixel Grid */
-        #spreadsheet-container {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            margin-top: 5px;
-        }
-
-        .excel-table {
-            border-collapse: collapse;
-            background-color: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        }
-
-        .excel-table td {
-            border: 1px solid #d0d7e5;
-            padding: 0;
-            width: 42px;
-            height: 42px;
-            position: relative;
-        }
-
-        .pixel-input {
-            width: 100%;
-            height: 100%;
-            box-sizing: border-box;
-            border: 2px solid transparent;
-            text-align: center;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 14px;
-            font-weight: bold;
-            color: #333;
-            /* Graph paper / cross-hatch pattern for unattempted cells */
-            background-color: #fafafa;
-            background-image: linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px), 
-                              linear-gradient(0deg, rgba(0,0,0,0.06) 1px, transparent 1px);
-            background-size: 10px 10px;
-            outline: none;
-            transition: all 0.2s;
-        }
-
-        .pixel-input:focus {
-            border: 2px solid #217346;
-            background-color: rgba(255,255,255,0.95) !important;
-            background-image: none !important;
-            color: #000 !important;
-            text-shadow: none !important;
-        }
-
-        .pixel-input.valid {
-            color: transparent;
-            background-image: none !important;
-        }
-
-        /* Color Legend Area */
-        .legend-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px 12px;
-            margin-top: 10px;
-        }
-        
-        .legend-item {
-            display: flex;
-            align-items: center;
-            font-size: 13px;
-            color: #333;
-            font-weight: bold;
-            background: #f8f9fa;
-            padding: 6px;
-            border-radius: 4px;
-            border: 1px solid #eee;
-        }
-
-        .color-box {
-            width: 18px;
-            height: 18px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            margin-right: 8px;
-        }
-
-        /* PDF Buttons */
+        /* Buttons */
+        .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; max-width: 200px; transition: background-color 0.2s; }
+        .btn-submit:hover { background-color: #152960; }
         .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
         .btn-pdf:hover { background-color: #124d2d; }
-        
-        footer { text-align: center; padding: 25px; color: #666; margin-top: 50px; border-top: 1px solid #ddd; background-color: white; }
+
+        /* Grid layout for 8 questions */
+        .questions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .questions-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-
     <div id="pdf-content">
         <header>
-            <div class="header-left">
-    <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
-</div>
-            <div class="header-center">
-                <h1>Character Creation</h1>
-            </div>
-            <div class="header-right">
-<div class="header-right"><a href="pixel-art.html" class="back-btn">&larr; Back to Unit</a></div>            </div>
-            </div>
+            <div class="header-left"><img src="logo.jpg" alt="Delta Serlby Park Logo"></div>
+            <div class="header-center"><h1>Binary Conversions</h1></div>
+            <div class="header-right"><a href="binary.html" class="back-btn">&larr; Back to Unit</a></div>
         </header>
 
-        <main>
+        <main class="task-container">
+
             <!-- PREPARATION: Keywords & Notes -->
             <div class="task-card task-prep">
                 <h2>Lesson Preparation</h2>
                 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">4 Key Words</h3>
-                <div style="display: flex; flex-direction: column; gap: 15px;">
-                    <div class="question-row" style="margin-bottom: 0;">
-                        <label class="question-label">Character</label>
-                        <input type="text" class="auto-input" placeholder="Type definition here...">
+                <div class="questions-grid">
+                    <div class="question-row">
+                        <label class="question-label">Binary</label>
+                        <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type definition here...">
                     </div>
-                    <div class="question-row" style="margin-bottom: 0;">
-                        <label class="question-label">Sprite</label>
-                        <input type="text" class="auto-input" placeholder="Type definition here...">
+                    <div class="question-row">
+                        <label class="question-label">Denary / Decimal</label>
+                        <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type definition here...">
                     </div>
-                    <div class="question-row" style="margin-bottom: 0;">
-                        <label class="question-label">Grid</label>
-                        <input type="text" class="auto-input" placeholder="Type definition here...">
+                    <div class="question-row">
+                        <label class="question-label">Bit</label>
+                        <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type definition here...">
                     </div>
-                    <div class="question-row" style="margin-bottom: 0;">
-                        <label class="question-label">Palette</label>
-                        <input type="text" class="auto-input" placeholder="Type definition here...">
+                    <div class="question-row">
+                        <label class="question-label">Byte</label>
+                        <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type definition here...">
                     </div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Lesson Notes</h3>
-                <div class="question-row" style="margin-bottom: 0;">
-                    <textarea class="auto-input" rows="6" placeholder="Write your notes from today's lesson here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                <div class="question-row">
+                    <textarea class="auto-input" rows="6" placeholder="Write your notes about today's lesson here..."></textarea>
                 </div>
             </div>
-<div class="scoreboard">
-            <div class="score-item">Red Task: <span id="status-1">Not Started</span></div>
-            <div class="score-item">Amber Task: <span id="status-2">Not Started</span></div>
-            <div class="score-item">Green Task: <span id="status-3">Not Started</span></div>
-            <div class="score-item">Blue Task: <span id="status-4">Not Started</span></div>
-        </div>
-            <!-- INTERACTIVE BINARY STUDIO -->
-            <div class="ide-container" id="main-ide">
-                <!-- 1. Instructions Panel -->
-                <div class="ide-panel" id="panel-instructions">
-                    <h3>1. Design Brief</h3>
-                    <select id="task-selector" onchange="switchTask()">
-                        <option value="1">🔴 RED TASK: Make a Face (4-Bit Binary)</option>
-                        <option value="2">🟠 AMBER TASK: Make a Pet (4-Bit Binary)</option>
-                        <option value="3">🟢 GREEN TASK: Make a Hero (4-Bit Binary)</option>
-                        <option value="4">🔵 BLUE TASK: Make a Villain (4-Bit Binary)</option>
-                    </select>
-                    
-                    <div id="instruction-panel">
-                        <strong>Studio Instructions:</strong><br><br>
-                        1. Select your task from the dropdown menu above.<br>
-                        2. Look at the <strong>Denary Palette</strong> on the right.<br>
-                        3. <strong>Convert the denary number into 4-bit binary</strong> (e.g., 0 = 0000, 9 = 1001).<br>
-                        4. Type the binary code directly into a grid cell to paint!<br><br>
-                        <em>Tip: Empty cells show a grid pattern. Typing 0 (0000) will turn the cell solid white.</em>
+
+            <!-- RED TASK: 4-Bit Binary to Denary -->
+            <div class="task-card task-maroon">
+                <h2>Red Task: 4-Bit Binary to Denary</h2>
+                <div class="instruction-box">
+                    Convert the 4-bit binary numbers into denary (decimal) numbers. <em>(Hint: Use the place-value headings 8, 4, 2, 1)</em>
+                </div>
+
+                <div class="questions-grid">
+                    <div class="question-row">
+                        <label class="question-label">1. Convert <code>1011</code> to denary:</label>
+                        <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                        <input type="text" class="auto-input red-input" data-answers='["11"]' placeholder="Enter number...">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">2. Convert <code>0101</code> to denary:</label>
+                        <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                        <input type="text" class="auto-input red-input" data-answers='["5"]' placeholder="Enter number...">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">3. Convert <code>1110</code> to denary:</label>
+                        <input type="text" class="auto-input red-input" data-answers='["14"]' placeholder="Enter number...">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">4. Convert <code>1000</code> to denary:</label>
+                        <input type="text" class="auto-input red-input" data-answers='["8"]' placeholder="Enter number...">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">5. Convert <code>0011</code> to denary:</label>
+                        <input type="text" class="auto-input red-input" data-answers='["3"]' placeholder="Enter number...">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">6. Convert <code>1111</code> to denary:</label>
+                        <input type="text" class="auto-input red-input" data-answers='["15"]' placeholder="Enter number...">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">7. Convert <code>0110</code> to denary:</label>
+                        <input type="text" class="auto-input red-input" data-answers='["6"]' placeholder="Enter number...">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">8. Convert <code>1001</code> to denary:</label>
+                        <input type="text" class="auto-input red-input" data-answers='["9"]' placeholder="Enter number...">
                     </div>
                 </div>
-
-                <!-- 2. The Canvas -->
-                <div class="ide-panel editor-panel" id="panel-editor">
-                    <h3 style="color: #217346; align-self: flex-start;" id="editor-title">2. Binary Canvas (10x10)</h3>
-                    <p style="font-size: 13px; color: #666; margin-top: 0; margin-bottom: 5px; align-self: flex-start;" id="canvas-hint">
-                        Type 4-bit binary numbers to paint. Press Tab to move quickly.
-                    </p>
-                    <div id="spreadsheet-container"></div>
-                </div>
-
-                <!-- 3. The Palette -->
-                <div class="ide-panel output-panel" id="panel-legend">
-                    <h3 style="color: var(--maroon);">3. Denary Palette</h3>
-                    <p style="font-size: 13px; color: #666; margin-top: 0;">Convert these denary numbers to 4-bit binary.</p>
-                    <div id="legend-container" class="legend-grid"></div>
-                </div>
+                <button class="btn-submit no-print" onclick="checkAnswers('red-input')">Check Answers</button>
             </div>
+
+            <!-- AMBER TASK: 8-Bit Binary to Denary -->
+            <div class="task-card task-amber">
+                <h2>Amber Task: 8-Bit Binary to Denary</h2>
+                <div class="instruction-box">
+                    Convert the 8-bit binary numbers into denary numbers. <em>(Hint: 128, 64, 32, 16, 8, 4, 2, 1)</em>
+                </div>
+
+                <div class="questions-grid">
+                    <div class="question-row">
+                        <label class="question-label">1. Convert <code>10010110</code> to denary:</label>
+                        <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                        <input type="text" class="auto-input amber-input" data-answers='["150"]' placeholder="Enter number...">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">2. Convert <code>00011101</code> to denary:</label>
+                        <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                        <input type="text" class="auto-input amber-input" data-answers='["29"]' placeholder="Enter number...">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">3. Convert <code>11000011</code> to denary:</label>
+                        <input type="text" class="auto-input amber-input" data-answers='["195"]' placeholder="Enter number...">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">4. Convert <code>11111111</code> to denary:</label>
+                        <input type="text" class="auto-input amber-input" data-answers='["255"]' placeholder="Enter number...">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">5. Convert <code>00001010</code> to denary:</label>
+                        <input type="text" class="auto-input amber-input" data-answers='["10"]' placeholder="Enter number...">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">6. Convert <code>01010101</code> to denary:</label>
+                        <input type="text" class="auto-input amber-input" data-answers='["85"]' placeholder="Enter number...">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">7. Convert <code>10101010</code> to denary:</label>
+                        <input type="text" class="auto-input amber-input" data-answers='["170"]' placeholder="Enter number...">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">8. Convert <code>01111111</code> to denary:</label>
+                        <input type="text" class="auto-input amber-input" data-answers='["127"]' placeholder="Enter number...">
+                    </div>
+                </div>
+                <button class="btn-submit no-print" onclick="checkAnswers('amber-input')">Check Answers</button>
+            </div>
+
+            <!-- GREEN TASK: 4-Bit Denary to Binary -->
+            <div class="task-card task-green">
+                <h2>Green Task: 4-Bit Denary to Binary</h2>
+                <div class="instruction-box">
+                    Convert the denary numbers into 4-bit binary codes.
+                </div>
+
+                <div class="questions-grid">
+                    <div class="question-row">
+                        <label class="question-label">1. Convert <code>7</code> to 4-bit binary:</label>
+                        <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                        <input type="text" class="auto-input green-input" data-answers='["0111", "7"]' placeholder="e.g. 0111">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">2. Convert <code>12</code> to 4-bit binary:</label>
+                        <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                        <input type="text" class="auto-input green-input" data-answers='["1100"]' placeholder="e.g. 1100">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">3. Convert <code>9</code> to 4-bit binary:</label>
+                        <input type="text" class="auto-input green-input" data-answers='["1001"]' placeholder="e.g. 1001">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">4. Convert <code>15</code> to 4-bit binary:</label>
+                        <input type="text" class="auto-input green-input" data-answers='["1111"]' placeholder="e.g. 1111">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">5. Convert <code>2</code> to 4-bit binary:</label>
+                        <input type="text" class="auto-input green-input" data-answers='["0010"]' placeholder="e.g. 0010">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">6. Convert <code>5</code> to 4-bit binary:</label>
+                        <input type="text" class="auto-input green-input" data-answers='["0101"]' placeholder="e.g. 0101">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">7. Convert <code>10</code> to 4-bit binary:</label>
+                        <input type="text" class="auto-input green-input" data-answers='["1010"]' placeholder="e.g. 1010">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">8. Convert <code>14</code> to 4-bit binary:</label>
+                        <input type="text" class="auto-input green-input" data-answers='["1110"]' placeholder="e.g. 1110">
+                    </div>
+                </div>
+                <button class="btn-submit no-print" style="background-color: #008f39;" onclick="checkAnswers('green-input')">Check Answers</button>
+            </div>
+
+            <!-- BLUE TASK: 8-Bit Denary to Binary -->
+            <div class="task-card task-navy">
+                <h2>Blue Task: 8-Bit Denary to Binary</h2>
+                <div class="instruction-box">
+                    Convert the denary numbers into full 8-bit binary codes.
+                </div>
+
+                <div class="questions-grid">
+                    <div class="question-row">
+                        <label class="question-label">1. Convert <code>45</code> to 8-bit binary:</label>
+                        <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                        <input type="text" class="auto-input navy-input" data-answers='["00101101"]' placeholder="e.g. 00101101">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">2. Convert <code>168</code> to 8-bit binary:</label>
+                        <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                        <input type="text" class="auto-input navy-input" data-answers='["10101000"]' placeholder="e.g. 10101000">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">3. Convert <code>210</code> to 8-bit binary:</label>
+                        <input type="text" class="auto-input navy-input" data-answers='["11010010"]' placeholder="e.g. 11010010">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">4. Convert <code>15</code> to 8-bit binary:</label>
+                        <input type="text" class="auto-input navy-input" data-answers='["00001111"]' placeholder="e.g. 00001111">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">5. Convert <code>99</code> to 8-bit binary:</label>
+                        <input type="text" class="auto-input navy-input" data-answers='["01100011"]' placeholder="e.g. 01100011">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">6. Convert <code>200</code> to 8-bit binary:</label>
+                        <input type="text" class="auto-input navy-input" data-answers='["11001000"]' placeholder="e.g. 11001000">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">7. Convert <code>63</code> to 8-bit binary:</label>
+                        <input type="text" class="auto-input navy-input" data-answers='["00111111"]' placeholder="e.g. 00111111">
+                    </div>
+                    <div class="question-row">
+                        <label class="question-label">8. Convert <code>128</code> to 8-bit binary:</label>
+                        <input type="text" class="auto-input navy-input" data-answers='["10000000"]' placeholder="e.g. 10000000">
+                    </div>
+                </div>
+                <button class="btn-submit no-print" style="background-color: #1e3a8a;" onclick="checkAnswers('navy-input')">Check Answers</button>
+            </div>
+
             <!-- PLENARY: 3 Key Takeaways -->
             <div class="task-card task-plenary">
                 <h2>Lesson Plenary</h2>
                 <h3 style="color: #444; margin-bottom: 15px;">My 3 Key Takeaways</h3>
+                
                 <div class="question-row">
                     <label class="question-label">1.</label>
-                    <input type="text" class="auto-input" placeholder="Type first takeaway here...">
+                    <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type first takeaway here...">
                 </div>
                 <div class="question-row">
                     <label class="question-label">2.</label>
-                    <input type="text" class="auto-input" placeholder="Type second takeaway here...">
+                    <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type second takeaway here...">
                 </div>
                 <div class="question-row">
                     <label class="question-label">3.</label>
-                    <input type="text" class="auto-input" placeholder="Type third takeaway here...">
+                    <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type third takeaway here...">
                 </div>
             </div>
+
         </main>
     </div> <!-- END PDF CONTENT WRAPPER -->
 
-    <!-- UNIVERSAL PDF DOWNLOAD BUTTONS -->
+    <!-- UNIVERSAL PDF DOWNLOAD BUTTON -->
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf no-print" onclick="downloadPDF()">📄 Download Work</button>
-        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearAllData()">Reset Page</button>
+        <button class="btn-pdf no-print" onclick="downloadPDF()">📄 Download Work as PDF</button>
+        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
     </div>
     
-    <footer>&copy; 2026 Delta Serlby Park - Computing Department</footer>
+    <footer>
+        &copy; 2026 Delta Serlby Park - Computing Department
+    </footer>
 
     <script>
-        const gridSize = 100; // 10x10 grid
-        let userBinaryDesigns = JSON.parse(localStorage.getItem('binaryStudioMemory')) || {};
-        let currentTask = "1";
+        /* --- AUTO-SAVE MEMORY LOGIC --- */
+        function saveProgress() {
+            var inputs = document.querySelectorAll('.auto-input');
+            var dataToSave = {};
+            
+            for (var i = 0; i < inputs.length; i++) {
+                dataToSave['input_' + i] = inputs[i].value;
+            }
+            localStorage.setItem('binaryConversionsMemory', JSON.stringify(dataToSave));
+        }
 
-        const taskNames = {
-            "1": "Red Task - Pixel Face",
-            "2": "Amber Task - Pixel Pet",
-            "3": "Green Task - Pixel Person",
-            "4": "Blue Task - Pixel Villain"
-        };
+        function loadProgress() {
+            var savedDataStr = localStorage.getItem('binaryConversionsMemory');
+            if (savedDataStr) {
+                var data = JSON.parse(savedDataStr);
+                var inputs = document.querySelectorAll('.auto-input');
+                
+                for (var i = 0; i < inputs.length; i++) {
+                    if (data['input_' + i]) {
+                        inputs[i].value = data['input_' + i];
+                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                            inputs[i].style.height = 'auto';
+                            inputs[i].style.height = inputs[i].scrollHeight + 'px';
+                        }
+                    }
+                }
+                
+                // Auto-mark previously saved answers
+                checkAnswers('red-input');
+                checkAnswers('amber-input');
+                checkAnswers('green-input');
+                checkAnswers('navy-input');
+            }
+        }
 
-        const paletteOrder = [
-            { denary: 0, bin: '0000', color: '#ffffff', label: '0 (Blank)' },
-            { denary: 1, bin: '0001', color: '#000000', label: '1' },
-            { denary: 2, bin: '0010', color: '#d32f2f', label: '2' },
-            { denary: 3, bin: '0011', color: '#388e3c', label: '3' },
-            { denary: 4, bin: '0100', color: '#1976d2', label: '4' },
-            { denary: 5, bin: '0101', color: '#fbc02d', label: '5' },
-            { denary: 6, bin: '0110', color: '#f57c00', label: '6' },
-            { denary: 7, bin: '0111', color: '#8e24aa', label: '7' },
-            { denary: 8, bin: '1000', color: '#e91e63', label: '8' },
-            { denary: 9, bin: '1001', color: '#00bcd4', label: '9' },
-            { denary: 10, bin: '1010', color: '#cddc39', label: '10' },
-            { denary: 11, bin: '1011', color: '#795548', label: '11' },
-            { denary: 12, bin: '1100', color: '#9e9e9e', label: '12' },
-            { denary: 13, bin: '1101', color: '#607d8b', label: '13' },
-            { denary: 14, bin: '1110', color: '#8d6e63', label: '14' },
-            { denary: 15, bin: '1111', color: '#009688', label: '15' },
-        ];
-
-        const activeColorMap = {};
-        paletteOrder.forEach(item => {
-            activeColorMap[item.bin] = item.color;
-        });
-
-        const colorMaps = { "1": activeColorMap, "2": activeColorMap, "3": activeColorMap, "4": activeColorMap };
-        const imageData = { "1": { bits: 4 }, "2": { bits: 4 }, "3": { bits: 4 }, "4": { bits: 4 } };
-
-        /* --- AUTO-SAVE FOR TEXT INPUTS --- */
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('auto-input')) {
-                var inputs = document.querySelectorAll('.auto-input');
-                for (var i = 0; i < inputs.length; i++) {
-                    userBinaryDesigns['note_' + i] = inputs[i].value;
+                saveProgress();
+                if (e.target.tagName.toLowerCase() === 'textarea') {
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
                 }
-                localStorage.setItem('binaryStudioMemory', JSON.stringify(userBinaryDesigns));
             }
         });
 
-        function loadTextInputs() {
-            var inputs = document.querySelectorAll('.auto-input');
+        function clearData() {
+            if (confirm("Are you sure you want to clear all your work on this page?")) {
+                localStorage.removeItem('binaryConversionsMemory');
+                window.location.reload();
+            }
+        }
+
+        window.onload = loadProgress;
+
+        /* --- BATCH-MARKING TEXT INPUT LOGIC --- */
+        function checkAnswers(groupClass) {
+            var inputs = document.getElementsByClassName(groupClass);
+            
             for (var i = 0; i < inputs.length; i++) {
-                if (userBinaryDesigns['note_' + i]) {
-                    inputs[i].value = userBinaryDesigns['note_' + i];
-                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                        inputs[i].style.height = 'auto';
-                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                    }
-                }
-            }
-        }
-
-        /* --- STUDIO LOGIC --- */
-        function switchTask() {
-            currentTask = document.getElementById("task-selector").value;
-            if (!userBinaryDesigns[currentTask]) {
-                userBinaryDesigns[currentTask] = new Array(gridSize).fill('');
-            }
-            buildGrid();
-            buildLegend();
-            updateScoreboard();
-        }
-
-        function buildGrid() {
-            const state = userBinaryDesigns[currentTask];
-            const container = document.getElementById('spreadsheet-container');
-
-            let html = '<table class="excel-table"><tbody>';
-            let cellIndex = 0;
-            
-            for(let r=0; r < 10; r++) {
-                html += '<tr>';
-                for(let c=0; c < 10; c++) {
-                    let savedCode = state[cellIndex] || '';
-                    html += `<td>
-                                <input type="text" 
-                                       id="cell-${cellIndex}" 
-                                       class="pixel-input" 
-                                       maxlength="5"
-                                       value="${savedCode}"
-                                       data-index="${cellIndex}"
-                                       oninput="checkBinaryCode(this)">
-                             </td>`;
-                    cellIndex++;
-                }
-                html += '</tr>';
-            }
-            html += '</tbody></table>';
-            container.innerHTML = html;
-
-            let inputs = document.querySelectorAll('.pixel-input');
-            inputs.forEach(input => checkBinaryCode(input));
-        }
-
-        function buildLegend() {
-            const legendContainer = document.getElementById('legend-container');
-            let html = '';
-            
-            let leftCol = paletteOrder.slice(0, 8);   // 0 to 8
-            let rightCol = paletteOrder.slice(8, 16); // 9 to 16
-
-            let maxRows = Math.max(leftCol.length, rightCol.length);
-            for (let i = 0; i < maxRows; i++) {
-                if (leftCol[i]) {
-                    let item = leftCol[i];
-                    let borderStyle = item.denary === 0 ? 'border: 1px solid #ccc;' : 'border: 1px solid transparent;';
-                    html += `
-                        <div class="legend-item">
-                            <div class="color-box" style="background-color: ${item.color}; ${borderStyle}"></div>
-                            <span>${item.label}</span>
-                        </div>`;
-                } else {
-                    html += `<div></div>`;
-                }
-
-                if (rightCol[i]) {
-                    let item = rightCol[i];
-                    html += `
-                        <div class="legend-item">
-                            <div class="color-box" style="background-color: ${item.color}; border: 1px solid transparent;"></div>
-                            <span>${item.label}</span>
-                        </div>`;
-                } else {
-                    html += `<div></div>`;
-                }
-            }
-
-            legendContainer.innerHTML = html;
-        }
-
-        function checkBinaryCode(el) {
-            let typedVal = el.value.trim();
-            let cellIndex = el.getAttribute('data-index');
-            let map = activeColorMap;
-            
-            userBinaryDesigns[currentTask][cellIndex] = typedVal;
-            localStorage.setItem('binaryStudioMemory', JSON.stringify(userBinaryDesigns));
-
-            if (map.hasOwnProperty(typedVal)) {
-                el.style.backgroundColor = map[typedVal];
-                el.style.backgroundImage = 'none';
-                el.classList.add('valid'); 
-            } else {
-                el.style.backgroundColor = '#fafafa';
-                el.style.backgroundImage = 'linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px), linear-gradient(0deg, rgba(0,0,0,0.06) 1px, transparent 1px)';
-                el.style.backgroundSize = '10px 10px';
-                el.classList.remove('valid');
-            }
-
-            updateScoreboard();
-        }
-
-        function updateScoreboard() {
-            let tasks = ['1', '2', '3', '4'];
-            
-            tasks.forEach(t => {
-                let statusEl = document.getElementById('status-' + t);
-                let designArray = userBinaryDesigns[t];
+                var inputElement = inputs[i];
+                var studentAnswer = inputElement.value.toLowerCase().trim();
+                var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers'));
                 
-                if (designArray) {
-                    let hasPainted = designArray.some(code => {
-                        return activeColorMap.hasOwnProperty(code) && activeColorMap[code] !== '#ffffff';
-                    });
-
-                    if (hasPainted) {
-                        statusEl.innerText = "Saved ✅";
-                        statusEl.classList.add('status-started');
-                    } else {
-                        statusEl.innerText = "Not Started";
-                        statusEl.classList.remove('status-started');
+                var isCorrect = false;
+                
+                for (var j = 0; j < acceptedAnswers.length; j++) {
+                    if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
+                        isCorrect = true;
+                        break;
                     }
                 }
-            });
-        }
 
-        function clearAllData() {
-            if (confirm("Are you sure you want to clear EVERYTHING including your text notes and all 4 binary drawings?")) {
-                localStorage.removeItem('binaryStudioMemory');
-                userBinaryDesigns = {};
-                loadTextInputs();
-                switchTask();
-                alert("Portfolio reset successfully.");
+                inputElement.classList.remove('input-correct', 'input-incorrect');
+
+                if (studentAnswer !== "") {
+                    if (isCorrect) {
+                        inputElement.classList.add('input-correct');
+                    } else {
+                        inputElement.classList.add('input-incorrect');
+                    }
+                }
             }
         }
 
         /* --- BULLETPROOF PDF GENERATION LOGIC --- */
         function downloadPDF() {
+            // Hide buttons
+            var buttonsToHide = document.querySelectorAll('.no-print');
+            for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'none';
             document.getElementById('action-buttons').style.display = 'none';
-            document.getElementById('panel-instructions').style.display = 'none';
-            document.getElementById('panel-legend').style.display = 'none';
-            
-            var textInputs = document.querySelectorAll('input.auto-input[type="text"]');
+
+            // Lock text inputs
+            var textInputs = document.querySelectorAll('input[type="text"]');
             for (var i = 0; i < textInputs.length; i++) {
                 textInputs[i].setAttribute('value', textInputs[i].value);
             }
+
+            // Expand textareas
             var textAreas = document.querySelectorAll('textarea');
             for (var j = 0; j < textAreas.length; j++) {
                 textAreas[j].innerHTML = textAreas[j].value;
                 textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
             }
 
-            var ideContainer = document.getElementById('main-ide');
-            ideContainer.style.gridTemplateColumns = '1fr';
-            
-            var gridContainer = document.getElementById('spreadsheet-container');
-            var originalGridHTML = gridContainer.innerHTML;
-            var titleEl = document.getElementById('editor-title');
-            var originalTitle = titleEl.innerText;
-            var hintEl = document.getElementById('canvas-hint');
-            var originalHintDisplay = hintEl.style.display;
-
-            titleEl.innerText = "Student Portfolio - Binary Coding Designs";
-            titleEl.style.textAlign = "center";
-            hintEl.style.display = 'none';
-
-            var portfolioHTML = '<div style="display: flex; flex-wrap: wrap; gap: 40px; justify-content: center; margin-top: 20px;">';
-            var attemptedCount = 0;
-
-            let tasks = ['1', '2', '3', '4'];
-            
-            tasks.forEach(t => {
-                let state = userBinaryDesigns[t];
-                let map = activeColorMap;
-
-                if (state) {
-                    let hasPainted = state.some(code => map.hasOwnProperty(code));
-                    
-                    if (hasPainted) {
-                        attemptedCount++;
-                        portfolioHTML += '<div style="text-align: center; page-break-inside: avoid; background: #fafafa; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">';
-                        portfolioHTML += '<h4 style="color: var(--navy); margin-top: 0; margin-bottom: 15px; font-size: 18px;">' + taskNames[t] + '</h4>';
-                        portfolioHTML += generateStaticGridHTML(state, map);
-                        portfolioHTML += '</div>';
-                    }
-                }
-            });
-            portfolioHTML += '</div>';
-
-            if (attemptedCount === 0) {
-                portfolioHTML = '<p style="text-align:center; font-size: 18px; padding: 40px; color: #666;">No characters coded yet. Use the canvas to build your binary portfolio!</p>';
-            }
-
-            gridContainer.innerHTML = portfolioHTML;
-
             var element = document.getElementById('pdf-content');
+
             var opt = {
                 margin:       0.3,
-                filename:     'Binary_Character_Portfolio.pdf',
+                filename:     'Binary_Conversions_Workbook.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
                 jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] } 
             };
 
             html2pdf().set(opt).from(element).save().then(function() {
+                for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'block';
                 document.getElementById('action-buttons').style.display = 'flex';
-                document.getElementById('panel-instructions').style.display = 'flex';
-                document.getElementById('panel-legend').style.display = 'flex';
-                ideContainer.style.gridTemplateColumns = '1fr 1.5fr 1fr';
                 
-                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
-
-                titleEl.innerText = originalTitle;
-                titleEl.style.textAlign = "left";
-                hintEl.style.display = originalHintDisplay;
-                gridContainer.innerHTML = originalGridHTML;
-                
-                switchTask();
+                for (var k = 0; k < textAreas.length; k++) {
+                    textAreas[k].style.height = "";
+                }
             });
         }
-
-        function generateStaticGridHTML(state, map) {
-            let html = `<table style="border-collapse: collapse; margin: 0 auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"><tbody>`;
-            let cellIndex = 0;
-            for(let r=0; r < 10; r++) {
-                html += `<tr>`;
-                for(let c=0; c < 10; c++) {
-                    let typedCode = state[cellIndex];
-                    let bgColor = '#ffffff'; 
-                    
-                    if (map.hasOwnProperty(typedCode)) {
-                        bgColor = map[typedCode];
-                    }
-                    
-                    html += `<td style="width: 25px; height: 25px; background-color: ${bgColor}; border: 1px solid rgba(0,0,0,0.05);"></td>`;
-                    cellIndex++;
-                }
-                html += '</tr>';
-            }
-            html += '</tbody></table>';
-            return html;
-        }
-
-        window.onload = () => {
-            loadTextInputs();
-            switchTask();
-            updateScoreboard();
-        };
     </script>
 </body>
 </html>
