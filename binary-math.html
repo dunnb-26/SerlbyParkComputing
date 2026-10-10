@@ -7,9 +7,10 @@
     
     <style>
         :root {
-            --navy: #1e3a8a; 
-            --yellow: #dfaa2b;
-            --maroon: #800000;
+            /* Official Delta Serlby Park Color Scheme */
+            --navy: #1B1464; 
+            --yellow: #F7931D;
+            --maroon: #822433;
             --bg-color: #f4f6f8;
             --text-color: #333;
         }
@@ -41,7 +42,7 @@
         .back-btn { background-color: var(--yellow); color: var(--navy); text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; transition: transform 0.2s; }
         .back-btn:hover { transform: scale(1.05); }
 
-        .task-container { max-width: 1000px; margin: 30px auto; padding: 20px; }
+        .task-container { max-width: 1050px; margin: 30px auto; padding: 20px; }
         .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid; }
         
         /* Section Header Colors */
@@ -55,9 +56,9 @@
         .task-maroon h2 { color: var(--maroon); margin-top: 0; }
         .task-maroon .instruction-box { border-left: 4px solid var(--maroon); }
 
-        .task-amber { border-top: 6px solid #ffb300; } 
-        .task-amber h2 { color: #ffb300; margin-top: 0; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
-        .task-amber .instruction-box { border-left: 4px solid #ffb300; }
+        .task-amber { border-top: 6px solid var(--yellow); } 
+        .task-amber h2 { color: var(--yellow); margin-top: 0; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
+        .task-amber .instruction-box { border-left: 4px solid var(--yellow); }
 
         .task-green { border-top: 6px solid #008f39; } 
         .task-green h2 { color: #008f39; margin-top: 0; }
@@ -67,44 +68,46 @@
         .task-navy h2 { color: var(--navy); margin-top: 0; }
         .task-navy .instruction-box { border-left: 4px solid var(--navy); }
 
-        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; text-align: center; }
+        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 25px; text-align: center; }
         
-        /* Standard Inputs */
+        /* Notes & Prep Inputs */
         .question-row { margin-bottom: 20px; }
         .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: var(--text-color); font-weight: bold; }
         
         .auto-input { 
-            width: 100%; 
-            padding: 12px; 
-            font-size: 16px; 
-            border: 2px solid #ccc; 
-            border-radius: 4px; 
-            transition: all 0.3s ease; 
-            box-sizing: border-box; 
-            background-color: white; 
-            font-family: inherit;
+            width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; 
+            border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; 
+            background-color: white; font-family: inherit;
         }
         .auto-input:focus { outline: none; border-color: #666; }
         textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; }
+
+        /* --- PER-BIT MATH GRID STYLING --- */
+        .sum-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 20px; }
+        .math-sum { background: #fdfdfd; padding: 20px; border-radius: 8px; border: 1px solid #ddd; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .sum-number { position: absolute; top: 15px; left: 15px; font-family: 'Segoe UI', sans-serif; font-size: 18px; font-weight: bold; color: #888; }
         
-        .code-input { font-family: 'Courier New', Courier, monospace; font-weight: bold; letter-spacing: 1px; max-width: 350px; }
+        .sum-table { border-collapse: collapse; font-family: 'Courier New', Courier, monospace; font-size: 22px; font-weight: bold; margin: 0 auto; }
+        .sum-table td { text-align: center; padding: 4px; width: 35px; }
+        .sum-line td { border-top: 3px solid #333; height: 8px; padding: 0; }
+        
+        .bit-box, .carry-box { 
+            width: 100%; height: 40px; text-align: center; font-family: 'Courier New', monospace; 
+            font-size: 20px; font-weight: bold; border: 2px solid #ccc; border-radius: 4px; 
+            padding: 0; box-sizing: border-box; transition: all 0.2s; background: white;
+        }
+        .bit-box:focus { border-color: var(--navy); background-color: #e6f2ff; outline: none; }
+        
+        /* Carry Row - Below the answer */
+        .carry-box { border-color: #d32f2f; color: #d32f2f; font-size: 16px; height: 30px; background: #fffafb; }
+        .carry-box:focus { border-color: var(--maroon); background-color: #ffebee; outline: none; }
+        .carry-label { font-family: 'Segoe UI', sans-serif; font-size: 12px; color: #d32f2f; text-transform: uppercase; text-align: right; padding-right: 10px; font-weight: bold; }
+
         .input-correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
         .input-incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
-        
-        /* Math Sum Grid Styling (Red & Amber Tasks) */
-        .sum-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 20px; }
-        .math-sum { font-family: 'Courier New', Courier, monospace; font-size: 20px; background: #f8f9fa; padding: 15px 25px; border-radius: 8px; border: 1px solid #ddd; display: flex; flex-direction: column; align-items: flex-end; position: relative; }
-        .sum-number { position: absolute; top: 10px; left: 15px; font-family: 'Segoe UI', sans-serif; font-size: 16px; font-weight: bold; color: #666; }
-        .math-row { letter-spacing: 4px; display: flex; align-items: center; justify-content: flex-end; width: 100%; margin-bottom: 6px; }
-        
-        .carry-label { font-family: 'Segoe UI', sans-serif; font-size: 12px; color: #d32f2f; margin-right: 10px; font-weight: bold; text-transform: uppercase; }
-        .carry-input { width: 140px; padding: 4px; border: 1px dashed #d32f2f; border-radius: 4px; text-align: right; font-family: 'Courier New', Courier, monospace; letter-spacing: 4px; color: #d32f2f; background: #fff; }
-        .carry-input-8 { width: 190px; }
-        
-        .math-line { border-bottom: 2px solid #333; width: 100%; margin: 5px 0 10px 0; }
-        .answer-input { width: 160px; padding: 8px; border: 2px solid #ccc; border-radius: 4px; text-align: right; font-family: 'Courier New', Courier, monospace; letter-spacing: 4px; font-size: 18px; font-weight: bold; transition: all 0.3s ease; }
-        .answer-input-8 { width: 220px; }
-        .answer-input:focus { outline: none; border-color: var(--navy); }
+
+        /* Shifts Flex Row */
+        .shift-flex-row { display: flex; gap: 6px; max-width: 400px; margin-top: 8px; }
 
         /* Buttons */
         .btn-submit { background-color: var(--navy); color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; max-width: 200px; transition: background-color 0.2s; }
@@ -161,166 +164,134 @@
             <div class="task-card task-maroon">
                 <h2>Red Task: 4-Bit Binary Addition</h2>
                 <div class="instruction-box">
-                    Complete the 4-bit binary addition sums. Use the dashed red box to track your <strong>Carries / Overflows</strong>.<br>
-                    <em>Remember: 0+0=0, 1+0=1, 1+1=10 (0 carry 1), 1+1+1=11 (1 carry 1).</em>
+                    Calculate the sums starting from the right. Type your answer bits into the grey boxes, and use the smaller red boxes underneath to track your <strong>Carries</strong>.<br>
+                    <em>(Tip: You can use the Left and Right arrow keys on your keyboard to quickly jump between boxes!)</em>
                 </div>
 
                 <div class="sum-grid">
                     <!-- Q1 -->
-                    <div class="math-sum">
+                    <div class="math-sum answer-group red-input" data-answers='["1001"]'>
                         <div class="sum-number">1.</div>
-                        <div class="math-row"><span class="carry-label">Carry</span> <input type="text" class="carry-input auto-input" maxlength="5"></div>
-                        <div class="math-row">&nbsp;&nbsp;0110</div>
-                        <div class="math-row">+&nbsp;0011</div>
-                        <div class="math-line"></div>
-                        <div class="math-row"><input type="text" class="answer-input auto-input red-input" data-answers='["1001"]' placeholder="Answer" maxlength="5"></div>
+                        <table class="sum-table">
+                            <tr><td></td><td>0</td><td>1</td><td>1</td><td>0</td></tr>
+                            <tr><td>+</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                            <tr class="sum-line"><td colspan="5"></td></tr>
+                            <tr>
+                                <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            </tr>
+                            <tr>
+                                <td class="carry-label">Carry</td>
+                                <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            </tr>
+                        </table>
                     </div>
                     <!-- Q2 -->
-                    <div class="math-sum">
+                    <div class="math-sum answer-group red-input" data-answers='["1001"]'>
                         <div class="sum-number">2.</div>
-                        <div class="math-row"><span class="carry-label">Carry</span> <input type="text" class="carry-input auto-input" maxlength="5"></div>
-                        <div class="math-row">&nbsp;&nbsp;0101</div>
-                        <div class="math-row">+&nbsp;0100</div>
-                        <div class="math-line"></div>
-                        <div class="math-row"><input type="text" class="answer-input auto-input red-input" data-answers='["1001"]' placeholder="Answer" maxlength="5"></div>
+                        <table class="sum-table">
+                            <tr><td></td><td>0</td><td>1</td><td>0</td><td>1</td></tr>
+                            <tr><td>+</td><td>0</td><td>1</td><td>0</td><td>0</td></tr>
+                            <tr class="sum-line"><td colspan="5"></td></tr>
+                            <tr>
+                                <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            </tr>
+                            <tr>
+                                <td class="carry-label">Carry</td>
+                                <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            </tr>
+                        </table>
                     </div>
                     <!-- Q3 -->
-                    <div class="math-sum">
+                    <div class="math-sum answer-group red-input" data-answers='["1111"]'>
                         <div class="sum-number">3.</div>
-                        <div class="math-row"><span class="carry-label">Carry</span> <input type="text" class="carry-input auto-input" maxlength="5"></div>
-                        <div class="math-row">&nbsp;&nbsp;1010</div>
-                        <div class="math-row">+&nbsp;0101</div>
-                        <div class="math-line"></div>
-                        <div class="math-row"><input type="text" class="answer-input auto-input red-input" data-answers='["1111"]' placeholder="Answer" maxlength="5"></div>
+                        <table class="sum-table">
+                            <tr><td></td><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+                            <tr><td>+</td><td>0</td><td>1</td><td>0</td><td>1</td></tr>
+                            <tr class="sum-line"><td colspan="5"></td></tr>
+                            <tr>
+                                <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            </tr>
+                            <tr>
+                                <td class="carry-label">Carry</td>
+                                <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            </tr>
+                        </table>
                     </div>
                     <!-- Q4 (Overflow) -->
-                    <div class="math-sum">
+                    <div class="math-sum answer-group red-input" data-answers='["10010"]'>
                         <div class="sum-number">4.</div>
-                        <div class="math-row"><span class="carry-label">Carry</span> <input type="text" class="carry-input auto-input" maxlength="5"></div>
-                        <div class="math-row">&nbsp;&nbsp;1001</div>
-                        <div class="math-row">+&nbsp;1001</div>
-                        <div class="math-line"></div>
-                        <div class="math-row"><input type="text" class="answer-input auto-input red-input" data-answers='["10010"]' placeholder="Answer" maxlength="5"></div>
-                    </div>
-                    <!-- Q5 (Overflow) -->
-                    <div class="math-sum">
-                        <div class="sum-number">5.</div>
-                        <div class="math-row"><span class="carry-label">Carry</span> <input type="text" class="carry-input auto-input" maxlength="5"></div>
-                        <div class="math-row">&nbsp;&nbsp;1100</div>
-                        <div class="math-row">+&nbsp;0111</div>
-                        <div class="math-line"></div>
-                        <div class="math-row"><input type="text" class="answer-input auto-input red-input" data-answers='["10011"]' placeholder="Answer" maxlength="5"></div>
-                    </div>
-                    <!-- Q6 (Overflow) -->
-                    <div class="math-sum">
-                        <div class="sum-number">6.</div>
-                        <div class="math-row"><span class="carry-label">Carry</span> <input type="text" class="carry-input auto-input" maxlength="5"></div>
-                        <div class="math-row">&nbsp;&nbsp;1111</div>
-                        <div class="math-row">+&nbsp;0001</div>
-                        <div class="math-line"></div>
-                        <div class="math-row"><input type="text" class="answer-input auto-input red-input" data-answers='["10000"]' placeholder="Answer" maxlength="5"></div>
+                        <table class="sum-table">
+                            <tr><td></td><td>1</td><td>0</td><td>0</td><td>1</td></tr>
+                            <tr><td>+</td><td>1</td><td>0</td><td>0</td><td>1</td></tr>
+                            <tr class="sum-line"><td colspan="5"></td></tr>
+                            <tr>
+                                <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            </tr>
+                            <tr>
+                                <td class="carry-label">Carry</td>
+                                <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                                <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
                 <button class="btn-submit no-print" style="background-color: var(--maroon);" onclick="checkAnswers('red-input')">Check Answers</button>
-            </div>
-
-            <!-- AMBER TASK: 8-Bit Binary Addition -->
-            <div class="task-card task-amber">
-                <h2>Amber Task: 8-Bit Binary Addition</h2>
-                <div class="instruction-box">
-                    Level up to 8-bit addition. Make sure to track your carries, and be aware that <strong>overflow errors</strong> can result in a 9-bit answer!
-                </div>
-
-                <div class="sum-grid">
-                    <!-- Q1 -->
-                    <div class="math-sum">
-                        <div class="sum-number">1.</div>
-                        <div class="math-row"><span class="carry-label">Carry</span> <input type="text" class="carry-input carry-input-8 auto-input" maxlength="9"></div>
-                        <div class="math-row">&nbsp;&nbsp;00001111</div>
-                        <div class="math-row">+&nbsp;00010000</div>
-                        <div class="math-line"></div>
-                        <div class="math-row"><input type="text" class="answer-input answer-input-8 auto-input amber-input" data-answers='["00011111", "11111"]' placeholder="Answer" maxlength="9"></div>
-                    </div>
-                    <!-- Q2 -->
-                    <div class="math-sum">
-                        <div class="sum-number">2.</div>
-                        <div class="math-row"><span class="carry-label">Carry</span> <input type="text" class="carry-input carry-input-8 auto-input" maxlength="9"></div>
-                        <div class="math-row">&nbsp;&nbsp;01010101</div>
-                        <div class="math-row">+&nbsp;00101010</div>
-                        <div class="math-line"></div>
-                        <div class="math-row"><input type="text" class="answer-input answer-input-8 auto-input amber-input" data-answers='["01111111"]' placeholder="Answer" maxlength="9"></div>
-                    </div>
-                    <!-- Q3 -->
-                    <div class="math-sum">
-                        <div class="sum-number">3.</div>
-                        <div class="math-row"><span class="carry-label">Carry</span> <input type="text" class="carry-input carry-input-8 auto-input" maxlength="9"></div>
-                        <div class="math-row">&nbsp;&nbsp;10000011</div>
-                        <div class="math-row">+&nbsp;01000100</div>
-                        <div class="math-line"></div>
-                        <div class="math-row"><input type="text" class="answer-input answer-input-8 auto-input amber-input" data-answers='["11000111"]' placeholder="Answer" maxlength="9"></div>
-                    </div>
-                    <!-- Q4 (Overflow) -->
-                    <div class="math-sum">
-                        <div class="sum-number">4.</div>
-                        <div class="math-row"><span class="carry-label">Carry</span> <input type="text" class="carry-input carry-input-8 auto-input" maxlength="9"></div>
-                        <div class="math-row">&nbsp;&nbsp;11110000</div>
-                        <div class="math-row">+&nbsp;11110000</div>
-                        <div class="math-line"></div>
-                        <div class="math-row"><input type="text" class="answer-input answer-input-8 auto-input amber-input" data-answers='["111100000"]' placeholder="Answer" maxlength="9"></div>
-                    </div>
-                    <!-- Q5 (Overflow) -->
-                    <div class="math-sum">
-                        <div class="sum-number">5.</div>
-                        <div class="math-row"><span class="carry-label">Carry</span> <input type="text" class="carry-input carry-input-8 auto-input" maxlength="9"></div>
-                        <div class="math-row">&nbsp;&nbsp;10101010</div>
-                        <div class="math-row">+&nbsp;11001100</div>
-                        <div class="math-line"></div>
-                        <div class="math-row"><input type="text" class="answer-input answer-input-8 auto-input amber-input" data-answers='["101110110"]' placeholder="Answer" maxlength="9"></div>
-                    </div>
-                    <!-- Q6 (Overflow) -->
-                    <div class="math-sum">
-                        <div class="sum-number">6.</div>
-                        <div class="math-row"><span class="carry-label">Carry</span> <input type="text" class="carry-input carry-input-8 auto-input" maxlength="9"></div>
-                        <div class="math-row">&nbsp;&nbsp;11111111</div>
-                        <div class="math-row">+&nbsp;00000001</div>
-                        <div class="math-line"></div>
-                        <div class="math-row"><input type="text" class="answer-input answer-input-8 auto-input amber-input" data-answers='["100000000"]' placeholder="Answer" maxlength="9"></div>
-                    </div>
-                </div>
-                <button class="btn-submit no-print" style="background-color: #ffb300; color: #333;" onclick="checkAnswers('amber-input')">Check Answers</button>
             </div>
 
             <!-- GREEN TASK: Left Shifts -->
             <div class="task-card task-green">
                 <h2>Green Task: Binary Left Shifts</h2>
                 <div class="instruction-box">
-                    Perform a <strong>Logical Left Shift</strong> on the following 8-bit numbers. <br>
-                    <em>Remember: A left shift moves all bits to the left and adds a 0 on the right side.</em>
+                    Perform a <strong>Logical Left Shift</strong> on the following 8-bit numbers. Enter your answer one bit at a time.
                 </div>
 
                 <div class="question-row">
-                    <label class="question-label">1. Shift <code>00001111</code> Left by 1 place:</label>
-                    <input type="text" class="auto-input code-input green-input" data-answers='["00011110"]' placeholder="e.g. 00011110">
+                    <label class="question-label">1. Shift <code>0000 1111</code> Left by 1 place:</label>
+                    <div class="answer-group shift-flex-row green-input" data-answers='["00011110"]'>
+                        <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
+                        <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
+                    </div>
                 </div>
                 <div class="question-row">
-                    <label class="question-label">2. Shift <code>00000101</code> Left by 2 places:</label>
-                    <input type="text" class="auto-input code-input green-input" data-answers='["00010100"]' placeholder="Enter binary answer...">
+                    <label class="question-label">2. Shift <code>0000 0101</code> Left by 2 places:</label>
+                    <div class="answer-group shift-flex-row green-input" data-answers='["00010100"]'>
+                        <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
+                        <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
+                    </div>
                 </div>
                 <div class="question-row">
-                    <label class="question-label">3. Shift <code>00110011</code> Left by 1 place:</label>
-                    <input type="text" class="auto-input code-input green-input" data-answers='["01100110"]' placeholder="Enter binary answer...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">4. Shift <code>00000011</code> Left by 3 places:</label>
-                    <input type="text" class="auto-input code-input green-input" data-answers='["00011000"]' placeholder="Enter binary answer...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">5. Shift <code>00000001</code> Left by 4 places:</label>
-                    <input type="text" class="auto-input code-input green-input" data-answers='["00010000"]' placeholder="Enter binary answer...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">6. Shift <code>01010101</code> Left by 1 place:</label>
-                    <input type="text" class="auto-input code-input green-input" data-answers='["10101010"]' placeholder="Enter binary answer...">
+                    <label class="question-label">3. Shift <code>0011 0011</code> Left by 1 place:</label>
+                    <div class="answer-group shift-flex-row green-input" data-answers='["01100110"]'>
+                        <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
+                        <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
+                    </div>
                 </div>
                 <button class="btn-submit no-print" style="background-color: #008f39;" onclick="checkAnswers('green-input')">Check Answers</button>
             </div>
@@ -329,42 +300,31 @@
             <div class="task-card task-navy">
                 <h2>Blue Task: Binary Right Shifts</h2>
                 <div class="instruction-box">
-                    Perform a <strong>Logical Right Shift</strong> on the following 8-bit numbers. <br>
-                    <em>Remember: A right shift moves all bits to the right and adds a 0 on the left side.</em>
+                    Perform a <strong>Logical Right Shift</strong> on the following 8-bit numbers.
                 </div>
 
                 <div class="question-row">
-                    <label class="question-label">1. Shift <code>11110000</code> Right by 1 place:</label>
-                    <input type="text" class="auto-input code-input navy-input" data-answers='["01111000"]' placeholder="e.g. 01111000">
+                    <label class="question-label">1. Shift <code>1111 0000</code> Right by 1 place:</label>
+                    <div class="answer-group shift-flex-row navy-input" data-answers='["01111000"]'>
+                        <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
+                        <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
+                    </div>
                 </div>
                 <div class="question-row">
-                    <label class="question-label">2. Shift <code>10101000</code> Right by 2 places:</label>
-                    <input type="text" class="auto-input code-input navy-input" data-answers='["00101010"]' placeholder="Enter binary answer...">
+                    <label class="question-label">2. Shift <code>1010 1000</code> Right by 2 places:</label>
+                    <div class="answer-group shift-flex-row navy-input" data-answers='["00101010"]'>
+                        <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
+                        <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
+                    </div>
                 </div>
                 <div class="question-row">
-                    <label class="question-label">3. Shift <code>01100110</code> Right by 1 place:</label>
-                    <input type="text" class="auto-input code-input navy-input" data-answers='["00110011"]' placeholder="Enter binary answer...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">4. Shift <code>11000000</code> Right by 3 places:</label>
-                    <input type="text" class="auto-input code-input navy-input" data-answers='["00011000"]' placeholder="Enter binary answer...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">5. Shift <code>10000000</code> Right by 4 places:</label>
-                    <input type="text" class="auto-input code-input navy-input" data-answers='["00001000"]' placeholder="Enter binary answer...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">6. Shift <code>11111111</code> Right by 2 places:</label>
-                    <input type="text" class="auto-input code-input navy-input" data-answers='["00111111"]' placeholder="Enter binary answer...">
+                    <label class="question-label">3. Shift <code>0110 0110</code> Right by 1 place:</label>
+                    <div class="answer-group shift-flex-row navy-input" data-answers='["00110011"]'>
+                        <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
+                        <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
+                    </div>
                 </div>
                 <button class="btn-submit no-print" onclick="checkAnswers('navy-input')">Check Answers</button>
-            </div>
-
-            <!-- CHALLENGE GAME LINK -->
-            <div class="task-card no-print" style="border: 2px solid #dfaa2b; text-align: center; background-color: #fdfbf7;">
-                <h2 style="color: #1e3a8a; margin-top: 0; font-size: 24px;">🎮 Finished Early? Play Binary Time Attack!</h2>
-                <p style="font-size: 16px; color: #555; margin-bottom: 20px;">Test your speed against the clock in the Delta Binary Time Attack game. Race to convert as many denary and binary numbers as you can in 60 seconds!</p>
-                <a href="binary-game.html" class="btn-submit" style="margin: 0 auto; background-color: #dfaa2b; color: #1e3a8a; text-decoration: none; display: inline-block; width: 250px;">Start Game &rarr;</a>
             </div>
 
             <!-- PLENARY: 3 Key Takeaways -->
@@ -403,16 +363,36 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <script>
+        /* --- KEYBOARD NAVIGATION (Left/Right Arrows) --- */
+        document.addEventListener('keydown', function(e) {
+            if(e.target.classList.contains('bit-box') || e.target.classList.contains('carry-box')) {
+                var td = e.target.parentElement;
+                if(e.key === 'ArrowLeft') {
+                    // Try to find previous td in table, or previous sibling in flex row
+                    var prev = td.previousElementSibling || e.target.previousElementSibling;
+                    if(prev) {
+                        var input = prev.tagName === 'INPUT' ? prev : prev.querySelector('input');
+                        if(input) input.focus();
+                    }
+                } else if (e.key === 'ArrowRight') {
+                    var next = td.nextElementSibling || e.target.nextElementSibling;
+                    if(next) {
+                        var input = next.tagName === 'INPUT' ? next : next.querySelector('input');
+                        if(input) input.focus();
+                    }
+                }
+            }
+        });
+
         /* --- FIREWALL-PROOF AUTO-SAVE MEMORY LOGIC --- */
         function saveProgress() {
             try {
                 var inputs = document.querySelectorAll('.auto-input');
                 var dataToSave = {};
-                
                 for (var i = 0; i < inputs.length; i++) {
                     dataToSave['input_' + i] = inputs[i].value;
                 }
-                localStorage.setItem('binaryMathMemory', JSON.stringify(dataToSave));
+                localStorage.setItem('binaryPerBitMemory', JSON.stringify(dataToSave));
             } catch (error) {
                 console.log("Memory saving blocked by browser - ignoring safely.");
             }
@@ -420,11 +400,10 @@
 
         function loadProgress() {
             try {
-                var savedDataStr = localStorage.getItem('binaryMathMemory');
+                var savedDataStr = localStorage.getItem('binaryPerBitMemory');
                 if (savedDataStr) {
                     var data = JSON.parse(savedDataStr);
                     var inputs = document.querySelectorAll('.auto-input');
-                    
                     for (var i = 0; i < inputs.length; i++) {
                         if (data['input_' + i]) {
                             inputs[i].value = data['input_' + i];
@@ -434,10 +413,8 @@
                             }
                         }
                     }
-                    
                     // Auto-mark previously saved answers
                     checkAnswers('red-input');
-                    checkAnswers('amber-input');
                     checkAnswers('green-input');
                     checkAnswers('navy-input');
                 }
@@ -458,40 +435,38 @@
 
         function clearData() {
             if (confirm("Are you sure you want to clear all your work on this page?")) {
-                try {
-                    localStorage.removeItem('binaryMathMemory');
-                } catch(e) {}
+                try { localStorage.removeItem('binaryPerBitMemory'); } catch(e) {}
                 window.location.reload();
             }
         }
 
         window.onload = loadProgress;
 
-        /* --- BATCH-MARKING TEXT INPUT LOGIC --- */
-        function checkAnswers(groupClass) {
-            var inputs = document.getElementsByClassName(groupClass);
-            for (var i = 0; i < inputs.length; i++) {
-                var inputElement = inputs[i];
-                var studentAnswer = inputElement.value.replace(/\s+/g, '').toLowerCase(); 
-                var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers'));
-                var isCorrect = false;
+        /* --- BATCH-MARKING PER-BIT INPUT LOGIC --- */
+        function checkAnswers(taskClass) {
+            var groups = document.querySelectorAll('.' + taskClass);
+            groups.forEach(function(group) {
+                var inputs = group.querySelectorAll('.bit-box');
                 
-                for (var j = 0; j < acceptedAnswers.length; j++) {
-                    if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
-                        isCorrect = true;
-                        break;
-                    }
-                }
+                // Check if they typed anything at all in this group
+                var hasTyped = Array.from(inputs).some(inp => inp.value.trim() !== '');
+                if (!hasTyped) return;
 
-                inputElement.classList.remove('input-correct', 'input-incorrect');
-                if (studentAnswer !== "") {
-                    if (isCorrect) {
-                        inputElement.classList.add('input-correct');
-                    } else {
-                        inputElement.classList.add('input-incorrect');
-                    }
-                }
-            }
+                // Concatenate the bits (treat blanks as '0' for binary comparison)
+                var studentBinaryString = Array.from(inputs).map(inp => inp.value.trim() === '' ? '0' : inp.value.trim()).join('');
+                var studentDecimal = parseInt(studentBinaryString, 2);
+                
+                var acceptedAnswers = JSON.parse(group.getAttribute('data-answers'));
+                var acceptedDecimal = parseInt(acceptedAnswers[0], 2);
+                
+                // Using mathematical decimal comparison ensures leading zeros (or blanks) don't trigger a false negative
+                var isCorrect = (studentDecimal === acceptedDecimal);
+
+                inputs.forEach(function(inp) {
+                    inp.classList.remove('input-correct', 'input-incorrect');
+                    inp.classList.add(isCorrect ? 'input-correct' : 'input-incorrect');
+                });
+            });
         }
 
         /* --- BULLETPROOF PDF GENERATION LOGIC --- */
@@ -501,18 +476,15 @@
                 return;
             }
 
-            // Hide buttons
             var buttonsToHide = document.querySelectorAll('.no-print');
             for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'none';
             document.getElementById('action-buttons').style.display = 'none';
 
-            // Lock text inputs
             var textInputs = document.querySelectorAll('input[type="text"]');
             for (var i = 0; i < textInputs.length; i++) {
                 textInputs[i].setAttribute('value', textInputs[i].value);
             }
 
-            // Expand textareas
             var textAreas = document.querySelectorAll('textarea');
             for (var j = 0; j < textAreas.length; j++) {
                 textAreas[j].innerHTML = textAreas[j].value;
@@ -520,7 +492,6 @@
             }
 
             var element = document.getElementById('pdf-content');
-
             var opt = {
                 margin:       0.3,
                 filename:     'Binary_Addition_Shifts_Workbook.pdf',
@@ -533,7 +504,6 @@
             html2pdf().set(opt).from(element).save().then(function() {
                 for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'block';
                 document.getElementById('action-buttons').style.display = 'flex';
-                
                 for (var k = 0; k < textAreas.length; k++) {
                     textAreas[k].style.height = "";
                 }
