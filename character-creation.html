@@ -487,8 +487,8 @@
             const legendContainer = document.getElementById('legend-container');
             let html = '';
             
-            let leftCol = paletteOrder.slice(0, 8);   // 0 to 8
-            let rightCol = paletteOrder.slice(8, 16); // 9 to 16
+            let leftCol = paletteOrder.slice(0, 8);
+            let rightCol = paletteOrder.slice(8, 16); 
 
             let maxRows = Math.max(leftCol.length, rightCol.length);
             for (let i = 0; i < maxRows; i++) {
@@ -549,7 +549,6 @@
                 let designArray = userBinaryDesigns[t];
                 
                 if (designArray) {
-                    // Check if they have painted anything other than blank cells
                     let hasPainted = designArray.some(code => {
                         return activeColorMap.hasOwnProperty(code) && activeColorMap[code] !== '#ffffff';
                     });
@@ -591,17 +590,18 @@
                 textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
             }
 
-            // 1. Target the grid/flex containers causing the page-break bug
+            // 1. Force the layout into block mode to bypass html2canvas layout bugs
             var ideContainer = document.getElementById('main-ide');
             var originalIdeDisplay = ideContainer.style.display || '';
-            ideContainer.style.display = 'block'; // Override Grid
+            ideContainer.style.display = 'block'; 
 
             var editorPanel = document.getElementById('panel-editor');
             var originalEditorDisplay = editorPanel.style.display || '';
-            editorPanel.style.display = 'block'; // Override Flexbox
+            editorPanel.style.display = 'block'; 
             
             var gridContainer = document.getElementById('spreadsheet-container');
             var originalGridHTML = gridContainer.innerHTML;
+            
             var titleEl = document.getElementById('editor-title');
             var originalTitle = titleEl.innerText;
             var hintEl = document.getElementById('canvas-hint');
@@ -611,8 +611,8 @@
             titleEl.style.textAlign = "center";
             hintEl.style.display = 'none';
 
-            // 2. Wrap the tasks in a block container instead of flex
-            var portfolioHTML = '<div style="display: block; text-align: center; margin-top: 20px;">';
+            // 2. Build the exact output using explicit flex/block divs (Tables are removed so nothing squashes)
+            var portfolioHTML = '<div style="display: flex; flex-wrap: wrap; justify-content: center; margin-top: 20px;">';
             var attemptedCount = 0;
 
             let tasks = ['1', '2', '3', '4'];
@@ -622,14 +622,13 @@
                 let map = activeColorMap;
 
                 if (state) {
-                    // Include in PDF if they actually painted something
                     let hasPainted = state.some(code => map.hasOwnProperty(code) && map[code] !== '#ffffff');
                     
                     if (hasPainted) {
                         attemptedCount++;
-                        // 3. Render tasks as inline-blocks so the PDF can safely break between them
-                        portfolioHTML += '<div style="display: inline-block; vertical-align: top; width: 45%; min-width: 300px; margin: 15px; page-break-inside: avoid; background: #fafafa; padding: 20px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box;">';
-                        portfolioHTML += '<h4 style="color: var(--navy); margin-top: 0; margin-bottom: 15px; font-size: 18px;">' + taskNames[t] + '</h4>';
+                        portfolioHTML += '<div style="display: inline-block; vertical-align: top; width: 45%; min-width: 250px; margin: 15px; page-break-inside: avoid; background: #fafafa; padding: 20px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box;">';
+                        // Replaced var(--navy) with exact hex color to stop html2canvas from wiping the text
+                        portfolioHTML += '<h4 style="color: #1B1464; margin-top: 0; margin-bottom: 15px; font-size: 18px; text-align: center;">' + taskNames[t] + '</h4>';
                         portfolioHTML += generateStaticGridHTML(state, map);
                         portfolioHTML += '</div>';
                     }
@@ -654,11 +653,11 @@
             };
 
             html2pdf().set(opt).from(element).save().then(function() {
+                // 3. Rebuild exactly as it was
                 document.getElementById('action-buttons').style.display = 'flex';
                 document.getElementById('panel-instructions').style.display = 'flex';
                 document.getElementById('panel-legend').style.display = 'flex';
                 
-                // 4. Restore the original layouts
                 ideContainer.style.display = originalIdeDisplay;
                 ideContainer.style.gridTemplateColumns = '1fr 1.5fr 1fr';
                 editorPanel.style.display = originalEditorDisplay;
@@ -674,25 +673,27 @@
             });
         }
 
+        // Entirely re-written to use structured blocks instead of Tables so the PDF engine cannot collapse empty rows
         function generateStaticGridHTML(state, map) {
-            let html = `<table style="border-collapse: collapse; margin: 0 auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"><tbody>`;
+            let html = '<div style="display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: fit-content; margin: 0 auto; background: white; border: 1px solid #ccc; padding: 2px;">';
             let cellIndex = 0;
+            
             for(let r=0; r < 10; r++) {
-                html += `<tr>`;
+                html += '<div style="display: flex;">';
                 for(let c=0; c < 10; c++) {
-                    let typedCode = state[cellIndex];
+                    let typedCode = state[cellIndex] || '';
                     let bgColor = '#ffffff'; 
                     
                     if (map.hasOwnProperty(typedCode)) {
                         bgColor = map[typedCode];
                     }
                     
-                    html += `<td style="width: 25px; height: 25px; background-color: ${bgColor}; border: 1px solid rgba(0,0,0,0.05);"></td>`;
+                    html += `<div style="width: 20px; height: 20px; background-color: ${bgColor}; border: 1px solid #eee; box-sizing: border-box;"></div>`;
                     cellIndex++;
                 }
-                html += '</tr>';
+                html += '</div>';
             }
-            html += '</tbody></table>';
+            html += '</div>';
             return html;
         }
 
