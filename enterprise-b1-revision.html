@@ -8,7 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
-        .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid; transition: all 0.3s ease; }
+        .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
         .task-prep { border-top: 6px solid #607d8b; } 
         .task-navy { border-top: 6px solid #1e3a8a; } 
         .task-card h2 { margin-top: 0; color: #333; }
@@ -16,11 +16,11 @@
         .task-navy h2 { color: #1e3a8a; }
         .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; }
         .center-text { text-align: center; }
-        .question-wrapper { margin-bottom: 25px; }
+        .question-wrapper { margin-bottom: 25px; page-break-inside: avoid !important; break-inside: avoid !important; }
         .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
         .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit; }
         .auto-input:focus { outline: none; border-color: #666; }
-        textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; }
+        textarea.auto-input { resize: vertical; min-height: 80px; }
         .correct { border-color: #388e3c !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
         .incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
         .feedback-msg { font-size: 14px; margin-top: 8px; font-weight: bold; display: none; }
@@ -631,11 +631,26 @@
             var hide = document.querySelectorAll('.no-print');
             for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
             document.getElementById('action-buttons').style.display = 'none';
+
+            var textAreas = document.querySelectorAll('textarea');
+            for (var j = 0; j < textAreas.length; j++) {
+                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
+            }
+
             var element = document.getElementById('pdf-content');
-            var opt = { margin: 0.3, filename: 'B1_Financial_Documents.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
+            var opt = { 
+                margin: 0.3, 
+                filename: 'B1_Financial_Documents.pdf', 
+                image: { type: 'jpeg', quality: 0.98 }, 
+                html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, 
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
             html2pdf().set(opt).from(element).save().then(function() {
                 for(var b=0; b<hide.length; b++) hide[b].style.display = 'block';
                 document.getElementById('action-buttons').style.display = 'flex';
+                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
             });
         }
     </script>
