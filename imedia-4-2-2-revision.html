@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4.2.2: Audio Files - Revision</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
+        .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
+        .task-prep { border-top: 6px solid #607d8b; } 
+        .task-navy { border-top: 6px solid #1e3a8a; } 
+        .task-card h2 { margin-top: 0; color: #333; }
+        .task-prep h2 { color: #607d8b; }
+        .task-navy h2 { color: #1e3a8a; }
+        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; }
+        .center-text { text-align: center; }
+        .question-wrapper { margin-bottom: 25px; page-break-inside: avoid !important; break-inside: avoid !important; }
+        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
+        .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit; }
+        .auto-input:focus { outline: none; border-color: #666; }
+        textarea.auto-input { resize: vertical; min-height: 80px; }
+        .correct { border-color: #388e3c !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
+        .incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
+        .feedback-msg { font-size: 14px; margin-top: 8px; font-weight: bold; display: none; }
+        .teacher-override-btn { background-color: #607d8b; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        .teacher-override-btn:hover { background-color: #455a64; }
+        .hidden { display: none !important; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; border-top: 6px solid #1e3a8a; }
+        .modal-input { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; text-align: center; }
+        .modal-btn-row { display: flex; gap: 10px; }
+        .modal-btn-confirm { flex: 1; background-color: #1e3a8a; color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-btn-cancel { flex: 1; background-color: #ccc; color: #333; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
+        .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
+        .btn-submit:hover { background-color: #152960; }
+        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
+        .btn-pdf:hover { background-color: #124d2d; }
+    </style>
+</head>
+<body>
+    <div id="pdf-content">
+        <header>
+            <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
+            <div class="header-center"><h1>4.2.2 Audio Files</h1></div>
+            <div class="header-right"><a href="enterprise-revision.html" class="back-btn">&larr; Back to Hub</a></div>
+        </header>
+
+        <main class="task-container">
+            <div class="task-card task-prep">
+                <h2>4.2.2 Revision Notes</h2>
+                <div class="instruction-box center-text">Use this space to write out your complete notes on sample rate, bit depth, audio quality, compression formats (lossy vs. lossless), and choosing suitable audio formats.</div>
+                <div class="question-wrapper">
+                    <textarea class="auto-input" rows="12" placeholder="Type your revision notes here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                </div>
+            </div>
+
+            <div class="task-card task-navy">
+                <h2>Self-Marking Knowledge Check</h2>
+                <div class="instruction-box center-text">Answer the questions below. The smart-marker accepts multiple ways of wording your answers!</div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 1: Sample rate and bit depth</h3>
+                
+                <div class="question-wrapper">
+                    <label class="question-label">1. What is sample rate?</label>
+                    <textarea id="ent422_q1" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["number of times per second that a sound is measured", "converted into digital audio"]], "feedback": "Acceptable: The number of times per second that a sound is measured when converted into digital audio."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q1')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">2. What unit is sample rate measured in?</label>
+                    <input type="text" id="ent422_q2" class="auto-input ent422-input" data-rubric='{"keywords": [["hertz", "hz", "kilohertz", "khz"]], "feedback": "Hertz (Hz) or kilohertz (kHz)."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q2')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">3. What does a sample rate of 44.1 kHz mean?</label>
+                    <textarea id="ent422_q3" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["sound is sampled 44 100 times every second"]], "feedback": "Acceptable: The sound is sampled 44,100 times every second."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q3')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">4. What is bit depth in digital audio?</label>
+                    <textarea id="ent422_q4" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["number of bits used to represent the level of each audio sample"]], "feedback": "Acceptable: The number of bits used to represent the level of each audio sample."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q4')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">5. How can a higher bit depth affect audio quality?</label>
+                    <textarea id="ent422_q5" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["more possible volume levels", "improve accuracy", "reduce quantisation noise"]], "feedback": "Acceptable: It allows more possible volume levels to be represented, improving accuracy and reducing noise."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q5')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">6. How can a higher sample rate affect audio quality?</label>
+                    <textarea id="ent422_q6" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["capture a wider range of sound frequencies"]], "feedback": "Acceptable: It can capture a wider range of sound frequencies, provided equipment and settings support it."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q6')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">7. What is one disadvantage of using a higher sample rate and bit depth?</label>
+                    <textarea id="ent422_q7" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["audio file will generally be larger", "require more storage space"]], "feedback": "Acceptable: The audio file will generally be larger and require more storage space."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q7')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">8. What is the difference between sample rate and bit depth?</label>
+                    <textarea id="ent422_q8" class="auto-input ent422-input" rows="3" data-rubric='{"keywords": [["sample rate is how often sound is measured"], ["bit depth is how accurately the level of each sample is represented"]], "feedback": "Sample rate is how often sound is measured; bit depth is how accurately the level of each sample is represented."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q8')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 2: Audio quality and file size</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">9. What is digital audio?</label>
+                    <textarea id="ent422_q9" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["sound converted into digital data so computer or device can store and play it"]], "feedback": "Acceptable: Sound that has been converted into digital data so a computer or device can store and play it."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q9')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">10. What is the relationship between audio quality and file size?</label>
+                    <textarea id="ent422_q10" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["higher quality settings often create larger files because more audio data is stored"]], "feedback": "Acceptable: Higher quality settings often create larger files because more audio data is stored."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q10')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">11. Why might a professional music recording use a higher bit depth?</label>
+                    <textarea id="ent422_q11" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["capture a wider range of audio levels more accurately", "useful during recording and editing"]], "feedback": "Acceptable: It captures a wider range of audio levels accurately, which is useful during recording and editing."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q11')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">12. Why might a voice recording for a simple online message not need extremely high audio settings?</label>
+                    <textarea id="ent422_q12" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["speech may remain clear with lower settings", "reduce file size and make it quicker to share"]], "feedback": "Acceptable: Speech remains clear with lower settings, reducing file size and making it quicker to share."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q12')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">13. Does increasing the sample rate always make audio sound better?</label>
+                    <textarea id="ent422_q13" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["no", "improvement depends on source, equipment and use"]], "feedback": "Acceptable: No. Improvement depends on the source, equipment and intended use. Higher settings also increase file size."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q13')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 3: Uncompressed and compressed audio</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">14. What is an uncompressed audio file?</label>
+                    <textarea id="ent422_q14" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["audio stored without compression", "preserving original digital audio data"]], "feedback": "Acceptable: Audio stored without compression, preserving the original digital audio data."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q14')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">15. Give two examples of uncompressed audio formats.</label>
+                    <input type="text" id="ent422_q15" class="auto-input ent422-input" data-rubric='{"keywords": [["wav", "aiff"]], "feedback": "WAV and AIFF."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q15')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">16. What is one advantage of uncompressed audio?</label>
+                    <textarea id="ent422_q16" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["preserves audio data without compression losses", "useful for high quality recording and editing"]], "feedback": "Acceptable: Preserves audio data without losses, useful for high-quality recording and editing."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q16')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">17. What is one disadvantage of uncompressed audio?</label>
+                    <textarea id="ent422_q17" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["files are large", "take up more storage space"]], "feedback": "Acceptable: Files are large and take up more storage space."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q17')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">18. What is audio compression?</label>
+                    <textarea id="ent422_q18" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["reducing the amount of data needed to store an audio recording", "smaller file size"]], "feedback": "Acceptable: Reducing the amount of data needed to store an audio recording, usually to make the file smaller."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q18')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">19. What is lossy audio compression?</label>
+                    <textarea id="ent422_q19" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["permanently removes some audio information to reduce file size"]], "feedback": "Acceptable: Compression that permanently removes some audio information to reduce file size."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q19')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">20. Give two examples of lossy audio formats.</label>
+                    <input type="text" id="ent422_q20" class="auto-input ent422-input" data-rubric='{"keywords": [["mp3", "aac"]], "feedback": "MP3 and AAC."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q20')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">21. What is one advantage of lossy compression?</label>
+                    <textarea id="ent422_q21" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["produces smaller files that are easier to store, stream and share"]], "feedback": "Acceptable: Produces smaller files that are easier to store, stream and share."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q21')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">22. What is one disadvantage of lossy compression?</label>
+                    <textarea id="ent422_q22" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["some sound information is lost", "reduce quality"]], "feedback": "Acceptable: Some sound information is lost, which can reduce quality, especially at lower bit rates."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q22')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">23. What is lossless audio compression?</label>
+                    <textarea id="ent422_q23" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["makes a file smaller without permanently losing original audio information"]], "feedback": "Acceptable: Compression that makes a file smaller without permanently losing the original audio information."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q23')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">24. Give one example of a lossless compressed audio format.</label>
+                    <input type="text" id="ent422_q24" class="auto-input ent422-input" data-rubric='{"keywords": [["flac", "alac"]], "feedback": "FLAC or ALAC."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q24')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">25. What is one advantage of lossless compression?</label>
+                    <textarea id="ent422_q25" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["reduces file size while allowing original audio data to be recovered exactly"]], "feedback": "Acceptable: Reduces file size while allowing original audio data to be recovered exactly."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q25')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">26. What is one disadvantage of lossless compression compared with lossy compression?</label>
+                    <textarea id="ent422_q26" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["files are usually larger than lossy versions"]], "feedback": "Acceptable: The files are usually larger than lossy versions of the same recording."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q26" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q26')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">27. What is the difference between lossy and lossless compression?</label>
+                    <textarea id="ent422_q27" class="auto-input ent422-input" rows="3" data-rubric='{"keywords": [["lossy permanently removes some data"], ["lossless reduces file size without permanently losing original audio data"]], "feedback": "Lossy permanently removes data; lossless reduces file size without permanently losing original data."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q27" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q27')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 4: Choosing the right audio format</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">28. Which format is often suitable for sharing music online when a small file size is important?</label>
+                    <input type="text" id="ent422_q28" class="auto-input ent422-input" data-rubric='{"keywords": [["mp3"]], "feedback": "MP3."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q28" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q28')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">29. Which format is commonly used for uncompressed audio recording and editing?</label>
+                    <input type="text" id="ent422_q29" class="auto-input ent422-input" data-rubric='{"keywords": [["wav"]], "feedback": "WAV."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q29" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q29')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">30. Why might a music producer use FLAC to store music?</label>
+                    <textarea id="ent422_q30" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["reduces file size without losing original audio data", "preserving quality"]], "feedback": "Acceptable: It reduces file size without losing original audio data, preserving quality."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q30" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q30')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">31. Why might a podcast creator use a compressed audio format?</label>
+                    <textarea id="ent422_q31" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["smaller files are quicker to upload and download", "easier for listeners to stream"]], "feedback": "Acceptable: Smaller files are quicker to upload and download, and easier for listeners to stream."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q31" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q31')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">32. A student is recording sound effects for a project that will need lots of editing. Why might WAV be a suitable choice?</label>
+                    <textarea id="ent422_q32" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["preserve recording without compression losses", "good quality audio to work with"]], "feedback": "Acceptable: It preserves the recording without compression losses, giving good quality audio to work with."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q32" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q32')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">33. A company wants to stream music to users with limited internet speeds. What type of format might be suitable, and why?</label>
+                    <textarea id="ent422_q33" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["lossy compressed format such as mp3 or aac", "smaller files use less bandwidth"]], "feedback": "Acceptable: Lossy compressed format like MP3/AAC, because smaller files use less bandwidth and stream easily."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q33" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q33')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">34. A sound engineer needs to archive recordings while preserving the original audio data. Which format could be suitable?</label>
+                    <input type="text" id="ent422_q34" class="auto-input ent422-input" data-rubric='{"keywords": [["flac"]], "feedback": "FLAC."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q34" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q34')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">35. Why should a creator check which audio formats a platform supports?</label>
+                    <textarea id="ent422_q35" class="auto-input ent422-input" rows="2" data-rubric='{"keywords": [["unsupported format may not play correctly", "creator may need to convert the file"]], "feedback": "Acceptable: An unsupported format may not play correctly, so the creator may need to convert the file."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent422_q35" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent422_q35')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('ent422-input')">Check Answers</button>
+            </div>
+        </main>
+    </div>
+    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
+        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
+        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+    </div>
+
+    <!-- SECURE PASSWORD MODAL -->
+    <div class="modal-overlay" id="verify-modal">
+        <div class="modal-content">
+            <h3>Teacher Verification</h3>
+            <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
+            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter PIN">
+            <div class="modal-btn-row">
+                <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
+                <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
+
+    <script>
+        function saveProgress() {
+            var inputs = document.querySelectorAll('.auto-input');
+            var dataToSave = {};
+            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
+            try { localStorage.setItem('enterprise4_2_2Memory_Smart_v1', JSON.stringify(dataToSave)); } catch (e) {}
+        }
+        function loadProgress() {
+            var saved = localStorage.getItem('enterprise4_2_2Memory_Smart_v1');
+            if (saved) {
+                var data = JSON.parse(saved);
+                var inputs = document.querySelectorAll('.auto-input');
+                for (var i = 0; i < inputs.length; i++) {
+                    if (data['input_' + i]) {
+                        inputs[i].value = data['input_' + i];
+                        if (data['class_' + i]) {
+                            inputs[i].className = data['class_' + i];
+                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
+                                var btnId = "override-" + inputs[i].id;
+                                var btn = document.getElementById(btnId);
+                                if (btn) btn.classList.remove('hidden');
+                            }
+                        }
+                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                            inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
+                        }
+                    }
+                }
+            }
+        }
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                saveProgress();
+                if (e.target.tagName.toLowerCase() === 'textarea') {
+                    e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';
+                }
+            }
+        });
+        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterprise4_2_2Memory_Smart_v1'); window.location.reload(); } }
+        window.onload = loadProgress;
+
+        let activeQuestionId = null;
+        function openVerifyModal(qId) {
+            activeQuestionId = qId;
+            document.getElementById('teacher-password-input').value = '';
+            document.getElementById('modal-error-msg').style.display = 'none';
+            document.getElementById('verify-modal').style.display = 'flex';
+            document.getElementById('teacher-password-input').focus();
+        }
+        function closeVerifyModal() {
+            document.getElementById('verify-modal').style.display = 'none';
+            activeQuestionId = null;
+        }
+        function submitVerify() {
+            var pass = document.getElementById('teacher-password-input').value;
+            if (pass === '2525') {
+                var inputEl = document.getElementById(activeQuestionId);
+                var feedbackDiv = inputEl.nextElementSibling;
+                inputEl.classList.add('teacher-locked');
+                if (inputEl.classList.contains('correct')) {
+                    inputEl.classList.remove('correct');
+                    inputEl.classList.add('incorrect');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; feedbackDiv.style.color = "#b71c1c"; feedbackDiv.style.display = "block"; }
+                } else {
+                    inputEl.classList.remove('incorrect');
+                    inputEl.classList.add('correct');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
+                }
+                closeVerifyModal();
+                saveProgress();
+            } else {
+                document.getElementById('modal-error-msg').style.display = 'block';
+            }
+        }
+        document.getElementById('teacher-password-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') submitVerify();
+        });
+
+        function checkAnswers(groupClass) {
+            var inputs = document.querySelectorAll('.' + groupClass);
+            for (var i = 0; i < inputs.length; i++) {
+                var inputElement = inputs[i];
+                var feedbackDiv = inputElement.nextElementSibling;
+                var overrideBtn = document.getElementById("override-" + inputElement.id);
+                if (overrideBtn) overrideBtn.classList.remove('hidden');
+
+                if (inputElement.classList.contains('teacher-locked')) {
+                    continue; 
+                }
+
+                var studentAnswer = inputElement.value.toLowerCase().replace(/[^a-z0-9\s\+\-\/\*\=\%]/g, " ").replace(/\s+/g, " ").trim();
+                var rubricStr = inputElement.getAttribute('data-rubric');
+                if(!rubricStr) continue;
+                var rubric;
+                try { rubric = JSON.parse(rubricStr); } catch (error) { continue; }
+                
+                var keywordGroups = rubric.keywords; 
+                inputElement.classList.remove('correct', 'incorrect');
+                if (studentAnswer === "") { if(feedbackDiv) feedbackDiv.style.display = 'none'; continue; }
+                
+                var wordCount = studentAnswer.split(" ").length;
+                if (!keywordGroups || keywordGroups.length === 0) {
+                    inputElement.classList.add('correct');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Answer recorded."; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
+                    continue;
+                }
+                
+                var conceptsFound = 0;
+                for(var k = 0; k < keywordGroups.length; k++) {
+                    var terms = keywordGroups[k];
+                    var matched = false;
+                    for(var s = 0; s < terms.length; s++) {
+                        var term = terms[s].toLowerCase().trim();
+                        if (term.length >= 3) { if (studentAnswer.includes(term)) { matched = true; break; } }
+                        else { var regex = new RegExp("\\b" + term + "\\b"); if (regex.test(studentAnswer)) { matched = true; break; } }
+                    }
+                    if(matched) conceptsFound++;
+                }
+                
+                var score = conceptsFound / keywordGroups.length;
+                var isPassed = false;
+                if (keywordGroups.length > 1) { isPassed = (score === 1); }
+                else { isPassed = (score >= 1 || (wordCount >= 4)); }
+                
+                if(feedbackDiv) {
+                    if (isPassed) {
+                        inputElement.classList.add('correct');
+                        feedbackDiv.innerHTML = "✅ Correct! All required concepts covered.";
+                        feedbackDiv.style.color = "#006100";
+                        feedbackDiv.style.display = "block";
+                    } else if (keywordGroups.length > 1 && score >= 0.5) {
+                        inputElement.classList.add('incorrect');
+                        feedbackDiv.innerHTML = "⚠️ Partial credit (" + conceptsFound + "/" + keywordGroups.length + " concepts). " + rubric.feedback;
+                        feedbackDiv.style.color = "#b27a00";
+                        feedbackDiv.style.display = "block";
+                    } else {
+                        inputElement.classList.add('incorrect');
+                        feedbackDiv.innerHTML = "❌ Not quite. " + rubric.feedback;
+                        feedbackDiv.style.color = "#b71c1c";
+                        feedbackDiv.style.display = "block";
+                    }
+                }
+            }
+            saveProgress();
+        }
+
+        function downloadPDF() {
+            var hide = document.querySelectorAll('.no-print');
+            for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
+            document.getElementById('action-buttons').style.display = 'none';
+
+            var textAreas = document.querySelectorAll('textarea');
+            for (var j = 0; j < textAreas.length; j++) {
+                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
+            }
+
+            var element = document.getElementById('pdf-content');
+            var opt = { 
+                margin: 0.3, 
+                filename: '4.2.2_Audio_Files.pdf', 
+                image: { type: 'jpeg', quality: 0.98 }, 
+                html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, 
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            html2pdf().set(opt).from(element).save().then(function() {
+                for(var b=0; b<hide.length; b++) hide[b].style.display = 'block';
+                document.getElementById('action-buttons').style.display = 'flex';
+                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
+            });
+        }
+    </script>
+</body>
+</html>
