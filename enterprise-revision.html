@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Revision Hub</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- HTML to PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        /* Task Container Styling */
+        .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
+        
+        .task-card { 
+            background: white; 
+            border-radius: 8px; 
+            padding: 25px; 
+            margin-bottom: 30px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            page-break-inside: avoid;
+            transition: all 0.3s ease;
+        }
+        
+        /* Section Header Colors */
+        .task-prep { border-top: 6px solid #607d8b; } 
+        .task-prep h2 { color: #607d8b; margin-top: 0; }
+        
+        .task-plenary { border-top: 6px solid #673ab7; } 
+        .task-plenary h2 { color: #673ab7; margin-top: 0; }
+
+        .task-maroon { border-top: 6px solid #800000; }
+        .task-maroon h2 { color: #800000; margin-top: 0; transition: color 0.3s; }
+        .task-maroon .instruction-box { border-left: 4px solid #800000; transition: border-color 0.3s; }
+
+        .task-amber { border-top: 6px solid #ffb300; }
+        .task-amber h2 { color: #ffb300; margin-top: 0; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
+        .task-amber .instruction-box { border-left: 4px solid #ffb300; }
+
+        .task-green { border-top: 6px solid #008f39; }
+        .task-green h2 { color: #008f39; margin-top: 0; }
+        .task-green .instruction-box { border-left: 4px solid #008f39; }
+
+        .task-navy { border-top: 6px solid #1e3a8a; }
+        .task-navy h2 { color: #1e3a8a; margin-top: 0; transition: color 0.3s; }
+        .task-navy .instruction-box { border-left: 4px solid #1e3a8a; transition: border-color 0.3s; }
+
+        /* TEACHER VERIFICATION STYLES */
+        .teacher-verify-btn { background-color: #607d8b; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background-color 0.2s; display: inline-block; }
+        .teacher-verify-btn:hover { background-color: #455a64; }
+        .teacher-verified { border-top-color: #008f39 !important; background-color: #f0fff0 !important; }
+        .teacher-verified h2 { color: #008f39 !important; }
+        .teacher-verified .instruction-box { border-left-color: #008f39 !important; }
+        .verified-badge { color: #008f39; font-size: 0.8em; margin-left: 10px; display: none; vertical-align: middle; }
+        .teacher-verified .verified-badge { display: inline-block; }
+
+        /* SECURE PASSWORD MODAL STYLES */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 300px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border-top: 5px solid #1e3a8a; }
+        .modal-content h3 { margin-top: 0; color: #333; }
+        .modal-input { width: 100%; padding: 10px; margin: 15px 0; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; box-sizing: border-box; text-align: center; letter-spacing: 2px; }
+        .modal-input:focus { outline: none; border-color: #1e3a8a; }
+        .modal-btn-row { display: flex; gap: 10px; justify-content: center; }
+        .modal-btn-confirm { background-color: #008f39; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; flex-grow: 1; }
+        .modal-btn-cancel { background-color: #d32f2f; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; flex-grow: 1; }
+        .modal-error { color: #d32f2f; font-size: 13px; font-weight: bold; margin-bottom: 10px; display: none; }
+
+        /* Common Elements */
+        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; text-align: center; }
+        
+        /* Inputs & Textareas */
+        .question-row { margin-bottom: 20px; }
+        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
+        .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit; }
+        .auto-input:focus { outline: none; border-color: #666; }
+        textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; }
+        
+        /* Correct & Incorrect Answer Styling */
+        .input-correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
+        .input-incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
+        
+        /* Buttons */
+        .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
+        .btn-submit:hover { background-color: #152960; }
+        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
+        .btn-pdf:hover { background-color: #124d2d; }
+    </style>
+</head>
+<body>
+    <div id="pdf-content">
+        <header>
+            <div class="header-left">
+                <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
+            </div>
+            <div class="header-center"><h1>Enterprise Revision Hub</h1></div>
+            <div class="header-right"><a href="index.html" class="back-btn">&larr; Back to Curriculum</a></div>
+        </header>
+
+        <main class="task-container">
+
+            <!-- A1 & A2: Targeting, Segmenting, 4Ps -->
+            <div class="task-card task-prep">
+                <h2>A1 & A2: Targeting, Segmenting & The 4Ps</h2>
+                
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">My Revision Notes</h3>
+                <div class="question-row">
+                    <textarea class="auto-input" rows="8" placeholder="Summarise your notes on demographics, psychographics, B2B, B2C, product life cycle, and pricing strategies here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Knowledge Check</h3>
+                <div class="question-row">
+                    <label class="question-label">Which market segmentation type focuses on age, gender, and income?</label>
+                    <input type="text" class="auto-input a1-input" data-answers='["demographic", "demographics"]' placeholder="Type answer here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">What pricing strategy involves setting a high price initially before lowering it?</label>
+                    <input type="text" class="auto-input a1-input" data-answers='["skimming", "price skimming"]' placeholder="Type answer here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">What is the stage in the product life cycle immediately following 'Introduction'?</label>
+                    <input type="text" class="auto-input a1-input" data-answers='["growth"]' placeholder="Type answer here...">
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Exam Style Question (2 Marks)</h3>
+                <div class="question-row">
+                    <label class="question-label">Identify the market type (Mass or Niche) for a business selling highly specialized, expensive climbing gear.</label>
+                    <input type="text" class="auto-input a1-input" data-answers='["niche", "niche market"]' placeholder="Type answer here...">
+                </div>
+                
+                <button class="btn-submit no-print" onclick="checkAnswers('a1-input')">Check Answers</button>
+            </div>
+
+            <!-- A3 & A4: Marketing Methods, Trust & Reputation -->
+            <div class="task-card task-maroon">
+                <h2>A3 & A4: Marketing Choice, Trust & Reputation</h2>
+                
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">My Revision Notes</h3>
+                <div class="question-row">
+                    <textarea class="auto-input" rows="8" placeholder="Summarise your notes on factors influencing marketing methods, brand image, customer service, and business ethics here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Knowledge Check</h3>
+                <div class="question-row">
+                    <label class="question-label">What term describes the public's perception of an enterprise's quality and value?</label>
+                    <input type="text" class="auto-input a3-input" data-answers='["brand image", "image"]' placeholder="Type answer here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">Name one way an enterprise can build reputation in its local community.</label>
+                    <input type="text" class="auto-input a3-input" data-answers='["donations", "charity", "prizes", "helping", "sponsorship"]' placeholder="Type answer here...">
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Exam Style Question (1 Mark)</h3>
+                <div class="question-row">
+                    <label class="question-label">State one factor that influences an entrepreneur's choice of marketing methods (other than cost).</label>
+                    <input type="text" class="auto-input a3-input" data-answers='["competitors", "competitors activities", "experience", "appropriateness", "speed", "accessibility"]' placeholder="Type answer here...">
+                </div>
+                
+                <button class="btn-submit no-print" onclick="checkAnswers('a3-input')">Check Answers</button>
+            </div>
+
+            <!-- B1, B2 & B3: Financial Docs, Payments & Revenue/Costs -->
+            <div class="task-card task-amber">
+                <h2>B1, B2 & B3: Docs, Payments & Revenue</h2>
+                
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">My Revision Notes</h3>
+                <div class="question-row">
+                    <textarea class="auto-input" rows="8" placeholder="Summarise your notes on purchase orders, invoices, payment methods, start-up costs vs running costs here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Knowledge Check</h3>
+                <div class="question-row">
+                    <label class="question-label">Which financial document is sent to request goods from a supplier?</label>
+                    <input type="text" class="auto-input b1-input" data-answers='["purchase order", "order"]' placeholder="Type answer here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">What is another term used for Revenue?</label>
+                    <input type="text" class="auto-input b1-input" data-answers='["turnover", "sales"]' placeholder="Type answer here...">
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Exam Style Question (2 Marks)</h3>
+                <div class="question-row">
+                    <label class="question-label">Identify a payment method (other than cash) that allows funds to be taken directly from a customer's bank account.</label>
+                    <input type="text" class="auto-input b1-input" data-answers='["debit card", "direct debit"]' placeholder="Type answer here...">
+                </div>
+                
+                <button class="btn-submit no-print" onclick="checkAnswers('b1-input')">Check Answers</button>
+            </div>
+
+            <!-- B4 & B5: Statements, Profitability & Liquidity -->
+            <div class="task-card task-green">
+                <h2>B4 & B5: Financial Statements & Liquidity</h2>
+                
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">My Revision Notes</h3>
+                <div class="question-row">
+                    <textarea class="auto-input" rows="8" placeholder="Summarise your notes on the Profit and Loss Account, Balance Sheet, Gross/Net profit, and Current Ratios here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Knowledge Check</h3>
+                <div class="question-row">
+                    <label class="question-label">What is Gross Profit divided by Revenue x 100?</label>
+                    <input type="text" class="auto-input b4-input" data-answers='["gross profit margin", "gpm", "gross profit margin percentage"]' placeholder="Type answer here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">What ratio is calculated by Current Assets divided by Current Liabilities?</label>
+                    <input type="text" class="auto-input b4-input" data-answers='["current ratio"]' placeholder="Type answer here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">On a balance sheet, what is the term for customers who owe the business money?</label>
+                    <input type="text" class="auto-input b4-input" data-answers='["debtors", "accounts receivable"]' placeholder="Type answer here...">
+                </div>
+                
+                <button class="btn-submit no-print" onclick="checkAnswers('b4-input')">Check Answers</button>
+            </div>
+
+            <!-- C1, C2 & C3: Budgeting & Cash Flow Problems -->
+            <div class="task-card task-navy">
+                <h2>C1, C2 & C3: Budgeting & Cash Flow</h2>
+                
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">My Revision Notes</h3>
+                <div class="question-row">
+                    <textarea class="auto-input" rows="8" placeholder="Summarise your notes on variances, cash flow forecasting, net cash flow, opening/closing balances, and fixing cash deficits here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Knowledge Check</h3>
+                <div class="question-row">
+                    <label class="question-label">What is the term used when actual spending is worse than the budgeted amount?</label>
+                    <input type="text" class="auto-input c1-input" data-answers='["adverse variance", "adverse"]' placeholder="Type answer here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">What is calculated by taking Total Inflows minus Total Outflows?</label>
+                    <input type="text" class="auto-input c1-input" data-answers='["net cash flow", "net inflow", "net outflow"]' placeholder="Type answer here...">
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Exam Style Question (2 Marks)</h3>
+                <div class="question-row">
+                    <label class="question-label">State one method to improve a cash flow deficit by reducing money going out (outflows).</label>
+                    <input type="text" class="auto-input c1-input" data-answers='["delaying payment to suppliers", "cutting costs", "delaying expansion", "cutting back expansion"]' placeholder="Type answer here...">
+                </div>
+                
+                <button class="btn-submit no-print" onclick="checkAnswers('c1-input')">Check Answers</button>
+            </div>
+
+            <!-- C4 & C5: Break-Even & Sources of Finance -->
+            <div class="task-card task-plenary">
+                <h2>C4 & C5: Break-Even & Business Finance</h2>
+                
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">My Revision Notes</h3>
+                <div class="question-row">
+                    <textarea class="auto-input" rows="8" placeholder="Summarise your notes on fixed/variable costs, margin of safety, and internal vs external sources of finance here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Knowledge Check</h3>
+                <div class="question-row">
+                    <label class="question-label">What type of costs do not change depending on output (e.g., rent)?</label>
+                    <input type="text" class="auto-input c4-input" data-answers='["fixed costs", "fixed"]' placeholder="Type answer here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">Is 'Retained Profits' an internal or external source of finance?</label>
+                    <input type="text" class="auto-input c4-input" data-answers='["internal", "internal source"]' placeholder="Type answer here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">Which source of finance involves raising small amounts of money from a large number of people online?</label>
+                    <input type="text" class="auto-input c4-input" data-answers='["crowdfunding"]' placeholder="Type answer here...">
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Exam Style Question (3 Marks)</h3>
+                <div class="question-row">
+                    <label class="question-label">What calculation determines the 'Margin of Safety'?</label>
+                    <input type="text" class="auto-input c4-input" data-answers='["actual sales minus break even point", "actual sales - break even point", "expected sales minus break even point"]' placeholder="Type answer here...">
+                </div>
+                
+                <button class="btn-submit no-print" onclick="checkAnswers('c4-input')">Check Answers</button>
+            </div>
+
+        </main>
+    </div> <!-- END PDF CONTENT WRAPPER -->
+
+    <!-- UNIVERSAL PDF DOWNLOAD BUTTON -->
+    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
+        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
+        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+    </div>
+    
+    <footer>
+        &copy; 2026 Delta Serlby Park - Enterprise Department
+    </footer>
+
+    <script>
+        /* --- AUTO-SAVE MEMORY LOGIC --- */
+        function saveProgress() {
+            var inputs = document.querySelectorAll('.auto-input');
+            var dataToSave = {};
+            
+            for (var i = 0; i < inputs.length; i++) {
+                dataToSave['input_' + i] = inputs[i].value;
+            }
+            
+            try {
+                localStorage.setItem('enterpriseRevisionMemory', JSON.stringify(dataToSave));
+            } catch (e) {
+                console.error("Storage limit reached", e);
+            }
+        }
+
+        function loadProgress() {
+            var savedDataStr = localStorage.getItem('enterpriseRevisionMemory');
+            if (savedDataStr) {
+                var data = JSON.parse(savedDataStr);
+                var inputs = document.querySelectorAll('.auto-input');
+                
+                for (var i = 0; i < inputs.length; i++) {
+                    if (data['input_' + i]) {
+                        inputs[i].value = data['input_' + i];
+                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                            inputs[i].style.height = 'auto';
+                            inputs[i].style.height = inputs[i].scrollHeight + 'px';
+                        }
+                    }
+                }
+                
+                // Check all answer groups on load
+                checkAnswers('a1-input');
+                checkAnswers('a3-input');
+                checkAnswers('b1-input');
+                checkAnswers('b4-input');
+                checkAnswers('c1-input');
+                checkAnswers('c4-input');
+            }
+        }
+
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                saveProgress();
+                if (e.target.tagName.toLowerCase() === 'textarea') {
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                }
+            }
+        });
+
+        function clearData() {
+            if (confirm("Are you sure you want to clear all your work on this page?")) {
+                localStorage.removeItem('enterpriseRevisionMemory');
+                window.location.reload();
+            }
+        }
+
+        window.onload = loadProgress;
+
+        /* --- BATCH-MARKING TEXT INPUT LOGIC --- */
+        function checkAnswers(groupClass) {
+            var inputs = document.getElementsByClassName(groupClass);
+            for (var i = 0; i < inputs.length; i++) {
+                var inputElement = inputs[i];
+                var studentAnswer = inputElement.value.toLowerCase().trim();
+                var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers') || '[]');
+                var isCorrect = false;
+                
+                for (var j = 0; j < acceptedAnswers.length; j++) {
+                    if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
+                        isCorrect = true; break;
+                    }
+                }
+                
+                inputElement.classList.remove('input-correct', 'input-incorrect');
+                if (studentAnswer !== "") {
+                    if (isCorrect) inputElement.classList.add('input-correct');
+                    else inputElement.classList.add('input-incorrect');
+                }
+            }
+        }
+
+        /* --- BULLETPROOF PDF GENERATION LOGIC --- */
+        function downloadPDF() {
+            var buttonsToHide = document.querySelectorAll('.no-print');
+            for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'none';
+            document.getElementById('action-buttons').style.display = 'none';
+
+            var textInputs = document.querySelectorAll('input[type="text"]');
+            for (var i = 0; i < textInputs.length; i++) {
+                textInputs[i].setAttribute('value', textInputs[i].value);
+            }
+
+            var textAreas = document.querySelectorAll('textarea');
+            for (var j = 0; j < textAreas.length; j++) {
+                textAreas[j].innerHTML = textAreas[j].value;
+                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
+            }
+
+            var element = document.getElementById('pdf-content');
+
+            var opt = {
+                margin:       0.3,
+                filename:     'Enterprise_Revision_Workbook.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] } 
+            };
+
+            html2pdf().set(opt).from(element).save().then(function() {
+                for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'block';
+                document.getElementById('action-buttons').style.display = 'flex';
+                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
+            });
+        }
+    </script>
+</body>
+</html>
