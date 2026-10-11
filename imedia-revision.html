@@ -3,289 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iMedia Revision Hub</title>
+    <title>Creative iMedia - Revision Hub</title>
+    <link rel="stylesheet" href="style.css">
+
     <style>
-        /* Base Styling */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f8;
-            margin: 0;
-            padding: 0;
-            color: #333;
+        /* Unit Header Styling */
+        .unit-header-container {
+            text-align: center;
+            margin: 50px 0 40px 0;
         }
 
-        /* Header Styling */
-        header {
-            background-color: #1e3a8a;
-            color: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        .header-left img {
-            max-height: 50px;
-        }
-        .header-center h1 {
-            margin: 0;
-            font-size: 24px;
-            letter-spacing: 1px;
-        }
-        .header-right {
-            width: 50px; /* Placeholder to balance flexbox if no back button is needed */
+        .unit-subtitle {
+            color: #800000;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 14px;
+            margin-bottom: 5px;
         }
 
-        /* Main Container */
-        .hub-container {
-            max-width: 1100px;
-            margin: 40px auto;
+        .unit-title {
+            color: #1e3a8a;
+            font-size: 2.5em;
+            margin: 0 0 15px 0;
+        }
+
+        .unit-desc {
+            color: #666;
+            font-size: 1.1em;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        /* Grid Layout */
+        .lesson-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto 60px auto;
             padding: 0 20px;
         }
-        
-        .welcome-box {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            text-align: center;
-            margin-bottom: 40px;
-            border-top: 5px solid #607d8b;
-        }
-        .welcome-box h2 {
-            margin-top: 0;
-            color: #1e3a8a;
-        }
-        .welcome-box p {
-            color: #555;
-            font-size: 16px;
-            margin-bottom: 0;
-        }
 
-        /* Section Styling */
-        .section-block {
-            margin-bottom: 40px;
-        }
-        .section-title {
-            color: #1e3a8a;
-            font-size: 22px;
-            border-bottom: 3px solid #dfaa2b;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        /* Grid & Cards */
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .topic-card {
+        /* Lesson Card Styling */
+        .lesson-card {
             background: white;
             border-radius: 8px;
-            padding: 20px;
-            border-top: 6px solid #1e3a8a;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.08);
-            text-decoration: none;
-            color: #333;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            padding: 30px 25px;
             display: flex;
             flex-direction: column;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            text-align: center;
         }
 
-        .topic-card:hover {
+        .lesson-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
         }
 
-        /* Differentiate colors by section to make it look great */
-        .section-1 .topic-card { border-top-color: #d32f2f; }
-        .section-2 .topic-card { border-top-color: #f57c00; }
-        .section-3 .topic-card { border-top-color: #388e3c; }
-        .section-4 .topic-card { border-top-color: #673ab7; }
+        /* Categorized Card Top Borders */
+        .card-1 { border-top: 6px solid #800000; } /* Maroon for Section 1 */
+        .card-2 { border-top: 6px solid #1e3a8a; } /* Navy for Section 2 */
+        .card-3 { border-top: 6px solid #008f39; } /* Green for Section 3 */
+        .card-4 { border-top: 6px solid #673ab7; } /* Purple for Section 4 */
 
-        .topic-num {
+        .lesson-number {
+            font-size: 0.85em;
             font-weight: bold;
-            color: #607d8b;
-            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             margin-bottom: 10px;
         }
-        
-        .topic-name {
-            font-size: 1.1em;
-            font-weight: bold;
-            line-height: 1.4;
+
+        .card-1 .lesson-number { color: #800000; }
+        .card-2 .lesson-number { color: #1e3a8a; }
+        .card-3 .lesson-number { color: #008f39; }
+        .card-4 .lesson-number { color: #673ab7; }
+
+        .lesson-card h2 {
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 1.3em;
             flex-grow: 1;
         }
 
-        .btn-enter {
-            margin-top: 20px;
-            background: #f8f9fa;
-            border: 1px solid #ccc;
-            padding: 10px;
-            text-align: center;
-            border-radius: 4px;
-            font-weight: bold;
+        /* Action Buttons */
+        .btn-start {
+            background-color: #dfaa2b; /* Delta Gold */
             color: #1e3a8a;
-            transition: background 0.2s, color 0.2s, border-color 0.2s;
-        }
-
-        .topic-card:hover .btn-enter {
-            background: #1e3a8a;
-            color: white;
-            border-color: #1e3a8a;
-        }
-
-        .section-1 .topic-card:hover .btn-enter { background: #d32f2f; border-color: #d32f2f; color: white; }
-        .section-2 .topic-card:hover .btn-enter { background: #f57c00; border-color: #f57c00; color: white; }
-        .section-3 .topic-card:hover .btn-enter { background: #388e3c; border-color: #388e3c; color: white; }
-        .section-4 .topic-card:hover .btn-enter { background: #673ab7; border-color: #673ab7; color: white; }
-
-        /* Footer */
-        footer {
+            font-weight: bold;
+            font-size: 15px;
             text-align: center;
-            padding: 20px;
-            color: #666;
-            font-size: 14px;
-            margin-top: 40px;
+            padding: 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            border: none;
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+
+        .btn-start:hover {
+            background-color: #c99722;
+        }
+        
+        footer {
+            text-align: center; 
+            padding: 20px; 
+            color: #666; 
+            font-size: 14px; 
+            margin-top: 40px; 
+            border-top: 1px solid #eee;
         }
     </style>
 </head>
 <body>
-
     <header>
         <div class="header-left">
-            <img src="logo.jpg" alt="Delta Serlby Park Logo"> <!-- Ensure logo.jpg is in the same folder -->
+            <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
         </div>
+        
         <div class="header-center">
-            <h1>Creative iMedia - Revision Hub</h1>
+            <h1>Revision Hub</h1>
         </div>
-        <div class="header-right"></div>
+        
+        <div class="header-right">
+            <a href="index.html" class="back-btn">&larr; Back to Main</a>
+        </div>
     </header>
 
-    <main class="hub-container">
-
-        <div class="welcome-box">
-            <h2>Welcome to iMedia Revision</h2>
-            <p>Select a topic from the modules below to complete your self-marking revision tasks, manage your notes, and export your work for your teacher.</p>
+    <main>
+        <div class="unit-header-container">
+            <div class="unit-subtitle">Complete Course Overview</div>
+            <h1 class="unit-title">Creative iMedia Revision</h1>
+            <p class="unit-desc">Select a topic below to access your digital revision notebook, complete with self-marking knowledge checks and exam-style questions.</p>
         </div>
 
-        <!-- SECTION 1 -->
-        <div class="section-block section-1">
-            <h2 class="section-title">Section 1: The Media Industry</h2>
-            <div class="card-grid">
-                
-                <a href="imedia-1-1.html" class="topic-card">
-                    <div class="topic-num">Topic 1.1</div>
-                    <div class="topic-name">Media industry sectors and products</div>
-                    <div class="btn-enter">Start Revision &rarr;</div>
-                </a>
-
-                <a href="imedia-1-2.html" class="topic-card">
-                    <div class="topic-num">Topic 1.2</div>
-                    <div class="topic-name">Job roles in the media industry</div>
-                    <div class="btn-enter">Start Revision &rarr;</div>
-                </a>
-
+        <div class="lesson-grid">
+            
+            <!-- SECTION 1: The Media Industry -->
+            <div class="lesson-card card-1">
+                <div class="lesson-number">TOPIC 1.1</div>
+                <h2>Media industry sectors and products</h2>
+                <a href="imedia-1-1-revision.html" class="btn-start">Open Revision Page &rarr;</a>
             </div>
-        </div>
 
-        <!-- SECTION 2 -->
-        <div class="section-block section-2">
-            <h2 class="section-title">Section 2: Purpose, Audience and Meaning</h2>
-            <div class="card-grid">
-                
-                <a href="imedia-2-1.html" class="topic-card">
-                    <div class="topic-num">Topic 2.1</div>
-                    <div class="topic-name">How style, content and layout are linked to the purpose</div>
-                    <div class="btn-enter">Start Revision &rarr;</div>
-                </a>
-
-                <a href="imedia-2-2.html" class="topic-card">
-                    <div class="topic-num">Topic 2.2</div>
-                    <div class="topic-name">Client requirements and how they are defined</div>
-                    <div class="btn-enter">Start Revision &rarr;</div>
-                </a>
-
-                <a href="imedia-2-3.html" class="topic-card">
-                    <div class="topic-num">Topic 2.3</div>
-                    <div class="topic-name">Audience demographics and segmentation</div>
-                    <div class="btn-enter">Start Revision &rarr;</div>
-                </a>
-
-                <a href="imedia-2-4.html" class="topic-card">
-                    <div class="topic-num">Topic 2.4</div>
-                    <div class="topic-name">Research methods, sources and types of data</div>
-                    <div class="btn-enter">Start Revision &rarr;</div>
-                </a>
-
-                <a href="imedia-2-5.html" class="topic-card">
-                    <div class="topic-num">Topic 2.5</div>
-                    <div class="topic-name">Media codes used to convey meaning, create impact and engage audiences</div>
-                    <div class="btn-enter">Start Revision &rarr;</div>
-                </a>
-
+            <div class="lesson-card card-1">
+                <div class="lesson-number">TOPIC 1.2</div>
+                <h2>Job roles in the media industry</h2>
+                <a href="imedia-1-2-revision.html" class="btn-start">Open Revision Page &rarr;</a>
             </div>
-        </div>
 
-        <!-- SECTION 3 -->
-        <div class="section-block section-3">
-            <h2 class="section-title">Section 3: Pre-production and Planning</h2>
-            <div class="card-grid">
-                
-                <a href="imedia-3-1.html" class="topic-card">
-                    <div class="topic-num">Topic 3.1</div>
-                    <div class="topic-name">Work planning</div>
-                    <div class="btn-enter">Start Revision &rarr;</div>
-                </a>
-
-                <a href="imedia-3-2.html" class="topic-card">
-                    <div class="topic-num">Topic 3.2</div>
-                    <div class="topic-name">Documents used to support ideas generation</div>
-                    <div class="btn-enter">Start Revision &rarr;</div>
-                </a>
-
-                <a href="imedia-3-3.html" class="topic-card">
-                    <div class="topic-num">Topic 3.3</div>
-                    <div class="topic-name">Documents used to design and plan media products</div>
-                    <div class="btn-enter">Start Revision &rarr;</div>
-                </a>
-
-                <a href="imedia-3-4.html" class="topic-card">
-                    <div class="topic-num">Topic 3.4</div>
-                    <div class="topic-name">The legal issues that affect media</div>
-                    <div class="btn-enter">Start Revision &rarr;</div>
-                </a>
-
+            <!-- SECTION 2: Purpose, Audience and Meaning -->
+            <div class="lesson-card card-2">
+                <div class="lesson-number">TOPIC 2.1</div>
+                <h2>How style, content and layout are linked to the purpose</h2>
+                <a href="imedia-2-1-revision.html" class="btn-start">Open Revision Page &rarr;</a>
             </div>
-        </div>
 
-        <!-- SECTION 4 -->
-        <div class="section-block section-4">
-            <h2 class="section-title">Section 4: Distribution and Properties</h2>
-            <div class="card-grid">
-                
-                <a href="imedia-4-1.html" class="topic-card">
-                    <div class="topic-num">Topic 4.1</div>
-                    <div class="topic-name">Distribution platforms and media to reach audiences</div>
-                    <div class="btn-enter">Start Revision &rarr;</div>
-                </a>
-
-                <a href="imedia-4-2.html" class="topic-card">
-                    <div class="topic-num">Topic 4.2</div>
-                    <div class="topic-name">Properties and formats of media files</div>
-                    <div class="btn-enter">Start Revision &rarr;</div>
-                </a>
-
+            <div class="lesson-card card-2">
+                <div class="lesson-number">TOPIC 2.2</div>
+                <h2>Client requirements and how they are defined</h2>
+                <a href="imedia-2-2-revision.html" class="btn-start">Open Revision Page &rarr;</a>
             </div>
-        </div>
 
+            <div class="lesson-card card-2">
+                <div class="lesson-number">TOPIC 2.3</div>
+                <h2>Audience demographics and segmentation</h2>
+                <a href="imedia-2-3-revision.html" class="btn-start">Open Revision Page &rarr;</a>
+            </div>
+
+            <div class="lesson-card card-2">
+                <div class="lesson-number">TOPIC 2.4</div>
+                <h2>Research methods, sources and types of data</h2>
+                <a href="imedia-2-4-revision.html" class="btn-start">Open Revision Page &rarr;</a>
+            </div>
+
+            <div class="lesson-card card-2">
+                <div class="lesson-number">TOPIC 2.5</div>
+                <h2>Media codes used to convey meaning and create impact</h2>
+                <a href="imedia-2-5-revision.html" class="btn-start">Open Revision Page &rarr;</a>
+            </div>
+
+            <!-- SECTION 3: Pre-production and Planning -->
+            <div class="lesson-card card-3">
+                <div class="lesson-number">TOPIC 3.1</div>
+                <h2>Work planning</h2>
+                <a href="imedia-3-1-revision.html" class="btn-start">Open Revision Page &rarr;</a>
+            </div>
+
+            <div class="lesson-card card-3">
+                <div class="lesson-number">TOPIC 3.2</div>
+                <h2>Documents used to support ideas generation</h2>
+                <a href="imedia-3-2-revision.html" class="btn-start">Open Revision Page &rarr;</a>
+            </div>
+
+            <div class="lesson-card card-3">
+                <div class="lesson-number">TOPIC 3.3</div>
+                <h2>Documents used to design and plan media products</h2>
+                <a href="imedia-3-3-revision.html" class="btn-start">Open Revision Page &rarr;</a>
+            </div>
+
+            <div class="lesson-card card-3">
+                <div class="lesson-number">TOPIC 3.4</div>
+                <h2>The legal issues that affect media</h2>
+                <a href="imedia-3-4-revision.html" class="btn-start">Open Revision Page &rarr;</a>
+            </div>
+
+            <!-- SECTION 4: Distribution and Properties -->
+            <div class="lesson-card card-4">
+                <div class="lesson-number">TOPIC 4.1</div>
+                <h2>Distribution platforms and media to reach audiences</h2>
+                <a href="imedia-4-1-revision.html" class="btn-start">Open Revision Page &rarr;</a>
+            </div>
+
+            <div class="lesson-card card-4">
+                <div class="lesson-number">TOPIC 4.2</div>
+                <h2>Properties and formats of media files</h2>
+                <a href="imedia-4-2-revision.html" class="btn-start">Open Revision Page &rarr;</a>
+            </div>
+
+        </div>
     </main>
-
+    
     <footer>
         &copy; 2026 Delta Serlby Park - Creative iMedia Department
     </footer>
-
 </body>
 </html>
