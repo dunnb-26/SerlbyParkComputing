@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4.2.1: Image Files - Revision</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
+        .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
+        .task-prep { border-top: 6px solid #607d8b; } 
+        .task-navy { border-top: 6px solid #1e3a8a; } 
+        .task-card h2 { margin-top: 0; color: #333; }
+        .task-prep h2 { color: #607d8b; }
+        .task-navy h2 { color: #1e3a8a; }
+        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; }
+        .center-text { text-align: center; }
+        .question-wrapper { margin-bottom: 25px; page-break-inside: avoid !important; break-inside: avoid !important; }
+        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
+        .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit; }
+        .auto-input:focus { outline: none; border-color: #666; }
+        textarea.auto-input { resize: vertical; min-height: 80px; }
+        .correct { border-color: #388e3c !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
+        .incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
+        .feedback-msg { font-size: 14px; margin-top: 8px; font-weight: bold; display: none; }
+        .teacher-override-btn { background-color: #607d8b; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        .teacher-override-btn:hover { background-color: #455a64; }
+        .hidden { display: none !important; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; border-top: 6px solid #1e3a8a; }
+        .modal-input { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; text-align: center; }
+        .modal-btn-row { display: flex; gap: 10px; }
+        .modal-btn-confirm { flex: 1; background-color: #1e3a8a; color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-btn-cancel { flex: 1; background-color: #ccc; color: #333; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
+        .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
+        .btn-submit:hover { background-color: #152960; }
+        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
+        .btn-pdf:hover { background-color: #124d2d; }
+    </style>
+</head>
+<body>
+    <div id="pdf-content">
+        <header>
+            <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
+            <div class="header-center"><h1>4.2.1 Image Files</h1></div>
+            <div class="header-right"><a href="enterprise-revision.html" class="back-btn">&larr; Back to Hub</a></div>
+        </header>
+
+        <main class="task-container">
+            <div class="task-card task-prep">
+                <h2>4.2.1 Revision Notes</h2>
+                <div class="instruction-box center-text">Use this space to write out your complete notes on DPI/PPI, resolution, pixel dimensions, raster and vector images, compression types, and choosing suitable image formats.</div>
+                <div class="question-wrapper">
+                    <textarea class="auto-input" rows="12" placeholder="Type your revision notes here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                </div>
+            </div>
+
+            <div class="task-card task-navy">
+                <h2>Self-Marking Knowledge Check</h2>
+                <div class="instruction-box center-text">Answer the questions below. The smart-marker accepts multiple ways of wording your answers!</div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 1: DPI, PPI and resolution</h3>
+                
+                <div class="question-wrapper">
+                    <label class="question-label">1. What does DPI stand for?</label>
+                    <textarea id="ent421_q1" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["dots per inch", "how many printed dots fit into one inch"]], "feedback": "Acceptable: Dots per inch. It describes how many printed dots fit into one inch."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q1')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">2. What does PPI stand for?</label>
+                    <textarea id="ent421_q2" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["pixels per inch", "how many pixels fit into one inch of an image"]], "feedback": "Acceptable: Pixels per inch. It describes how many pixels fit into one inch of a digital image."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q2')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">3. What is resolution in a digital image?</label>
+                    <textarea id="ent421_q3" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["amount of image detail", "pixel dimensions", "pixel density"]], "feedback": "Acceptable: The amount of image detail, often described using pixel dimensions or pixel density."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent41_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q3')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">4. What is the difference between DPI and PPI?</label>
+                    <textarea id="ent421_q4" class="auto-input ent421-input" rows="3" data-rubric='{"keywords": [["ppi refers to pixels per inch in a digital image"], ["dpi refers to printed dots per inch"]], "feedback": "PPI refers to pixels per inch in digital images; DPI refers to printed dots per inch."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q4')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">5. What does a higher PPI usually mean when printing an image at the same size?</label>
+                    <textarea id="ent421_q5" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["more pixels are packed into each inch", "sharper and more detailed"]], "feedback": "Acceptable: More pixels are packed into each inch, which can make the print look sharper and more detailed."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q5')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">6. What could happen if an image has too few pixels for a large print?</label>
+                    <textarea id="ent421_q6" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["look blurry", "blocky", "pixelated"]], "feedback": "Acceptable: It may look blurry, blocky or pixelated."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q6')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">7. Does increasing the PPI value automatically create more original image detail?</label>
+                    <textarea id="ent421_q7" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["no", "setting alone does not add new detail", "original pixel dimensions matter"]], "feedback": "Acceptable: No. Changing the setting alone does not add new detail. Original pixel dimensions matter too."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q7')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">8. Why might a high quality printed photograph need a higher resolution than a small web thumbnail?</label>
+                    <textarea id="ent421_q8" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["print is often viewed closely and needs more detail", "thumbnail uses fewer pixels"]], "feedback": "Acceptable: A print is viewed closely and needs more detail, while a small thumbnail can use fewer pixels."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q8')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 2: Pixel dimensions and image quality</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">9. What are pixel dimensions?</label>
+                    <textarea id="ent421_q9" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["width and height of an image measured in pixels", "1920 x 1080"]], "feedback": "Acceptable: The width and height of an image measured in pixels (e.g. 1920 × 1080)."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q9')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">10. What is a pixel?</label>
+                    <textarea id="ent421_q10" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["tiny picture element that combines with other pixels to form a digital image"]], "feedback": "Acceptable: A tiny picture element that combines with other pixels to form a digital image."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q10')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">11. What does an image size of 1920 × 1080 pixels mean?</label>
+                    <textarea id="ent421_q11" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["image is 1920 pixels wide and 1080 pixels high"]], "feedback": "Acceptable: The image is 1920 pixels wide and 1080 pixels high."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q11')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">12. How can pixel dimensions affect image quality?</label>
+                    <textarea id="ent421_q12" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["more pixels can capture more detail", "displayed or printed larger without becoming pixelated"]], "feedback": "Acceptable: More pixels capture more detail, allowing images to be displayed or printed larger without pixelation."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q12')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">13. Why might a small image look poor when enlarged?</label>
+                    <textarea id="ent421_q13" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["does not contain enough original pixels to show extra detail", "blurry or blocky"]], "feedback": "Acceptable: It lacks enough original pixels to show extra detail, so it becomes blurry or blocky."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q13')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">14. What pixel dimensions might be suitable for a large digital display?</label>
+                    <textarea id="ent421_q14" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["relatively high resolution", "1920 x 1080 or higher"]], "feedback": "Acceptable: A relatively high resolution, such as 1920 × 1080 or higher, depending on intended use."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q14')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">15. Why might a small image be suitable for a website thumbnail?</label>
+                    <textarea id="ent421_q15" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["loads quickly", "uses less storage or bandwidth", "still clear at small size"]], "feedback": "Acceptable: It loads quickly and uses less storage/bandwidth while remaining clear at a small size."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q15')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">16. A photo is 400 × 300 pixels. What is one limitation if it is printed as a large poster?</label>
+                    <textarea id="ent421_q16" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["may look blurry or pixelated", "limited pixel detail"]], "feedback": "Acceptable: It may look blurry or pixelated because it has limited pixel detail."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q16')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">17. Why should an image creator consider where an image will be used?</label>
+                    <textarea id="ent421_q17" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["different uses need different levels of detail, dimensions and file sizes"]], "feedback": "Acceptable: Different uses need different levels of detail, dimensions and file sizes."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q17')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">18. What is the relationship between pixel dimensions and file size?</label>
+                    <textarea id="ent421_q18" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["more pixels usually mean a larger file", "format and compression also affect"]], "feedback": "Acceptable: More pixels usually mean a larger file, although format, content and compression also affect it."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q18')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 3: Raster, bitmap and vector images</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">19. What is a raster or bitmap image?</label>
+                    <textarea id="ent421_q19" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["image made from a grid of pixels"]], "feedback": "Acceptable: An image made from a grid of pixels."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q19')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">20. Give two examples of raster image file formats.</label>
+                    <textarea id="ent421_q20" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["jpeg", "jpg", "png", "gif", "bmp", "tiff"]], "feedback": "Acceptable: JPEG/JPG, PNG, GIF, BMP or TIFF."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q20')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">21. What is one advantage of raster images?</label>
+                    <textarea id="ent421_q21" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["good for detailed photographs, textures, shading and complex colour changes"]], "feedback": "Acceptable: Good for detailed photographs, textures, shading and complex colour changes."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q21')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">22. What is one limitation of raster images?</label>
+                    <textarea id="ent421_q22" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["enlarging them too much can make them blurry or pixelated"]], "feedback": "Acceptable: Enlarging them too much can make them blurry or pixelated."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q22')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">23. What is a vector image?</label>
+                    <textarea id="ent421_q23" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["made from mathematically defined shapes, lines and curves rather than grid of pixels"]], "feedback": "Acceptable: An image made from mathematically defined shapes, lines and curves rather than a pixel grid."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q23')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">24. Give two examples of vector image file formats.</label>
+                    <textarea id="ent421_q24" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["svg", "ai", "eps", "vector pdf"]], "feedback": "Acceptable: SVG, AI, EPS or vector PDF content."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q24')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">25. What is one advantage of vector images?</label>
+                    <textarea id="ent421_q25" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["can be resized without losing sharpness", "useful for logos and icons"]], "feedback": "Acceptable: They can be resized without losing sharpness, making them useful for logos and icons."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q25')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">26. What is one limitation of vector images?</label>
+                    <textarea id="ent421_q26" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["less suitable for realistic photographs with complex colour and texture"]], "feedback": "Acceptable: They are less suitable for realistic photographs with complex colour and texture."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q26" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q26')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">27. What happens when a raster image is enlarged too much?</label>
+                    <textarea id="ent421_q27" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["individual pixels may become visible", "image looks blocky or blurry"]], "feedback": "Acceptable: Individual pixels may become visible and the image can look blocky or blurry."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q27" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q27')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">28. What happens when a vector image is enlarged?</label>
+                    <textarea id="ent421_q28" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["shapes are recalculated", "edges generally remain sharp"]], "feedback": "Acceptable: Its shapes are recalculated, so edges generally remain sharp."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q28" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q28')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">29. A company needs a logo for both a business card and a huge sign. Which image type is usually best, and why?</label>
+                    <textarea id="ent421_q29" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["vector", "resized to different dimensions without becoming pixelated"]], "feedback": "Acceptable: Vector, because it can be resized to different dimensions without becoming pixelated."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q29" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q29')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">30. A photographer needs to save a realistic photograph. Which image type is usually more suitable, and why?</label>
+                    <textarea id="ent421_q30" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["raster", "can represent detailed photographic colours, shading and textures"]], "feedback": "Acceptable: Raster, because it can represent detailed photographic colours, shading and textures."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q30" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q30')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 4: Uncompressed and compressed image files</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">31. What is an uncompressed image file?</label>
+                    <textarea id="ent421_q31" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["saved without compression", "original image data retained", "file can be large"]], "feedback": "Acceptable: An image saved without compression, so original data is retained but files can be large."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q31" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q31')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">32. Give an example of an image format that can store uncompressed data.</label>
+                    <input type="text" id="ent421_q32" class="auto-input ent421-input" data-rubric='{"keywords": [["bmp", "tiff"]], "feedback": "BMP or TIFF."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q32" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q32')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">33. What is image compression?</label>
+                    <textarea id="ent421_q33" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["reducing the amount of data needed to store an image", "smaller file size"]], "feedback": "Acceptable: Reducing the amount of data needed to store an image, usually to make the file smaller."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q33" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q33')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">34. What is lossy compression?</label>
+                    <textarea id="ent421_q34" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["permanently removes some image information to reduce file size"]], "feedback": "Acceptable: Compression that permanently removes some image information to reduce file size."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q34" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q34')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">35. Give an example of a lossy image format.</label>
+                    <input type="text" id="ent421_q35" class="auto-input ent421-input" data-rubric='{"keywords": [["jpeg", "jpg"]], "feedback": "JPEG/JPG."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q35" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q35')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">36. What is one advantage of lossy compression?</label>
+                    <textarea id="ent421_q36" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["creates much smaller files", "quicker to upload, download or share"]], "feedback": "Acceptable: Creates much smaller files, making images quicker to upload, download or share."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q36" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q36')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">37. What is one disadvantage of lossy compression?</label>
+                    <textarea id="ent421_q37" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["some image quality or detail is permanently lost"]], "feedback": "Acceptable: Some image quality or detail is permanently lost, especially at high compression levels."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q37" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q37')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">38. What is lossless compression?</label>
+                    <textarea id="ent421_q38" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["reduces file size without permanently losing original image information"]], "feedback": "Acceptable: Compression that reduces file size without permanently losing the original image information."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q38" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q38')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">39. Give two examples of formats that commonly use lossless image compression.</label>
+                    <textarea id="ent421_q39" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["png", "gif"]], "feedback": "Acceptable: PNG and GIF."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q39" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q39')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">40. What is one advantage of lossless compression?</label>
+                    <textarea id="ent421_q40" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["original image information can be recovered without quality loss"]], "feedback": "Acceptable: Original image info can be recovered without quality loss from the compression."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q40" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q40')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">41. What is one disadvantage of lossless compression?</label>
+                    <textarea id="ent421_q41" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["file is often larger than an equivalent lossy version"]], "feedback": "Acceptable: The file is often larger than an equivalent lossy version."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q41" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q41')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">42. What is the difference between lossy and lossless compression?</label>
+                    <textarea id="ent421_q42" class="auto-input ent421-input" rows="3" data-rubric='{"keywords": [["lossy permanently removes some data"], ["lossless keeps original image information recoverable"]], "feedback": "Lossy compression permanently removes some data; lossless keeps original information recoverable."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q42" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q42')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">43. Why might a website use compressed images?</label>
+                    <textarea id="ent421_q43" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["smaller files load faster", "use less bandwidth"]], "feedback": "Acceptable: Smaller files can load faster and use less bandwidth."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q43" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q43')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">44. Why might a designer choose an uncompressed image file for some professional work?</label>
+                    <textarea id="ent421_q44" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["preserve image data without compression loss", "need more storage space"]], "feedback": "Acceptable: Preserves image data without loss, although files require more storage space."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q44" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q44')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">45. What might happen if a JPEG image is repeatedly edited and saved at high compression?</label>
+                    <textarea id="ent421_q45" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["image quality can gradually deteriorate", "more detail lost each time recompressed"]], "feedback": "Acceptable: Image quality can gradually deteriorate because more detail may be lost each time it is recompressed."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q45" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q45')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 5: Choosing the right format for the task</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">46. Which format is often suitable for a photograph on a website where a small file size is important?</label>
+                    <input type="text" id="ent421_q46" class="auto-input ent421-input" data-rubric='{"keywords": [["jpeg", "jpg"]], "feedback": "JPEG/JPG."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q46" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q46')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">47. Which format is suitable for a web graphic that needs a transparent background?</label>
+                    <input type="text" id="ent421_q47" class="auto-input ent421-input" data-rubric='{"keywords": [["png"]], "feedback": "PNG."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q47" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q47')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">48. Which format is suitable for a scalable logo on a website?</label>
+                    <input type="text" id="ent421_q48" class="auto-input ent421-input" data-rubric='{"keywords": [["svg"]], "feedback": "SVG."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q48" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q48')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">49. A designer needs a detailed image for printing and wants to avoid lossy compression. What should they consider?</label>
+                    <textarea id="ent421_q49" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["lossless format", "png or tiff", "suitable pixel dimensions and resolution"]], "feedback": "Acceptable: A lossless format like PNG or TIFF, with suitable pixel dimensions and resolution for print size."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q49" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q49')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">50. A student must choose between JPEG and PNG for a graphic containing sharp text, flat colours and transparent areas. Which is usually better, and why?</label>
+                    <textarea id="ent421_q50" class="auto-input ent421-input" rows="2" data-rubric='{"keywords": [["png", "supports transparency and lossless compression", "preserve sharp edges and text"]], "feedback": "Acceptable: PNG, because it supports transparency and lossless compression, preserving sharp text and flat colours."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent421_q50" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent421_q50')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('ent421-input')">Check Answers</button>
+            </div>
+        </main>
+    </div>
+    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
+        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
+        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+    </div>
+
+    <!-- SECURE PASSWORD MODAL -->
+    <div class="modal-overlay" id="verify-modal">
+        <div class="modal-content">
+            <h3>Teacher Verification</h3>
+            <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
+            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter PIN">
+            <div class="modal-btn-row">
+                <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
+                <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
+
+    <script>
+        function saveProgress() {
+            var inputs = document.querySelectorAll('.auto-input');
+            var dataToSave = {};
+            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
+            try { localStorage.setItem('enterprise4_2_1Memory_Smart_v1', JSON.stringify(dataToSave)); } catch (e) {}
+        }
+        function loadProgress() {
+            var saved = localStorage.getItem('enterprise4_2_1Memory_Smart_v1');
+            if (saved) {
+                var data = JSON.parse(saved);
+                var inputs = document.querySelectorAll('.auto-input');
+                for (var i = 0; i < inputs.length; i++) {
+                    if (data['input_' + i]) {
+                        inputs[i].value = data['input_' + i];
+                        if (data['class_' + i]) {
+                            inputs[i].className = data['class_' + i];
+                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
+                                var btnId = "override-" + inputs[i].id;
+                                var btn = document.getElementById(btnId);
+                                if (btn) btn.classList.remove('hidden');
+                            }
+                        }
+                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                            inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
+                        }
+                    }
+                }
+            }
+        }
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                saveProgress();
+                if (e.target.tagName.toLowerCase() === 'textarea') {
+                    e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';
+                }
+            }
+        });
+        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterprise4_2_1Memory_Smart_v1'); window.location.reload(); } }
+        window.onload = loadProgress;
+
+        let activeQuestionId = null;
+        function openVerifyModal(qId) {
+            activeQuestionId = qId;
+            document.getElementById('teacher-password-input').value = '';
+            document.getElementById('modal-error-msg').style.display = 'none';
+            document.getElementById('verify-modal').style.display = 'flex';
+            document.getElementById('teacher-password-input').focus();
+        }
+        function closeVerifyModal() {
+            document.getElementById('verify-modal').style.display = 'none';
+            activeQuestionId = null;
+        }
+        function submitVerify() {
+            var pass = document.getElementById('teacher-password-input').value;
+            if (pass === '2525') {
+                var inputEl = document.getElementById(activeQuestionId);
+                var feedbackDiv = inputEl.nextElementSibling;
+                inputEl.classList.add('teacher-locked');
+                if (inputEl.classList.contains('correct')) {
+                    inputEl.classList.remove('correct');
+                    inputEl.classList.add('incorrect');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; feedbackDiv.style.color = "#b71c1c"; feedbackDiv.style.display = "block"; }
+                } else {
+                    inputEl.classList.remove('incorrect');
+                    inputEl.classList.add('correct');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
+                }
+                closeVerifyModal();
+                saveProgress();
+            } else {
+                document.getElementById('modal-error-msg').style.display = 'block';
+            }
+        }
+        document.getElementById('teacher-password-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') submitVerify();
+        });
+
+        function checkAnswers(groupClass) {
+            var inputs = document.querySelectorAll('.' + groupClass);
+            for (var i = 0; i < inputs.length; i++) {
+                var inputElement = inputs[i];
+                var feedbackDiv = inputElement.nextElementSibling;
+                var overrideBtn = document.getElementById("override-" + inputElement.id);
+                if (overrideBtn) overrideBtn.classList.remove('hidden');
+
+                if (inputElement.classList.contains('teacher-locked')) {
+                    continue; 
+                }
+
+                var studentAnswer = inputElement.value.toLowerCase().replace(/[^a-z0-9\s\+\-\/\*\=\%]/g, " ").replace(/\s+/g, " ").trim();
+                var rubricStr = inputElement.getAttribute('data-rubric');
+                if(!rubricStr) continue;
+                var rubric;
+                try { rubric = JSON.parse(rubricStr); } catch (error) { continue; }
+                
+                var keywordGroups = rubric.keywords; 
+                inputElement.classList.remove('correct', 'incorrect');
+                if (studentAnswer === "") { if(feedbackDiv) feedbackDiv.style.display = 'none'; continue; }
+                
+                var wordCount = studentAnswer.split(" ").length;
+                if (!keywordGroups || keywordGroups.length === 0) {
+                    inputElement.classList.add('correct');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Answer recorded."; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
+                    continue;
+                }
+                
+                var conceptsFound = 0;
+                for(var k = 0; k < keywordGroups.length; k++) {
+                    var terms = keywordGroups[k];
+                    var matched = false;
+                    for(var s = 0; s < terms.length; s++) {
+                        var term = terms[s].toLowerCase().trim();
+                        if (term.length >= 3) { if (studentAnswer.includes(term)) { matched = true; break; } }
+                        else { var regex = new RegExp("\\b" + term + "\\b"); if (regex.test(studentAnswer)) { matched = true; break; } }
+                    }
+                    if(matched) conceptsFound++;
+                }
+                
+                var score = conceptsFound / keywordGroups.length;
+                var isPassed = false;
+                if (keywordGroups.length > 1) { isPassed = (score === 1); }
+                else { isPassed = (score >= 1 || (wordCount >= 4)); }
+                
+                if(feedbackDiv) {
+                    if (isPassed) {
+                        inputElement.classList.add('correct');
+                        feedbackDiv.innerHTML = "✅ Correct! All required concepts covered.";
+                        feedbackDiv.style.color = "#006100";
+                        feedbackDiv.style.display = "block";
+                    } else if (keywordGroups.length > 1 && score >= 0.5) {
+                        inputElement.classList.add('incorrect');
+                        feedbackDiv.innerHTML = "⚠️ Partial credit (" + conceptsFound + "/" + keywordGroups.length + " concepts). " + rubric.feedback;
+                        feedbackDiv.style.color = "#b27a00";
+                        feedbackDiv.style.display = "block";
+                    } else {
+                        inputElement.classList.add('incorrect');
+                        feedbackDiv.innerHTML = "❌ Not quite. " + rubric.feedback;
+                        feedbackDiv.style.color = "#b71c1c";
+                        feedbackDiv.style.display = "block";
+                    }
+                }
+            }
+            saveProgress();
+        }
+
+        function downloadPDF() {
+            var hide = document.querySelectorAll('.no-print');
+            for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
+            document.getElementById('action-buttons').style.display = 'none';
+
+            var textAreas = document.querySelectorAll('textarea');
+            for (var j = 0; j < textAreas.length; j++) {
+                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
+            }
+
+            var element = document.getElementById('pdf-content');
+            var opt = { 
+                margin: 0.3, 
+                filename: '4.2.1_Image_Files.pdf', 
+                image: { type: 'jpeg', quality: 0.98 }, 
+                html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, 
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            html2pdf().set(opt).from(element).save().then(function() {
+                for(var b=0; b<hide.length; b++) hide[b].style.display = 'block';
+                document.getElementById('action-buttons').style.display = 'flex';
+                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
+            });
+        }
+    </script>
+</body>
+</html>
