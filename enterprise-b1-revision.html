@@ -24,7 +24,13 @@
         .input-correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
         .input-partial { border-color: #ffb300 !important; background-color: #fff8e1 !important; color: #b27a00; font-weight: bold; }
         .input-incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
-        .feedback-msg { font-size: 14px; margin-top: 8px; font-weight: bold; display: none; }
+        
+        /* Teacher Override Styling */
+        .input-override { border-color: #0284c7 !important; background-color: #e0f2fe !important; color: #0369a1; font-weight: bold; }
+        
+        .feedback-msg { font-size: 14px; margin-top: 8px; font-weight: bold; display: none; cursor: pointer; }
+        .feedback-msg:hover { opacity: 0.8; }
+
         .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
         .btn-submit:hover { background-color: #152960; }
         .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
@@ -50,7 +56,10 @@
 
             <div class="task-card task-navy">
                 <h2>Self-Marking Knowledge Check</h2>
-                <div class="instruction-box center-text">Answer the questions below. Smart-marker active.</div>
+                <div class="instruction-box center-text">
+                    Answer the questions below. Smart-marker active. <br>
+                    <small><em>💡 Teacher Tip: Double-click any feedback message to override and force-mark an answer as correct!</em></small>
+                </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 1: Types of financial documents</h3>
                 
@@ -404,10 +413,23 @@
             var inputs = document.querySelectorAll('.auto-input');
             var dataToSave = {};
             for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; }
-            try { localStorage.setItem('enterpriseB1Memory_Smart', JSON.stringify(dataToSave)); } catch (e) {}
+            
+            // Also save any teacher overrides
+            var overrides = {};
+            inputs.forEach((inp, idx) => {
+                if (inp.classList.contains('input-override')) overrides['override_' + idx] = true;
+            });
+            
+            try { 
+                localStorage.setItem('enterpriseB1Memory_Smart', JSON.stringify(dataToSave)); 
+                localStorage.setItem('enterpriseB1Overrides', JSON.stringify(overrides));
+            } catch (e) {}
         }
+
         function loadProgress() {
             var saved = localStorage.getItem('enterpriseB1Memory_Smart');
+            var savedOverrides = localStorage.getItem('enterpriseB1Overrides');
+            
             if (saved) {
                 var data = JSON.parse(saved);
                 var inputs = document.querySelectorAll('.auto-input');
@@ -419,9 +441,26 @@
                         }
                     }
                 }
-                checkAnswers('b1-input');
+            }
+
+            if (savedOverrides) {
+                var ovData = JSON.parse(savedOverrides);
+                var inputs = document.querySelectorAll('.auto-input');
+                inputs.forEach((inp, idx) => {
+                    if (ovData['override_' + idx]) {
+                        inp.classList.remove('input-correct', 'input-partial', 'input-incorrect');
+                        inp.classList.add('input-override');
+                        var fb = inp.nextElementSibling;
+                        if (fb) {
+                            fb.innerHTML = "🛡️ Correct! (Teacher Approved Override)";
+                            fb.style.color = "#0369a1";
+                            fb.style.display = "block";
+                        }
+                    }
+                });
             }
         }
+
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('auto-input')) {
                 saveProgress();
@@ -430,37 +469,79 @@
                 }
             }
         });
-        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterpriseB1Memory_Smart'); window.location.reload(); } }
+
+        // TEACHER OVERRIDE EVENT LISTENER (Double-click feedback box to override)
+        document.addEventListener('dblclick', function(e) {
+            if (e.target.classList.contains('feedback-msg')) {
+                var feedbackDiv = e.target;
+                var inputElement = feedbackDiv.previousElementSibling;
+                
+                if (inputElement && inputElement.classList.contains('auto-input')) {
+                    inputElement.classList.remove('input-correct', 'input-partial', 'input-incorrect');
+                    
+                    if (inputElement.classList.contains('input-override')) {
+                        // Toggle off override and re-run check
+                        inputElement.classList.remove('input-override');
+                        feedbackDiv.style.display = 'none';
+                        saveProgress();
+                        alert("Teacher override removed for this question.");
+                    } else {
+                        // Toggle on override
+                        inputElement.classList.add('input-override');
+                        feedbackDiv.innerHTML = "🛡️ Correct! (Teacher Approved Override)";
+                        feedbackDiv.style.color = "#0369a1";
+                        feedbackDiv.style.display = "block";
+                        saveProgress();
+                    }
+                }
+            }
+        });
+
+        function clearData() { 
+            if (confirm("Clear all work and overrides?")) { 
+                localStorage.removeItem('enterpriseB1Memory_Smart'); 
+                localStorage.removeItem('enterpriseB1Overrides');
+                window.location.reload(); 
+            } 
+        }
         window.onload = loadProgress;
 
         function checkAnswers(groupClass) {
             var inputs = document.querySelectorAll('.' + groupClass);
             for (var i = 0; i < inputs.length; i++) {
                 var inputElement = inputs[i];
+                
+                // If it has a teacher override, skip automatic marking and keep it green/blue!
+                if (inputElement.classList.contains('input-override')) continue;
+
                 var studentAnswer = inputElement.value.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
                 var rubricStr = inputElement.getAttribute('data-rubric');
                 var feedbackDiv = inputElement.nextElementSibling;
                 if(!rubricStr) continue;
-var rubric;
-
-try {
-    rubric = JSON.parse(rubricStr);
-} catch (error) {
-    console.error("Invalid rubric for question:", inputElement, error);
-    if (feedbackDiv) {
-        feedbackDiv.textContent = "Marking error: please check this question's rubric.";
-        feedbackDiv.style.display = "block";
-    }
-    continue;
-}                var keywordGroups = rubric.keywords; 
+                
+                var rubric;
+                try {
+                    rubric = JSON.parse(rubricStr);
+                } catch (error) {
+                    console.error("Invalid rubric for question:", inputElement, error);
+                    if (feedbackDiv) {
+                        feedbackDiv.textContent = "Marking error: please check this question's rubric.";
+                        feedbackDiv.style.display = "block";
+                    }
+                    continue;
+                }
+                
+                var keywordGroups = rubric.keywords; 
                 inputElement.classList.remove('input-correct', 'input-partial', 'input-incorrect');
                 if (studentAnswer === "") { if(feedbackDiv) feedbackDiv.style.display = 'none'; continue; }
+                
                 var wordCount = studentAnswer.split(" ").length;
                 if (!keywordGroups || keywordGroups.length === 0) {
                     inputElement.classList.add('input-correct');
                     if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Answer recorded."; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
                     continue;
                 }
+                
                 var conceptsFound = 0;
                 for(var k = 0; k < keywordGroups.length; k++) {
                     var terms = keywordGroups[k];
@@ -472,10 +553,12 @@ try {
                     }
                     if(matched) conceptsFound++;
                 }
+                
                 var score = conceptsFound / keywordGroups.length;
                 var isPassed = false;
                 if (keywordGroups.length > 1) { isPassed = (score === 1); }
                 else { isPassed = (score >= 1 || (wordCount >= 4)); }
+                
                 if(feedbackDiv) {
                     if (isPassed) {
                         inputElement.classList.add('input-correct');
@@ -495,6 +578,7 @@ try {
                 }
             }
         }
+
         function downloadPDF() {
             var hide = document.querySelectorAll('.no-print');
             for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
