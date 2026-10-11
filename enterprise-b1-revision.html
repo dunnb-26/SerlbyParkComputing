@@ -21,16 +21,19 @@
         .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit; }
         .auto-input:focus { outline: none; border-color: #666; }
         textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; }
-        .input-correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
-        .input-partial { border-color: #ffb300 !important; background-color: #fff8e1 !important; color: #b27a00; font-weight: bold; }
-        .input-incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
-        
-        /* Teacher Override Styling */
-        .input-override { border-color: #0284c7 !important; background-color: #e0f2fe !important; color: #0369a1; font-weight: bold; }
-        
-        .feedback-msg { font-size: 14px; margin-top: 8px; font-weight: bold; display: none; cursor: pointer; }
-        .feedback-msg:hover { opacity: 0.8; }
-
+        .correct { border-color: #388e3c !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
+        .incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
+        .feedback-msg { font-size: 14px; margin-top: 8px; font-weight: bold; display: none; }
+        .teacher-override-btn { background-color: #607d8b; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        .teacher-override-btn:hover { background-color: #455a64; }
+        .hidden { display: none !important; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; border-top: 6px solid #1e3a8a; }
+        .modal-input { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; text-align: center; }
+        .modal-btn-row { display: flex; gap: 10px; }
+        .modal-btn-confirm { flex: 1; background-color: #1e3a8a; color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-btn-cancel { flex: 1; background-color: #ccc; color: #333; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
         .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
         .btn-submit:hover { background-color: #152960; }
         .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
@@ -56,346 +59,405 @@
 
             <div class="task-card task-navy">
                 <h2>Self-Marking Knowledge Check</h2>
-                <div class="instruction-box center-text">
-                    Answer the questions below. Smart-marker active. <br>
-                    <small><em>💡 Teacher Tip: Double-click any feedback message to override and force-mark an answer as correct!</em></small>
-                </div>
+                <div class="instruction-box center-text">Answer the questions below. Smart-marker active.</div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 1: Types of financial documents</h3>
                 
                 <div class="question-wrapper">
                     <label class="question-label">1. What is a purchase order?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["document", "sent"], ["buyer", "supplier"], ["requesting", "goods", "services"]], "feedback": "A document sent by a buyer to a supplier requesting goods or services."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q1" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["document", "sent"], ["buyer", "supplier"], ["requesting", "goods", "services"]], "feedback": "A document sent by a buyer to a supplier requesting goods or services."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q1')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">2. What is the purpose of a purchase order?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["formally request", "request"], ["goods", "services"], ["confirm", "ordered"]], "feedback": "To formally request goods or services and confirm what has been ordered."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q2" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["formally request", "request"], ["goods", "services"], ["confirm", "ordered"]], "feedback": "To formally request goods or services and confirm what has been ordered."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q2')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">3. Who usually creates a purchase order?</label>
-                    <input type="text" class="auto-input b1-input" data-rubric='{"keywords": [["buyer", "purchaser"]], "feedback": "The buyer."}' placeholder="Type answer here...">
+                    <input type="text" id="b1_q3" class="auto-input b1-input" data-rubric='{"keywords": [["buyer", "purchaser"]], "feedback": "The buyer."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q3')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">4. What is a delivery note?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["document", "supplied"], ["delivery", "listing"], ["goods delivered"]], "feedback": "A document supplied with a delivery listing the goods delivered."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q4" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["document", "supplied"], ["delivery", "listing"], ["goods delivered"]], "feedback": "A document supplied with a delivery listing the goods delivered."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">5. What is the purpose of a delivery note?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["show", "record"], ["goods", "delivered"]], "feedback": "To show which goods have been delivered."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q5" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["show", "record"], ["goods", "delivered"]], "feedback": "To show which goods have been delivered."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q5')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">6. What is a goods received note (GRN)?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["document", "completed"], ["buyer"], ["record", "goods received"]], "feedback": "A document completed by the buyer to record goods received."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q6" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["document", "completed"], ["buyer"], ["record", "goods received"]], "feedback": "A document completed by the buyer to record goods received."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q6')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">7. What is the purpose of a goods received note?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["confirm"], ["quantity", "condition"], ["goods received"]], "feedback": "To confirm the quantity and condition of goods received."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q7" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["confirm"], ["quantity", "condition"], ["goods received"]], "feedback": "To confirm the quantity and condition of goods received."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q7')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">8. What is an invoice?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["document"], ["requesting payment", "payment"], ["goods", "services supplied"]], "feedback": "A document requesting payment for goods or services supplied."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q8" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["document"], ["requesting payment", "payment"], ["goods", "services supplied"]], "feedback": "A document requesting payment for goods or services supplied."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q8')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">9. What information is usually included on an invoice?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["goods", "services", "quantities"], ["prices", "total", "terms", "date"]], "feedback": "Goods/services supplied, quantities, prices, total amount owed, payment terms and date."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q9" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["goods", "services", "quantities"], ["prices", "total", "terms", "date"]], "feedback": "Goods/services supplied, quantities, prices, total amount owed, payment terms and date."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q9')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">10. What is a credit note?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["document"], ["reduces", "amount owed"], ["customer"]], "feedback": "A document that reduces the amount a customer owes."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q10" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["document"], ["reduces", "amount owed"], ["customer"]], "feedback": "A document that reduces the amount a customer owes."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q10')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">11. When might a business issue a credit note?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["returned", "faulty"], ["overcharged"]], "feedback": "When goods are returned, faulty, or an invoice has been overcharged."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q11" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["returned", "faulty"], ["overcharged"]], "feedback": "When goods are returned, faulty, or an invoice has been overcharged."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q11')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">12. What is a statement of account?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["summary"], ["transactions", "balance owed"], ["customer"]], "feedback": "A summary of transactions and the balance owed by a customer over a period."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q12" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["summary"], ["transactions", "balance owed"], ["customer"]], "feedback": "A summary of transactions and the balance owed by a customer over a period."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q12')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">13. What is the purpose of a statement of account?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["show", "summarise"], ["invoices", "payments", "credit notes"], ["balance"]], "feedback": "To show invoices, payments, credit notes and the outstanding balance."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q13" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["show", "summarise"], ["invoices", "payments", "credit notes"], ["balance"]], "feedback": "To show invoices, payments, credit notes and the outstanding balance."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q13')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">14. What is a remittance advice slip?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["document", "sent"], ["customer"], ["explain", "invoices", "payment"]], "feedback": "A document sent by a customer to explain which invoices a payment relates to."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q14" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["document", "sent"], ["customer"], ["explain", "invoices", "payment"]], "feedback": "A document sent by a customer to explain which invoices a payment relates to."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q14')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">15. What is the purpose of a remittance advice slip?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["help", "supplier"], ["match payment", "correct invoice"]], "feedback": "To help the supplier match a payment to the correct invoice or invoices."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q15" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["help", "supplier"], ["match payment", "correct invoice"]], "feedback": "To help the supplier match a payment to the correct invoice or invoices."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q15')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">16. What is a receipt?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["document"], ["confirming", "payment made"]], "feedback": "A document confirming that payment has been made."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q16" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["document"], ["confirming", "payment made"]], "feedback": "A document confirming that payment has been made."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q16')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">17. What is the purpose of a receipt?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["provide proof", "proof of payment"]], "feedback": "To provide proof of payment."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q17" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["provide proof", "proof of payment"]], "feedback": "To provide proof of payment."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q17')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 2: Sequence of financial documents</h3>
                 <div class="question-wrapper">
                     <label class="question-label">18. Which document is usually created first when ordering goods from a supplier?</label>
-                    <input type="text" class="auto-input b1-input" data-rubric='{"keywords": [["purchase order"]], "feedback": "Purchase order."}' placeholder="Type answer here...">
+                    <input type="text" id="b1_q18" class="auto-input b1-input" data-rubric='{"keywords": [["purchase order"]], "feedback": "Purchase order."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q18')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">19. Which document usually accompanies goods when they are delivered?</label>
-                    <input type="text" class="auto-input b1-input" data-rubric='{"keywords": [["delivery note"]], "feedback": "Delivery note."}' placeholder="Type answer here...">
+                    <input type="text" id="b1_q19" class="auto-input b1-input" data-rubric='{"keywords": [["delivery note"]], "feedback": "Delivery note."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q19')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">20. Which document records the goods that a business has received?</label>
-                    <input type="text" class="auto-input b1-input" data-rubric='{"keywords": [["goods received note", "grn"]], "feedback": "Goods received note (GRN)."}' placeholder="Type answer here...">
+                    <input type="text" id="b1_q20" class="auto-input b1-input" data-rubric='{"keywords": [["goods received note", "grn"]], "feedback": "Goods received note (GRN)."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q20')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">21. Which document requests payment from the buyer?</label>
-                    <input type="text" class="auto-input b1-input" data-rubric='{"keywords": [["invoice"]], "feedback": "Invoice."}' placeholder="Type answer here...">
+                    <input type="text" id="b1_q21" class="auto-input b1-input" data-rubric='{"keywords": [["invoice"]], "feedback": "Invoice."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q21')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">22. Which document may be issued if goods are returned to the supplier?</label>
-                    <input type="text" class="auto-input b1-input" data-rubric='{"keywords": [["credit note"]], "feedback": "Credit note."}' placeholder="Type answer here...">
+                    <input type="text" id="b1_q22" class="auto-input b1-input" data-rubric='{"keywords": [["credit note"]], "feedback": "Credit note."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q22')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">23. Which document summarises transactions and outstanding balance on a customer's account?</label>
-                    <input type="text" class="auto-input b1-input" data-rubric='{"keywords": [["statement of account"]], "feedback": "Statement of account."}' placeholder="Type answer here...">
+                    <input type="text" id="b1_q23" class="auto-input b1-input" data-rubric='{"keywords": [["statement of account"]], "feedback": "Statement of account."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q23')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">24. Which document tells a supplier which invoices a payment covers?</label>
-                    <input type="text" class="auto-input b1-input" data-rubric='{"keywords": [["remittance advice"]], "feedback": "Remittance advice slip."}' placeholder="Type answer here...">
+                    <input type="text" id="b1_q24" class="auto-input b1-input" data-rubric='{"keywords": [["remittance advice"]], "feedback": "Remittance advice slip."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q24')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">25. Which document confirms that payment has been made?</label>
-                    <input type="text" class="auto-input b1-input" data-rubric='{"keywords": [["receipt"]], "feedback": "Receipt."}' placeholder="Type answer here...">
+                    <input type="text" id="b1_q25" class="auto-input b1-input" data-rubric='{"keywords": [["receipt"]], "feedback": "Receipt."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q25')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">26. Put these documents into a typical order: invoice, purchase order, delivery note.</label>
-                    <input type="text" class="auto-input b1-input" data-rubric='{"keywords": [["purchase order"], ["delivery note"], ["invoice"]], "feedback": "Purchase order, delivery note, invoice."}' placeholder="Type answer here...">
+                    <input type="text" id="b1_q26" class="auto-input b1-input" data-rubric='{"keywords": [["purchase order"], ["delivery note"], ["invoice"]], "feedback": "Purchase order, delivery note, invoice."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q26" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q26')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">27. Put these documents into a typical order: receipt, invoice, purchase order, delivery note.</label>
-                    <input type="text" class="auto-input b1-input" data-rubric='{"keywords": [["purchase order"], ["delivery note"], ["invoice"], ["receipt"]], "feedback": "Purchase order, delivery note, invoice, receipt."}' placeholder="Type answer here...">
+                    <input type="text" id="b1_q27" class="auto-input b1-input" data-rubric='{"keywords": [["purchase order"], ["delivery note"], ["invoice"], ["receipt"]], "feedback": "Purchase order, delivery note, invoice, receipt."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q27" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q27')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">28. Why might a goods received note be completed before an invoice is approved for payment?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["check", "confirm"], ["quantity", "condition"], ["received"]], "feedback": "To check that goods ordered have been received in the correct quantity and condition."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q28" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["check", "confirm"], ["quantity", "condition"], ["received"]], "feedback": "To check that goods ordered have been received in the correct quantity and condition."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q28" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q28')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 3: Importance of accuracy</h3>
                 <div class="question-wrapper">
                     <label class="question-label">29. What is meant by accuracy in financial documents?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["correct", "complete"], ["free from errors", "no errors"]], "feedback": "Information that is correct, complete and free from errors."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q29" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["correct", "complete"], ["free from errors", "no errors"]], "feedback": "Information that is correct, complete and free from errors."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q29" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q29')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">30. Give two examples of errors that could occur on an invoice.</label>
-                    <input type="text" class="auto-input b1-input" data-rubric='{"keywords": [["price"], ["quantity"]], "feedback": "Incorrect price, incorrect quantity."}' placeholder="Type answer here...">
+                    <input type="text" id="b1_q30" class="auto-input b1-input" data-rubric='{"keywords": [["price"], ["quantity"]], "feedback": "Incorrect price, incorrect quantity."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q30" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q30')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">31. Why is it important to check the quantities on a delivery note?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["identify"], ["missing", "incorrect goods"]], "feedback": "To identify missing or incorrect goods."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q31" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["identify"], ["missing", "incorrect goods"]], "feedback": "To identify missing or incorrect goods."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q31" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q31')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">32. Why should a purchase order be accurate?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["ensure"], ["correct goods", "quantities", "prices"]], "feedback": "To ensure correct goods, quantities and prices are ordered."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q32" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["ensure"], ["correct goods", "quantities", "prices"]], "feedback": "To ensure correct goods, quantities and prices are ordered."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q32" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q32')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">33. What could happen if an invoice contains an incorrect price?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["overcharged", "undercharged"]], "feedback": "The customer could be overcharged or undercharged."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q33" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["overcharged", "undercharged"]], "feedback": "The customer could be overcharged or undercharged."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q33" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q33')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">34. Why is it important to check an invoice against a purchase order and delivery note?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["confirm", "check"], ["match"], ["order", "delivery"]], "feedback": "To confirm that goods, quantities and prices match the order and delivery."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q34" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["confirm", "check"], ["match"], ["order", "delivery"]], "feedback": "To confirm that goods, quantities and prices match the order and delivery."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q34" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q34')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">35. What could happen if a credit note is recorded incorrectly?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["customer account", "balance"], ["incorrect", "wrong"]], "feedback": "The customer's account balance could be incorrect."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q35" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["customer account", "balance"], ["incorrect", "wrong"]], "feedback": "The customer's account balance could be incorrect."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q35" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q35')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">36. Why must receipts contain accurate payment information?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["proof of payment", "proof"], ["support", "financial records"]], "feedback": "To provide reliable proof of payment and support financial records."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q36" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["proof of payment", "proof"], ["support", "financial records"]], "feedback": "To provide reliable proof of payment and support financial records."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q36" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q36')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">37. How could inaccurate financial documents damage a business's relationship with suppliers?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["disputes"], ["reduce trust", "trust"]], "feedback": "Incorrect payments or orders could cause disputes and reduce trust."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q37" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["disputes"], ["reduce trust", "trust"]], "feedback": "Incorrect payments or orders could cause disputes and reduce trust."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q37" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q37')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">38. Why should businesses check financial documents before making payments?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["prevent"], ["overpayments", "duplicate", "fraudulent"]], "feedback": "To prevent overpayments, duplicate payments and fraudulent payments."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q38" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["prevent"], ["overpayments", "duplicate", "fraudulent"]], "feedback": "To prevent overpayments, duplicate payments and fraudulent payments."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q38" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q38')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 4: Accounting and record keeping</h3>
                 <div class="question-wrapper">
                     <label class="question-label">39. What is meant by record keeping?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["storing", "maintaining"], ["business records"]], "feedback": "The process of storing and maintaining business records."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q39" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["storing", "maintaining"], ["business records"]], "feedback": "The process of storing and maintaining business records."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q39" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q39')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">40. Why are financial documents important for business accounting?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["evidence", "transactions"], ["financial records"]], "feedback": "They provide evidence of transactions and support accurate financial records."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q40" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["evidence", "transactions"], ["financial records"]], "feedback": "They provide evidence of transactions and support accurate financial records."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q40" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q40')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">41. How can accurate financial records help a business calculate its profit?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["reliable"], ["income", "expense", "figures"]], "feedback": "They provide reliable income and expense figures."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q41" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["reliable"], ["income", "expense", "figures"]], "feedback": "They provide reliable income and expense figures."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q41" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q41')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">42. Why should a business keep copies of invoices and receipts?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["evidence"], ["transactions", "payments"]], "feedback": "As evidence of transactions and payments."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q42" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["evidence"], ["transactions", "payments"]], "feedback": "As evidence of transactions and payments."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q42" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q42')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">43. How can accurate record keeping help a business manage its cash flow?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["tracking", "track"], ["money owed", "received", "due"]], "feedback": "By tracking money owed, money received and payments due."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q43" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["tracking", "track"], ["money owed", "received", "due"]], "feedback": "By tracking money owed, money received and payments due."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q43" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q43')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">44. Why might a business use financial documents to resolve a dispute with a supplier?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["evidence"], ["ordered", "delivered", "charged"]], "feedback": "They provide evidence of what was ordered, delivered and charged."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q44" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["evidence"], ["ordered", "delivered", "charged"]], "feedback": "They provide evidence of what was ordered, delivered and charged."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q44" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q44')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">45. How can poor record keeping affect a business?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["incorrect accounts", "missed payments"], ["difficulty", "tracking debts"]], "feedback": "Incorrect accounts, missed payments, difficulty tracking debts and unreliable information."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q45" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["incorrect accounts", "missed payments"], ["difficulty", "tracking debts"]], "feedback": "Incorrect accounts, missed payments, difficulty tracking debts and unreliable information."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q45" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q45')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">46. Why is it important to keep financial records organised?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["find information", "quickly"], ["check transactions", "accounts"]], "feedback": "To find information quickly, check transactions and prepare accurate accounts."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q46" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["find information", "quickly"], ["check transactions", "accounts"]], "feedback": "To find information quickly, check transactions and prepare accurate accounts."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q46" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q46')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">47. How can accurate financial records help a business prepare its accounts?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["reliable information"], ["income", "expenditure", "assets", "liabilities"]], "feedback": "They provide reliable information about income, expenditure, assets and liabilities."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q47" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["reliable information"], ["income", "expenditure", "assets", "liabilities"]], "feedback": "They provide reliable information about income, expenditure, assets and liabilities."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q47" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q47')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 5 & 6: Application and Exam Questions</h3>
                 <div class="question-wrapper">
                     <label class="question-label">48. A business orders 50 chairs but only receives 45. Which document should help identify the discrepancy?</label>
-                    <input type="text" class="auto-input b1-input" data-rubric='{"keywords": [["delivery note"]], "feedback": "Delivery note."}' placeholder="Type answer here...">
+                    <input type="text" id="b1_q48" class="auto-input b1-input" data-rubric='{"keywords": [["delivery note"]], "feedback": "Delivery note."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q48" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q48')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">49. A business receives 45 chairs instead of 50. Which document could it complete to record the quantity received?</label>
-                    <input type="text" class="auto-input b1-input" data-rubric='{"keywords": [["goods received note", "grn"]], "feedback": "Goods received note (GRN)."}' placeholder="Type answer here...">
+                    <input type="text" id="b1_q49" class="auto-input b1-input" data-rubric='{"keywords": [["goods received note", "grn"]], "feedback": "Goods received note (GRN)."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q49" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q49')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">50. A supplier sends a document requesting £800 for goods delivered. What is this document called?</label>
-                    <input type="text" class="auto-input b1-input" data-rubric='{"keywords": [["invoice"]], "feedback": "Invoice."}' placeholder="Type answer here...">
+                    <input type="text" id="b1_q50" class="auto-input b1-input" data-rubric='{"keywords": [["invoice"]], "feedback": "Invoice."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q50" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q50')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">51. A customer returns faulty goods worth £100. Which document could the supplier issue to reduce the amount owed?</label>
-                    <input type="text" class="auto-input b1-input" data-rubric='{"keywords": [["credit note"]], "feedback": "Credit note."}' placeholder="Type answer here...">
+                    <input type="text" id="b1_q51" class="auto-input b1-input" data-rubric='{"keywords": [["credit note"]], "feedback": "Credit note."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q51" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q51')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">52. A supplier sends a customer a summary showing three unpaid invoices. What is this document called?</label>
-                    <input type="text" class="auto-input b1-input" data-rubric='{"keywords": [["statement of account"]], "feedback": "Statement of account."}' placeholder="Type answer here...">
+                    <input type="text" id="b1_q52" class="auto-input b1-input" data-rubric='{"keywords": [["statement of account"]], "feedback": "Statement of account."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q52" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q52')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">53. A customer pays two invoices in one bank transfer and tells the supplier which invoices are covered. Which document could they send?</label>
-                    <input type="text" class="auto-input b1-input" data-rubric='{"keywords": [["remittance advice"]], "feedback": "Remittance advice slip."}' placeholder="Type answer here...">
+                    <input type="text" id="b1_q53" class="auto-input b1-input" data-rubric='{"keywords": [["remittance advice"]], "feedback": "Remittance advice slip."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q53" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q53')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">54. A customer pays for goods in a shop and needs proof of payment. Which document should they receive?</label>
-                    <input type="text" class="auto-input b1-input" data-rubric='{"keywords": [["receipt"]], "feedback": "Receipt."}' placeholder="Type answer here...">
+                    <input type="text" id="b1_q54" class="auto-input b1-input" data-rubric='{"keywords": [["receipt"]], "feedback": "Receipt."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q54" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q54')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">55. A business orders 20 computers but accidentally records 200 on its purchase order. Explain one possible consequence.</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["deliver too many", "excess"], ["costs", "storage"]], "feedback": "Supplier may deliver too many computers, causing unnecessary costs and storage problems."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q55" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["deliver too many", "excess"], ["costs", "storage"]], "feedback": "Supplier may deliver too many computers, causing unnecessary costs and storage problems."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q55" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q55')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">56. An invoice shows £500, but the purchase order and delivery note support a total of £450. What should the business do?</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["check discrepancy", "dispute"], ["corrected invoice", "request"]], "feedback": "Check discrepancy with supplier and request a corrected invoice before paying."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q56" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["check discrepancy", "dispute"], ["corrected invoice", "request"]], "feedback": "Check discrepancy with supplier and request a corrected invoice before paying."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q56" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q56')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">57. A business loses its receipts and cannot prove that several bills were paid. Explain one possible consequence.</label>
-                    <textarea class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["struggle to prove", "prove payment"], ["disputes", "accounting records"]], "feedback": "May struggle to prove payment, resolve disputes or maintain accurate accounting records."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q57" class="auto-input b1-input" rows="2" data-rubric='{"keywords": [["struggle to prove", "prove payment"], ["disputes", "accounting records"]], "feedback": "May struggle to prove payment, resolve disputes or maintain accurate accounting records."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q57" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q57')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">58. A supplier receives a payment but cannot identify which invoice it covers. Which document could have helped?</label>
-                    <input type="text" class="auto-input b1-input" data-rubric='{"keywords": [["remittance advice"]], "feedback": "Remittance advice slip."}' placeholder="Type answer here...">
+                    <input type="text" id="b1_q58" class="auto-input b1-input" data-rubric='{"keywords": [["remittance advice"]], "feedback": "Remittance advice slip."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q58" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q58')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">59. Explain two reasons why accuracy is important when completing financial documents. (4 marks)</label>
-                    <textarea class="auto-input b1-input" rows="3" data-rubric='{"keywords": [["prevent incorrect payments", "overpayment"], ["accounting records", "calculate profit"]], "feedback": "Prevent incorrect payments and maintain accurate accounting records to calculate profit."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q59" class="auto-input b1-input" rows="3" data-rubric='{"keywords": [["prevent incorrect payments", "overpayment"], ["accounting records", "calculate profit"]], "feedback": "Prevent incorrect payments and maintain accurate accounting records to calculate profit."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q59" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q59')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">60. Explain how purchase orders, delivery notes and invoices work together when a business buys goods. (6 marks)</label>
-                    <textarea class="auto-input b1-input" rows="4" data-rubric='{"keywords": [["purchase order", "requested"], ["delivery note", "accompanies"], ["invoice", "compare", "prices"]], "feedback": "PO orders goods, delivery note checks delivery, invoice compares quantities and prices before payment."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q60" class="auto-input b1-input" rows="4" data-rubric='{"keywords": [["purchase order", "requested"], ["delivery note", "accompanies"], ["invoice", "compare", "prices"]], "feedback": "PO orders goods, delivery note checks delivery, invoice compares quantities and prices before payment."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q60" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q60')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">61. Explain two benefits of accurate financial record keeping to an enterprise. (4 marks)</label>
-                    <textarea class="auto-input b1-input" rows="3" data-rubric='{"keywords": [["cash flow management", "track outstanding"], ["financial accounts", "calculate profit"]], "feedback": "Better cash flow management and accurate financial accounts to calculate profit."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q61" class="auto-input b1-input" rows="3" data-rubric='{"keywords": [["cash flow management", "track outstanding"], ["financial accounts", "calculate profit"]], "feedback": "Better cash flow management and accurate financial accounts to calculate profit."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q61" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q61')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">62. A business receives an invoice for goods never delivered. Explain how financial documents could help avoid incorrect payment. (6 marks)</label>
-                    <textarea class="auto-input b1-input" rows="4" data-rubric='{"keywords": [["compare", "purchase order", "delivery note"], ["evidence", "dispute", "cash flow"]], "feedback": "Compare invoice with PO and delivery note, providing evidence to dispute and protect cash flow."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b1_q62" class="auto-input b1-input" rows="4" data-rubric='{"keywords": [["compare", "purchase order", "delivery note"], ["evidence", "dispute", "cash flow"]], "feedback": "Compare invoice with PO and delivery note, providing evidence to dispute and protect cash flow."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b1_q62" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b1_q62')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <button class="btn-submit no-print" onclick="checkAnswers('b1-input')">Check Answers</button>
@@ -406,61 +468,52 @@
         <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
         <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
     </div>
+
+    <!-- SECURE PASSWORD MODAL -->
+    <div class="modal-overlay" id="verify-modal">
+        <div class="modal-content">
+            <h3>Teacher Verification</h3>
+            <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
+            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter PIN">
+            <div class="modal-btn-row">
+                <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
+                <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
+            </div>
+        </div>
+    </div>
+
     <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
 
     <script>
         function saveProgress() {
             var inputs = document.querySelectorAll('.auto-input');
             var dataToSave = {};
-            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; }
-            
-            // Also save any teacher overrides
-            var overrides = {};
-            inputs.forEach((inp, idx) => {
-                if (inp.classList.contains('input-override')) overrides['override_' + idx] = true;
-            });
-            
-            try { 
-                localStorage.setItem('enterpriseB1Memory_Smart', JSON.stringify(dataToSave)); 
-                localStorage.setItem('enterpriseB1Overrides', JSON.stringify(overrides));
-            } catch (e) {}
+            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
+            try { localStorage.setItem('enterpriseB1Memory_Smart', JSON.stringify(dataToSave)); } catch (e) {}
         }
-
         function loadProgress() {
             var saved = localStorage.getItem('enterpriseB1Memory_Smart');
-            var savedOverrides = localStorage.getItem('enterpriseB1Overrides');
-            
             if (saved) {
                 var data = JSON.parse(saved);
                 var inputs = document.querySelectorAll('.auto-input');
                 for (var i = 0; i < inputs.length; i++) {
                     if (data['input_' + i]) {
                         inputs[i].value = data['input_' + i];
+                        if (data['class_' + i]) {
+                            inputs[i].className = data['class_' + i];
+                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
+                                var btnId = "override-" + inputs[i].id;
+                                var btn = document.getElementById(btnId);
+                                if (btn) btn.classList.remove('hidden');
+                            }
+                        }
                         if (inputs[i].tagName.toLowerCase() === 'textarea') {
                             inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
                         }
                     }
                 }
             }
-
-            if (savedOverrides) {
-                var ovData = JSON.parse(savedOverrides);
-                var inputs = document.querySelectorAll('.auto-input');
-                inputs.forEach((inp, idx) => {
-                    if (ovData['override_' + idx]) {
-                        inp.classList.remove('input-correct', 'input-partial', 'input-incorrect');
-                        inp.classList.add('input-override');
-                        var fb = inp.nextElementSibling;
-                        if (fb) {
-                            fb.innerHTML = "🛡️ Correct! (Teacher Approved Override)";
-                            fb.style.color = "#0369a1";
-                            fb.style.display = "block";
-                        }
-                    }
-                });
-            }
         }
-
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('auto-input')) {
                 saveProgress();
@@ -469,75 +522,71 @@
                 }
             }
         });
-
-        // TEACHER OVERRIDE EVENT LISTENER (Double-click feedback box to override)
-        document.addEventListener('dblclick', function(e) {
-            if (e.target.classList.contains('feedback-msg')) {
-                var feedbackDiv = e.target;
-                var inputElement = feedbackDiv.previousElementSibling;
-                
-                if (inputElement && inputElement.classList.contains('auto-input')) {
-                    inputElement.classList.remove('input-correct', 'input-partial', 'input-incorrect');
-                    
-                    if (inputElement.classList.contains('input-override')) {
-                        // Toggle off override and re-run check
-                        inputElement.classList.remove('input-override');
-                        feedbackDiv.style.display = 'none';
-                        saveProgress();
-                        alert("Teacher override removed for this question.");
-                    } else {
-                        // Toggle on override
-                        inputElement.classList.add('input-override');
-                        feedbackDiv.innerHTML = "🛡️ Correct! (Teacher Approved Override)";
-                        feedbackDiv.style.color = "#0369a1";
-                        feedbackDiv.style.display = "block";
-                        saveProgress();
-                    }
-                }
-            }
-        });
-
-        function clearData() { 
-            if (confirm("Clear all work and overrides?")) { 
-                localStorage.removeItem('enterpriseB1Memory_Smart'); 
-                localStorage.removeItem('enterpriseB1Overrides');
-                window.location.reload(); 
-            } 
-        }
+        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterpriseB1Memory_Smart'); window.location.reload(); } }
         window.onload = loadProgress;
+
+        let activeQuestionId = null;
+        function openVerifyModal(qId) {
+            activeQuestionId = qId;
+            document.getElementById('teacher-password-input').value = '';
+            document.getElementById('modal-error-msg').style.display = 'none';
+            document.getElementById('verify-modal').style.display = 'flex';
+            document.getElementById('teacher-password-input').focus();
+        }
+        function closeVerifyModal() {
+            document.getElementById('verify-modal').style.display = 'none';
+            activeQuestionId = null;
+        }
+        function submitVerify() {
+            var pass = document.getElementById('teacher-password-input').value;
+            if (pass === '2525') {
+                var inputEl = document.getElementById(activeQuestionId);
+                var feedbackDiv = inputEl.nextElementSibling;
+                inputEl.classList.add('teacher-locked');
+                if (inputEl.classList.contains('correct')) {
+                    inputEl.classList.remove('correct');
+                    inputEl.classList.add('incorrect');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; feedbackDiv.style.color = "#b71c1c"; feedbackDiv.style.display = "block"; }
+                } else {
+                    inputEl.classList.remove('incorrect');
+                    inputEl.classList.add('correct');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
+                }
+                closeVerifyModal();
+                saveProgress();
+            } else {
+                document.getElementById('modal-error-msg').style.display = 'block';
+            }
+        }
+        document.getElementById('teacher-password-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') submitVerify();
+        });
 
         function checkAnswers(groupClass) {
             var inputs = document.querySelectorAll('.' + groupClass);
             for (var i = 0; i < inputs.length; i++) {
                 var inputElement = inputs[i];
-                
-                // If it has a teacher override, skip automatic marking and keep it green/blue!
-                if (inputElement.classList.contains('input-override')) continue;
+                var feedbackDiv = inputElement.nextElementSibling;
+                var overrideBtn = document.getElementById("override-" + inputElement.id);
+                if (overrideBtn) overrideBtn.classList.remove('hidden');
+
+                if (inputElement.classList.contains('teacher-locked')) {
+                    continue; 
+                }
 
                 var studentAnswer = inputElement.value.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
                 var rubricStr = inputElement.getAttribute('data-rubric');
-                var feedbackDiv = inputElement.nextElementSibling;
                 if(!rubricStr) continue;
-                
                 var rubric;
-                try {
-                    rubric = JSON.parse(rubricStr);
-                } catch (error) {
-                    console.error("Invalid rubric for question:", inputElement, error);
-                    if (feedbackDiv) {
-                        feedbackDiv.textContent = "Marking error: please check this question's rubric.";
-                        feedbackDiv.style.display = "block";
-                    }
-                    continue;
-                }
+                try { rubric = JSON.parse(rubricStr); } catch (error) { continue; }
                 
                 var keywordGroups = rubric.keywords; 
-                inputElement.classList.remove('input-correct', 'input-partial', 'input-incorrect');
+                inputElement.classList.remove('correct', 'incorrect');
                 if (studentAnswer === "") { if(feedbackDiv) feedbackDiv.style.display = 'none'; continue; }
                 
                 var wordCount = studentAnswer.split(" ").length;
                 if (!keywordGroups || keywordGroups.length === 0) {
-                    inputElement.classList.add('input-correct');
+                    inputElement.classList.add('correct');
                     if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Answer recorded."; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
                     continue;
                 }
@@ -561,22 +610,21 @@
                 
                 if(feedbackDiv) {
                     if (isPassed) {
-                        inputElement.classList.add('input-correct');
+                        inputElement.classList.add('correct');
                         feedbackDiv.innerHTML = "✅ Correct! All required concepts covered.";
                         feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block";
                     } else if (keywordGroups.length > 1 && score >= 0.5) {
-                        inputElement.classList.add('input-partial');
+                        inputElement.classList.add('incorrect');
                         feedbackDiv.innerHTML = "⚠️ Partial credit (" + conceptsFound + "/" + keywordGroups.length + " concepts). " + rubric.feedback;
-                        feedbackDiv.style.color = "#b27a00";
-                        feedbackDiv.style.display = "block";
+                        feedbackDiv.style.color = "#b27a00"; feedbackDiv.style.display = "block";
                     } else {
-                        inputElement.classList.add('input-incorrect');
+                        inputElement.classList.add('incorrect');
                         feedbackDiv.innerHTML = "❌ Not quite. " + rubric.feedback;
-                        feedbackDiv.style.color = "#b71c1c";
-                        feedbackDiv.style.display = "block";
+                        feedbackDiv.style.color = "#b71c1c"; feedbackDiv.style.display = "block";
                     }
                 }
             }
+            saveProgress();
         }
 
         function downloadPDF() {
