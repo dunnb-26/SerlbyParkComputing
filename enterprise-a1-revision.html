@@ -21,13 +21,19 @@
         .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit; }
         .auto-input:focus { outline: none; border-color: #666; }
         textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; }
-        .input-correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
-        .input-partial { border-color: #ffb300 !important; background-color: #fff8e1 !important; color: #b27a00; font-weight: bold; }
-        .input-incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
-        .input-override { border-color: #0284c7 !important; background-color: #e0f2fe !important; color: #0369a1; font-weight: bold; }
+        .input-correct, .correct { border-color: #388e3c !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
+        .input-incorrect, .incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
         .feedback-msg { font-size: 14px; margin-top: 8px; font-weight: bold; display: none; }
-        .teacher-btn { background: none; border: none; color: #0284c7; font-size: 12px; cursor: pointer; margin-top: 4px; padding: 0; display: none; font-weight: bold; }
-        .teacher-btn:hover { text-decoration: underline; }
+        .teacher-override-btn { background-color: #607d8b; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        .teacher-override-btn:hover { background-color: #455a64; }
+        .hidden { display: none !important; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; border-top: 6px solid #1e3a8a; }
+        .modal-input { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; text-align: center; }
+        .modal-btn-row { display: flex; gap: 10px; }
+        .modal-btn-confirm { flex: 1; background-color: #1e3a8a; color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-btn-cancel { flex: 1; background-color: #ccc; color: #333; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
         .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
         .btn-submit:hover { background-color: #152960; }
         .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
@@ -59,289 +65,289 @@
                 
                 <div class="question-wrapper">
                     <label class="question-label">1. What is a target market?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["market", "group", "customers", "people", "audience"], ["sell", "sales", "selling", "target", "aim", "focus", "reach"]], "feedback": "Mention the specific group or customers an enterprise wants to sell its products to."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q1" class="auto-input a1-input" data-rubric='{"keywords": [["market", "group", "customers", "people", "audience"], ["sell", "sales", "selling", "target", "aim", "focus", "reach"]], "feedback": "Mention the specific group or customers an enterprise wants to sell its products to."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q1')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">2. What is market segmentation?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["dividing", "divide", "divides", "split", "splitting", "breaking", "categorising"], ["characteristics", "similar", "traits", "groups", "features", "types"]], "feedback": "Mention dividing the market into groups with similar characteristics."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q2" class="auto-input a1-input" data-rubric='{"keywords": [["dividing", "divide", "divides", "split", "splitting", "breaking", "categorising"], ["characteristics", "similar", "traits", "groups", "features", "types"]], "feedback": "Mention dividing the market into groups with similar characteristics."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q2')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">3. Why might an enterprise identify a target market?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["focus", "concentrate", "target", "tailor", "direct"], ["buy", "buying", "sales", "likely", "purchasing", "customers"]], "feedback": "Mention focusing products or marketing on customers most likely to buy."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q3" class="auto-input a1-input" data-rubric='{"keywords": [["focus", "concentrate", "target", "tailor", "direct"], ["buy", "buying", "sales", "likely", "purchasing", "customers"]], "feedback": "Mention focusing products or marketing on customers most likely to buy."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q3')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">4. What does demographic segmentation involve?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["age", "gender", "sex", "income", "education", "ethnicity", "religion", "social"]], "feedback": "Give examples of demographics like age, gender, income, or education level."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q4" class="auto-input a1-input" data-rubric='{"keywords": [["age", "gender", "sex", "income", "education", "ethnicity", "religion", "social"]], "feedback": "Give examples of demographics like age, gender, income, or education level."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">5. What does geographic segmentation involve?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["location", "area", "where", "region", "geography", "place", "country", "city"]], "feedback": "Ensure you mention dividing customers according to their location or region."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q5" class="auto-input a1-input" data-rubric='{"keywords": [["location", "area", "where", "region", "geography", "place", "country", "city"]], "feedback": "Ensure you mention dividing customers according to their location or region."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q5')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">6. What does psychographic segmentation involve?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["social", "class", "attitudes", "lifestyle", "personality", "values", "opinions", "interests"]], "feedback": "Mention aspects like social class, attitudes, lifestyle, or personality."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q6" class="auto-input a1-input" data-rubric='{"keywords": [["social", "class", "attitudes", "lifestyle", "personality", "values", "opinions", "interests"]], "feedback": "Mention aspects like social class, attitudes, lifestyle, or personality."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q6')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">7. What does behavioural segmentation involve?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["spending", "habits", "loyalty", "usage", "benefits", "consumption", "purchasing", "behavior"]], "feedback": "Mention habits, usage rate, brand loyalty, or desired benefits."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q7" class="auto-input a1-input" data-rubric='{"keywords": [["spending", "habits", "loyalty", "usage", "benefits", "consumption", "purchasing", "behavior"]], "feedback": "Mention habits, usage rate, brand loyalty, or desired benefits."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q7')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">8. What does B2B stand for?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["business to business"]], "feedback": "It stands for Business to Business."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q8" class="auto-input a1-input" data-rubric='{"keywords": [["business to business"]], "feedback": "It stands for Business to Business."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q8')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">9. What does B2C stand for?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["business to consumer", "business to customer"]], "feedback": "It stands for Business to Consumer."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q9" class="auto-input a1-input" data-rubric='{"keywords": [["business to consumer", "business to customer"]], "feedback": "It stands for Business to Consumer."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q9')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">10. What is a niche market?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["small", "specialised", "specific", "narrow"], ["group", "customers", "market", "segment"]], "feedback": "Explain that it is a small, specialised market aimed at a specific group."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q10" class="auto-input a1-input" data-rubric='{"keywords": [["small", "specialised", "specific", "narrow"], ["group", "customers", "market", "segment"]], "feedback": "Explain that it is a small, specialised market aimed at a specific group."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q10')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">11. What is a mass market?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["large", "wide", "broad", "huge", "general"], ["range", "customers", "audience", "market", "people"]], "feedback": "Explain that it is a large market aimed at a wide range of customers."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q11" class="auto-input a1-input" data-rubric='{"keywords": [["large", "wide", "broad", "huge", "general"], ["range", "customers", "audience", "market", "people"]], "feedback": "Explain that it is a large market aimed at a wide range of customers."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q11')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 2: Identifying Market Segments</h3>
                 <div class="question-wrapper">
                     <label class="question-label">12. A clothing company sells school uniforms specifically for children aged 11 to 16. Which type of segmentation is this?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["demographic"]], "feedback": "It targets customers by age, so it is demographic segmentation."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q12" class="auto-input a1-input" data-rubric='{"keywords": [["demographic"]], "feedback": "It targets customers by age, so it is demographic segmentation."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q12')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">13. A takeaway advertises its delivery service to people living within 5 miles. Which type of segmentation is this?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["geographic"]], "feedback": "It targets customers by location, so it is geographic segmentation."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q13" class="auto-input a1-input" data-rubric='{"keywords": [["geographic"]], "feedback": "It targets customers by location, so it is geographic segmentation."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q13')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">14. A fitness brand targets people who enjoy an active lifestyle. Which type of segmentation is this?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["psychographic"]], "feedback": "It targets customers by lifestyle, so it is psychographic segmentation."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q14" class="auto-input a1-input" data-rubric='{"keywords": [["psychographic"]], "feedback": "It targets customers by lifestyle, so it is psychographic segmentation."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q14')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">15. A supermarket offers discounts to customers who regularly buy its products. Which type of segmentation is this?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["behavioural", "behavioral"]], "feedback": "It targets purchasing habits and loyalty, making it behavioural segmentation."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q15" class="auto-input a1-input" data-rubric='{"keywords": [["behavioural", "behavioral"]], "feedback": "It targets purchasing habits and loyalty, making it behavioural segmentation."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q15')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">16. A car manufacturer targets customers earning over £100,000 per year. Which type of segmentation is this?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["demographic"]], "feedback": "It uses income to filter customers, which falls under demographic segmentation."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q16" class="auto-input a1-input" data-rubric='{"keywords": [["demographic"]], "feedback": "It uses income to filter customers, which falls under demographic segmentation."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q16')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">17. A company sells specifically to customers who prefer environmentally friendly brands. Which type of segmentation is this?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["psychographic"]], "feedback": "It focuses on customer attitudes, so it is psychographic segmentation."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q17" class="auto-input a1-input" data-rubric='{"keywords": [["psychographic"]], "feedback": "It focuses on customer attitudes, so it is psychographic segmentation."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q17')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">18. A coffee shop introduces a rewards card for its most frequent customers. Which type of segmentation is this?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["behavioural", "behavioral"]], "feedback": "It uses customer loyalty and purchase frequency, which is behavioural."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q18" class="auto-input a1-input" data-rubric='{"keywords": [["behavioural", "behavioral"]], "feedback": "It uses customer loyalty and purchase frequency, which is behavioural."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q18')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">19. A business sells winter coats mainly in areas that experience very cold weather. Which type of segmentation is this?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["geographic"]], "feedback": "It considers location and climate, so it is geographic segmentation."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q19" class="auto-input a1-input" data-rubric='{"keywords": [["geographic"]], "feedback": "It considers location and climate, so it is geographic segmentation."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q19')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">20. A company sells gaming equipment designed specifically for professional esports players. What type of market is this?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["niche"]], "feedback": "It targets a small, specialised group of customers, making it a niche market."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q20" class="auto-input a1-input" data-rubric='{"keywords": [["niche"]], "feedback": "It targets a small, specialised group of customers, making it a niche market."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q20')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 3: Understanding Different Markets</h3>
                 <div class="question-wrapper">
                     <label class="question-label">21. Give one example of a B2B transaction.</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["sell", "supplying", "business", "company", "enterprise", "supplier"], ["school", "organization", "another business", "firm"]], "feedback": "Mention one business supplying another organization or business."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q21" class="auto-input a1-input" data-rubric='{"keywords": [["sell", "supplying", "business", "company", "enterprise", "supplier"], ["school", "organization", "another business", "firm"]], "feedback": "Mention one business supplying another organization or business."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q21')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">22. Give one example of a B2C transaction.</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["buy", "purchasing", "customer", "person", "consumer"], ["shop", "store", "business", "retailer"]], "feedback": "Mention an individual customer buying from a business or shop."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q22" class="auto-input a1-input" data-rubric='{"keywords": [["buy", "purchasing", "customer", "person", "consumer"], ["shop", "store", "business", "retailer"]], "feedback": "Mention an individual customer buying from a business or shop."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q22')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">23. What is the main difference between B2B and B2C?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["b2b", "businesses", "firms"], ["b2c", "consumers", "individuals", "people"]], "feedback": "Explain that B2B involves sales between businesses, while B2C is sales to individual consumers."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q23" class="auto-input a1-input" data-rubric='{"keywords": [["b2b", "businesses", "firms"], ["b2c", "consumers", "individuals", "people"]], "feedback": "Explain that B2B involves sales between businesses, while B2C is sales to individual consumers."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q23')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">24. A company manufactures basic white T-shirts for millions of customers. Is this a niche or mass market?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["mass"]], "feedback": "It appeals to a wide range of customers, so it is a mass market."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q24" class="auto-input a1-input" data-rubric='{"keywords": [["mass"]], "feedback": "It appeals to a wide range of customers, so it is a mass market."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q24')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">25. A business sells handmade vegan shoes specifically for customers seeking cruelty-free footwear. Is this niche or mass?</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["niche"]], "feedback": "It targets a specific group with particular preferences, so it is a niche market."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q25" class="auto-input a1-input" data-rubric='{"keywords": [["niche"]], "feedback": "It targets a specific group with particular preferences, so it is a niche market."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q25')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">26. Give one advantage of targeting a niche market.</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["less", "fewer", "lower", "reduce"], ["competition", "competitors", "rivals"]], "feedback": "Mention that there is usually less competition from larger businesses."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q26" class="auto-input a1-input" data-rubric='{"keywords": [["less", "fewer", "lower", "reduce"], ["competition", "competitors", "rivals"]], "feedback": "Mention that there is usually less competition from larger businesses."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q26" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q26')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">27. Give one disadvantage of targeting a niche market.</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["limited", "small", "restrict", "low"], ["customers", "sales", "audience", "market size"]], "feedback": "Mention that potential customers are limited, restricting overall sales."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q27" class="auto-input a1-input" data-rubric='{"keywords": [["limited", "small", "restrict", "low"], ["customers", "sales", "audience", "market size"]], "feedback": "Mention that potential customers are limited, restricting overall sales."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q27" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q27')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">28. Give one advantage of targeting a mass market.</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["large", "high", "more", "lots", "huge"], ["sales", "customers", "revenue", "profit", "money"]], "feedback": "Mention potential to sell to a large number of customers and generate high sales revenue."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q28" class="auto-input a1-input" data-rubric='{"keywords": [["large", "high", "more", "lots", "huge"], ["sales", "customers", "revenue", "profit", "money"]], "feedback": "Mention potential to sell to a large number of customers and generate high sales revenue."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q28" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q28')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">29. Give one disadvantage of targeting a mass market.</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["more", "high", "lots", "intense"], ["competition", "competitors", "rivals"]], "feedback": "Mention that there is much more competition from other businesses."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q29" class="auto-input a1-input" data-rubric='{"keywords": [["more", "high", "lots", "intense"], ["competition", "competitors", "rivals"]], "feedback": "Mention that there is much more competition from other businesses."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q29" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q29')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 4 & 5: Application and Challenge</h3>
                 <div class="question-wrapper">
                     <label class="question-label">30. A business sells expensive watches to wealthy adults aged 35 to 60. Identify two demographic characteristics used.</label>
-                    <input type="text" class="auto-input a1-input" data-rubric='{"keywords": [["age", "adults", "35"], ["income", "wealth", "wealthy", "pay", "money"]], "feedback": "Identify both age and income/wealth."}' placeholder="Type answer here...">
+                    <input type="text" id="a1_q30" class="auto-input a1-input" data-rubric='{"keywords": [["age", "adults", "35"], ["income", "wealth", "wealthy", "pay", "money"]], "feedback": "Identify both age and income/wealth."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q30" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q30')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">31. A gym targets customers who want to improve fitness and enjoy an active lifestyle. Explain why psychographic segmentation is suitable.</label>
-                    <textarea class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["lifestyle", "attitudes", "interests", "active"], ["fitness", "likely", "interested"]], "feedback": "Mention how it targets specific lifestyles or attitudes towards fitness."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a1_q31" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["lifestyle", "attitudes", "interests", "active"], ["fitness", "likely", "interested"]], "feedback": "Mention how it targets specific lifestyles or attitudes towards fitness."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q31" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q31')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">32. A local bakery wants to attract nearby customers. Explain how geographic segmentation could help.</label>
-                    <textarea class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["advertise", "target", "reach", "market"], ["local", "area", "nearby", "location"]], "feedback": "Explain that it helps advertise to people in the local area who are likely to visit."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a1_q32" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["advertise", "target", "reach", "market"], ["local", "area", "nearby", "location"]], "feedback": "Explain that it helps advertise to people in the local area who are likely to visit."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q32" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q32')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">33. A business sells premium dog food for dogs with allergies. Explain why they target a niche market.</label>
-                    <textarea class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["specialised", "specific", "dietary", "needs"], ["premium", "price", "charge", "high price"]], "feedback": "Serves a specialised group with specific needs, allowing higher prices."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a1_q33" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["specialised", "specific", "dietary", "needs"], ["premium", "price", "charge", "high price"]], "feedback": "Serves a specialised group with specific needs, allowing higher prices."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q33" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q33')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">34. A business sells basic cleaning products to UK supermarkets. Identify the market type and justify it.</label>
-                    <textarea class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["b2b", "business to business"], ["businesses", "supermarkets", "organizations"]], "feedback": "Identify it as B2B because it sells to other businesses (supermarkets)."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a1_q34" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["b2b", "business to business"], ["businesses", "supermarkets", "organizations"]], "feedback": "Identify it as B2B because it sells to other businesses (supermarkets)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q34" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q34')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">35. A clothing enterprise wants to sell affordable clothes to as many people as possible. Explain why a mass market suits them.</label>
-                    <textarea class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["wide", "large", "many", "range", "broad"], ["sales", "revenue", "increase", "growth"]], "feedback": "Targets a wide range of customers to increase overall sales revenue."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a1_q35" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["wide", "large", "many", "range", "broad"], ["sales", "revenue", "increase", "growth"]], "feedback": "Targets a wide range of customers to increase overall sales revenue."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q35" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q35')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">36. Explain one reason why market segmentation could help an enterprise increase sales.</label>
-                    <textarea class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["tailor", "adapt", "specific", "needs", "suit"], ["likely", "purchase", "buy", "sales"]], "feedback": "Tailoring products/ads to specific needs makes customers more likely to buy."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a1_q36" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["tailor", "adapt", "specific", "needs", "suit"], ["likely", "purchase", "buy", "sales"]], "feedback": "Tailoring products/ads to specific needs makes customers more likely to buy."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q36" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q36')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">37. A business advertises luxury holidays to high-income customers. Explain how two types of segmentation are used.</label>
-                    <textarea class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["demographic", "income", "wealth"], ["psychographic", "luxury", "attitudes"]], "feedback": "Identify Demographic (income) and Psychographic (luxury attitudes)."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a1_q37" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["demographic", "income", "wealth"], ["psychographic", "luxury", "attitudes"]], "feedback": "Identify Demographic (income) and Psychographic (luxury attitudes)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q37" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q37')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">38. Explain one reason why it is important to understand a target market before launching a product.</label>
-                    <textarea class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["design", "meet", "needs", "wants"], ["wasting", "risk", "sales", "money"]], "feedback": "Designing products that meet needs increases sales and reduces risk of wasting money."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a1_q38" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["design", "meet", "needs", "wants"], ["wasting", "risk", "sales", "money"]], "feedback": "Designing products that meet needs increases sales and reduces risk of wasting money."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q38" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q38')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">39. A business sells budget smartphones to students (16-21) who regularly upgrade. Identify three ways they could segment.</label>
-                    <textarea class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["demographic", "age"], ["behavioural", "behavioral", "upgrading", "frequency"]], "feedback": "Identify Demographic (age) and Behavioural (upgrading frequency)."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a1_q39" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["demographic", "age"], ["behavioural", "behavioral", "upgrading", "frequency"]], "feedback": "Identify Demographic (age) and Behavioural (upgrading frequency)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q39" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q39')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">40. Explain why a business targeting a niche market might face less competition but still struggle to grow.</label>
-                    <textarea class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["specialised", "fewer", "less"], ["limited", "restrict", "small", "potential"]], "feedback": "Serves a specialised group, but total potential customers are limited."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a1_q40" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["specialised", "fewer", "less"], ["limited", "restrict", "small", "potential"]], "feedback": "Serves a specialised group, but total potential customers are limited."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q40" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q40')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">41. A new enterprise has a limited advertising budget. Explain why targeting a specific segment is effective.</label>
-                    <textarea class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["focus", "concentrate", "likely"], ["wasted", "wasting", "reduces", "save"]], "feedback": "Focuses the budget on likely buyers, reducing wasted advertising money."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a1_q41" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["focus", "concentrate", "likely"], ["wasted", "wasting", "reduces", "save"]], "feedback": "Focuses the budget on likely buyers, reducing wasted advertising money."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q41" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q41')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">42. A business sells reusable water bottles. Explain how it could use demographic, geographic, psychographic and behavioural segmentation.</label>
-                    <textarea class="auto-input a1-input" rows="3" data-rubric='{"keywords": [["demographic"], ["geographic"], ["psychographic"], ["behavioural", "behavioral"]], "feedback": "Name all four types with brief context (age, location, environment, habits)."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a1_q42" class="auto-input a1-input" rows="3" data-rubric='{"keywords": [["demographic"], ["geographic"], ["psychographic"], ["behavioural", "behavioral"]], "feedback": "Name all four types with brief context (age, location, environment, habits)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q42" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q42')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">43. Explain the difference between a niche market and a target market.</label>
-                    <textarea class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["target", "sell", "aim", "group"], ["niche", "small", "specialised"]], "feedback": "Target market is who you sell to; a niche is a specific small market segment."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a1_q43" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["target", "sell", "aim", "group"], ["niche", "small", "specialised"]], "feedback": "Target market is who you sell to; a niche is a specific small market segment."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q43" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q43')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">44. A business sells sports equipment to schools and individuals. Explain how it operates in both B2B and B2C markets.</label>
-                    <textarea class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["b2b", "schools", "organisations"], ["b2c", "individual", "consumers", "people"]], "feedback": "Schools are B2B organizations, and individuals are B2C consumers."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a1_q44" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["b2b", "schools", "organisations"], ["b2c", "individual", "consumers", "people"]], "feedback": "Schools are B2B organizations, and individuals are B2C consumers."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q44" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q44')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">45. Explain how effective market segmentation could give an enterprise a competitive advantage.</label>
-                    <textarea class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["understand", "meet", "needs", "effectively", "better"], ["satisfaction", "loyalty", "sales"]], "feedback": "Meeting customer needs better than competitors increases loyalty and sales."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a1_q45" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["understand", "meet", "needs", "effectively", "better"], ["satisfaction", "loyalty", "sales"]], "feedback": "Meeting customer needs better than competitors increases loyalty and sales."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
-                    <button class="no-print teacher-btn" onclick="toggleOverride(this)">🛡️ Override Mark</button>
+                    <div style="text-align: right;"><button id="override-a1_q45" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a1_q45')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <button class="btn-submit no-print" onclick="checkAnswers('a1-input')">Check Answers</button>
@@ -352,61 +358,52 @@
         <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
         <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
     </div>
+
+    <!-- SECURE PASSWORD MODAL -->
+    <div class="modal-overlay" id="verify-modal">
+        <div class="modal-content">
+            <h3>Teacher Verification</h3>
+            <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
+            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter PIN">
+            <div class="modal-btn-row">
+                <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
+                <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
+            </div>
+        </div>
+    </div>
+
     <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
 
     <script>
         function saveProgress() {
             var inputs = document.querySelectorAll('.auto-input');
             var dataToSave = {};
-            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; }
-            var overrides = {};
-            inputs.forEach((inp, idx) => {
-                if (inp.classList.contains('input-override')) overrides['override_' + idx] = true;
-            });
-            try { 
-                localStorage.setItem('enterpriseA1Memory_Smart', JSON.stringify(dataToSave)); 
-                localStorage.setItem('enterpriseA1Overrides', JSON.stringify(overrides));
-            } catch (e) {}
+            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
+            try { localStorage.setItem('enterpriseA1Memory_Smart', JSON.stringify(dataToSave)); } catch (e) {}
         }
-
         function loadProgress() {
             var saved = localStorage.getItem('enterpriseA1Memory_Smart');
-            var savedOverrides = localStorage.getItem('enterpriseA1Overrides');
             if (saved) {
                 var data = JSON.parse(saved);
                 var inputs = document.querySelectorAll('.auto-input');
                 for (var i = 0; i < inputs.length; i++) {
                     if (data['input_' + i]) {
                         inputs[i].value = data['input_' + i];
+                        if (data['class_' + i]) {
+                            inputs[i].className = data['class_' + i];
+                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
+                                var btnId = "override-" + inputs[i].id;
+                                var btn = document.getElementById(btnId);
+                                if (btn) btn.classList.remove('hidden');
+                            }
+                        }
                         if (inputs[i].tagName.toLowerCase() === 'textarea') {
                             inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
                         }
                     }
                 }
             }
-            if (savedOverrides) {
-                var ovData = JSON.parse(savedOverrides);
-                var inputs = document.querySelectorAll('.auto-input');
-                inputs.forEach((inp, idx) => {
-                    if (ovData['override_' + idx]) {
-                        inp.classList.remove('input-correct', 'input-partial', 'input-incorrect');
-                        inp.classList.add('input-override');
-                        var fb = inp.nextElementSibling;
-                        if (fb) {
-                            fb.innerHTML = "🛡️ Correct! (Teacher Approved Override)";
-                            fb.style.color = "#0369a1";
-                            fb.style.display = "block";
-                            var btn = fb.nextElementSibling;
-                            if(btn && btn.classList.contains('teacher-btn')) {
-                                btn.style.display = 'inline-block';
-                                btn.innerText = "❌ Remove Override";
-                            }
-                        }
-                    }
-                });
-            }
         }
-
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('auto-input')) {
                 saveProgress();
@@ -415,53 +412,52 @@
                 }
             }
         });
+        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterpriseA1Memory_Smart'); window.location.reload(); } }
+        window.onload = loadProgress;
 
-        function toggleOverride(btnElement) {
-            var passCode = prompt("Enter teacher PIN to override:");
-            if (passCode === "2525") {
-                var feedbackDiv = btnElement.previousElementSibling;
-                var inputElement = feedbackDiv.previousElementSibling;
-                if (inputElement && inputElement.classList.contains('auto-input')) {
-                    inputElement.classList.remove('input-correct', 'input-partial', 'input-incorrect');
-                    if (inputElement.classList.contains('input-override')) {
-                        inputElement.classList.remove('input-override');
-                        feedbackDiv.style.display = 'none';
-                        btnElement.innerText = "🛡️ Override Mark";
-                        saveProgress();
-                        alert("Teacher override removed.");
-                    } else {
-                        inputElement.classList.add('input-override');
-                        feedbackDiv.innerHTML = "🛡️ Correct! (Teacher Approved Override)";
-                        feedbackDiv.style.color = "#0369a1";
-                        feedbackDiv.style.display = "block";
-                        btnElement.innerText = "❌ Remove Override";
-                        saveProgress();
-                    }
+        let activeQuestionId = null;
+        function openVerifyModal(qId) {
+            activeQuestionId = qId;
+            document.getElementById('teacher-password-input').value = '';
+            document.getElementById('modal-error-msg').style.display = 'none';
+            document.getElementById('verify-modal').style.display = 'flex';
+            document.getElementById('teacher-password-input').focus();
+        }
+        function closeVerifyModal() {
+            document.getElementById('verify-modal').style.display = 'none';
+            activeQuestionId = null;
+        }
+        function submitVerify() {
+            var pass = document.getElementById('teacher-password-input').value;
+            if (pass === '2525') {
+                var inputEl = document.getElementById(activeQuestionId);
+                var feedbackDiv = inputEl.nextElementSibling;
+                if (inputEl.classList.contains('correct')) {
+                    inputEl.classList.remove('correct');
+                    inputEl.classList.add('incorrect');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; feedbackDiv.style.color = "#b71c1c"; feedbackDiv.style.display = "block"; }
+                } else {
+                    inputEl.classList.remove('incorrect');
+                    inputEl.classList.add('correct');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
                 }
-            } else if (passCode !== null) {
-                alert("Incorrect PIN.");
+                closeVerifyModal();
+                saveProgress();
+            } else {
+                document.getElementById('modal-error-msg').style.display = 'block';
             }
         }
-
-        function clearData() { 
-            if (confirm("Clear all work and overrides?")) { 
-                localStorage.removeItem('enterpriseA1Memory_Smart'); 
-                localStorage.removeItem('enterpriseA1Overrides');
-                window.location.reload(); 
-            } 
-        }
-        window.onload = loadProgress;
+        document.getElementById('teacher-password-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') submitVerify();
+        });
 
         function checkAnswers(groupClass) {
             var inputs = document.querySelectorAll('.' + groupClass);
             for (var i = 0; i < inputs.length; i++) {
                 var inputElement = inputs[i];
                 var feedbackDiv = inputElement.nextElementSibling;
-                var overrideBtn = feedbackDiv ? feedbackDiv.nextElementSibling : null;
-                if (overrideBtn && overrideBtn.classList.contains('teacher-btn')) {
-                    overrideBtn.style.display = 'inline-block';
-                }
-                if (inputElement.classList.contains('input-override')) continue;
+                var overrideBtn = document.getElementById("override-" + inputElement.id);
+                if (overrideBtn) overrideBtn.classList.remove('hidden');
 
                 var studentAnswer = inputElement.value.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
                 var rubricStr = inputElement.getAttribute('data-rubric');
@@ -470,12 +466,12 @@
                 try { rubric = JSON.parse(rubricStr); } catch (error) { continue; }
                 
                 var keywordGroups = rubric.keywords; 
-                inputElement.classList.remove('input-correct', 'input-partial', 'input-incorrect');
+                inputElement.classList.remove('correct', 'incorrect');
                 if (studentAnswer === "") { if(feedbackDiv) feedbackDiv.style.display = 'none'; continue; }
                 
                 var wordCount = studentAnswer.split(" ").length;
                 if (!keywordGroups || keywordGroups.length === 0) {
-                    inputElement.classList.add('input-correct');
+                    inputElement.classList.add('correct');
                     if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Answer recorded."; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
                     continue;
                 }
@@ -499,22 +495,21 @@
                 
                 if(feedbackDiv) {
                     if (isPassed) {
-                        inputElement.classList.add('input-correct');
+                        inputElement.classList.add('correct');
                         feedbackDiv.innerHTML = "✅ Correct! All required concepts covered.";
                         feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block";
                     } else if (keywordGroups.length > 1 && score >= 0.5) {
-                        inputElement.classList.add('input-partial');
+                        inputElement.classList.add('incorrect'); // or partial
                         feedbackDiv.innerHTML = "⚠️ Partial credit (" + conceptsFound + "/" + keywordGroups.length + " concepts). " + rubric.feedback;
-                        feedbackDiv.style.color = "#b27a00";
-                        feedbackDiv.style.display = "block";
+                        feedbackDiv.style.color = "#b27a00"; feedbackDiv.style.display = "block";
                     } else {
-                        inputElement.classList.add('input-incorrect');
+                        inputElement.classList.add('incorrect');
                         feedbackDiv.innerHTML = "❌ Not quite. " + rubric.feedback;
-                        feedbackDiv.style.color = "#b71c1c";
-                        feedbackDiv.style.display = "block";
+                        feedbackDiv.style.color = "#b71c1c"; feedbackDiv.style.display = "block";
                     }
                 }
             }
+            saveProgress();
         }
 
         function downloadPDF() {
