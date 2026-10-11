@@ -21,8 +21,8 @@
         .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit; }
         .auto-input:focus { outline: none; border-color: #666; }
         textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; }
-        .input-correct, .correct { border-color: #388e3c !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
-        .input-incorrect, .incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
+        .correct { border-color: #388e3c !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
+        .incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
         .feedback-msg { font-size: 14px; margin-top: 8px; font-weight: bold; display: none; }
         .teacher-override-btn { background-color: #607d8b; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; margin-top: 5px; }
         .teacher-override-btn:hover { background-color: #455a64; }
@@ -432,6 +432,7 @@
             if (pass === '2525') {
                 var inputEl = document.getElementById(activeQuestionId);
                 var feedbackDiv = inputEl.nextElementSibling;
+                inputEl.classList.add('teacher-locked');
                 if (inputEl.classList.contains('correct')) {
                     inputEl.classList.remove('correct');
                     inputEl.classList.add('incorrect');
@@ -451,7 +452,7 @@
             if (e.key === 'Enter') submitVerify();
         });
 
-function checkAnswers(groupClass) {
+        function checkAnswers(groupClass) {
             var inputs = document.querySelectorAll('.' + groupClass);
             for (var i = 0; i < inputs.length; i++) {
                 var inputElement = inputs[i];
@@ -459,8 +460,7 @@ function checkAnswers(groupClass) {
                 var overrideBtn = document.getElementById("override-" + inputElement.id);
                 if (overrideBtn) overrideBtn.classList.remove('hidden');
 
-                // 🛡️ PROTECT TEACHER OVERRIDES: If already marked correct via override, skip auto-checking!
-                if (inputElement.classList.contains('correct') && feedbackDiv && feedbackDiv.innerHTML.includes("Teacher Approved Override")) {
+                if (inputElement.classList.contains('teacher-locked')) {
                     continue; 
                 }
 
