@@ -340,84 +340,44 @@
         function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterpriseA1Memory_Smart'); window.location.reload(); } }
         window.onload = loadProgress;
 
-        /* --- SMART CHECKING SCRIPT: STRICT ON MULTI-CONCEPT QUESTIONS --- */
         function checkAnswers(groupClass) {
-            var inputs = document.getElementsByClassName(groupClass);
-            
+            var inputs = document.querySelectorAll('.' + groupClass);
             for (var i = 0; i < inputs.length; i++) {
                 var inputElement = inputs[i];
-                var studentAnswer = inputElement.value.toLowerCase()
-                                        .replace(/[^a-z0-9\s]/g, " ")
-                                        .replace(/\s+/g, " ")
-                                        .trim();
-                                        
+                var studentAnswer = inputElement.value.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
                 var rubricStr = inputElement.getAttribute('data-rubric');
                 var feedbackDiv = inputElement.nextElementSibling;
-                
                 if(!rubricStr) continue;
-                
                 var rubric = JSON.parse(rubricStr);
                 var keywordGroups = rubric.keywords; 
-
                 inputElement.classList.remove('input-correct', 'input-partial', 'input-incorrect');
-                
-                if (studentAnswer === "") {
-                    if(feedbackDiv) feedbackDiv.style.display = 'none';
-                    continue;
-                }
-
+                if (studentAnswer === "") { if(feedbackDiv) feedbackDiv.style.display = 'none'; continue; }
                 var wordCount = studentAnswer.split(" ").length;
                 if (!keywordGroups || keywordGroups.length === 0) {
                     inputElement.classList.add('input-correct');
-                    if(feedbackDiv) {
-                        feedbackDiv.innerHTML = "✅ Answer recorded.";
-                        feedbackDiv.style.color = "#006100";
-                        feedbackDiv.style.display = "block";
-                    }
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Answer recorded."; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
                     continue;
                 }
-
                 var conceptsFound = 0;
-
                 for(var k = 0; k < keywordGroups.length; k++) {
                     var terms = keywordGroups[k];
                     var matched = false;
-                    
                     for(var s = 0; s < terms.length; s++) {
                         var term = terms[s].toLowerCase().trim();
-                        
-                        if (term.length >= 3) {
-                            if (studentAnswer.includes(term)) {
-                                matched = true;
-                                break;
-                            }
-                        } else {
-                            var regex = new RegExp("\\b" + term + "\\b");
-                            if (regex.test(studentAnswer)) {
-                                matched = true;
-                                break;
-                            }
-                        }
+                        if (term.length >= 3) { if (studentAnswer.includes(term)) { matched = true; break; } }
+                        else { var regex = new RegExp("\\b" + term + "\\b"); if (regex.test(studentAnswer)) { matched = true; break; } }
                     }
                     if(matched) conceptsFound++;
                 }
-
                 var score = conceptsFound / keywordGroups.length;
-
-                // STRICT RULE FOR MULTI-CONCEPT QUESTIONS:
                 var isPassed = false;
-                if (keywordGroups.length > 1) {
-                    isPassed = (score === 1); // Must hit all concept buckets for multi-part questions
-                } else {
-                    isPassed = (score >= 1 || (wordCount >= 4)); // Lenient for single definitions
-                }
-
+                if (keywordGroups.length > 1) { isPassed = (score === 1); }
+                else { isPassed = (score >= 1 || (wordCount >= 4)); }
                 if(feedbackDiv) {
                     if (isPassed) {
                         inputElement.classList.add('input-correct');
                         feedbackDiv.innerHTML = "✅ Correct! All required concepts covered.";
-                        feedbackDiv.style.color = "#006100";
-                        feedbackDiv.style.display = "block";
+                        feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block";
                     } else if (keywordGroups.length > 1 && score >= 0.5) {
                         inputElement.classList.add('input-partial');
                         feedbackDiv.innerHTML = "⚠️ Partial credit (" + conceptsFound + "/" + keywordGroups.length + " concepts). " + rubric.feedback;
@@ -432,7 +392,6 @@
                 }
             }
         }
-
         function downloadPDF() {
             var hide = document.querySelectorAll('.no-print');
             for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
