@@ -340,44 +340,81 @@
         function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterpriseA1Memory_Lenient'); window.location.reload(); } }
         window.onload = loadProgress;
 
+       /* --- HIGHLY LENIENT CONCEPT-BASED MARKING --- */
         function checkAnswers(groupClass) {
             var inputs = document.getElementsByClassName(groupClass);
+            
             for (var i = 0; i < inputs.length; i++) {
                 var inputElement = inputs[i];
-                var studentAnswer = inputElement.value.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+                
+                var studentAnswer = inputElement.value.toLowerCase()
+                                        .replace(/[^a-z0-9\s]/g, " ")
+                                        .replace(/\s+/g, " ")
+                                        .trim();
+                                        
                 var rubricStr = inputElement.getAttribute('data-rubric');
                 var feedbackDiv = inputElement.nextElementSibling;
+                
                 if(!rubricStr) continue;
+                
                 var rubric = JSON.parse(rubricStr);
                 var keywordGroups = rubric.keywords; 
+
                 inputElement.classList.remove('input-correct', 'input-partial', 'input-incorrect');
-                if (studentAnswer === "") { feedbackDiv.style.display = 'none'; continue; }
-                if (!keywordGroups || keywordGroups.length === 0) {
-                    inputElement.classList.add('input-correct');
-                    feedbackDiv.innerHTML = "✅ Answer recorded."; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block";
+                
+                if (studentAnswer === "") {
+                    feedbackDiv.style.display = 'none';
                     continue;
                 }
+
+                // If the student wrote a reasonable length answer (e.g. 3+ words), let's be generous!
+                var wordCount = studentAnswer.split(" ").length;
+                if (!keywordGroups || keywordGroups.length === 0) {
+                    inputElement.classList.add('input-correct');
+                    feedbackDiv.innerHTML = "✅ Answer recorded.";
+                    feedbackDiv.style.color = "#006100";
+                    feedbackDiv.style.display = "block";
+                    continue;
+                }
+
                 var conceptsFound = 0;
+
                 for(var k = 0; k < keywordGroups.length; k++) {
                     var terms = keywordGroups[k];
                     var matched = false;
+                    
                     for(var s = 0; s < terms.length; s++) {
                         var term = terms[s].toLowerCase().trim();
-                        if (term.length >= 4) { if (studentAnswer.includes(term)) { matched = true; break; } }
-                        else { var regex = new RegExp("\\b" + term + "\\b"); if (regex.test(studentAnswer)) { matched = true; break; } }
+                        
+                        if (term.length >= 3) {
+                            if (studentAnswer.includes(term)) {
+                                matched = true;
+                                break;
+                            }
+                        } else {
+                            var regex = new RegExp("\\b" + term + "\\b");
+                            if (regex.test(studentAnswer)) {
+                                matched = true;
+                                break;
+                            }
+                        }
                     }
                     if(matched) conceptsFound++;
                 }
+
                 var score = conceptsFound / keywordGroups.length;
-                if (score >= 1) {
+
+                // LENIENT RULE: If they match at least 50% of the concepts, OR if they wrote a well-thought-out sentence (5+ words) on definition questions, award full credit!
+                if (score >= 0.5 || (wordCount >= 5 && keywordGroups.length <= 2)) {
                     inputElement.classList.add('input-correct');
-                    feedbackDiv.innerHTML = "✅ Perfect! " + (rubric.success || ""); feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block";
-                } else if (score >= 0.5) {
-                    inputElement.classList.add('input-partial');
-                    feedbackDiv.innerHTML = "⚠️ Good attempt (" + conceptsFound + "/" + keywordGroups.length + " concepts). " + rubric.feedback; feedbackDiv.style.color = "#b27a00"; feedbackDiv.style.display = "block";
+                    feedbackDiv.innerHTML = "✅ Correct! (Well explained)";
+                    feedbackDiv.style.color = "#006100";
+                    feedbackDiv.style.display = "block";
                 } else {
                     inputElement.classList.add('input-incorrect');
-                    feedbackDiv.innerHTML = "❌ Not quite. " + rubric.feedback; feedbackDiv.style.color = "#b71c1c"; feedbackDiv.style.display = "block";
+                    feedbackDiv.innerHTML = "❌ Not quite. " + rubric.feedback;
+                    feedbackDiv.style.color = "#b71c1c";
+                    feedbackDiv.style.display = "block";
                 }
             }
         }
