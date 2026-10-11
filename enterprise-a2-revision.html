@@ -21,10 +21,19 @@
         .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit; }
         .auto-input:focus { outline: none; border-color: #666; }
         textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; }
-        .input-correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
-        .input-partial { border-color: #ffb300 !important; background-color: #fff8e1 !important; color: #b27a00; font-weight: bold; }
-        .input-incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
+        .correct { border-color: #388e3c !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
+        .incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
         .feedback-msg { font-size: 14px; margin-top: 8px; font-weight: bold; display: none; }
+        .teacher-override-btn { background-color: #607d8b; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        .teacher-override-btn:hover { background-color: #455a64; }
+        .hidden { display: none !important; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; border-top: 6px solid #1e3a8a; }
+        .modal-input { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; text-align: center; }
+        .modal-btn-row { display: flex; gap: 10px; }
+        .modal-btn-confirm { flex: 1; background-color: #1e3a8a; color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-btn-cancel { flex: 1; background-color: #ccc; color: #333; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
         .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
         .btn-submit:hover { background-color: #152960; }
         .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
@@ -56,107 +65,126 @@
                 
                 <div class="question-wrapper">
                     <label class="question-label">1. What are the four elements of the marketing mix (the 4Ps)?</label>
-                    <input type="text" class="auto-input a2-input" data-rubric='{"keywords": [["product"], ["price"], ["place"], ["promotion"]], "feedback": "Name all four: Product, Price, Place, and Promotion."}' placeholder="Type answer here...">
+                    <input type="text" id="a2_q1" class="auto-input a2-input" data-rubric='{"keywords": [["product"], ["price"], ["place"], ["promotion"]], "feedback": "Name all four: Product, Price, Place, and Promotion."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-a2_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q1')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">2. What is the marketing mix?</label>
-                    <input type="text" class="auto-input a2-input" data-rubric='{"keywords": [["combination", "mix", "set", "different", "range", "variety"], ["decisions", "methods", "strategies"], ["market", "sell", "effectively", "advertise"]], "feedback": "The combination of marketing decisions an enterprise uses to market its products effectively."}' placeholder="Type answer here...">
+                    <input type="text" id="a2_q2" class="auto-input a2-input" data-rubric='{"keywords": [["combination", "mix", "set", "different", "range", "variety"], ["decisions", "methods", "strategies"], ["market", "sell", "effectively", "advertise"]], "feedback": "The combination of marketing decisions an enterprise uses to market its products effectively."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-a2_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q2')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">3. What is meant by product in the marketing mix?</label>
-                    <input type="text" class="auto-input a2-input" data-rubric='{"keywords": [["good", "service", "item", "product"], ["sell", "offered", "customer", "provide"]], "feedback": "The good or service provided by an enterprise to meet customer needs."}' placeholder="Type answer here...">
+                    <input type="text" id="a2_q3" class="auto-input a2-input" data-rubric='{"keywords": [["good", "service", "item", "product"], ["sell", "offered", "customer", "provide"]], "feedback": "The good or service provided by an enterprise to meet customer needs."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-a2_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q3')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">4. What is meant by price?</label>
-                    <input type="text" class="auto-input a2-input" data-rubric='{"keywords": [["amount", "cost", "money", "charged"], ["pay", "purchase", "buy"]], "feedback": "The amount of money customers pay to purchase a product or service."}' placeholder="Type answer here...">
+                    <input type="text" id="a2_q4" class="auto-input a2-input" data-rubric='{"keywords": [["amount", "cost", "money", "charged"], ["pay", "purchase", "buy"]], "feedback": "The amount of money customers pay to purchase a product or service."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-a2_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">5. What is meant by place?</label>
-                    <input type="text" class="auto-input a2-input" data-rubric='{"keywords": [["where", "location", "channels", "sold", "distributed"], ["buy", "customer", "access"]], "feedback": "Where and how products are made available for customers to buy (distribution)."}' placeholder="Type answer here...">
+                    <input type="text" id="a2_q5" class="auto-input a2-input" data-rubric='{"keywords": [["where", "location", "channels", "sold", "distributed"], ["buy", "customer", "access"]], "feedback": "Where and how products are made available for customers to buy (distribution)."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-a2_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q5')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">6. What is meant by promotion?</label>
-                    <input type="text" class="auto-input a2-input" data-rubric='{"keywords": [["communicating", "advertising", "informing", "persuading"], ["customers", "awareness", "sales"]], "feedback": "Communicating with customers to raise awareness and persuade them to buy."}' placeholder="Type answer here...">
+                    <input type="text" id="a2_q6" class="auto-input a2-input" data-rubric='{"keywords": [["communicating", "advertising", "informing", "persuading"], ["customers", "awareness", "sales"]], "feedback": "Communicating with customers to raise awareness and persuade them to buy."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-a2_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q6')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 2: The 4 Ps in Detail</h3>
                 <div class="question-wrapper">
                     <label class="question-label">7. Why is product design important?</label>
-                    <input type="text" class="auto-input a2-input" data-rubric='{"keywords": [["meet", "satisfy", "needs", "wants", "appeal"], ["quality", "function", "attractive"]], "feedback": "Ensures products meet customer needs, function well, and look appealing."}' placeholder="Type answer here...">
+                    <input type="text" id="a2_q7" class="auto-input a2-input" data-rubric='{"keywords": [["meet", "satisfy", "needs", "wants", "appeal"], ["quality", "function", "attractive"]], "feedback": "Ensures products meet customer needs, function well, and look appealing."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-a2_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q7')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">8. Name four pricing strategies an enterprise might use.</label>
-                    <input type="text" class="auto-input a2-input" data-rubric='{"keywords": [["penetration", "skim", "competitive", "cost plus", "psychological", "loss leader"]], "feedback": "Penetration, Skimming, Competitive, Cost-plus, Psychological, Loss leader."}' placeholder="Type answer here...">
+                    <input type="text" id="a2_q8" class="auto-input a2-input" data-rubric='{"keywords": [["penetration", "skim", "competitive", "cost plus", "psychological", "loss leader"]], "feedback": "Penetration, Skimming, Competitive, Cost-plus, Psychological, Loss leader."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-a2_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q8')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">9. What is penetration pricing?</label>
-                    <input type="text" class="auto-input a2-input" data-rubric='{"keywords": [["low", "cheap"], ["market share", "new product", "attract"]], "feedback": "Setting a low initial price to break into a market and gain market share."}' placeholder="Type answer here...">
+                    <input type="text" id="a2_q9" class="auto-input a2-input" data-rubric='{"keywords": [["low", "cheap"], ["market share", "new product", "attract"]], "feedback": "Setting a low initial price to break into a market and gain market share."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-a2_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q9')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">10. What is price skimming?</label>
-                    <input type="text" class="auto-input a2-input" data-rubric='{"keywords": [["high", "expensive"], ["new", "innovative", "unique", "max profit"]], "feedback": "Setting a high initial price for a unique or innovative product to maximize profit."}' placeholder="Type answer here...">
+                    <input type="text" id="a2_q10" class="auto-input a2-input" data-rubric='{"keywords": [["high", "expensive"], ["new", "innovative", "unique", "max profit"]], "feedback": "Setting a high initial price for a unique or innovative product to maximize profit."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-a2_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q10')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">11. What is competitive pricing?</label>
-                    <input type="text" class="auto-input a2-input" data-rubric='{"keywords": [["similar", "rivals", "competitors"], ["market price", "matching"]], "feedback": "Pricing products close to competitors prices in the same market."}' placeholder="Type answer here...">
+                    <input type="text" id="a2_q11" class="auto-input a2-input" data-rubric='{"keywords": [["similar", "rivals", "competitors"], ["market price", "matching"]], "feedback": "Pricing products close to competitors prices in the same market."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-a2_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q11')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">12. What is cost-plus pricing?</label>
-                    <input type="text" class="auto-input a2-input" data-rubric='{"keywords": [["cost", "producing"], ["markup", "percentage", "added profit"]], "feedback": "Calculating the total cost of making a product and adding a percentage markup for profit."}' placeholder="Type answer here...">
+                    <input type="text" id="a2_q12" class="auto-input a2-input" data-rubric='{"keywords": [["cost", "producing"], ["markup", "percentage", "added profit"]], "feedback": "Calculating the total cost of making a product and adding a percentage markup for profit."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-a2_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q12')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">13. Give two examples of distribution channels (place).</label>
-                    <input type="text" class="auto-input a2-input" data-rubric='{"keywords": [["retailer", "online", "wholesaler", "direct", "ecommerce"]], "feedback": "E.g., selling directly online or through retail shops."}' placeholder="Type answer here...">
+                    <input type="text" id="a2_q13" class="auto-input a2-input" data-rubric='{"keywords": [["retailer", "online", "wholesaler", "direct", "ecommerce"]], "feedback": "E.g., selling directly online or through retail shops."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-a2_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q13')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">14. Give two examples of promotional methods.</label>
-                    <input type="text" class="auto-input a2-input" data-rubric='{"keywords": [["advertising", "social media", "sales promotion", "sponsorship", "public relations"]], "feedback": "E.g., Advertising, social media, special offers."}' placeholder="Type answer here...">
+                    <input type="text" id="a2_q14" class="auto-input a2-input" data-rubric='{"keywords": [["advertising", "social media", "sales promotion", "sponsorship", "public relations"]], "feedback": "E.g., Advertising, social media, special offers."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-a2_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q14')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 3 & 4: Application and Exam Questions</h3>
                 <div class="question-wrapper">
                     <label class="question-label">15. A tech company launches a brand-new smartphone with unique features. Which pricing strategy should it use and why?</label>
-                    <textarea class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["skimming", "high price"], ["unique", "innovative", "maximize profit"]], "feedback": "Price skimming because the unique features allow charging a high initial price."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a2_q15" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["skimming", "high price"], ["unique", "innovative", "maximize profit"]], "feedback": "Price skimming because the unique features allow charging a high initial price."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-a2_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q15')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">16. A new soft drink enters a crowded market dominated by massive brands. Which pricing strategy should it use?</label>
-                    <input type="text" class="auto-input a2-input" data-rubric='{"keywords": [["penetration"]], "feedback": "Penetration pricing, to attract customers away from established rivals."}' placeholder="Type answer here...">
+                    <input type="text" id="a2_q16" class="auto-input a2-input" data-rubric='{"keywords": [["penetration"]], "feedback": "Penetration pricing, to attract customers away from established rivals."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-a2_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q16')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">17. Explain how the elements of the marketing mix must work together.</label>
-                    <textarea class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["consistent", "fit together", "support"], ["product", "price", "place", "promotion"]], "feedback": "They must be consistent (e.g., luxury products need high prices and high-end promotion)."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a2_q17" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["consistent", "fit together", "support"], ["product", "price", "place", "promotion"]], "feedback": "They must be consistent (e.g., luxury products need high prices and high-end promotion)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-a2_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q17')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">18. Explain two ways a business could promote a new clothing line. (4 marks)</label>
-                    <textarea class="auto-input a2-input" rows="3" data-rubric='{"keywords": [["social media", "instagram", "influencers"], ["advertising", "magazines", "discounts"]], "feedback": "Mentioning social media marketing and magazine ads to reach target customers."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a2_q18" class="auto-input a2-input" rows="3" data-rubric='{"keywords": [["social media", "instagram", "influencers"], ["advertising", "magazines", "discounts"]], "feedback": "Mentioning social media marketing and magazine ads to reach target customers."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-a2_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q18')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">19. Explain how price and product quality are linked in the minds of consumers. (4 marks)</label>
-                    <textarea class="auto-input a2-input" rows="3" data-rubric='{"keywords": [["high price", "expensive"], ["quality", "luxury", "expect"]], "feedback": "High prices often lead consumers to expect superior quality and exclusive features."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a2_q19" class="auto-input a2-input" rows="3" data-rubric='{"keywords": [["high price", "expensive"], ["quality", "luxury", "expect"]], "feedback": "High prices often lead consumers to expect superior quality and exclusive features."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-a2_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q19')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <button class="btn-submit no-print" onclick="checkAnswers('a2-input')">Check Answers</button>
@@ -167,13 +195,27 @@
         <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
         <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
     </div>
+
+    <!-- SECURE PASSWORD MODAL -->
+    <div class="modal-overlay" id="verify-modal">
+        <div class="modal-content">
+            <h3>Teacher Verification</h3>
+            <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
+            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter PIN">
+            <div class="modal-btn-row">
+                <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
+                <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
+            </div>
+        </div>
+    </div>
+
     <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
 
     <script>
         function saveProgress() {
             var inputs = document.querySelectorAll('.auto-input');
             var dataToSave = {};
-            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; }
+            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
             try { localStorage.setItem('enterpriseA2Memory_Smart', JSON.stringify(dataToSave)); } catch (e) {}
         }
         function loadProgress() {
@@ -184,12 +226,19 @@
                 for (var i = 0; i < inputs.length; i++) {
                     if (data['input_' + i]) {
                         inputs[i].value = data['input_' + i];
+                        if (data['class_' + i]) {
+                            inputs[i].className = data['class_' + i];
+                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
+                                var btnId = "override-" + inputs[i].id;
+                                var btn = document.getElementById(btnId);
+                                if (btn) btn.classList.remove('hidden');
+                            }
+                        }
                         if (inputs[i].tagName.toLowerCase() === 'textarea') {
                             inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
                         }
                     }
                 }
-                checkAnswers('a2-input');
             }
         }
         document.addEventListener('input', function(e) {
@@ -203,101 +252,108 @@
         function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterpriseA2Memory_Smart'); window.location.reload(); } }
         window.onload = loadProgress;
 
-        function checkAnswers(groupClass) {
-            var inputs = document.querySelectorAll('.' + groupClass);
-            console.log("Total inputs found for " + groupClass + ": " + inputs.length);
-
-            for (var i = 0; i < inputs.length; i++) {
-                try {
-                    var inputElement = inputs[i];
-                    var studentAnswer = inputElement.value.toLowerCase()
-                                            .replace(/[^a-z0-9\s]/g, " ")
-                                            .replace(/\s+/g, " ")
-                                            .trim();
-                                            
-                    var rubricStr = inputElement.getAttribute('data-rubric');
-                    var feedbackDiv = inputElement.nextElementSibling;
-                    
-                    if(!rubricStr) continue;
-                    
-var rubric;
-
-try {
-    rubric = JSON.parse(rubricStr);
-} catch (error) {
-    console.error("Invalid rubric for question:", inputElement, error);
-    if (feedbackDiv) {
-        feedbackDiv.textContent = "Marking error: please check this question's rubric.";
-        feedbackDiv.style.display = "block";
-    }
-    continue;
-}                    var keywordGroups = rubric.keywords; 
-
-                    inputElement.classList.remove('input-correct', 'input-partial', 'input-incorrect');
-                    
-                    if (studentAnswer === "") {
-                        if(feedbackDiv) feedbackDiv.style.display = 'none';
-                        continue;
-                    }
-
-                    var wordCount = studentAnswer.split(" ").length;
-                    if (!keywordGroups || keywordGroups.length === 0) {
-                        inputElement.classList.add('input-correct');
-                        if(feedbackDiv) { 
-                            feedbackDiv.innerHTML = "✅ Answer recorded."; 
-                            feedbackDiv.style.color = "#006100"; 
-                            feedbackDiv.style.display = "block"; 
-                        }
-                        continue;
-                    }
-
-                    var conceptsFound = 0;
-                    for(var k = 0; k < keywordGroups.length; k++) {
-                        var terms = keywordGroups[k];
-                        var matched = false;
-                        for(var s = 0; s < terms.length; s++) {
-                            var term = terms[s].toLowerCase().trim();
-                            if (term.length >= 3) { 
-                                if (studentAnswer.includes(term)) { matched = true; break; } 
-                            } else { 
-                                var regex = new RegExp("\\b" + term + "\\b"); 
-                                if (regex.test(studentAnswer)) { matched = true; break; } 
-                            }
-                        }
-                        if(matched) conceptsFound++;
-                    }
-
-                    var score = conceptsFound / keywordGroups.length;
-                    var isPassed = false;
-                    if (keywordGroups.length > 1) { 
-                        isPassed = (score === 1); 
-                    } else { 
-                        isPassed = (score >= 1 || (wordCount >= 4)); 
-                    }
-
-                    if(feedbackDiv) {
-                        if (isPassed) {
-                            inputElement.classList.add('input-correct');
-                            feedbackDiv.innerHTML = "✅ Correct! All required concepts covered.";
-                            feedbackDiv.style.color = "#006100"; 
-                            feedbackDiv.style.display = "block";
-                        } else if (keywordGroups.length > 1 && score >= 0.5) {
-                            inputElement.classList.add('input-partial');
-                            feedbackDiv.innerHTML = "⚠️ Partial credit (" + conceptsFound + "/" + keywordGroups.length + " concepts). " + rubric.feedback;
-                            feedbackDiv.style.color = "#b27a00"; 
-                            feedbackDiv.style.display = "block";
-                        } else {
-                            inputElement.classList.add('input-incorrect');
-                            feedbackDiv.innerHTML = "❌ Not quite. " + rubric.feedback;
-                            feedbackDiv.style.color = "#b71c1c"; 
-                            feedbackDiv.style.display = "block";
-                        }
-                    }
-                } catch (err) {
-                    console.error("Error marking question index " + i, err);
+        let activeQuestionId = null;
+        function openVerifyModal(qId) {
+            activeQuestionId = qId;
+            document.getElementById('teacher-password-input').value = '';
+            document.getElementById('modal-error-msg').style.display = 'none';
+            document.getElementById('verify-modal').style.display = 'flex';
+            document.getElementById('teacher-password-input').focus();
+        }
+        function closeVerifyModal() {
+            document.getElementById('verify-modal').style.display = 'none';
+            activeQuestionId = null;
+        }
+        function submitVerify() {
+            var pass = document.getElementById('teacher-password-input').value;
+            if (pass === '2525') {
+                var inputEl = document.getElementById(activeQuestionId);
+                var feedbackDiv = inputEl.nextElementSibling;
+                inputEl.classList.add('teacher-locked');
+                if (inputEl.classList.contains('correct')) {
+                    inputEl.classList.remove('correct');
+                    inputEl.classList.add('incorrect');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; feedbackDiv.style.color = "#b71c1c"; feedbackDiv.style.display = "block"; }
+                } else {
+                    inputEl.classList.remove('incorrect');
+                    inputEl.classList.add('correct');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
                 }
+                closeVerifyModal();
+                saveProgress();
+            } else {
+                document.getElementById('modal-error-msg').style.display = 'block';
             }
         }
+        document.getElementById('teacher-password-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') submitVerify();
+        });
+
+        function checkAnswers(groupClass) {
+            var inputs = document.querySelectorAll('.' + groupClass);
+            for (var i = 0; i < inputs.length; i++) {
+                var inputElement = inputs[i];
+                var feedbackDiv = inputElement.nextElementSibling;
+                var overrideBtn = document.getElementById("override-" + inputElement.id);
+                if (overrideBtn) overrideBtn.classList.remove('hidden');
+
+                if (inputElement.classList.contains('teacher-locked')) {
+                    continue; 
+                }
+
+                var studentAnswer = inputElement.value.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+                var rubricStr = inputElement.getAttribute('data-rubric');
+                if(!rubricStr) continue;
+                var rubric;
+                try { rubric = JSON.parse(rubricStr); } catch (error) { continue; }
+                
+                var keywordGroups = rubric.keywords; 
+                inputElement.classList.remove('correct', 'incorrect');
+                if (studentAnswer === "") { if(feedbackDiv) feedbackDiv.style.display = 'none'; continue; }
+                
+                var wordCount = studentAnswer.split(" ").length;
+                if (!keywordGroups || keywordGroups.length === 0) {
+                    inputElement.classList.add('correct');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Answer recorded."; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
+                    continue;
+                }
+                
+                var conceptsFound = 0;
+                for(var k = 0; k < keywordGroups.length; k++) {
+                    var terms = keywordGroups[k];
+                    var matched = false;
+                    for(var s = 0; s < terms.length; s++) {
+                        var term = terms[s].toLowerCase().trim();
+                        if (term.length >= 3) { if (studentAnswer.includes(term)) { matched = true; break; } }
+                        else { var regex = new RegExp("\\b" + term + "\\b"); if (regex.test(studentAnswer)) { matched = true; break; } }
+                    }
+                    if(matched) conceptsFound++;
+                }
+                
+                var score = conceptsFound / keywordGroups.length;
+                var isPassed = false;
+                if (keywordGroups.length > 1) { isPassed = (score === 1); }
+                else { isPassed = (score >= 1 || (wordCount >= 4)); }
+                
+                if(feedbackDiv) {
+                    if (isPassed) {
+                        inputElement.classList.add('correct');
+                        feedbackDiv.innerHTML = "✅ Correct! All required concepts covered.";
+                        feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block";
+                    } else if (keywordGroups.length > 1 && score >= 0.5) {
+                        inputElement.classList.add('incorrect');
+                        feedbackDiv.innerHTML = "⚠️ Partial credit (" + conceptsFound + "/" + keywordGroups.length + " concepts). " + rubric.feedback;
+                        feedbackDiv.style.color = "#b27a00"; feedbackDiv.style.display = "block";
+                    } else {
+                        inputElement.classList.add('incorrect');
+                        feedbackDiv.innerHTML = "❌ Not quite. " + rubric.feedback;
+                        feedbackDiv.style.color = "#b71c1c"; feedbackDiv.style.display = "block";
+                    }
+                }
+            }
+            saveProgress();
+        }
+
         function downloadPDF() {
             var hide = document.querySelectorAll('.no-print');
             for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
