@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3.3: Pre-production documents - Revision</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
+        .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
+        .task-prep { border-top: 6px solid #607d8b; } 
+        .task-navy { border-top: 6px solid #1e3a8a; } 
+        .task-card h2 { margin-top: 0; color: #333; }
+        .task-prep h2 { color: #607d8b; }
+        .task-navy h2 { color: #1e3a8a; }
+        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; }
+        .center-text { text-align: center; }
+        .question-wrapper { margin-bottom: 25px; page-break-inside: avoid !important; break-inside: avoid !important; }
+        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
+        .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit; }
+        .auto-input:focus { outline: none; border-color: #666; }
+        textarea.auto-input { resize: vertical; min-height: 80px; }
+        .correct { border-color: #388e3c !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
+        .incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
+        .feedback-msg { font-size: 14px; margin-top: 8px; font-weight: bold; display: none; }
+        .teacher-override-btn { background-color: #607d8b; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        .teacher-override-btn:hover { background-color: #455a64; }
+        .hidden { display: none !important; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; border-top: 6px solid #1e3a8a; }
+        .modal-input { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; text-align: center; }
+        .modal-btn-row { display: flex; gap: 10px; }
+        .modal-btn-confirm { flex: 1; background-color: #1e3a8a; color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-btn-cancel { flex: 1; background-color: #ccc; color: #333; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
+        .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
+        .btn-submit:hover { background-color: #152960; }
+        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
+        .btn-pdf:hover { background-color: #124d2d; }
+    </style>
+</head>
+<body>
+    <div id="pdf-content">
+        <header>
+            <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
+            <div class="header-center"><h1>3.3 Pre-production documents</h1></div>
+            <div class="header-right"><a href="enterprise-revision.html" class="back-btn">&larr; Back to Hub</a></div>
+        </header>
+
+        <main class="task-container">
+            <div class="task-card task-prep">
+                <h2>3.3 Revision Notes</h2>
+                <div class="instruction-box center-text">Use this space to write out your complete notes on pre-production, asset logs, flow charts, scripts, storyboards, visualisation diagrams and wireframes.</div>
+                <div class="question-wrapper">
+                    <textarea class="auto-input" rows="12" placeholder="Type your revision notes here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                </div>
+            </div>
+
+            <div class="task-card task-navy">
+                <h2>Self-Marking Knowledge Check</h2>
+                <div class="instruction-box center-text">Answer the questions below. The smart-marker accepts multiple ways of wording your answers!</div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 1: Understanding pre-production documents</h3>
+                
+                <div class="question-wrapper">
+                    <label class="question-label">1. What is pre-production?</label>
+                    <textarea id="ent33_v2_q1" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["planning a media product", "getting everything ready first"]], "feedback": "Acceptable: Planning a media product before making it, or getting everything ready first."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q1')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">2. What is a pre-production document?</label>
+                    <textarea id="ent33_v2_q2" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["document used to plan a media product before creating it"]], "feedback": "Acceptable: A document used to plan a media product before creating it."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q2')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">3. Why are pre-production documents used?</label>
+                    <textarea id="ent33_v2_q3" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["organise ideas", "save time", "reduce mistakes", "everyone knows what to do"]], "feedback": "Acceptable: To organise ideas, save time, reduce mistakes and make sure everyone knows what to do."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q3')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">4. Name one type of pre-production document.</label>
+                    <textarea id="ent33_v2_q4" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["storyboard", "script", "asset log", "flow chart", "visualisation diagram", "wireframe"]], "feedback": "Acceptable: Storyboard, script, asset log, flow chart, visualisation diagram or wireframe."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q4')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">5. How can pre-production documents help a team?</label>
+                    <textarea id="ent33_v2_q5" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["show everyone what needs to be made", "how it should look or work"]], "feedback": "Acceptable: They show everyone what needs to be made and how it should look or work."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q5')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">6. Why should a media product be planned before production?</label>
+                    <textarea id="ent33_v2_q6" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["spot problems early", "prevents wasted time or money"]], "feedback": "Acceptable: It helps spot problems early and prevents wasted time or money."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q6')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">7. What is the difference between pre-production and production?</label>
+                    <textarea id="ent33_v2_q7" class="auto-input ent33v2-input" rows="3" data-rubric='{"keywords": [["pre-production is the planning stage"], ["production is when the product is created"]], "feedback": "Pre-production is the planning stage; production is when the product is created."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q7')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">8. Why might a client need to approve a pre-production document?</label>
+                    <textarea id="ent33_v2_q8" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["check the plan meets their requirements before time is spent"]], "feedback": "Acceptable: To check the plan meets their requirements before time is spent making it."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q8')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">9. What could happen if a media product is not planned properly?</label>
+                    <textarea id="ent33_v2_q9" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["contain mistakes", "miss the brief", "cost more", "take longer"]], "feedback": "Acceptable: It could contain mistakes, miss the brief, cost more or take longer to complete."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q9')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">10. Why might different pre-production documents be used for one project?</label>
+                    <textarea id="ent33_v2_q10" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["plan a different part", "visuals", "dialogue", "layout", "assets"]], "feedback": "Acceptable: Each document helps plan a different part, such as visuals, dialogue, layout or assets."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q10')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 2: Asset logs</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">11. What is an asset log?</label>
+                    <textarea id="ent33_v2_q11" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["list of the assets needed for a media product"]], "feedback": "Acceptable: A list of the assets needed for a media product."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q11')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">12. What is an asset?</label>
+                    <textarea id="ent33_v2_q12" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["something used in a media product", "image", "sound", "video", "font"]], "feedback": "Acceptable: Something used in a media product, such as an image, sound, video or font."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q12')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">13. Give two examples of assets.</label>
+                    <textarea id="ent33_v2_q13" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["photographs", "music", "logos", "sound effects"]], "feedback": "Acceptable: Photographs and music, or logos and sound effects."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q13')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">14. What information might an asset log contain?</label>
+                    <textarea id="ent33_v2_q14" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["asset name", "description", "file type", "source", "location", "permission", "copyright"]], "feedback": "Acceptable: Asset name, description, file type, source, location, permission or copyright details."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q14')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">15. Why is an asset log useful?</label>
+                    <textarea id="ent33_v2_q15" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["keeps track of all the assets needed and where they came from"]], "feedback": "Acceptable: It keeps track of all the assets needed and where they came from."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q15')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">16. How could an asset log help save time?</label>
+                    <textarea id="ent33_v2_q16" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["makes assets easier to find instead of searching through lots of files"]], "feedback": "Acceptable: It makes assets easier to find instead of searching through lots of files."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q16')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">17. Why might an asset log include the source of an image?</label>
+                    <textarea id="ent33_v2_q17" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["creator knows where it came from", "check whether it can legally be used"]], "feedback": "Acceptable: So the creator knows where it came from and can check whether it can legally be used."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q17')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">18. Why might copyright information be recorded in an asset log?</label>
+                    <textarea id="ent33_v2_q18" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["avoid using material without permission", "breaking copyright rules"]], "feedback": "Acceptable: To avoid using material without permission and breaking copyright rules."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q18')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">19. What could happen if an asset is missing from the asset log?</label>
+                    <textarea id="ent33_v2_q19" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["could be forgotten", "difficult to find", "used without checking permissions"]], "feedback": "Acceptable: It could be forgotten, difficult to find or used without checking its permissions."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q19')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">20. A student is making a video and needs music, photographs and sound effects. Which document could list them?</label>
+                    <input type="text" id="ent33_v2_q20" class="auto-input ent33v2-input" data-rubric='{"keywords": [["asset log"]], "feedback": "An asset log."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q20')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">21. What does the file location in an asset log tell you?</label>
+                    <textarea id="ent33_v2_q21" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["where the file is saved", "folder or shared drive"]], "feedback": "Acceptable: Where the file is saved, such as a folder or shared drive."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q21')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">22. Why might an asset log record whether an asset has been obtained?</label>
+                    <textarea id="ent33_v2_q22" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["show what is ready and what still needs to be found or created"]], "feedback": "Acceptable: To show what is ready and what still needs to be found or created."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q22')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">23. Give one reason a media creator might make their own asset.</label>
+                    <textarea id="ent33_v2_q23" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["make it original", "match the brief", "avoid copyright issues"]], "feedback": "Acceptable: To make it original, match the brief or avoid copyright issues with someone else's work."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q23')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">24. How can an asset log help when a project is shared between several people?</label>
+                    <textarea id="ent33_v2_q24" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["everyone can see which assets are needed and where to access them"]], "feedback": "Acceptable: Everyone can see which assets are needed and where to access them."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q24')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">25. What is the difference between an asset log and a storyboard?</label>
+                    <textarea id="ent33_v2_q25" class="auto-input ent33v2-input" rows="3" data-rubric='{"keywords": [["asset log lists materials needed"], ["storyboard shows planned sequence of scenes or shots"]], "feedback": "An asset log lists materials needed; a storyboard shows the planned sequence of scenes or shots."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q25')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 3: Flow charts</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">26. What is a flow chart?</label>
+                    <textarea id="ent33_v2_q26" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["diagram showing steps in a process or how a system works"]], "feedback": "Acceptable: A diagram showing steps in a process or how a system works."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q26" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q26')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">27. What is a flow chart used for in media production?</label>
+                    <textarea id="ent33_v2_q27" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["plan the order of events", "user choices", "how an interactive product works"]], "feedback": "Acceptable: To plan the order of events, user choices or how an interactive product works."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q27" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q27')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">28. What does an arrow show on a flow chart?</label>
+                    <textarea id="ent33_v2_q28" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["direction or order in which the process moves"]], "feedback": "Acceptable: The direction or order in which the process moves."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q28" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q28')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">29. What does a decision symbol represent?</label>
+                    <textarea id="ent33_v2_q29" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["point where a choice is made", "yes/no", "correct/incorrect"]], "feedback": "Acceptable: A point where a choice is made, such as yes/no or correct/incorrect."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q29" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q29')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">30. Why are flow charts useful for interactive products?</label>
+                    <textarea id="ent33_v2_q30" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["show what happens when users choose different options"]], "feedback": "Acceptable: They show what happens when users choose different options."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q30" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q30')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">31. Give an example of a decision in an interactive game.</label>
+                    <textarea id="ent33_v2_q31" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["whether the player has enough points to move to the next level"]], "feedback": "Acceptable: Whether the player has enough points to move to the next level."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q31" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q31')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">32. Why should a flow chart have a clear start and end?</label>
+                    <textarea id="ent33_v2_q32" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["easy to understand where the process begins and finishes"]], "feedback": "Acceptable: So it is easy to understand where the process begins and finishes."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q32" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q32')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">33. What could happen if a flow chart misses out a step?</label>
+                    <textarea id="ent33_v2_q33" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["process may not work properly", "creator may forget something important"]], "feedback": "Acceptable: The process may not work properly or the creator may forget something important."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q33" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q33')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">34. A website asks users whether they want to visit the shop or the contact page. Which document could plan this?</label>
+                    <input type="text" id="ent33_v2_q34" class="auto-input ent33v2-input" data-rubric='{"keywords": [["flow chart"]], "feedback": "A flow chart."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q34" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q34')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">35. How can a flow chart help identify problems before production?</label>
+                    <textarea id="ent33_v2_q35" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["reveal missing steps", "confusing choices", "paths that lead nowhere"]], "feedback": "Acceptable: It can reveal missing steps, confusing choices or paths that lead nowhere."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q35" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q35')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">36. What is a process in a flow chart?</label>
+                    <textarea id="ent33_v2_q36" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["action or task that happens as part of the sequence"]], "feedback": "Acceptable: An action or task that happens as part of the sequence."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q36" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q36')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">37. Why might a flow chart use different shapes?</label>
+                    <textarea id="ent33_v2_q37" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["different shapes represent different things", "start, action or decision"]], "feedback": "Acceptable: Different shapes represent different things, such as a start, action or decision."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q37" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q37')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">38. What is the difference between a flow chart and a storyboard?</label>
+                    <textarea id="ent33_v2_q38" class="auto-input ent33v2-input" rows="3" data-rubric='{"keywords": [["flow chart shows steps and decisions"], ["storyboard shows planned shots or scenes"]], "feedback": "A flow chart shows steps and decisions; a storyboard shows planned shots or scenes."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q38" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q38')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">39. A user clicks “Yes” or “No” on a quiz. How could a flow chart show this?</label>
+                    <textarea id="ent33_v2_q39" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["decision point with separate branches for the two answers"]], "feedback": "Acceptable: A decision point with separate branches for the two answers."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q39" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q39')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">40. Why should a flow chart be easy to follow?</label>
+                    <textarea id="ent33_v2_q40" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["creator can build product correctly", "understand planned process"]], "feedback": "Acceptable: So the creator can build the product correctly and understand the planned process."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q40" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q40')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 4: Scripts</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">41. What is a script?</label>
+                    <textarea id="ent33_v2_q41" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["written plan of what will be said or happen in a video", "animation", "advert"]], "feedback": "Acceptable: A written plan of what will be said or happen in a video, animation, advert or audio product."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q41" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q41')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">42. What information might a script contain?</label>
+                    <textarea id="ent33_v2_q42" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["dialogue", "narration", "character names", "sound effects", "directions"]], "feedback": "Acceptable: Dialogue, narration, character names, sound effects and directions."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q42" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q42')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">43. What is dialogue?</label>
+                    <textarea id="ent33_v2_q43" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["words spoken by characters or presenters"]], "feedback": "Acceptable: The words spoken by characters or presenters."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q43" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q43')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">44. What is narration?</label>
+                    <textarea id="ent33_v2_q44" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["voice speaking over or explaining what is happening", "off screen"]], "feedback": "Acceptable: A voice speaking over or explaining what is happening, often off-screen."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q44" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q44')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">45. Why is a script useful?</label>
+                    <textarea id="ent33_v2_q45" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["tells performers what to say", "helps organise content"]], "feedback": "Acceptable: It tells performers what to say and helps organise the content."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q45" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q45')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">46. How can a script help make a video more organised?</label>
+                    <textarea id="ent33_v2_q46" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["puts spoken content in order so filming follows a clear plan"]], "feedback": "Acceptable: It puts the spoken content in order so filming follows a clear plan."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q46" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q46')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">47. Why might a script include directions for sound effects?</label>
+                    <textarea id="ent33_v2_q47" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["correct sounds can be added at the right moments"]], "feedback": "Acceptable: So the correct sounds can be added at the right moments."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q47" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q47')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">48. What could happen if dialogue is not included in a script?</label>
+                    <textarea id="ent33_v2_q48" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["performers may forget what to say", "deliver inconsistent lines"]], "feedback": "Acceptable: Performers may forget what to say or deliver inconsistent lines."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q48" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q48')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">49. What is the difference between dialogue and stage directions?</label>
+                    <textarea id="ent33_v2_q49" class="auto-input ent33v2-input" rows="3" data-rubric='{"keywords": [["dialogue is what is said"], ["stage directions explain actions or how something should be performed"]], "feedback": "Dialogue is what is said; stage directions explain actions or how something should be performed."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q49" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q49')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">50. A student is making a radio advert. Which document could plan the words and sound effects?</label>
+                    <input type="text" id="ent33_v2_q50" class="auto-input ent33v2-input" data-rubric='{"keywords": [["script"]], "feedback": "A script."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q50" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q50')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">51. Why might a script include timings?</label>
+                    <textarea id="ent33_v2_q51" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["keep the product within its required length", "help plan pacing"]], "feedback": "Acceptable: To keep the product within its required length and help plan pacing."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q51" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q51')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">52. Why should a script use language suitable for its target audience?</label>
+                    <textarea id="ent33_v2_q52" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["audience can understand it and relate to the message"]], "feedback": "Acceptable: So the audience can understand it and relate to the message."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q52" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q52')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">53. What is a voice-over?</label>
+                    <textarea id="ent33_v2_q53" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["voice heard over visuals", "someone who is not shown speaking"]], "feedback": "Acceptable: A voice heard over visuals, usually from someone not shown speaking on screen."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q53" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q53')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">54. How can a script reduce mistakes during recording?</label>
+                    <textarea id="ent33_v2_q54" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["gives performers a prepared version to follow rather than making things up"]], "feedback": "Acceptable: It gives performers a prepared version to follow rather than making everything up."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q54" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q54')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">55. What is one difference between a script and a storyboard?</label>
+                    <textarea id="ent33_v2_q55" class="auto-input ent33v2-input" rows="3" data-rubric='{"keywords": [["script focuses on words and sounds"], ["storyboard focuses on what the audience will see"]], "feedback": "A script focuses on words and sounds; a storyboard focuses on what the audience will see in each shot."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q55" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q55')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 5: Storyboards</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">56. What is a storyboard?</label>
+                    <textarea id="ent33_v2_q56" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["sequence of panels showing how a video, animation or film is planned"]], "feedback": "Acceptable: A sequence of panels showing how a video, animation or film is planned."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q56" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q56')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">57. What does each panel in a storyboard usually represent?</label>
+                    <textarea id="ent33_v2_q57" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["shot, scene or moment in the product"]], "feedback": "Acceptable: A shot, scene or moment in the product."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q57" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q57')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">58. What information might be included in a storyboard panel?</label>
+                    <textarea id="ent33_v2_q58" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["drawing", "camera angle", "movement", "dialogue", "sound", "timing"]], "feedback": "Acceptable: A drawing, camera angle, movement, dialogue, sound or timing."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q58" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q58')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">59. Why are storyboards useful?</label>
+                    <textarea id="ent33_v2_q59" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["show what will happen visually and help plan order of shots"]], "feedback": "Acceptable: They show what will happen visually and help plan the order of shots."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q59" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q59')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">60. What is a camera angle?</label>
+                    <textarea id="ent33_v2_q60" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["position or direction from which a shot is filmed"]], "feedback": "Acceptable: The position or direction from which a shot is filmed."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q60" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q60')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">61. What is a close-up?</label>
+                    <textarea id="ent33_v2_q61" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["shot showing something in detail", "face"]], "feedback": "Acceptable: A shot showing something in detail, often a person's face."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q61" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q61')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">62. What is a long shot?</label>
+                    <textarea id="ent33_v2_q62" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["shot showing a subject and more of the surrounding area"]], "feedback": "Acceptable: A shot showing a subject and more of the surrounding area."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q62" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q62')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">63. Why might arrows be used in a storyboard?</label>
+                    <textarea id="ent33_v2_q63" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["show movement", "character walking", "camera moving"]], "feedback": "Acceptable: To show movement, such as a character walking or a camera moving."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q63" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q63')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">64. How can a storyboard help the filming process?</label>
+                    <textarea id="ent33_v2_q64" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["tells the crew which shots to capture and in what order"]], "feedback": "Acceptable: It tells the crew which shots to capture and in what order."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q64" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q64')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">65. What could happen if the shots are in the wrong order?</label>
+                    <textarea id="ent33_v2_q65" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["story may be confusing", "events may not make sense"]], "feedback": "Acceptable: The story may be confusing or events may not make sense."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q65" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q65')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">66. A student is planning an animation about a character getting lost. Which document could show each scene in order?</label>
+                    <input type="text" id="ent33_v2_q66" class="auto-input ent33v2-input" data-rubric='{"keywords": [["storyboard"]], "feedback": "A storyboard."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q66" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q66')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">67. Why might a storyboard include sound notes?</label>
+                    <textarea id="ent33_v2_q67" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["show when music, dialogue or sound effects should happen"]], "feedback": "Acceptable: To show when music, dialogue or sound effects should happen."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q67" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q67')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">68. What is the difference between a shot and a scene?</label>
+                    <textarea id="ent33_v2_q68" class="auto-input ent33v2-input" rows="3" data-rubric='{"keywords": [["shot is one continuous camera recording"], ["scene is a larger part of the story containing several shots"]], "feedback": "A shot is one continuous camera recording; a scene is a larger part of the story containing several shots."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q68" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q68')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">69. Why should storyboard panels be numbered?</label>
+                    <textarea id="ent33_v2_q69" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["make the correct order clear"]], "feedback": "Acceptable: To make the correct order clear."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q69" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q69')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">70. How can a storyboard help identify problems before filming?</label>
+                    <textarea id="ent33_v2_q70" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["reveal missing shots", "unclear action", "scenes that do not flow well"]], "feedback": "Acceptable: It can reveal missing shots, unclear action or scenes that do not flow well."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q70" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q70')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 6: Visualisation diagrams</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">71. What is a visualisation diagram?</label>
+                    <textarea id="ent33_v2_q71" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["drawing showing what a media product or design is intended to look like"]], "feedback": "Acceptable: A drawing showing what a media product or design is intended to look like."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q71" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q71')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">72. What type of product might use a visualisation diagram?</label>
+                    <textarea id="ent33_v2_q72" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["magazine cover", "poster", "advert", "dvd cover", "static media product"]], "feedback": "Acceptable: A magazine cover, poster, advert, DVD cover or other static media product."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q72" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q72')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">73. What information might a visualisation diagram show?</label>
+                    <textarea id="ent33_v2_q73" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["images", "text", "colours", "fonts", "layout", "positioning"]], "feedback": "Acceptable: Images, text, colours, fonts, layout and positioning."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q73" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q73')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">74. Why are visualisation diagrams useful?</label>
+                    <textarea id="ent33_v2_q74" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["show planned appearance before final product is created"]], "feedback": "Acceptable: They show the planned appearance before the final product is created."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q74" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q74')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">75. What does layout mean?</label>
+                    <textarea id="ent33_v2_q75" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["how items are arranged on a page or screen"]], "feedback": "Acceptable: How items are arranged on a page or screen."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q75" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q75')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">76. Why might a visualisation diagram include annotations?</label>
+                    <textarea id="ent33_v2_q76" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["explain design choices", "why particular image, colour or font is used"]], "feedback": "Acceptable: To explain design choices, such as why a particular image, colour or font is used."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q76" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q76')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">77. What is an annotation?</label>
+                    <textarea id="ent33_v2_q77" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["note explaining something about a design", "label describing a feature"]], "feedback": "Acceptable: A note explaining something about a design, or a label describing a feature."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q77" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q77')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">78. Why might a designer show the client a visualisation diagram?</label>
+                    <textarea id="ent33_v2_q78" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["get feedback and approval before making finished product"]], "feedback": "Acceptable: To get feedback and approval before making the finished product."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q78" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q78')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">79. How can colour choices affect a media product?</label>
+                    <textarea id="ent33_v2_q79" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["create a mood", "attract attention", "match a brand"]], "feedback": "Acceptable: They can create a mood, attract attention or help match a brand."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q79" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q79')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">80. A student is planning a poster for a school event. Which document could show where the title, images and date will go?</label>
+                    <input type="text" id="ent33_v2_q80" class="auto-input ent33v2-input" data-rubric='{"keywords": [["visualisation diagram"]], "feedback": "A visualisation diagram."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q80" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q80')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">81. What is typography?</label>
+                    <textarea id="ent33_v2_q81" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["style and appearance of text", "fonts", "how text is arranged"]], "feedback": "Acceptable: The style and appearance of text, including fonts and how text is arranged."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q81" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q81')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">82. Why is the position of a title important on a poster?</label>
+                    <textarea id="ent33_v2_q82" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["helps audience notice main message", "understand what poster is about"]], "feedback": "Acceptable: It helps the audience notice the main message and understand what the poster is about."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q82" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q82')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">83. How can a visualisation diagram help save time?</label>
+                    <textarea id="ent33_v2_q83" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["design problems can be spotted before creating final product"]], "feedback": "Acceptable: Design problems can be spotted before creating the final product."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q83" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q83')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">84. What is one difference between a visualisation diagram and a storyboard?</label>
+                    <textarea id="ent33_v2_q84" class="auto-input ent33v2-input" rows="3" data-rubric='{"keywords": [["visualisation diagram shows one design or screen"], ["storyboard shows sequence of shots or scenes"]], "feedback": "A visualisation diagram shows one design or screen; a storyboard shows a sequence of shots or scenes."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q84" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q84')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">85. Why should a visualisation diagram consider the target audience?</label>
+                    <textarea id="ent33_v2_q85" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["design needs to appeal to people it is intended for", "easy for them to understand"]], "feedback": "Acceptable: The design needs to appeal to the people it is intended for and be easy for them to understand."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q85" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q85')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 7: Wireframes</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">86. What is a wireframe?</label>
+                    <textarea id="ent33_v2_q86" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["simple plan showing layout and structure of a website or app screen"]], "feedback": "Acceptable: A simple plan showing the layout and structure of a website or app screen."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q86" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q86')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">87. What might a wireframe show?</label>
+                    <textarea id="ent33_v2_q87" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["where menus, buttons, images, headings, text and navigation will go"]], "feedback": "Acceptable: Where menus, buttons, images, headings, text and navigation will go."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q87" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q87')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">88. Why are wireframes useful?</label>
+                    <textarea id="ent33_v2_q88" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["help plan layout before spending time designing or building finished website or app"]], "feedback": "Acceptable: They help plan the layout before spending time designing or building the finished website or app."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q88" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q88')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">89. What is navigation on a website?</label>
+                    <textarea id="ent33_v2_q89" class="auto-input ent33v2-input" rows="2" data-rubric='{"keywords": [["menus, links and buttons that help users move between pages"]], "feedback": "Acceptable: The menus, links and buttons that help users move between pages."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q89" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q89')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">90. A student is planning a website homepage and needs to decide where the logo, menu, images and buttons will appear. Which document should they use, and why?</label>
+                    <textarea id="ent33_v2_q90" class="auto-input ent33v2-input" rows="3" data-rubric='{"keywords": [["wireframe", "shows structure and position of items on page before website is built"]], "feedback": "Acceptable: A wireframe, because it shows structure and position of items on the page before the website is built."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-ent33_v2_q90" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent33_v2_q90')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('ent33v2-input')">Check Answers</button>
+            </div>
+        </main>
+    </div>
+    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
+        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
+        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+    </div>
+
+    <!-- SECURE PASSWORD MODAL -->
+    <div class="modal-overlay" id="verify-modal">
+        <div class="modal-content">
+            <h3>Teacher Verification</h3>
+            <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
+            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter PIN">
+            <div class="modal-btn-row">
+                <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
+                <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
+
+    <script>
+        function saveProgress() {
+            var inputs = document.querySelectorAll('.auto-input');
+            var dataToSave = {};
+            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
+            try { localStorage.setItem('enterprise3_3v2Memory_Smart_v1', JSON.stringify(dataToSave)); } catch (e) {}
+        }
+        function loadProgress() {
+            var saved = localStorage.getItem('enterprise3_3v2Memory_Smart_v1');
+            if (saved) {
+                var data = JSON.parse(saved);
+                var inputs = document.querySelectorAll('.auto-input');
+                for (var i = 0; i < inputs.length; i++) {
+                    if (data['input_' + i]) {
+                        inputs[i].value = data['input_' + i];
+                        if (data['class_' + i]) {
+                            inputs[i].className = data['class_' + i];
+                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
+                                var btnId = "override-" + inputs[i].id;
+                                var btn = document.getElementById(btnId);
+                                if (btn) btn.classList.remove('hidden');
+                            }
+                        }
+                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                            inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
+                        }
+                    }
+                }
+            }
+        }
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                saveProgress();
+                if (e.target.tagName.toLowerCase() === 'textarea') {
+                    e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';
+                }
+            }
+        });
+        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterprise3_3v2Memory_Smart_v1'); window.location.reload(); } }
+        window.onload = loadProgress;
+
+        let activeQuestionId = null;
+        function openVerifyModal(qId) {
+            activeQuestionId = qId;
+            document.getElementById('teacher-password-input').value = '';
+            document.getElementById('modal-error-msg').style.display = 'none';
+            document.getElementById('verify-modal').style.display = 'flex';
+            document.getElementById('teacher-password-input').focus();
+        }
+        function closeVerifyModal() {
+            document.getElementById('verify-modal').style.display = 'none';
+            activeQuestionId = null;
+        }
+        function submitVerify() {
+            var pass = document.getElementById('teacher-password-input').value;
+            if (pass === '2525') {
+                var inputEl = document.getElementById(activeQuestionId);
+                var feedbackDiv = inputEl.nextElementSibling;
+                inputEl.classList.add('teacher-locked');
+                if (inputEl.classList.contains('correct')) {
+                    inputEl.classList.remove('correct');
+                    inputEl.classList.add('incorrect');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; feedbackDiv.style.color = "#b71c1c"; feedbackDiv.style.display = "block"; }
+                } else {
+                    inputEl.classList.remove('incorrect');
+                    inputEl.classList.add('correct');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
+                }
+                closeVerifyModal();
+                saveProgress();
+            } else {
+                document.getElementById('modal-error-msg').style.display = 'block';
+            }
+        }
+        document.getElementById('teacher-password-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') submitVerify();
+        });
+
+        function checkAnswers(groupClass) {
+            var inputs = document.querySelectorAll('.' + groupClass);
+            for (var i = 0; i < inputs.length; i++) {
+                var inputElement = inputs[i];
+                var feedbackDiv = inputElement.nextElementSibling;
+                var overrideBtn = document.getElementById("override-" + inputElement.id);
+                if (overrideBtn) overrideBtn.classList.remove('hidden');
+
+                if (inputElement.classList.contains('teacher-locked')) {
+                    continue; 
+                }
+
+                var studentAnswer = inputElement.value.toLowerCase().replace(/[^a-z0-9\s\+\-\/\*\=\%]/g, " ").replace(/\s+/g, " ").trim();
+                var rubricStr = inputElement.getAttribute('data-rubric');
+                if(!rubricStr) continue;
+                var rubric;
+                try { rubric = JSON.parse(rubricStr); } catch (error) { continue; }
+                
+                var keywordGroups = rubric.keywords; 
+                inputElement.classList.remove('correct', 'incorrect');
+                if (studentAnswer === "") { if(feedbackDiv) feedbackDiv.style.display = 'none'; continue; }
+                
+                var wordCount = studentAnswer.split(" ").length;
+                if (!keywordGroups || keywordGroups.length === 0) {
+                    inputElement.classList.add('correct');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Answer recorded."; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
+                    continue;
+                }
+                
+                var conceptsFound = 0;
+                for(var k = 0; k < keywordGroups.length; k++) {
+                    var terms = keywordGroups[k];
+                    var matched = false;
+                    for(var s = 0; s < terms.length; s++) {
+                        var term = terms[s].toLowerCase().trim();
+                        if (term.length >= 3) { if (studentAnswer.includes(term)) { matched = true; break; } }
+                        else { var regex = new RegExp("\\b" + term + "\\b"); if (regex.test(studentAnswer)) { matched = true; break; } }
+                    }
+                    if(matched) conceptsFound++;
+                }
+                
+                var score = conceptsFound / keywordGroups.length;
+                var isPassed = false;
+                if (keywordGroups.length > 1) { isPassed = (score === 1); }
+                else { isPassed = (score >= 1 || (wordCount >= 4)); }
+                
+                if(feedbackDiv) {
+                    if (isPassed) {
+                        inputElement.classList.add('correct');
+                        feedbackDiv.innerHTML = "✅ Correct! All required concepts covered.";
+                        feedbackDiv.style.color = "#006100";
+                        feedbackDiv.style.display = "block";
+                    } else if (keywordGroups.length > 1 && score >= 0.5) {
+                        inputElement.classList.add('incorrect');
+                        feedbackDiv.innerHTML = "⚠️ Partial credit (" + conceptsFound + "/" + keywordGroups.length + " concepts). " + rubric.feedback;
+                        feedbackDiv.style.color = "#b27a00";
+                        feedbackDiv.style.display = "block";
+                    } else {
+                        inputElement.classList.add('incorrect');
+                        feedbackDiv.innerHTML = "❌ Not quite. " + rubric.feedback;
+                        feedbackDiv.style.color = "#b71c1c";
+                        feedbackDiv.style.display = "block";
+                    }
+                }
+            }
+            saveProgress();
+        }
+
+        function downloadPDF() {
+            var hide = document.querySelectorAll('.no-print');
+            for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
+            document.getElementById('action-buttons').style.display = 'none';
+
+            var textAreas = document.querySelectorAll('textarea');
+            for (var j = 0; j < textAreas.length; j++) {
+                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
+            }
+
+            var element = document.getElementById('pdf-content');
+            var opt = { 
+                margin: 0.3, 
+                filename: '3.3_Pre_Production_Documents.pdf', 
+                image: { type: 'jpeg', quality: 0.98 }, 
+                html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, 
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            html2pdf().set(opt).from(element).save().then(function() {
+                for(var b=0; b<hide.length; b++) hide[b].style.display = 'block';
+                document.getElementById('action-buttons').style.display = 'flex';
+                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
+            });
+        }
+    </script>
+</body>
+</html>
