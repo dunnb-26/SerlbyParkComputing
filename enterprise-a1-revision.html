@@ -451,13 +451,18 @@
             if (e.key === 'Enter') submitVerify();
         });
 
-        function checkAnswers(groupClass) {
+function checkAnswers(groupClass) {
             var inputs = document.querySelectorAll('.' + groupClass);
             for (var i = 0; i < inputs.length; i++) {
                 var inputElement = inputs[i];
                 var feedbackDiv = inputElement.nextElementSibling;
                 var overrideBtn = document.getElementById("override-" + inputElement.id);
                 if (overrideBtn) overrideBtn.classList.remove('hidden');
+
+                // 🛡️ PROTECT TEACHER OVERRIDES: If already marked correct via override, skip auto-checking!
+                if (inputElement.classList.contains('correct') && feedbackDiv && feedbackDiv.innerHTML.includes("Teacher Approved Override")) {
+                    continue; 
+                }
 
                 var studentAnswer = inputElement.value.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
                 var rubricStr = inputElement.getAttribute('data-rubric');
@@ -499,7 +504,7 @@
                         feedbackDiv.innerHTML = "✅ Correct! All required concepts covered.";
                         feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block";
                     } else if (keywordGroups.length > 1 && score >= 0.5) {
-                        inputElement.classList.add('incorrect'); // or partial
+                        inputElement.classList.add('incorrect');
                         feedbackDiv.innerHTML = "⚠️ Partial credit (" + conceptsFound + "/" + keywordGroups.length + " concepts). " + rubric.feedback;
                         feedbackDiv.style.color = "#b27a00"; feedbackDiv.style.display = "block";
                     } else {
