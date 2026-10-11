@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C4: Break Even Analysis - Revision</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
+        .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
+        .task-prep { border-top: 6px solid #607d8b; } 
+        .task-navy { border-top: 6px solid #1e3a8a; } 
+        .task-card h2 { margin-top: 0; color: #333; }
+        .task-prep h2 { color: #607d8b; }
+        .task-navy h2 { color: #1e3a8a; }
+        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; }
+        .center-text { text-align: center; }
+        .question-wrapper { margin-bottom: 25px; page-break-inside: avoid !important; break-inside: avoid !important; }
+        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
+        .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit; }
+        .auto-input:focus { outline: none; border-color: #666; }
+        textarea.auto-input { resize: vertical; min-height: 80px; }
+        .correct { border-color: #388e3c !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
+        .incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
+        .feedback-msg { font-size: 14px; margin-top: 8px; font-weight: bold; display: none; }
+        .teacher-override-btn { background-color: #607d8b; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        .teacher-override-btn:hover { background-color: #455a64; }
+        .hidden { display: none !important; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; border-top: 6px solid #1e3a8a; }
+        .modal-input { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; text-align: center; }
+        .modal-btn-row { display: flex; gap: 10px; }
+        .modal-btn-confirm { flex: 1; background-color: #1e3a8a; color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-btn-cancel { flex: 1; background-color: #ccc; color: #333; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
+        .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
+        .btn-submit:hover { background-color: #152960; }
+        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
+        .btn-pdf:hover { background-color: #124d2d; }
+    </style>
+</head>
+<body>
+    <div id="pdf-content">
+        <header>
+            <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
+            <div class="header-center"><h1>C4: Break Even Analysis</h1></div>
+            <div class="header-right"><a href="enterprise-revision.html" class="back-btn">&larr; Back to Hub</a></div>
+        </header>
+
+        <main class="task-container">
+            <div class="task-card task-prep">
+                <h2>C4 Revision Notes</h2>
+                <div class="instruction-box center-text">Use this space to write out your complete notes on fixed and variable costs, total costs, revenue, break even point, margin of safety, break even charts, and the strengths and limitations of break even analysis.</div>
+                <div class="question-wrapper">
+                    <textarea class="auto-input" rows="12" placeholder="Type your revision notes here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                </div>
+            </div>
+
+            <div class="task-card task-navy">
+                <h2>Self-Marking Knowledge Check</h2>
+                <div class="instruction-box center-text">Answer the questions below. Smart-marker active.</div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 1: Key Knowledge</h3>
+                
+                <div class="question-wrapper">
+                    <label class="question-label">Q1. What are fixed costs?</label>
+                    <input type="text" id="c4_q1" class="auto-input c4-input" data-rubric='{"keywords": [["costs", "expenses"], ["stay the same", "constant"], ["regardless of output", "output"]], "feedback": "Costs that stay the same regardless of output."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q1')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">Q2. Give one example of a fixed cost.</label>
+                    <input type="text" id="c4_q2" class="auto-input c4-input" data-rubric='{"keywords": [["rent", "insurance", "salaries", "business rates"]], "feedback": "Rent."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q2')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">Q3. What are variable costs?</label>
+                    <input type="text" id="c4_q3" class="auto-input c4-input" data-rubric='{"keywords": [["costs", "expenses"], ["change", "vary"], ["with output", "output"]], "feedback": "Costs that change with output."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q3')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">Q4. Give one example of a variable cost.</label>
+                    <input type="text" id="c4_q4" class="auto-input c4-input" data-rubric='{"keywords": [["raw materials", "materials", "stock", "piece rate wages"]], "feedback": "Raw materials."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q4')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">Q5. What are total costs?</label>
+                    <input type="text" id="c4_q5" class="auto-input c4-input" data-rubric='{"keywords": [["fixed costs"], ["plus", "add"], ["variable costs"]], "feedback": "Fixed costs plus variable costs."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q5')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">Q6. What is total revenue?</label>
+                    <input type="text" id="c4_q6" class="auto-input c4-input" data-rubric='{"keywords": [["selling price"], ["multiplied by", "times"], ["quantity sold", "quantity"]], "feedback": "Selling price multiplied by quantity sold."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q6')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">Q7. What is the break even point?</label>
+                    <input type="text" id="c4_q7" class="auto-input c4-input" data-rubric='{"keywords": [["output", "sales"], ["total revenue equals total costs", "revenue equals costs"]], "feedback": "Output where total revenue equals total costs."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q7')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">Q8. What happens at the break even point?</label>
+                    <input type="text" id="c4_q8" class="auto-input c4-input" data-rubric='{"keywords": [["no profit", "zero profit"], ["no loss", "zero loss"]], "feedback": "No profit or loss."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q8')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">Q9. What is the margin of safety?</label>
+                    <input type="text" id="c4_q9" class="auto-input c4-input" data-rubric='{"keywords": [["actual sales", "forecast sales"], ["minus", "subtract"], ["break even output", "break even"]], "feedback": "Actual or forecast sales minus break even output."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q9')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">Q10. What is the area of profit on a break even chart?</label>
+                    <input type="text" id="c4_q10" class="auto-input c4-input" data-rubric='{"keywords": [["total revenue exceeds total costs", "revenue exceeds costs"]], "feedback": "Area where total revenue exceeds total costs."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q10')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">Q11. What is the area of loss on a break even chart?</label>
+                    <input type="text" id="c4_q11" class="auto-input c4-input" data-rubric='{"keywords": [["total costs exceeds total revenue", "costs exceed revenue"]], "feedback": "Area where total costs exceed total revenue."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q11')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 2: Calculating Costs and Revenue</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">Q12. An enterprise has fixed costs of £500 and variable costs of £300. Calculate total costs.</label>
+                    <input type="text" id="c4_q12" class="auto-input c4-input" data-rubric='{"keywords": [["800", "£800"]], "feedback": "£800."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q12')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q13. An enterprise sells 100 products at £10 each. Calculate total revenue.</label>
+                    <input type="text" id="c4_q13" class="auto-input c4-input" data-rubric='{"keywords": [["1000", "£1000"]], "feedback": "£1,000."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q13')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q14. An enterprise has fixed costs of £400 and variable costs of £600. Calculate total costs.</label>
+                    <input type="text" id="c4_q14" class="auto-input c4-input" data-rubric='{"keywords": [["1000", "£1000"]], "feedback": "£1,000."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q14')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q15. An enterprise sells 200 products at £5 each. Calculate total revenue.</label>
+                    <input type="text" id="c4_q15" class="auto-input c4-input" data-rubric='{"keywords": [["1000", "£1000"]], "feedback": "£1,000."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q15')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q16. An enterprise has total revenue of £2,000 and total costs of £1,500. Calculate its profit.</label>
+                    <input type="text" id="c4_q16" class="auto-input c4-input" data-rubric='{"keywords": [["500", "£500"]], "feedback": "£500."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q16')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q17. An enterprise has total revenue of £1,200 and total costs of £1,500. Calculate its loss.</label>
+                    <input type="text" id="c4_q17" class="auto-input c4-input" data-rubric='{"keywords": [["300", "£300"]], "feedback": "£300."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q17')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 3: Calculating the Break Even Point</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">Q18. What is the formula for the break even point in units?</label>
+                    <input type="text" id="c4_q18" class="auto-input c4-input" data-rubric='{"keywords": [["fixed costs"], ["divided by", "÷", "/"], ["contribution per unit"]], "feedback": "Fixed costs divided by contribution per unit."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q18')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q19. How is contribution per unit calculated?</label>
+                    <input type="text" id="c4_q19" class="auto-input c4-input" data-rubric='{"keywords": [["selling price per unit", "selling price"], ["minus", "subtract"], ["variable cost per unit", "variable cost"]], "feedback": "Selling price per unit minus variable cost per unit."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q19')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q20. An enterprise sells a product for £10. Variable cost per unit is £4. Calculate contribution per unit.</label>
+                    <input type="text" id="c4_q20" class="auto-input c4-input" data-rubric='{"keywords": [["6", "£6"]], "feedback": "£6."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q20')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q21. Fixed costs are £600 and contribution per unit is £6. Calculate the break even point.</label>
+                    <input type="text" id="c4_q21" class="auto-input c4-input" data-rubric='{"keywords": [["100", "100 units"]], "feedback": "100 units."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q21')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q22. Fixed costs are £1,000 and contribution per unit is £5. Calculate the break even point.</label>
+                    <input type="text" id="c4_q22" class="auto-input c4-input" data-rubric='{"keywords": [["200", "200 units"]], "feedback": "200 units."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q22')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q23. Fixed costs are £800, selling price is £12 and variable cost per unit is £4. Calculate the break even point.</label>
+                    <input type="text" id="c4_q23" class="auto-input c4-input" data-rubric='{"keywords": [["100", "100 units"]], "feedback": "100 units."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q23')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q24. An enterprise breaks even at 150 units and sells 200 units. How many units above break even has it sold?</label>
+                    <input type="text" id="c4_q24" class="auto-input c4-input" data-rubric='{"keywords": [["50", "50 units"]], "feedback": "50 units."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q24')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 4: Margin of Safety</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">Q25. What is the formula for margin of safety?</label>
+                    <input type="text" id="c4_q25" class="auto-input c4-input" data-rubric='{"keywords": [["actual sales"], ["minus", "subtract"], ["break even sales"]], "feedback": "Actual sales minus break even sales."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q25')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q26. An enterprise sells 300 units and breaks even at 200 units. Calculate its margin of safety.</label>
+                    <input type="text" id="c4_q26" class="auto-input c4-input" data-rubric='{"keywords": [["100", "100 units"]], "feedback": "100 units."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q26" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q26')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q27. An enterprise sells 500 units and breaks even at 350 units. Calculate its margin of safety.</label>
+                    <input type="text" id="c4_q27" class="auto-input c4-input" data-rubric='{"keywords": [["150", "150 units"]], "feedback": "150 units."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q27" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q27')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q28. An enterprise sells 250 units and breaks even at 250 units. Calculate its margin of safety.</label>
+                    <input type="text" id="c4_q28" class="auto-input c4-input" data-rubric='{"keywords": [["0", "0 units", "zero"]], "feedback": "0 units."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q28" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q28')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q29. What does a large margin of safety suggest?</label>
+                    <input type="text" id="c4_q29" class="auto-input c4-input" data-rubric='{"keywords": [["sales can fall further", "sales fall"], ["before a loss occurs", "loss"]], "feedback": "Sales can fall further before a loss occurs."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q29" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q29')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q30. What does a small margin of safety suggest?</label>
+                    <input type="text" id="c4_q30" class="auto-input c4-input" data-rubric='{"keywords": [["greater risk", "risk"], ["making a loss", "loss"]], "feedback": "Greater risk of making a loss."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q30" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q30')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 5: Break Even Charts</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">Q31. What does the horizontal axis usually show on a break even chart?</label>
+                    <input type="text" id="c4_q31" class="auto-input c4-input" data-rubric='{"keywords": [["output", "units sold"]], "feedback": "Output or units sold."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q31" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q31')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q32. What does the vertical axis usually show on a break even chart?</label>
+                    <input type="text" id="c4_q32" class="auto-input c4-input" data-rubric='{"keywords": [["costs and revenue", "costs", "revenue"], ["pounds", "money"]], "feedback": "Costs and revenue in pounds."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q32" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q32')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q33. What does the total revenue line show?</label>
+                    <input type="text" id="c4_q33" class="auto-input c4-input" data-rubric='{"keywords": [["income from sales", "income"], ["different output levels", "output"]], "feedback": "Income from sales at different output levels."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q33" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q33')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q34. What does the total cost line show?</label>
+                    <input type="text" id="c4_q34" class="auto-input c4-input" data-rubric='{"keywords": [["fixed costs plus variable costs", "fixed and variable costs"], ["output levels"]], "feedback": "Fixed costs plus variable costs at different output levels."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q34" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q34')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q35. Where is the break even point shown on a break even chart?</label>
+                    <input type="text" id="c4_q35" class="auto-input c4-input" data-rubric='{"keywords": [["total revenue and total costs intersect", "intersect", "cross"]], "feedback": "Where total revenue and total costs intersect."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q35" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q35')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q36. Where is the profit area on a break even chart?</label>
+                    <input type="text" id="c4_q36" class="auto-input c4-input" data-rubric='{"keywords": [["total revenue is above total costs", "revenue above costs"]], "feedback": "Where total revenue is above total costs."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q36" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q36')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q37. Where is the loss area on a break even chart?</label>
+                    <input type="text" id="c4_q37" class="auto-input c4-input" data-rubric='{"keywords": [["total costs are above total revenue", "costs above revenue"]], "feedback": "Where total costs are above total revenue."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q37" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q37')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q38. What happens to the total revenue line when more units are sold at the same price?</label>
+                    <input type="text" id="c4_q38" class="auto-input c4-input" data-rubric='{"keywords": [["revenue increases", "increases"]], "feedback": "Revenue increases."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q38" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q38')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 6: Importance of Breaking Even</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">Q39. Why is breaking even important to an enterprise?</label>
+                    <input type="text" id="c4_q39" class="auto-input c4-input" data-rubric='{"keywords": [["covers all costs", "covers costs"]], "feedback": "Covers all costs."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q39" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q39')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q40. Why might a new enterprise aim to break even quickly?</label>
+                    <input type="text" id="c4_q40" class="auto-input c4-input" data-rubric='{"keywords": [["reduce financial risk", "risk"]], "feedback": "Reduce financial risk."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q40" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q40')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q41. What happens if an enterprise consistently sells below its break even point?</label>
+                    <input type="text" id="c4_q41" class="auto-input c4-input" data-rubric='{"keywords": [["makes a loss", "loss"]], "feedback": "Makes a loss."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q41" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q41')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q42. How can break even analysis help an enterprise set prices?</label>
+                    <input type="text" id="c4_q42" class="auto-input c4-input" data-rubric='{"keywords": [["shows sales needed", "sales needed"], ["cover costs", "given price"]], "feedback": "Shows sales needed to cover costs at a given price."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q42" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q42')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q43. How can break even analysis help an enterprise decide how many products to sell?</label>
+                    <input type="text" id="c4_q43" class="auto-input c4-input" data-rubric='{"keywords": [["identifies minimum sales", "minimum sales"], ["cover costs"]], "feedback": "Identifies minimum sales needed to cover costs."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q43" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q43')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 7: Strengths and Limitations</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">Q44. Give one strength of break even analysis.</label>
+                    <input type="text" id="c4_q44" class="auto-input c4-input" data-rubric='{"keywords": [["identifies sales needed", "sales needed to cover costs"]], "feedback": "Identifies sales needed to cover costs."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q44" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q44')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q45. Give another strength of break even analysis.</label>
+                    <input type="text" id="c4_q45" class="auto-input c4-input" data-rubric='{"keywords": [["helps with pricing", "pricing"], ["sales targets", "targets"]], "feedback": "Helps with pricing and sales targets."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q45" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q45')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q46. Give one limitation of break even analysis.</label>
+                    <input type="text" id="c4_q46" class="auto-input c4-input" data-rubric='{"keywords": [["sales forecasts may be inaccurate", "forecasts inaccurate"], ["estimates"]], "feedback": "Sales forecasts may be inaccurate."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q46" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q46')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q47. Give another limitation of break even analysis.</label>
+                    <input type="text" id="c4_q47" class="auto-input c4-input" data-rubric='{"keywords": [["assumes", "assumption"], ["prices and costs remain constant", "constant"]], "feedback": "Assumes selling prices and costs remain constant."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q47" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q47')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q48. Why might break even analysis be less reliable when costs change frequently?</label>
+                    <textarea id="c4_q48" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["calculations", "results"], ["no longer reflect actual costs", "actual costs"]], "feedback": "Calculations may no longer reflect actual costs."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q48" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q48')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q49. Why might actual sales differ from the break even forecast?</label>
+                    <textarea id="c4_q49" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["changes in demand", "demand"], ["competition", "economic conditions"]], "feedback": "Changes in demand, competition, or economic conditions."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q49" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q49')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 8: Application Questions</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">Q50. Calculate the contribution per candle.</label>
+                    <input type="text" id="c4_q50" class="auto-input c4-input" data-rubric='{"keywords": [["10", "£10"]], "feedback": "£10."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q50" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q50')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q51. Calculate the break even point in units.</label>
+                    <input type="text" id="c4_q51" class="auto-input c4-input" data-rubric='{"keywords": [["100", "100 candles"]], "feedback": "100 candles."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q51" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q51')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q52. Calculate the margin of safety.</label>
+                    <input type="text" id="c4_q52" class="auto-input c4-input" data-rubric='{"keywords": [["50", "50 candles"]], "feedback": "50 candles."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q52" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q52')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q53. Calculate the total revenue from selling 150 candles.</label>
+                    <input type="text" id="c4_q53" class="auto-input c4-input" data-rubric='{"keywords": [["2250", "£2250"]], "feedback": "£2,250."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q53" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q53')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q54. Calculate the total costs of producing and selling 150 candles.</label>
+                    <input type="text" id="c4_q54" class="auto-input c4-input" data-rubric='{"keywords": [["1750", "£1750"]], "feedback": "£1,750."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q54" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q54')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q55. Calculate the profit from selling 150 candles.</label>
+                    <input type="text" id="c4_q55" class="auto-input c4-input" data-rubric='{"keywords": [["500", "£500"]], "feedback": "£500."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q55" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q55')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q56. Explain what the margin of safety tells Yorkshire Candles.</label>
+                    <textarea id="c4_q56" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["sales can fall by 50 candles", "sales fall by 50"], ["reaches break even", "break even"]], "feedback": "Sales can fall by 50 candles before the enterprise reaches break even."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q56" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q56')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 9: Exam Style Questions</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">Q57. State two examples of fixed costs. (2 marks)</label>
+                    <input type="text" id="c4_q57" class="auto-input c4-input" data-rubric='{"keywords": [["rent", "insurance", "salaries"]], "feedback": "Rent and insurance."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q57" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q57')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q58. Explain one difference between fixed costs and variable costs. (3 marks)</label>
+                    <textarea id="c4_q58" class="auto-input c4-input" rows="3" data-rubric='{"keywords": [["fixed costs stay the same", "stay the same"], ["variable costs change with output", "change with output"], ["production increases", "increases"]], "feedback": "Fixed costs stay the same as output changes, while variable costs change with output, so higher production usually increases variable costs."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q58" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q58')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q59. Explain one benefit of break even analysis to an enterprise. (3 marks)</label>
+                    <textarea id="c4_q59" class="auto-input c4-input" rows="3" data-rubric='{"keywords": [["calculates minimum sales", "minimum sales"], ["helps set sales targets", "sales targets"], ["reduces uncertainty", "uncertainty"]], "feedback": "Calculates minimum sales required to cover costs, helps set sales targets, and reduces uncertainty."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q59" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q59')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q60. Explain one limitation of break even analysis. (3 marks)</label>
+                    <textarea id="c4_q60" class="auto-input c4-input" rows="3" data-rubric='{"keywords": [["relies on estimates", "estimates"], ["actual demand may change", "demand may change"], ["inaccurate", "assumptions"]], "feedback": "Relies on estimates, actual demand may change, and calculations may be inaccurate if assumptions fail."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q60" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q60')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q61. Explain why an enterprise should aim to sell above its break even point. (4 marks)</label>
+                    <textarea id="c4_q61" class="auto-input c4-input" rows="3" data-rubric='{"keywords": [["revenue exceeds total costs", "revenue exceeds costs"], ["profit is generated", "profit generated"], ["growth", "financial stability"]], "feedback": "Revenue exceeds total costs so profit is generated, providing money for growth and improving financial stability."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-c4_q61" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q61')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('c4-input')">Check Answers</button>
+            </div>
+        </main>
+    </div>
+    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
+        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
+        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+    </div>
+
+    <!-- SECURE PASSWORD MODAL -->
+    <div class="modal-overlay" id="verify-modal">
+        <div class="modal-content">
+            <h3>Teacher Verification</h3>
+            <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
+            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter PIN">
+            <div class="modal-btn-row">
+                <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
+                <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
+
+    <script>
+        function saveProgress() {
+            var inputs = document.querySelectorAll('.auto-input');
+            var dataToSave = {};
+            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
+            try { localStorage.setItem('enterpriseC4Memory_Smart', JSON.stringify(dataToSave)); } catch (e) {}
+        }
+        function loadProgress() {
+            var saved = localStorage.getItem('enterpriseC4Memory_Smart');
+            if (saved) {
+                var data = JSON.parse(saved);
+                var inputs = document.querySelectorAll('.auto-input');
+                for (var i = 0; i < inputs.length; i++) {
+                    if (data['input_' + i]) {
+                        inputs[i].value = data['input_' + i];
+                        if (data['class_' + i]) {
+                            inputs[i].className = data['class_' + i];
+                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
+                                var btnId = "override-" + inputs[i].id;
+                                var btn = document.getElementById(btnId);
+                                if (btn) btn.classList.remove('hidden');
+                            }
+                        }
+                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                            inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
+                        }
+                    }
+                }
+            }
+        }
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                saveProgress();
+                if (e.target.tagName.toLowerCase() === 'textarea') {
+                    e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';
+                }
+            }
+        });
+        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterpriseC4Memory_Smart'); window.location.reload(); } }
+        window.onload = loadProgress;
+
+        let activeQuestionId = null;
+        function openVerifyModal(qId) {
+            activeQuestionId = qId;
+            document.getElementById('teacher-password-input').value = '';
+            document.getElementById('modal-error-msg').style.display = 'none';
+            document.getElementById('verify-modal').style.display = 'flex';
+            document.getElementById('teacher-password-input').focus();
+        }
+        function closeVerifyModal() {
+            document.getElementById('verify-modal').style.display = 'none';
+            activeQuestionId = null;
+        }
+        function submitVerify() {
+            var pass = document.getElementById('teacher-password-input').value;
+            if (pass === '2525') {
+                var inputEl = document.getElementById(activeQuestionId);
+                var feedbackDiv = inputEl.nextElementSibling;
+                inputEl.classList.add('teacher-locked');
+                if (inputEl.classList.contains('correct')) {
+                    inputEl.classList.remove('correct');
+                    inputEl.classList.add('incorrect');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; feedbackDiv.style.color = "#b71c1c"; feedbackDiv.style.display = "block"; }
+                } else {
+                    inputEl.classList.remove('incorrect');
+                    inputEl.classList.add('correct');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
+                }
+                closeVerifyModal();
+                saveProgress();
+            } else {
+                document.getElementById('modal-error-msg').style.display = 'block';
+            }
+        }
+        document.getElementById('teacher-password-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') submitVerify();
+        });
+
+        function checkAnswers(groupClass) {
+            var inputs = document.querySelectorAll('.' + groupClass);
+            for (var i = 0; i < inputs.length; i++) {
+                var inputElement = inputs[i];
+                var feedbackDiv = inputElement.nextElementSibling;
+                var overrideBtn = document.getElementById("override-" + inputElement.id);
+                if (overrideBtn) overrideBtn.classList.remove('hidden');
+
+                if (inputElement.classList.contains('teacher-locked')) {
+                    continue; 
+                }
+
+                var studentAnswer = inputElement.value.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+                var rubricStr = inputElement.getAttribute('data-rubric');
+                if(!rubricStr) continue;
+                var rubric;
+                try { rubric = JSON.parse(rubricStr); } catch (error) { continue; }
+                
+                var keywordGroups = rubric.keywords; 
+                inputElement.classList.remove('correct', 'incorrect');
+                if (studentAnswer === "") { if(feedbackDiv) feedbackDiv.style.display = 'none'; continue; }
+                
+                var wordCount = studentAnswer.split(" ").length;
+                if (!keywordGroups || keywordGroups.length === 0) {
+                    inputElement.classList.add('correct');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Answer recorded."; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
+                    continue;
+                }
+                
+                var conceptsFound = 0;
+                for(var k = 0; k < keywordGroups.length; k++) {
+                    var terms = keywordGroups[k];
+                    var matched = false;
+                    for(var s = 0; s < terms.length; s++) {
+                        var term = terms[s].toLowerCase().trim();
+                        if (term.length >= 3) { if (studentAnswer.includes(term)) { matched = true; break; } }
+                        else { var regex = new RegExp("\\b" + term + "\\b"); if (regex.test(studentAnswer)) { matched = true; break; } }
+                    }
+                    if(matched) conceptsFound++;
+                }
+                
+                var score = conceptsFound / keywordGroups.length;
+                var isPassed = false;
+                if (keywordGroups.length > 1) { isPassed = (score === 1); }
+                else { isPassed = (score >= 1 || (wordCount >= 4)); }
+                
+                if(feedbackDiv) {
+                    if (isPassed) {
+                        inputElement.classList.add('correct');
+                        feedbackDiv.innerHTML = "✅ Correct! All required concepts covered.";
+                        feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block";
+                    } else if (keywordGroups.length > 1 && score >= 0.5) {
+                        inputElement.classList.add('incorrect');
+                        feedbackDiv.innerHTML = "⚠️ Partial credit (" + conceptsFound + "/" + keywordGroups.length + " concepts). " + rubric.feedback;
+                        feedbackDiv.style.color = "#b27a00"; feedbackDiv.style.display = "block";
+                    } else {
+                        inputElement.classList.add('incorrect');
+                        feedbackDiv.innerHTML = "❌ Not quite. " + rubric.feedback;
+                        feedbackDiv.style.color = "#b71c1c"; feedbackDiv.style.display = "block";
+                    }
+                }
+            }
+            saveProgress();
+        }
+
+        function downloadPDF() {
+            var hide = document.querySelectorAll('.no-print');
+            for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
+            document.getElementById('action-buttons').style.display = 'none';
+
+            var textAreas = document.querySelectorAll('textarea');
+            for (var j = 0; j < textAreas.length; j++) {
+                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
+            }
+
+            var element = document.getElementById('pdf-content');
+            var opt = { 
+                margin: 0.3, 
+                filename: 'C4_Break_Even_Analysis.pdf', 
+                image: { type: 'jpeg', quality: 0.98 }, 
+                html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, 
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            html2pdf().set(opt).from(element).save().then(function() {
+                for(var b=0; b<hide.length; b++) hide[b].style.display = 'block';
+                document.getElementById('action-buttons').style.display = 'flex';
+                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
+            });
+        }
+    </script>
+</body>
+</html>
