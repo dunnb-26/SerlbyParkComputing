@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B5: Financial Performance - Revision</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
+        .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
+        .task-prep { border-top: 6px solid #607d8b; } 
+        .task-navy { border-top: 6px solid #1e3a8a; } 
+        .task-card h2 { margin-top: 0; color: #333; }
+        .task-prep h2 { color: #607d8b; }
+        .task-navy h2 { color: #1e3a8a; }
+        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; }
+        .center-text { text-align: center; }
+        .question-wrapper { margin-bottom: 25px; page-break-inside: avoid !important; break-inside: avoid !important; }
+        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
+        .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit; }
+        .auto-input:focus { outline: none; border-color: #666; }
+        textarea.auto-input { resize: vertical; min-height: 80px; }
+        .correct { border-color: #388e3c !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
+        .incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
+        .feedback-msg { font-size: 14px; margin-top: 8px; font-weight: bold; display: none; }
+        .teacher-override-btn { background-color: #607d8b; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        .teacher-override-btn:hover { background-color: #455a64; }
+        .hidden { display: none !important; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; border-top: 6px solid #1e3a8a; }
+        .modal-input { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; text-align: center; }
+        .modal-btn-row { display: flex; gap: 10px; }
+        .modal-btn-confirm { flex: 1; background-color: #1e3a8a; color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-btn-cancel { flex: 1; background-color: #ccc; color: #333; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
+        .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
+        .btn-submit:hover { background-color: #152960; }
+        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
+        .btn-pdf:hover { background-color: #124d2d; }
+    </style>
+</head>
+<body>
+    <div id="pdf-content">
+        <header>
+            <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
+            <div class="header-center"><h1>B5: Financial Performance</h1></div>
+            <div class="header-right"><a href="enterprise-revision.html" class="back-btn">&larr; Back to Hub</a></div>
+        </header>
+
+        <main class="task-container">
+            <div class="task-card task-prep">
+                <h2>B5 Revision Notes</h2>
+                <div class="instruction-box center-text">Use this space to write out your complete notes on profitability vs liquidity, Gross Profit Margin (GPM), Net Profit Margin (NPM), Current Ratio, and Liquid Capital (Acid Test) Ratio.</div>
+                <div class="question-wrapper">
+                    <textarea class="auto-input" rows="12" placeholder="Type your revision notes here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                </div>
+            </div>
+
+            <div class="task-card task-navy">
+                <h2>Self-Marking Knowledge Check</h2>
+                <div class="instruction-box center-text">Answer the questions below. Financial ratio calculations and exam questions require clear explanations!</div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 1: Cash, Profitability and Liquidity</h3>
+                
+                <div class="question-wrapper">
+                    <label class="question-label">Q1. What is cash?</label>
+                    <input type="text" id="b5_q1" class="auto-input b5-input" data-rubric='{"keywords": [["money", "funds"], ["available", "enterprise", "business"]], "feedback": "Money available to the enterprise."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q1')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">Q2. What is profit?</label>
+                    <input type="text" id="b5_q2" class="auto-input b5-input" data-rubric='{"keywords": [["revenue"], ["minus", "subtract"], ["total costs", "costs"]], "feedback": "Revenue minus total costs."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q2')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">Q3. What is the difference between cash and profit?</label>
+                    <input type="text" id="b5_q3" class="auto-input b5-input" data-rubric='{"keywords": [["cash", "money available"], ["profit", "revenue", "costs"]], "feedback": "Cash is money available, while profit is revenue minus costs."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q3')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">Q4. Can an enterprise make a profit but have cash flow problems?</label>
+                    <input type="text" id="b5_q4" class="auto-input b5-input" data-rubric='{"keywords": [["yes"]], "feedback": "Yes."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q4')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">Q5. Why might a profitable enterprise have cash flow problems?</label>
+                    <input type="text" id="b5_q5" class="auto-input b5-input" data-rubric='{"keywords": [["customers", "invoices", "not paid"], ["cash", "tied up", "stock"]], "feedback": "Customers have not paid invoices or cash is tied up in stock."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q5')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">Q6. What is profitability?</label>
+                    <input type="text" id="b5_q6" class="auto-input b5-input" data-rubric='{"keywords": [["ability", "capacity"], ["generate", "make"], ["profit"]], "feedback": "The ability to generate profit."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q6')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">Q7. What is liquidity?</label>
+                    <input type="text" id="b5_q7" class="auto-input b5-input" data-rubric='{"keywords": [["ability", "capacity"], ["pay"], ["short term debts", "debts", "bills"]], "feedback": "The ability to pay short term debts."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q7')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">Q8. What is the difference between liquidity and profitability?</label>
+                    <input type="text" id="b5_q8" class="auto-input b5-input" data-rubric='{"keywords": [["liquidity", "pay debts"], ["profitability", "make profit"]], "feedback": "Liquidity measures ability to pay debts, whereas profitability measures ability to make profit."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q8')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">Q9. Why is profitability important to an enterprise?</label>
+                    <input type="text" id="b5_q9" class="auto-input b5-input" data-rubric='{"keywords": [["grow", "growth"], ["rewards owners", "owners"]], "feedback": "Helps the enterprise grow and rewards owners."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q9')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <div class="question-wrapper">
+                    <label class="question-label">Q10. Why is liquidity important to an enterprise?</label>
+                    <input type="text" id="b5_q10" class="auto-input b5-input" data-rubric='{"keywords": [["pay bills", "pay debts"], ["time", "promptly"]], "feedback": "Helps pay bills and debts on time."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q10')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 2: Gross Profit Margin (GPM)</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">Q11. What does gross profit margin measure?</label>
+                    <input type="text" id="b5_q11" class="auto-input b5-input" data-rubric='{"keywords": [["gross profit"], ["percentage"], ["revenue"]], "feedback": "Gross profit as a percentage of revenue."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q11')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q12. What is the formula for gross profit margin?</label>
+                    <input type="text" id="b5_q12" class="auto-input b5-input" data-rubric='{"keywords": [["gross profit"], ["revenue"], ["100"]], "feedback": "(Gross profit divided by revenue) multiplied by 100."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q12')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q13. An enterprise has gross profit of £4,000 and revenue of £10,000. Calculate its gross profit margin.</label>
+                    <input type="text" id="b5_q13" class="auto-input b5-input" data-rubric='{"keywords": [["40", "40%"]], "feedback": "40%."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q13')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q14. An enterprise has gross profit of £6,000 and revenue of £20,000. Calculate its gross profit margin.</label>
+                    <input type="text" id="b5_q14" class="auto-input b5-input" data-rubric='{"keywords": [["30", "30%"]], "feedback": "30%."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q14')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q15. An enterprise has gross profit of £9,000 and revenue of £15,000. Calculate its gross profit margin.</label>
+                    <input type="text" id="b5_q15" class="auto-input b5-input" data-rubric='{"keywords": [["60", "60%"]], "feedback": "60%."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q15')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q16. What does a high gross profit margin suggest?</label>
+                    <input type="text" id="b5_q16" class="auto-input b5-input" data-rubric='{"keywords": [["more gross profit", "gross profit"], ["each pound", "sales"]], "feedback": "More gross profit from each pound of sales."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q16')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q17. How could an enterprise increase its gross profit margin?</label>
+                    <input type="text" id="b5_q17" class="auto-input b5-input" data-rubric='{"keywords": [["reduce cost of sales", "cost of sales"], ["increase", "raise"], ["selling prices", "prices"]], "feedback": "Reduce cost of sales or increase selling prices."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q17')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 3: Net Profit Margin (NPM)</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">Q18. What does net profit margin measure?</label>
+                    <input type="text" id="b5_q18" class="auto-input b5-input" data-rubric='{"keywords": [["net profit"], ["percentage"], ["revenue"]], "feedback": "Net profit as a percentage of revenue."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q18')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q19. What is the formula for net profit margin?</label>
+                    <input type="text" id="b5_q19" class="auto-input b5-input" data-rubric='{"keywords": [["net profit"], ["revenue"], ["100"]], "feedback": "(Net profit divided by revenue) multiplied by 100."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q19')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q20. An enterprise has net profit of £2,000 and revenue of £10,000. Calculate its net profit margin.</label>
+                    <input type="text" id="b5_q20" class="auto-input b5-input" data-rubric='{"keywords": [["20", "20%"]], "feedback": "20%."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q20')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q21. An enterprise has net profit of £3,000 and revenue of £15,000. Calculate its net profit margin.</label>
+                    <input type="text" id="b5_q21" class="auto-input b5-input" data-rubric='{"keywords": [["20", "20%"]], "feedback": "20%."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q21')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q22. An enterprise has net profit of £4,000 and revenue of £20,000. Calculate its net profit margin.</label>
+                    <input type="text" id="b5_q22" class="auto-input b5-input" data-rubric='{"keywords": [["20", "20%"]], "feedback": "20%."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q22')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q23. What does a high net profit margin suggest?</label>
+                    <input type="text" id="b5_q23" class="auto-input b5-input" data-rubric='{"keywords": [["more net profit", "net profit"], ["each pound", "sales"]], "feedback": "More net profit from each pound of sales."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q23')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q24. How could an enterprise increase its net profit margin?</label>
+                    <input type="text" id="b5_q24" class="auto-input b5-input" data-rubric='{"keywords": [["reduce expenses", "expenses"], ["increase revenue", "revenue"]], "feedback": "Reduce expenses or increase revenue."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q24')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 4: Current Ratio</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">Q25. What does the current ratio measure?</label>
+                    <input type="text" id="b5_q25" class="auto-input b5-input" data-rubric='{"keywords": [["ability", "pay"], ["short term debts", "debts"], ["current assets"]], "feedback": "Ability to pay short term debts using current assets."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q25')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q26. What is the formula for the current ratio?</label>
+                    <input type="text" id="b5_q26" class="auto-input b5-input" data-rubric='{"keywords": [["current assets"], ["divided by", "÷", "/"], ["current liabilities"]], "feedback": "Current assets divided by current liabilities."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q26" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q26')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q27. An enterprise has current assets of £12,000 and current liabilities of £6,000. Calculate its current ratio.</label>
+                    <input type="text" id="b5_q27" class="auto-input b5-input" data-rubric='{"keywords": [["2:1", "2 to 1"]], "feedback": "2:1."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q27" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q27')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q28. An enterprise has current assets of £8,000 and current liabilities of £4,000. Calculate its current ratio.</label>
+                    <input type="text" id="b5_q28" class="auto-input b5-input" data-rubric='{"keywords": [["2:1", "2 to 1"]], "feedback": "2:1."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q28" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q28')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q29. An enterprise has current assets of £6,000 and current liabilities of £8,000. Calculate its current ratio.</label>
+                    <input type="text" id="b5_q29" class="auto-input b5-input" data-rubric='{"keywords": [["0.75:1", "0.75 to 1"]], "feedback": "0.75:1."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q29" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q29')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q30. What might a current ratio below 1:1 suggest?</label>
+                    <input type="text" id="b5_q30" class="auto-input b5-input" data-rubric='{"keywords": [["struggle", "unable"], ["pay short term debts", "debts"]], "feedback": "May struggle to pay short term debts."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q30" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q30')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q31. Why might a very high current ratio be a concern?</label>
+                    <input type="text" id="b5_q31" class="auto-input b5-input" data-rubric='{"keywords": [["too much money", "tied up"], ["current assets", "stock", "cash"]], "feedback": "Too much money tied up in current assets."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q31" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q31')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 5: Liquid Capital Ratio</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">Q32. What does the liquid capital ratio measure?</label>
+                    <input type="text" id="b5_q32" class="auto-input b5-input" data-rubric='{"keywords": [["ability", "pay"], ["short term debts", "debts"], ["without selling inventory", "inventory", "stock"]], "feedback": "Ability to pay short term debts without selling inventory."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q32" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q32')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q33. What is another name for the liquid capital ratio?</label>
+                    <input type="text" id="b5_q33" class="auto-input b5-input" data-rubric='{"keywords": [["acid test", "acid test ratio"]], "feedback": "Acid test ratio."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q33" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q33')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q34. What is the formula for the liquid capital ratio?</label>
+                    <input type="text" id="b5_q34" class="auto-input b5-input" data-rubric='{"keywords": [["current assets", "inventory"], ["divided by", "÷", "/"], ["current liabilities"]], "feedback": "(Current assets minus inventory) divided by current liabilities."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q34" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q34')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q35. An enterprise has current assets of £10,000, inventory of £2,000 and current liabilities of £4,000. Calculate its liquid capital ratio.</label>
+                    <input type="text" id="b5_q35" class="auto-input b5-input" data-rubric='{"keywords": [["2:1", "2 to 1"]], "feedback": "2:1."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q35" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q35')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q36. An enterprise has current assets of £9,000, inventory of £3,000 and current liabilities of £4,000. Calculate its liquid capital ratio.</label>
+                    <input type="text" id="b5_q36" class="auto-input b5-input" data-rubric='{"keywords": [["1.5:1", "1.5 to 1"]], "feedback": "1.5:1."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q36" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q36')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q37. An enterprise has current assets of £8,000, inventory of £4,000 and current liabilities of £6,000. Calculate its liquid capital ratio.</label>
+                    <input type="text" id="b5_q37" class="auto-input b5-input" data-rubric='{"keywords": [["0.67:1", "0.67 to 1"]], "feedback": "0.67:1."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q37" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q37')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q38. Why is inventory excluded from the liquid capital ratio?</label>
+                    <input type="text" id="b5_q38" class="auto-input b5-input" data-rubric='{"keywords": [["take time", "slow"], ["sell", "value"]], "feedback": "May take time to sell and may not sell quickly for its full value."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q38" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q38')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q39. What might a low liquid capital ratio suggest?</label>
+                    <input type="text" id="b5_q39" class="auto-input b5-input" data-rubric='{"keywords": [["struggle", "unable"], ["pay debts", "debts without selling"]], "feedback": "May struggle to pay debts without selling inventory."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q39" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q39')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 6: Application Questions</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">Q40. Calculate Yorkshire Sports' gross profit margin.</label>
+                    <input type="text" id="b5_q40" class="auto-input b5-input" data-rubric='{"keywords": [["40", "40%"]], "feedback": "40%."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q40" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q40')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q41. Calculate Yorkshire Sports' net profit margin.</label>
+                    <input type="text" id="b5_q41" class="auto-input b5-input" data-rubric='{"keywords": [["10", "10%"]], "feedback": "10%."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q41" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q41')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q42. Calculate Yorkshire Sports' current ratio.</label>
+                    <input type="text" id="b5_q42" class="auto-input b5-input" data-rubric='{"keywords": [["2:1", "2 to 1"]], "feedback": "2:1."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q42" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q42')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q43. Calculate Yorkshire Sports' liquid capital ratio.</label>
+                    <input type="text" id="b5_q43" class="auto-input b5-input" data-rubric='{"keywords": [["1.33:1", "1.33 to 1"]], "feedback": "1.33:1."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q43" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q43')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q44. What does the gross profit margin suggest about Yorkshire Sports?</label>
+                    <textarea id="b5_q44" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["40p", "gross profit"], ["1", "revenue"]], "feedback": "Makes 40p gross profit per £1 of revenue."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q44" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q44')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q45. What does the net profit margin suggest about Yorkshire Sports?</label>
+                    <textarea id="b5_q45" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["10p", "net profit"], ["1", "revenue"]], "feedback": "Makes 10p net profit per £1 of revenue."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q45" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q45')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q46. What does the current ratio suggest about Yorkshire Sports' liquidity?</label>
+                    <textarea id="b5_q46" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["twice", "double"], ["pay short term debts", "debts"]], "feedback": "Current assets are twice current liabilities, meaning it may be able to pay short term debts."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q46" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q46')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q47. Why might the liquid capital ratio be more useful than the current ratio for some enterprises?</label>
+                    <textarea id="b5_q47" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["excludes inventory", "inventory"], ["liquid assets", "liquidity"]], "feedback": "Excludes inventory and focuses on more liquid assets."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q47" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q47')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 7: Exam Style Questions</h3>
+                <div class="question-wrapper">
+                    <label class="question-label">Q48. State the formula for gross profit margin. (2 marks)</label>
+                    <input type="text" id="b5_q48" class="auto-input b5-input" data-rubric='{"keywords": [["gross profit"], ["revenue"], ["100"]], "feedback": "Gross profit divided by revenue multiplied by 100."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q48" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q48')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q49. State the formula for the liquid capital ratio. (2 marks)</label>
+                    <input type="text" id="b5_q49" class="auto-input b5-input" data-rubric='{"keywords": [["current assets", "inventory"], ["divided by", "÷", "/"], ["current liabilities"]], "feedback": "Current assets minus inventory, divided by current liabilities."}' placeholder="Type answer here...">
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q49" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q49')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q50. Explain one difference between profitability and liquidity. (3 marks)</label>
+                    <textarea id="b5_q50" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["profitability", "make profit"], ["liquidity", "pay short term debts"]], "feedback": "Profitability measures ability to make profit, while liquidity measures ability to pay short term debts."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q50" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q50')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q51. Explain why an enterprise might have high profitability but low liquidity. (3 marks)</label>
+                    <textarea id="b5_q51" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["profit", "sales"], ["tied up", "owe money", "inventory"], ["cash", "pay bills"]], "feedback": "High profit from sales, but cash is tied up in inventory or owed by customers, leaving insufficient cash to pay bills."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q51" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q51')">👨‍🏫 Override Score</button></div>
+                </div>
+                <div class="question-wrapper">
+                    <label class="question-label">Q52. Explain why an enterprise should monitor its profitability and liquidity ratios. (4 marks)</label>
+                    <textarea id="b5_q52" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["measure", "performance"], ["pay debts", "profit"], ["identify problems", "decisions"]], "feedback": "Measures profit performance and debt-paying ability, identifies problems early, and supports financial decisions."}' placeholder="Type answer here..."></textarea>
+                    <div class="feedback-msg"></div>
+                    <div style="text-align: right;"><button id="override-b5_q52" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q52')">👨‍🏫 Override Score</button></div>
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('b5-input')">Check Answers</button>
+            </div>
+        </main>
+    </div>
+    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
+        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
+        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+    </div>
+
+    <!-- SECURE PASSWORD MODAL -->
+    <div class="modal-overlay" id="verify-modal">
+        <div class="modal-content">
+            <h3>Teacher Verification</h3>
+            <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
+            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter PIN">
+            <div class="modal-btn-row">
+                <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
+                <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
+
+    <script>
+        function saveProgress() {
+            var inputs = document.querySelectorAll('.auto-input');
+            var dataToSave = {};
+            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
+            try { localStorage.setItem('enterpriseB5Memory_Smart', JSON.stringify(dataToSave)); } catch (e) {}
+        }
+        function loadProgress() {
+            var saved = localStorage.getItem('enterpriseB5Memory_Smart');
+            if (saved) {
+                var data = JSON.parse(saved);
+                var inputs = document.querySelectorAll('.auto-input');
+                for (var i = 0; i < inputs.length; i++) {
+                    if (data['input_' + i]) {
+                        inputs[i].value = data['input_' + i];
+                        if (data['class_' + i]) {
+                            inputs[i].className = data['class_' + i];
+                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
+                                var btnId = "override-" + inputs[i].id;
+                                var btn = document.getElementById(btnId);
+                                if (btn) btn.classList.remove('hidden');
+                            }
+                        }
+                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                            inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
+                        }
+                    }
+                }
+            }
+        }
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                saveProgress();
+                if (e.target.tagName.toLowerCase() === 'textarea') {
+                    e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';
+                }
+            }
+        });
+        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterpriseB5Memory_Smart'); window.location.reload(); } }
+        window.onload = loadProgress;
+
+        let activeQuestionId = null;
+        function openVerifyModal(qId) {
+            activeQuestionId = qId;
+            document.getElementById('teacher-password-input').value = '';
+            document.getElementById('modal-error-msg').style.display = 'none';
+            document.getElementById('verify-modal').style.display = 'flex';
+            document.getElementById('teacher-password-input').focus();
+        }
+        function closeVerifyModal() {
+            document.getElementById('verify-modal').style.display = 'none';
+            activeQuestionId = null;
+        }
+        function submitVerify() {
+            var pass = document.getElementById('teacher-password-input').value;
+            if (pass === '2525') {
+                var inputEl = document.getElementById(activeQuestionId);
+                var feedbackDiv = inputEl.nextElementSibling;
+                inputEl.classList.add('teacher-locked');
+                if (inputEl.classList.contains('correct')) {
+                    inputEl.classList.remove('correct');
+                    inputEl.classList.add('incorrect');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; feedbackDiv.style.color = "#b71c1c"; feedbackDiv.style.display = "block"; }
+                } else {
+                    inputEl.classList.remove('incorrect');
+                    inputEl.classList.add('correct');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
+                }
+                closeVerifyModal();
+                saveProgress();
+            } else {
+                document.getElementById('modal-error-msg').style.display = 'block';
+            }
+        }
+        document.getElementById('teacher-password-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') submitVerify();
+        });
+
+        function checkAnswers(groupClass) {
+            var inputs = document.querySelectorAll('.' + groupClass);
+            for (var i = 0; i < inputs.length; i++) {
+                var inputElement = inputs[i];
+                var feedbackDiv = inputElement.nextElementSibling;
+                var overrideBtn = document.getElementById("override-" + inputElement.id);
+                if (overrideBtn) overrideBtn.classList.remove('hidden');
+
+                if (inputElement.classList.contains('teacher-locked')) {
+                    continue; 
+                }
+
+                var studentAnswer = inputElement.value.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+                var rubricStr = inputElement.getAttribute('data-rubric');
+                if(!rubricStr) continue;
+                var rubric;
+                try { rubric = JSON.parse(rubricStr); } catch (error) { continue; }
+                
+                var keywordGroups = rubric.keywords; 
+                inputElement.classList.remove('correct', 'incorrect');
+                if (studentAnswer === "") { if(feedbackDiv) feedbackDiv.style.display = 'none'; continue; }
+                
+                var wordCount = studentAnswer.split(" ").length;
+                if (!keywordGroups || keywordGroups.length === 0) {
+                    inputElement.classList.add('correct');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Answer recorded."; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
+                    continue;
+                }
+                
+                var conceptsFound = 0;
+                for(var k = 0; k < keywordGroups.length; k++) {
+                    var terms = keywordGroups[k];
+                    var matched = false;
+                    for(var s = 0; s < terms.length; s++) {
+                        var term = terms[s].toLowerCase().trim();
+                        if (term.length >= 3) { if (studentAnswer.includes(term)) { matched = true; break; } }
+                        else { var regex = new RegExp("\\b" + term + "\\b"); if (regex.test(studentAnswer)) { matched = true; break; } }
+                    }
+                    if(matched) conceptsFound++;
+                }
+                
+                var score = conceptsFound / keywordGroups.length;
+                var isPassed = false;
+                if (keywordGroups.length > 1) { isPassed = (score === 1); }
+                else { isPassed = (score >= 1 || (wordCount >= 4)); }
+                
+                if(feedbackDiv) {
+                    if (isPassed) {
+                        inputElement.classList.add('correct');
+                        feedbackDiv.innerHTML = "✅ Correct! All required concepts covered.";
+                        feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block";
+                    } else if (keywordGroups.length > 1 && score >= 0.5) {
+                        inputElement.classList.add('incorrect');
+                        feedbackDiv.innerHTML = "⚠️ Partial credit (" + conceptsFound + "/" + keywordGroups.length + " concepts). " + rubric.feedback;
+                        feedbackDiv.style.color = "#b27a00"; feedbackDiv.style.display = "block";
+                    } else {
+                        inputElement.classList.add('incorrect');
+                        feedbackDiv.innerHTML = "❌ Not quite. " + rubric.feedback;
+                        feedbackDiv.style.color = "#b71c1c"; feedbackDiv.style.display = "block";
+                    }
+                }
+            }
+            saveProgress();
+        }
+
+        function downloadPDF() {
+            var hide = document.querySelectorAll('.no-print');
+            for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
+            document.getElementById('action-buttons').style.display = 'none';
+
+            var textAreas = document.querySelectorAll('textarea');
+            for (var j = 0; j < textAreas.length; j++) {
+                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
+            }
+
+            var element = document.getElementById('pdf-content');
+            var opt = { 
+                margin: 0.3, 
+                filename: 'B5_Financial_Performance.pdf', 
+                image: { type: 'jpeg', quality: 0.98 }, 
+                html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, 
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            html2pdf().set(opt).from(element).save().then(function() {
+                for(var b=0; b<hide.length; b++) hide[b].style.display = 'block';
+                document.getElementById('action-buttons').style.display = 'flex';
+                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
+            });
+        }
+    </script>
+</body>
+</html>
