@@ -50,7 +50,7 @@
 
             <div class="task-card task-navy">
                 <h2>Self-Marking Knowledge Check</h2>
-                <div class="instruction-box center-text">Answer the questions below. Click "Check Answers" at the bottom. <br><small><em>Lenient smart-marker checks for flexible concepts and alternative phrasings!</em></small></div>
+                <div class="instruction-box center-text">Answer the questions below. Click "Check Answers" at the bottom. <br><small><em>Definitions are flexible, but multi-part application questions require all key concepts!</em></small></div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 1: Key Definitions</h3>
                 
@@ -311,10 +311,10 @@
             var inputs = document.querySelectorAll('.auto-input');
             var dataToSave = {};
             for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; }
-            try { localStorage.setItem('enterpriseA1Memory_Lenient', JSON.stringify(dataToSave)); } catch (e) {}
+            try { localStorage.setItem('enterpriseA1Memory_Smart', JSON.stringify(dataToSave)); } catch (e) {}
         }
         function loadProgress() {
-            var saved = localStorage.getItem('enterpriseA1Memory_Lenient');
+            var saved = localStorage.getItem('enterpriseA1Memory_Smart');
             if (saved) {
                 var data = JSON.parse(saved);
                 var inputs = document.querySelectorAll('.auto-input');
@@ -337,16 +337,15 @@
                 }
             }
         });
-        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterpriseA1Memory_Lenient'); window.location.reload(); } }
+        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterpriseA1Memory_Smart'); window.location.reload(); } }
         window.onload = loadProgress;
 
-       /* --- HIGHLY LENIENT CONCEPT-BASED MARKING --- */
+        /* --- SMART CHECKING SCRIPT: STRICT ON MULTI-CONCEPT QUESTIONS --- */
         function checkAnswers(groupClass) {
             var inputs = document.getElementsByClassName(groupClass);
             
             for (var i = 0; i < inputs.length; i++) {
                 var inputElement = inputs[i];
-                
                 var studentAnswer = inputElement.value.toLowerCase()
                                         .replace(/[^a-z0-9\s]/g, " ")
                                         .replace(/\s+/g, " ")
@@ -363,17 +362,18 @@
                 inputElement.classList.remove('input-correct', 'input-partial', 'input-incorrect');
                 
                 if (studentAnswer === "") {
-                    feedbackDiv.style.display = 'none';
+                    if(feedbackDiv) feedbackDiv.style.display = 'none';
                     continue;
                 }
 
-                // If the student wrote a reasonable length answer (e.g. 3+ words), let's be generous!
                 var wordCount = studentAnswer.split(" ").length;
                 if (!keywordGroups || keywordGroups.length === 0) {
                     inputElement.classList.add('input-correct');
-                    feedbackDiv.innerHTML = "✅ Answer recorded.";
-                    feedbackDiv.style.color = "#006100";
-                    feedbackDiv.style.display = "block";
+                    if(feedbackDiv) {
+                        feedbackDiv.innerHTML = "✅ Answer recorded.";
+                        feedbackDiv.style.color = "#006100";
+                        feedbackDiv.style.display = "block";
+                    }
                     continue;
                 }
 
@@ -404,20 +404,35 @@
 
                 var score = conceptsFound / keywordGroups.length;
 
-                // LENIENT RULE: If they match at least 50% of the concepts, OR if they wrote a well-thought-out sentence (5+ words) on definition questions, award full credit!
-                if (score >= 0.5 || (wordCount >= 5 && keywordGroups.length <= 2)) {
-                    inputElement.classList.add('input-correct');
-                    feedbackDiv.innerHTML = "✅ Correct! (Well explained)";
-                    feedbackDiv.style.color = "#006100";
-                    feedbackDiv.style.display = "block";
+                // STRICT RULE FOR MULTI-CONCEPT QUESTIONS:
+                var isPassed = false;
+                if (keywordGroups.length > 1) {
+                    isPassed = (score === 1); // Must hit all concept buckets for multi-part questions
                 } else {
-                    inputElement.classList.add('input-incorrect');
-                    feedbackDiv.innerHTML = "❌ Not quite. " + rubric.feedback;
-                    feedbackDiv.style.color = "#b71c1c";
-                    feedbackDiv.style.display = "block";
+                    isPassed = (score >= 1 || (wordCount >= 4)); // Lenient for single definitions
+                }
+
+                if(feedbackDiv) {
+                    if (isPassed) {
+                        inputElement.classList.add('input-correct');
+                        feedbackDiv.innerHTML = "✅ Correct! All required concepts covered.";
+                        feedbackDiv.style.color = "#006100";
+                        feedbackDiv.style.display = "block";
+                    } else if (keywordGroups.length > 1 && score >= 0.5) {
+                        inputElement.classList.add('input-partial');
+                        feedbackDiv.innerHTML = "⚠️ Partial credit (" + conceptsFound + "/" + keywordGroups.length + " concepts). " + rubric.feedback;
+                        feedbackDiv.style.color = "#b27a00";
+                        feedbackDiv.style.display = "block";
+                    } else {
+                        inputElement.classList.add('input-incorrect');
+                        feedbackDiv.innerHTML = "❌ Not quite. " + rubric.feedback;
+                        feedbackDiv.style.color = "#b71c1c";
+                        feedbackDiv.style.display = "block";
+                    }
                 }
             }
         }
+
         function downloadPDF() {
             var hide = document.querySelectorAll('.no-print');
             for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
