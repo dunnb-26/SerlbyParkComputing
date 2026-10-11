@@ -292,8 +292,18 @@
                 var rubricStr = inputElement.getAttribute('data-rubric');
                 var feedbackDiv = inputElement.nextElementSibling;
                 if(!rubricStr) continue;
-                var rubric = JSON.parse(rubricStr);
-                var keywordGroups = rubric.keywords; 
+var rubric;
+
+try {
+    rubric = JSON.parse(rubricStr);
+} catch (error) {
+    console.error("Invalid rubric for question:", inputElement, error);
+    if (feedbackDiv) {
+        feedbackDiv.textContent = "Marking error: please check this question's rubric.";
+        feedbackDiv.style.display = "block";
+    }
+    continue;
+}                var keywordGroups = rubric.keywords; 
                 inputElement.classList.remove('input-correct', 'input-partial', 'input-incorrect');
                 if (studentAnswer === "") { if(feedbackDiv) feedbackDiv.style.display = 'none'; continue; }
                 var wordCount = studentAnswer.split(" ").length;
