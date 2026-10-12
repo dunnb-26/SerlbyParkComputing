@@ -399,8 +399,9 @@
                     <label>List 3 different functions you have learned in Excel (e.g., SUM) and briefly describe what one of them does:</label>
                     <textarea id="connect-red" class="persist-input" placeholder="Type your list here..."></textarea>
                 </div>
-                <div style="text-align: right;">
-                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('red')">👨‍🏫 Teacher Verify</button>
+                <div style="text-align: right; gap: 10px; display: flex; justify-content: flex-end;">
+                    <button class="teacher-verify-btn no-print" style="background-color: #388e3c;" onclick="openVerifyModal('red-correct')">✅ Correct</button>
+                    <button class="teacher-verify-btn no-print" style="background-color: #d32f2f;" onclick="openVerifyModal('red-incorrect')">❌ Incorrect</button>
                 </div>
             </div>
 
@@ -413,8 +414,9 @@
                     <label>Explain the difference between a basic Formula (like =A2*B2) and a Function (like =AVERAGE(A1:A10)):</label>
                     <textarea id="connect-amber" class="persist-input" placeholder="Type your explanation here..."></textarea>
                 </div>
-                <div style="text-align: right;">
-                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('amber')">👨‍🏫 Teacher Verify</button>
+                <div style="text-align: right; gap: 10px; display: flex; justify-content: flex-end;">
+                    <button class="teacher-verify-btn no-print" style="background-color: #388e3c;" onclick="openVerifyModal('amber-correct')">✅ Correct</button>
+                    <button class="teacher-verify-btn no-print" style="background-color: #d32f2f;" onclick="openVerifyModal('amber-incorrect')">❌ Incorrect</button>
                 </div>
             </div>
 
@@ -427,8 +429,9 @@
                     <label>Explain what an Absolute Cell Reference is (e.g., $B$6) and give an example of when you would need to use one instead of a normal reference:</label>
                     <textarea id="connect-green" class="persist-input" placeholder="Type your response here..."></textarea>
                 </div>
-                <div style="text-align: right;">
-                    <button class="teacher-verify-btn no-print" onclick="openVerifyModal('green')">👨‍🏫 Teacher Verify</button>
+                <div style="text-align: right; gap: 10px; display: flex; justify-content: flex-end;">
+                    <button class="teacher-verify-btn no-print" style="background-color: #388e3c;" onclick="openVerifyModal('green-correct')">✅ Correct</button>
+                    <button class="teacher-verify-btn no-print" style="background-color: #d32f2f;" onclick="openVerifyModal('green-incorrect')">❌ Incorrect</button>
                 </div>
             </div>
 
@@ -619,9 +622,21 @@
         function submitVerify() {
             const pass = document.getElementById('teacher-password-input').value;
             if (pass === '2525') {
-                if (activeLevel === 'red' || activeLevel === 'amber' || activeLevel === 'green') {
-                    // Task Verification Logic
-                    document.getElementById('task-' + activeLevel).classList.add('teacher-verified');
+                if (activeLevel.includes('-correct') || activeLevel.includes('-incorrect')) {
+                    // New Connect Task Logic
+                    const [level, status] = activeLevel.split('-');
+                    const textarea = document.getElementById('connect-' + level);
+                    const taskCard = document.getElementById('task-' + level);
+
+                    if (status === 'correct') {
+                        textarea.classList.add('correct');
+                        textarea.classList.remove('incorrect');
+                        taskCard.classList.add('teacher-verified');
+                    } else {
+                        textarea.classList.add('incorrect');
+                        textarea.classList.remove('correct');
+                        taskCard.classList.remove('teacher-verified');
+                    }
                 } else if (activeLevel.startsWith('q')) {
                     // Question Override Logic (Toggles correct/incorrect)
                     let el = document.getElementById(activeLevel);
@@ -701,9 +716,15 @@
                     red_verified: document.getElementById('task-red').classList.contains('teacher-verified'),
                     amber_verified: document.getElementById('task-amber').classList.contains('teacher-verified'),
                     green_verified: document.getElementById('task-green').classList.contains('teacher-verified'),
+                    
+                    // Added classes for the connect textareas to save state correctly
                     connectRed: document.getElementById('connect-red').value,
+                    connectRed_class: document.getElementById('connect-red').className,
                     connectAmber: document.getElementById('connect-amber').value,
+                    connectAmber_class: document.getElementById('connect-amber').className,
                     connectGreen: document.getElementById('connect-green').value,
+                    connectGreen_class: document.getElementById('connect-green').className,
+                    
                     spagRows: []
                 };
 
@@ -766,8 +787,13 @@
                 if (data.green_verified) document.getElementById('task-green').classList.add('teacher-verified');
 
                 document.getElementById('connect-red').value = data.connectRed || '';
+                if (data.connectRed_class) document.getElementById('connect-red').className = data.connectRed_class;
+                
                 document.getElementById('connect-amber').value = data.connectAmber || '';
+                if (data.connectAmber_class) document.getElementById('connect-amber').className = data.connectAmber_class;
+                
                 document.getElementById('connect-green').value = data.connectGreen || '';
+                if (data.connectGreen_class) document.getElementById('connect-green').className = data.connectGreen_class;
 
                 const container = document.getElementById('practice-rows-container');
                 container.innerHTML = '';
