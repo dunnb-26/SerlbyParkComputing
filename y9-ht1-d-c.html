@@ -296,7 +296,7 @@
             background: white;
             padding: 25px;
             border-radius: 8px;
-            width: 320px;
+            width: 350px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             text-align: center;
             border-top: 6px solid #1e3a8a;
@@ -308,7 +308,7 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
-            font-size: 16px;
+            font-size: 14px;
         }
         .modal-btn-row {
             display: flex;
@@ -534,7 +534,7 @@
             <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
             <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter Passcode">
             
-            <textarea id="teacher-feedback-input" class="modal-input hidden" placeholder="Optional Feedback for student..." style="resize: vertical; min-height: 80px; font-family: inherit; margin-top: 5px;"></textarea>
+            <textarea id="teacher-feedback-input" class="modal-input hidden" placeholder="Optional Feedback for student..." style="resize: vertical; min-height: 120px; font-family: inherit; margin-top: 5px;"></textarea>
             
             <div class="modal-btn-row">
                 <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
@@ -555,6 +555,13 @@
             3: ['number', 'whole', 'text', 'character', 'quotes', 'speech mark', 'math', 'calculate'],
             4: ['mistake', 'grammar', 'code', 'typo', 'rule', 'spell', 'spelling', 'type', 'error', 'symbol'],
             5: ['explain', 'understand', 'note', 'notes', 'read', 'ignore', 'human', 'help', 'remember']
+        };
+
+        // Model Answers for Automatic Feedback
+        const modelAnswers = {
+            'red': "Here is the correct answer to help you:\n\n- String: Stores text (e.g., 'Hello')\n- Integer: Stores whole numbers (e.g., 10)\n- Float: Stores decimal numbers (e.g., 3.14)\n- Boolean: Stores True or False",
+            'amber': "Here is the correct answer to help you:\n\nYou would use a variable to store the data, the input() function to ask the user, and the int() function to convert the input into a whole number.\n\nExample: age = int(input('What is your age?'))",
+            'green': "Here is the correct answer to help you:\n\nAn 'if' statement runs a block of code once if a condition is true. A 'while' loop repeats a block of code continuously as long as a condition is true.\n\nUse 'if' to check something once, and 'while' to repeat an action until a goal is met."
         };
 
         function checkSentenceAnswer(inputId, keywords) {
@@ -695,14 +702,24 @@
         function openVerifyModal(level) {
             activeLevel = level;
             document.getElementById('teacher-password-input').value = '';
-            document.getElementById('teacher-feedback-input').value = ''; // Reset feedback box
             document.getElementById('modal-error-msg').style.display = 'none';
             
-            // Only show the feedback box for Part 2 Connect tasks (not part 1 overrides)
+            const feedbackInput = document.getElementById('teacher-feedback-input');
+
+            // Set automatic feedback based on task status
             if (level.includes('-correct') || level.includes('-incorrect')) {
-                document.getElementById('teacher-feedback-input').classList.remove('hidden');
+                const [taskLevel, status] = level.split('-');
+                
+                if (status === 'correct') {
+                    feedbackInput.value = "Well done! Great work.";
+                } else {
+                    feedbackInput.value = modelAnswers[taskLevel];
+                }
+                
+                feedbackInput.classList.remove('hidden');
             } else {
-                document.getElementById('teacher-feedback-input').classList.add('hidden');
+                feedbackInput.value = '';
+                feedbackInput.classList.add('hidden');
             }
 
             document.getElementById('verify-modal').style.display = 'flex';
@@ -739,7 +756,7 @@
                     
                     // Display Teacher Feedback if provided
                     if (feedbackText) {
-                        feedbackDiv.innerHTML = "<strong>👨‍🏫 Teacher Feedback:</strong><br>" + feedbackText.replace(/\n/g, '<br>');
+                        feedbackDiv.innerHTML = "<strong>👨‍🏫 Teacher Feedback:</strong><br><br>" + feedbackText.replace(/\n/g, '<br>');
                         feedbackDiv.classList.remove('hidden');
                     } else {
                         feedbackDiv.classList.add('hidden');
