@@ -4,15 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Y9 HT1 - Demonstrate & Connect (Python)</title>
-    <link rel="stylesheet" href="style.css">
     
     <!-- HTML to PDF Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+        
+        header {
+            background-color: #1e3a8a;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
         .task-container {
             max-width: 900px;
-            margin: 0 auto 40px auto;
+            margin: 20px auto 40px auto;
             padding: 20px;
         }
         .task-card {
@@ -218,6 +244,25 @@
         }
         .teacher-override-btn:hover { background-color: #757575; }
 
+        /* Teacher Feedback Display */
+        .teacher-feedback-display {
+            background-color: #f8f9fa;
+            border-left: 4px solid #607d8b;
+            padding: 12px 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+            color: #333;
+            font-size: 0.95em;
+        }
+        .teacher-verified-correct .teacher-feedback-display {
+            background-color: #fff;
+            border-left-color: #388e3c;
+        }
+        .teacher-verified-incorrect .teacher-feedback-display {
+            background-color: #fff;
+            border-left-color: #d32f2f;
+        }
+
         /* CORRECT & INCORRECT DYNAMIC STATUS STYLING */
         .teacher-verified-correct {
             border-top-color: #388e3c !important;
@@ -251,7 +296,7 @@
             background: white;
             padding: 25px;
             border-radius: 8px;
-            width: 300px;
+            width: 320px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             text-align: center;
             border-top: 6px solid #1e3a8a;
@@ -309,18 +354,25 @@
             padding: 15px;
             border-radius: 6px;
         }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
     <header>
         <div class="header-left">
-            <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
+            <span>Delta Serlby Park</span>
         </div>
         <div class="header-center">
             <h1>Year 9 Computing - Python</h1>
         </div>
         <div class="header-right">
-            <a href="javascript:history.back()" class="back-btn">&larr; Back to Unit</a>
+            <a href="javascript:history.back()" class="back-btn">&larr; Back</a>
         </div>
     </header>
 
@@ -412,6 +464,10 @@
                     <label>List three data types used in Python (e.g., String) and describe what type of data they store:</label>
                     <textarea id="connect-red" class="persist-input" placeholder="Type your answer here..."></textarea>
                 </div>
+                
+                <!-- Feedback Display -->
+                <div id="feedback-red" class="teacher-feedback-display hidden"></div>
+
                 <div style="text-align: right; gap: 10px; display: flex; justify-content: flex-end;">
                     <button class="teacher-verify-btn no-print" style="background-color: #388e3c;" onclick="openVerifyModal('red-correct')">✅ Correct</button>
                     <button class="teacher-verify-btn no-print" style="background-color: #d32f2f;" onclick="openVerifyModal('red-incorrect')">❌ Incorrect</button>
@@ -430,6 +486,10 @@
                     <label>Explain how you would ask a user for their age and store it in a variable. Which Python functions are needed?</label>
                     <textarea id="connect-amber" class="persist-input" placeholder="Type your explanation here..."></textarea>
                 </div>
+                
+                <!-- Feedback Display -->
+                <div id="feedback-amber" class="teacher-feedback-display hidden"></div>
+
                 <div style="text-align: right; gap: 10px; display: flex; justify-content: flex-end;">
                     <button class="teacher-verify-btn no-print" style="background-color: #388e3c;" onclick="openVerifyModal('amber-correct')">✅ Correct</button>
                     <button class="teacher-verify-btn no-print" style="background-color: #d32f2f;" onclick="openVerifyModal('amber-incorrect')">❌ Incorrect</button>
@@ -448,6 +508,10 @@
                     <label>Write a short paragraph explaining the difference between an <code>if</code> statement and a <code>while</code> loop. When would you use each?</label>
                     <textarea id="connect-green" class="persist-input" placeholder="Type your response here..."></textarea>
                 </div>
+                
+                <!-- Feedback Display -->
+                <div id="feedback-green" class="teacher-feedback-display hidden"></div>
+
                 <div style="text-align: right; gap: 10px; display: flex; justify-content: flex-end;">
                     <button class="teacher-verify-btn no-print" style="background-color: #388e3c;" onclick="openVerifyModal('green-correct')">✅ Correct</button>
                     <button class="teacher-verify-btn no-print" style="background-color: #d32f2f;" onclick="openVerifyModal('green-incorrect')">❌ Incorrect</button>
@@ -463,12 +527,15 @@
         </div>
     </main>
 
-    <!-- SECURE PASSWORD MODAL -->
+    <!-- SECURE PASSWORD & FEEDBACK MODAL -->
     <div class="modal-overlay" id="verify-modal">
         <div class="modal-content">
             <h3>Teacher Verification</h3>
             <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
             <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter Passcode">
+            
+            <textarea id="teacher-feedback-input" class="modal-input hidden" placeholder="Optional Feedback for student..." style="resize: vertical; min-height: 80px; font-family: inherit; margin-top: 5px;"></textarea>
+            
             <div class="modal-btn-row">
                 <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
                 <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
@@ -628,7 +695,16 @@
         function openVerifyModal(level) {
             activeLevel = level;
             document.getElementById('teacher-password-input').value = '';
+            document.getElementById('teacher-feedback-input').value = ''; // Reset feedback box
             document.getElementById('modal-error-msg').style.display = 'none';
+            
+            // Only show the feedback box for Part 2 Connect tasks (not part 1 overrides)
+            if (level.includes('-correct') || level.includes('-incorrect')) {
+                document.getElementById('teacher-feedback-input').classList.remove('hidden');
+            } else {
+                document.getElementById('teacher-feedback-input').classList.add('hidden');
+            }
+
             document.getElementById('verify-modal').style.display = 'flex';
             document.getElementById('teacher-password-input').focus();
         }
@@ -646,6 +722,8 @@
                     const [level, status] = activeLevel.split('-');
                     const textarea = document.getElementById('connect-' + level);
                     const taskCard = document.getElementById('task-' + level);
+                    const feedbackDiv = document.getElementById('feedback-' + level);
+                    const feedbackText = document.getElementById('teacher-feedback-input').value.trim();
 
                     if (status === 'correct') {
                         textarea.classList.add('correct');
@@ -658,6 +736,16 @@
                         taskCard.classList.add('teacher-verified-incorrect');
                         taskCard.classList.remove('teacher-verified-correct');
                     }
+                    
+                    // Display Teacher Feedback if provided
+                    if (feedbackText) {
+                        feedbackDiv.innerHTML = "<strong>👨‍🏫 Teacher Feedback:</strong><br>" + feedbackText.replace(/\n/g, '<br>');
+                        feedbackDiv.classList.remove('hidden');
+                    } else {
+                        feedbackDiv.classList.add('hidden');
+                        feedbackDiv.innerHTML = "";
+                    }
+
                 } else if (activeLevel.startsWith('q')) {
                     // Question Override Logic (Toggles correct/incorrect)
                     let el = document.getElementById(activeLevel);
@@ -677,8 +765,17 @@
             }
         }
 
+        // Allow pressing Enter from either the password or feedback box
         document.getElementById('teacher-password-input').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') submitVerify();
+        });
+        
+        // Prevent accidental enters inside feedback box from submitting if they just want a new line, 
+        // but let Ctrl+Enter submit it
+        document.getElementById('teacher-feedback-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                submitVerify();
+            }
         });
 
         // --- BULLETPROOF PDF GENERATION LOGIC ---
@@ -752,6 +849,14 @@
                     connectAmber_class: document.getElementById('connect-amber').className,
                     connectGreen: document.getElementById('connect-green').value,
                     connectGreen_class: document.getElementById('connect-green').className,
+                    
+                    // Teacher feedback persistence
+                    feedbackRed: document.getElementById('feedback-red').innerHTML,
+                    feedbackRed_hidden: document.getElementById('feedback-red').classList.contains('hidden'),
+                    feedbackAmber: document.getElementById('feedback-amber').innerHTML,
+                    feedbackAmber_hidden: document.getElementById('feedback-amber').classList.contains('hidden'),
+                    feedbackGreen: document.getElementById('feedback-green').innerHTML,
+                    feedbackGreen_hidden: document.getElementById('feedback-green').classList.contains('hidden'),
                     
                     spagRows: []
                 };
@@ -832,6 +937,16 @@
                 
                 document.getElementById('connect-green').value = data.connectGreen || '';
                 if (data.connectGreen_class) document.getElementById('connect-green').className = data.connectGreen_class;
+
+                // Load Feedback
+                if (data.feedbackRed) document.getElementById('feedback-red').innerHTML = data.feedbackRed;
+                if (data.feedbackRed_hidden === false) document.getElementById('feedback-red').classList.remove('hidden');
+
+                if (data.feedbackAmber) document.getElementById('feedback-amber').innerHTML = data.feedbackAmber;
+                if (data.feedbackAmber_hidden === false) document.getElementById('feedback-amber').classList.remove('hidden');
+
+                if (data.feedbackGreen) document.getElementById('feedback-green').innerHTML = data.feedbackGreen;
+                if (data.feedbackGreen_hidden === false) document.getElementById('feedback-green').classList.remove('hidden');
 
                 const container = document.getElementById('practice-rows-container');
                 container.innerHTML = '';
