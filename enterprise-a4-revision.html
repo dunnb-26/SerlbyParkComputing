@@ -3,287 +3,1009 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A4: Trust, Reputation and Loyalty - Revision</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Y9 HT1 - Demonstrate & Connect (Python)</title>
+    
+    <!-- HTML to PDF Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
-        .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
-        .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
-        .task-prep { border-top: 6px solid #607d8b; } 
-        .task-navy { border-top: 6px solid #1e3a8a; } 
-        .task-card h2 { margin-top: 0; color: #333; }
-        .task-prep h2 { color: #607d8b; }
-        .task-navy h2 { color: #1e3a8a; }
-        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; }
-        .center-text { text-align: center; }
-        .question-wrapper { margin-bottom: 25px; page-break-inside: avoid !important; break-inside: avoid !important; }
-        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
-        .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit; }
-        .auto-input:focus { outline: none; border-color: #666; }
-        textarea.auto-input { resize: vertical; min-height: 80px; }
-        .correct { border-color: #388e3c !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
-        .incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
-        .feedback-msg { font-size: 14px; margin-top: 8px; font-weight: bold; display: none; }
-        .teacher-override-btn { background-color: #607d8b; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; margin-top: 5px; }
-        .teacher-override-btn:hover { background-color: #455a64; }
-        .hidden { display: none !important; }
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; border-top: 6px solid #1e3a8a; }
-        .modal-input { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; text-align: center; }
-        .modal-btn-row { display: flex; gap: 10px; }
-        .modal-btn-confirm { flex: 1; background-color: #1e3a8a; color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        .modal-btn-cancel { flex: 1; background-color: #ccc; color: #333; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
-        .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
-        .btn-submit:hover { background-color: #152960; }
-        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+        
+        header {
+            background-color: #1e3a8a;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .task-container {
+            max-width: 900px;
+            margin: 20px auto 40px auto;
+            padding: 20px;
+        }
+        .task-card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            border-top: 6px solid #1e3a8a;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        /* RAG Task Colors */
+        .red-task { border-top-color: #d32f2f; }
+        .amber-task { border-top-color: #f57c00; }
+        .green-task { border-top-color: #388e3c; }
+        
+        .task-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #1e3a8a;
+        }
+        .red-task .task-title { color: #d32f2f; }
+        .amber-task .task-title { color: #f57c00; }
+        .green-task .task-title { color: #388e3c; }
+
+        .instruction-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #dfaa2b;
+            padding: 15px;
+            margin-bottom: 25px;
+            color: #555;
+            font-style: italic;
+        }
+
+        .question-group {
+            margin-bottom: 20px;
+        }
+        .question-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .question-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 16px;
+            box-sizing: border-box;
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        /* Locked answer styling: keeps red spelling underlines visible while preventing edits */
+        textarea.spellcheck-locked {
+            background-color: #fafafa;
+            color: #333;
+            cursor: default;
+        }
+
+        /* Action Buttons */
+        .btn-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .btn-mark {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: #dfaa2b;
+            color: #1e3a8a;
+            transition: background-color 0.2s;
+        }
+        .btn-mark:hover { background-color: #c99722; }
+
+        /* Universal Action Buttons Area (PDF & Reset) */
+        .action-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 40px auto;
+        }
+        .btn-pdf {
+            background-color: #217346;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
         .btn-pdf:hover { background-color: #124d2d; }
+
+        .btn-reset {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-reset:hover { background-color: #b71c1c; }
+
+        /* Spelling Practice Area */
+        .spag-practice-box {
+            background-color: #fff3e0;
+            border: 2px solid #f57c00;
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+        .practice-header {
+            font-weight: bold;
+            color: #e65100;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 40px;
+            gap: 10px;
+            text-align: center;
+        }
+        .practice-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 40px;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .practice-row input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.95em;
+            width: 100%;
+            box-sizing: border-box;
+            background: white;
+        }
+        .btn-remove-row {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            height: 38px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-remove-row:hover { background-color: #b71c1c; }
+
+        .btn-add-word {
+            background-color: #607d8b;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-add-word:hover { background-color: #455a64; }
+
+        /* Teacher Verification & Override Styles */
+        .teacher-verify-btn {
+            background-color: #607d8b;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .teacher-verify-btn:hover { background-color: #455a64; }
+
+        .teacher-override-btn {
+            background-color: #9e9e9e;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        .teacher-override-btn:hover { background-color: #757575; }
+
+        /* Teacher Feedback Display */
+        .teacher-feedback-display {
+            background-color: #f8f9fa;
+            border-left: 4px solid #607d8b;
+            padding: 12px 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+            color: #333;
+            font-size: 0.95em;
+        }
+        .teacher-verified-correct .teacher-feedback-display {
+            background-color: #fff;
+            border-left-color: #388e3c;
+        }
+        .teacher-verified-incorrect .teacher-feedback-display {
+            background-color: #fff;
+            border-left-color: #d32f2f;
+        }
+
+        /* CORRECT & INCORRECT DYNAMIC STATUS STYLING */
+        .teacher-verified-correct {
+            border-top-color: #388e3c !important;
+            background-color: #e8f5e9 !important;
+        }
+        .teacher-verified-correct .task-title { color: #388e3c !important; }
+        .teacher-verified-correct .instruction-box { border-left-color: #388e3c !important; }
+
+        .teacher-verified-incorrect {
+            border-top-color: #d32f2f !important;
+            background-color: #ffebee !important;
+        }
+        .teacher-verified-incorrect .task-title { color: #d32f2f !important; }
+        .teacher-verified-incorrect .instruction-box { border-left-color: #d32f2f !important; }
+
+        .verified-badge { font-size: 0.8em; margin-left: 10px; display: none; vertical-align: middle; }
+        .teacher-verified-correct .badge-correct { display: inline-block; color: #388e3c; }
+        .teacher-verified-incorrect .badge-incorrect { display: inline-block; color: #d32f2f; }
+
+        /* Secure Password Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 350px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-align: center;
+            border-top: 6px solid #1e3a8a;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        .modal-btn-row {
+            display: flex;
+            gap: 10px;
+        }
+        .modal-btn-confirm {
+            flex: 1;
+            background-color: #1e3a8a;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .modal-btn-cancel {
+            flex: 1;
+            background-color: #ccc;
+            color: #333;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .modal-error {
+            color: #d32f2f;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            display: none;
+        }
+
+        /* Marking Colors & Utility */
+        .correct { border-color: #388e3c !important; background-color: #e8f5e9 !important; }
+        .incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; }
+        .hidden { display: none !important; }
+
+        #score-display {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
-    <div id="pdf-content">
-        <header>
-            <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
-            <div class="header-center"><h1>A4: Trust, Reputation and Loyalty</h1></div>
-            <div class="header-right"><a href="enterprise-revision.html" class="back-btn">&larr; Back to Hub</a></div>
-        </header>
+    <header>
+        <div class="header-left">
+            <span>Delta Serlby Park</span>
+        </div>
+        <div class="header-center">
+            <h1>Year 9 Computing - Python</h1>
+        </div>
+        <div class="header-right">
+            <a href="javascript:history.back()" class="back-btn">&larr; Back</a>
+        </div>
+    </header>
 
-        <main class="task-container">
-            <div class="task-card task-prep">
-                <h2>A4 Revision Notes</h2>
-                <div class="instruction-box center-text">Use this space to write out your complete notes on customer trust, business reputation, building customer loyalty, responding to reviews, and providing good customer service.</div>
-                <div class="question-wrapper">
-                    <textarea class="auto-input" rows="12" placeholder="Type your revision notes here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+    <main>
+        <div class="task-container" id="pdf-content">
+            
+            <!-- STAGE 1: DEMONSTRATE TASK -->
+            <div id="demonstrate-stage" class="task-card">
+                <div class="task-title">Part 1: Demonstrate</div>
+                <div class="instruction-box">
+                    Write full sentences to answer the 5 questions below. Browser spellcheck will underline any spelling errors in red as you type. When you click "Mark My Work", your score and spelling table will appear below. Your progress is automatically saved.
+                </div>
+
+                <div class="question-group">
+                    <label>1. Explain what the <code>print()</code> function is used for in Python:</label>
+                    <textarea id="q1" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <div style="text-align: right;">
+                        <button id="override-q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('q1')">👨‍🏫 Override Score</button>
+                    </div>
+                </div>
+                <div class="question-group">
+                    <label>2. Explain what a variable is used for in programming:</label>
+                    <textarea id="q2" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <div style="text-align: right;">
+                        <button id="override-q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('q2')">👨‍🏫 Override Score</button>
+                    </div>
+                </div>
+                <div class="question-group">
+                    <label>3. What is the difference between an integer and a string data type?</label>
+                    <textarea id="q3" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <div style="text-align: right;">
+                        <button id="override-q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('q3')">👨‍🏫 Override Score</button>
+                    </div>
+                </div>
+                <div class="question-group">
+                    <label>4. Explain what a "syntax error" is when writing code:</label>
+                    <textarea id="q4" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <div style="text-align: right;">
+                        <button id="override-q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('q4')">👨‍🏫 Override Score</button>
+                    </div>
+                </div>
+                <div class="question-group">
+                    <label>5. Why do programmers use comments (using the # symbol) in their code?</label>
+                    <textarea id="q5" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <div style="text-align: right;">
+                        <button id="override-q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('q5')">👨‍🏫 Override Score</button>
+                    </div>
+                </div>
+
+                <div class="btn-row" id="stage1-buttons">
+                    <button class="btn-mark no-print" onclick="markStage1()">✅ Mark My Work</button>
+                </div>
+
+                <div id="score-display" class="hidden"></div>
+            </div>
+
+            <!-- LESSON 2: SPELLING PRACTICE BOX (Initially Hidden) -->
+            <div id="spag-section" class="task-card hidden" style="border-top-color: #f57c00;">
+                <div class="task-title" style="color: #e65100;">Spelling Corrections & Practice</div>
+                <div class="instruction-box">
+                    Look at any words in your Demonstrate answers above that have red underlines. Type each misspelled word in the first column, and practice spelling it correctly **3 times** across the next three columns. If you had no spelling mistakes, you can remove the rows using the ❌ button.
+                </div>
+                
+                <div class="spag-practice-box">
+                    <div class="practice-header">
+                        <div>Misspelled Word</div>
+                        <div>Attempt 1</div>
+                        <div>Attempt 2</div>
+                        <div>Attempt 3</div>
+                        <div></div>
+                    </div>
+                    <div id="practice-rows-container">
+                        <!-- Rows generated dynamically -->
+                    </div>
+                    <button class="btn-add-word no-print" onclick="addPracticeRow()">+ Add Another Word</button>
                 </div>
             </div>
 
-            <div class="task-card task-navy">
-                <h2>Self-Marking Knowledge Check</h2>
-                <div class="instruction-box center-text">Answer the questions below. The smart-marker accepts multiple ways of wording your answers!</div>
-
-                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Part 1: Recall questions</h3>
+            <!-- STAGE 2: CONNECT TASKS (Initially Hidden) -->
+            <div id="task-red" class="task-card red-task hidden">
+                <div class="task-title">Part 2: Connect - RED TASK (Consolidation) 
+                    <span class="verified-badge badge-correct">✅ Teacher Verified: Correct</span>
+                    <span class="verified-badge badge-incorrect">❌ Teacher Verified: Incorrect</span>
+                </div>
+                <div class="instruction-box">
+                    Review the basics. Complete the task below after finishing your spelling practice above.
+                </div>
+                <div class="question-group">
+                    <label>List three data types used in Python (e.g., String) and describe what type of data they store:</label>
+                    <textarea id="connect-red" class="persist-input" placeholder="Type your answer here..."></textarea>
+                </div>
                 
-                <div class="question-wrapper">
-                    <label class="question-label">1. What does customer trust mean?</label>
-                    <textarea id="a4_q1" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["believe", "rely", "get what they paid for", "do what it says"]], "feedback": "Acceptable: Customers believe the business will do what it says, rely on it, or trust they will get what they paid for."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q1')">👨‍🏫 Override Score</button></div>
-                </div>
+                <!-- Feedback Display -->
+                <div id="feedback-red" class="teacher-feedback-display hidden"></div>
 
-                <div class="question-wrapper">
-                    <label class="question-label">2. What is a business's reputation?</label>
-                    <textarea id="a4_q2" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["think about", "say about", "good or bad", "impression"]], "feedback": "Acceptable: What people think/say about the business, if it is seen as good/bad, or the impression people have of it."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q2')">👨‍🏫 Override Score</button></div>
+                <div style="text-align: right; gap: 10px; display: flex; justify-content: flex-end;">
+                    <button class="teacher-verify-btn no-print" style="background-color: #388e3c;" onclick="openVerifyModal('red-correct')">✅ Correct</button>
+                    <button class="teacher-verify-btn no-print" style="background-color: #d32f2f;" onclick="openVerifyModal('red-incorrect')">❌ Incorrect</button>
                 </div>
+            </div>
 
-                <div class="question-wrapper">
-                    <label class="question-label">3. What is customer loyalty?</label>
-                    <textarea id="a4_q3" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["coming back", "repeatedly", "choose the business", "stick with a brand", "instead of competitors"]], "feedback": "Acceptable: Customers keep coming back, buy repeatedly, choose it over competitors, or stick with the brand."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q3')">👨‍🏫 Override Score</button></div>
+            <div id="task-amber" class="task-card amber-task hidden">
+                <div class="task-title">Part 2: Connect - AMBER TASK (Application) 
+                    <span class="verified-badge badge-correct">✅ Teacher Verified: Correct</span>
+                    <span class="verified-badge badge-incorrect">❌ Teacher Verified: Incorrect</span>
                 </div>
+                <div class="instruction-box">
+                    Great effort! Connect your knowledge. Complete the task below after finishing your spelling practice above.
+                </div>
+                <div class="question-group">
+                    <label>Explain how you would ask a user for their age and store it in a variable. Which Python functions are needed?</label>
+                    <textarea id="connect-amber" class="persist-input" placeholder="Type your explanation here..."></textarea>
+                </div>
+                
+                <!-- Feedback Display -->
+                <div id="feedback-amber" class="teacher-feedback-display hidden"></div>
 
-                <div class="question-wrapper">
-                    <label class="question-label">4. Give one way a business can build trust.</label>
-                    <textarea id="a4_q4" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["honest", "good quality", "promises", "on time", "fairly", "clear prices"]], "feedback": "Acceptable: Be honest, provide good quality, keep promises, deliver on time, handle complaints fairly, or have clear prices."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q4')">👨‍🏫 Override Score</button></div>
+                <div style="text-align: right; gap: 10px; display: flex; justify-content: flex-end;">
+                    <button class="teacher-verify-btn no-print" style="background-color: #388e3c;" onclick="openVerifyModal('amber-correct')">✅ Correct</button>
+                    <button class="teacher-verify-btn no-print" style="background-color: #d32f2f;" onclick="openVerifyModal('amber-incorrect')">❌ Incorrect</button>
                 </div>
+            </div>
 
-                <div class="question-wrapper">
-                    <label class="question-label">5. Give one way a business can build a good reputation.</label>
-                    <textarea id="a4_q5" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["good service", "reliable", "positive reviews", "treat customers well", "resolve problems", "value for money"]], "feedback": "Acceptable: Provide good service, reliable products, get positive reviews, treat customers well, or offer value for money."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q5')">👨‍🏫 Override Score</button></div>
+            <div id="task-green" class="task-card green-task hidden">
+                <div class="task-title">Part 2: Connect - GREEN TASK (Challenge) 
+                    <span class="verified-badge badge-correct">✅ Teacher Verified: Correct</span>
+                    <span class="verified-badge badge-incorrect">❌ Teacher Verified: Incorrect</span>
                 </div>
+                <div class="instruction-box">
+                    Perfect score! Challenge task complete. Complete the task below after finishing your spelling practice above.
+                </div>
+                <div class="question-group">
+                    <label>Write a short paragraph explaining the difference between an <code>if</code> statement and a <code>while</code> loop. When would you use each?</label>
+                    <textarea id="connect-green" class="persist-input" placeholder="Type your response here..."></textarea>
+                </div>
+                
+                <!-- Feedback Display -->
+                <div id="feedback-green" class="teacher-feedback-display hidden"></div>
 
-                <div class="question-wrapper">
-                    <label class="question-label">6. Give one way a business can encourage customer loyalty.</label>
-                    <textarea id="a4_q6" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["loyalty cards", "good service", "rewards", "discounts", "good quality", "valued"]], "feedback": "Acceptable: Offer loyalty cards, give rewards/discounts, provide good service, or make customers feel valued."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q6')">👨‍🏫 Override Score</button></div>
+                <div style="text-align: right; gap: 10px; display: flex; justify-content: flex-end;">
+                    <button class="teacher-verify-btn no-print" style="background-color: #388e3c;" onclick="openVerifyModal('green-correct')">✅ Correct</button>
+                    <button class="teacher-verify-btn no-print" style="background-color: #d32f2f;" onclick="openVerifyModal('green-incorrect')">❌ Incorrect</button>
                 </div>
+            </div>
 
-                <div class="question-wrapper">
-                    <label class="question-label">7. What is a customer review?</label>
-                    <textarea id="a4_q7" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["feedback", "opinion", "experience", "rating", "comment"]], "feedback": "Acceptable: Feedback from a buyer, an opinion about their experience, or a rating/comment about a business."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q7')">👨‍🏫 Override Score</button></div>
-                </div>
+        </div>
 
-                <div class="question-wrapper">
-                    <label class="question-label">8. What is word of mouth?</label>
-                    <textarea id="a4_q8" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["telling others", "recommendations", "friends", "family", "talking"]], "feedback": "Acceptable: People telling others about a business, recommendations from friends/family, or customers talking about experiences."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q8')">👨‍🏫 Override Score</button></div>
-                </div>
+        <!-- UNIVERSAL ACTION BUTTONS (PDF & RESET - Hidden until marked) -->
+        <div class="action-row hidden" id="action-buttons">
+            <button class="btn-pdf" onclick="downloadPDF()">📄 Download Work</button>
+            <button class="btn-reset" onclick="clearData()">Reset Page</button>
+        </div>
+    </main>
 
-                <div class="question-wrapper">
-                    <label class="question-label">9. What is a repeat purchase?</label>
-                    <textarea id="a4_q9" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["buying from the same", "same business again", "same product another time", "buy more", "returning"]], "feedback": "Acceptable: Buying from the same business again, purchasing the same product another time, or returning to buy more."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q9')">👨‍🏫 Override Score</button></div>
-                </div>
+    <!-- SECURE PASSWORD & FEEDBACK MODAL -->
+    <div class="modal-overlay" id="verify-modal">
+        <div class="modal-content">
+            <h3>Teacher Verification</h3>
+            <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
+            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter Passcode">
+            
+            <textarea id="teacher-feedback-input" class="modal-input hidden" placeholder="Optional Feedback for student..." style="resize: vertical; min-height: 120px; font-family: inherit; margin-top: 5px;"></textarea>
+            
+            <div class="modal-btn-row">
+                <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
+                <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        &copy; 2026 Delta Serlby Park - Computing Department
+    </footer>
 
-                <div class="question-wrapper">
-                    <label class="question-label">10. What is customer service?</label>
-                    <textarea id="a4_q10" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["helps", "treats", "answering", "sorting out problems", "before or after buying"]], "feedback": "Acceptable: How a business helps/treats customers, answering questions, or sorting out problems before/after buying."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q10')">👨‍🏫 Override Score</button></div>
-                </div>
+    <script>
+        // Python Specific Keywords for Marking
+        const qKeywords = {
+            1: ['output', 'display', 'screen', 'show', 'text', 'console', 'user'],
+            2: ['store', 'save', 'hold', 'data', 'value', 'information', 'memory', 'remember'],
+            3: ['number', 'whole', 'text', 'character', 'quotes', 'speech mark', 'math', 'calculate'],
+            4: ['mistake', 'grammar', 'code', 'typo', 'rule', 'spell', 'spelling', 'type', 'error', 'symbol'],
+            5: ['explain', 'understand', 'note', 'notes', 'read', 'ignore', 'human', 'help', 'remember']
+        };
 
-                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Part 2: Building trust</h3>
-                <div class="question-wrapper">
-                    <label class="question-label">11. Why is trust important to a business?</label>
-                    <textarea id="a4_q11" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["willing to buy", "feel safer", "come back", "recommendations"]], "feedback": "Acceptable: Customers more willing to buy, feel safer spending money, come back, or recommend the business."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q11')">👨‍🏫 Override Score</button></div>
-                </div>
-                <div class="question-wrapper">
-                    <label class="question-label">12. Why might customers avoid a business they do not trust?</label>
-                    <textarea id="a4_q12" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["ripped off", "not as promised", "losing money", "reliable"]], "feedback": "Acceptable: Might think they will be ripped off, product not as promised, worry about losing money, or prefer reliable places."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q12')">👨‍🏫 Override Score</button></div>
-                </div>
-                <div class="question-wrapper">
-                    <label class="question-label">13. Why should a business be honest about its products?</label>
-                    <textarea id="a4_q13" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["know what they are buying", "false claims", "complaints", "lose trust", "bad reputation"]], "feedback": "Acceptable: Customers need to know what they're buying, false claims lead to complaints, lose trust, or get a bad reputation."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q13')">👨‍🏫 Override Score</button></div>
-                </div>
-                <div class="question-wrapper">
-                    <label class="question-label">14. Why is keeping promises important?</label>
-                    <textarea id="a4_q14" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["expect to get", "reliable", "return", "breaking promises", "complaints"]], "feedback": "Acceptable: Customers expect to get what was promised, shows it is reliable, they return, or breaking promises leads to complaints."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q14')">👨‍🏫 Override Score</button></div>
-                </div>
-                <div class="question-wrapper">
-                    <label class="question-label">15. Why is delivering orders on time important?</label>
-                    <textarea id="a4_q15" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["receive what they need", "when expected", "less likely to complain", "relied on"]], "feedback": "Acceptable: Receive what they need when expected, less likely to complain, shows business can be relied on."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q15')">👨‍🏫 Override Score</button></div>
-                </div>
-                <div class="question-wrapper">
-                    <label class="question-label">16. How can clear prices help build trust?</label>
-                    <textarea id="a4_q16" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["know what they will pay", "fewer surprises", "hidden costs", "honest"]], "feedback": "Acceptable: Know what they will pay, fewer surprises, avoids hidden costs, or feel the business is being honest."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q16')">👨‍🏫 Override Score</button></div>
-                </div>
-                <div class="question-wrapper">
-                    <label class="question-label">17. Why might a money-back guarantee help build trust?</label>
-                    <textarea id="a4_q17" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["less worried", "money back", "goes wrong", "confidence"]], "feedback": "Acceptable: Feel less worried about buying, know they may get money back if things go wrong, shows confidence in product."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q17')">👨‍🏫 Override Score</button></div>
-                </div>
-                <div class="question-wrapper">
-                    <label class="question-label">18. How can a business show that its products are reliable?</label>
-                    <textarea id="a4_q18" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["good quality", "test", "fix faults", "warranties", "respond to complaints", "work as expected"]], "feedback": "Acceptable: Offer good quality, test products, fix faults, provide warranties, respond to complaints, or make sure they work."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q18')">👨‍🏫 Override Score</button></div>
-                </div>
-                <div class="question-wrapper">
-                    <label class="question-label">19. Why might customers trust a business they have used before?</label>
-                    <textarea id="a4_q19" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["know what to expect", "good experience", "reliable", "delivered on its promises"]], "feedback": "Acceptable: Know what to expect, had a good experience, know it's reliable, or it delivered on its promises previously."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q19')">👨‍🏫 Override Score</button></div>
-                </div>
-                <div class="question-wrapper">
-                    <label class="question-label">20. Can a business lose trust even if its products are good? Explain.</label>
-                    <textarea id="a4_q20" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["yes", "rude", "late", "unclear", "ignored", "badly treated"]], "feedback": "Acceptable: Yes, staff might be rude, late deliveries, unclear prices, ignored complaints, or feeling badly treated."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q20')">👨‍🏫 Override Score</button></div>
-                </div>
+        // Model Answers for Automatic Feedback
+        const modelAnswers = {
+            'red': "Here is the correct answer to help you:\n\n- String: Stores text (e.g., 'Hello')\n- Integer: Stores whole numbers (e.g., 10)\n- Float: Stores decimal numbers (e.g., 3.14)\n- Boolean: Stores True or False",
+            'amber': "Here is the correct answer to help you:\n\nYou would use a variable to store the data, the input() function to ask the user, and the int() function to convert the input into a whole number.\n\nExample: age = int(input('What is your age?'))",
+            'green': "Here is the correct answer to help you:\n\nAn 'if' statement runs a block of code once if a condition is true. A 'while' loop repeats a block of code continuously as long as a condition is true.\n\nUse 'if' to check something once, and 'while' to repeat an action until a goal is met."
+        };
 
-                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Part 3: Reputation</h3>
-                <div class="question-wrapper">
-                    <label class="question-label">21. Why is a good reputation useful?</label>
-                    <textarea id="a4_q21" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["attracts customers", "recommend", "trust it more", "stand out"]], "feedback": "Acceptable: Attracts customers, people recommend it, customers trust it more, helps it stand out from competitors."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q21')">👨‍🏫 Override Score</button></div>
-                </div>
-                <div class="question-wrapper">
-                    <label class="question-label">22. How can a business develop a bad reputation?</label>
-                    <textarea id="a4_q22" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["poor quality", "bad service", "overcharge", "lie", "ignore complaints", "late"]], "feedback": "Acceptable: Sell poor quality, bad service, overcharge, lie about products, ignore complaints, or repeatedly deliver late."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q22')">👨‍🏫 Override Score</button></div>
-                </div>
-                <div class="question-wrapper">
-                    <label class="question-label">23. How can online reviews affect a business?</label>
-                    <textarea id="a4_q23" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["attract", "put people off", "deciding where to buy", "influence trust"]], "feedback": "Acceptable: Good reviews attract, bad reviews put people off, helps people decide where to buy, or influences trust."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q23')">👨‍🏫 Override Score</button></div>
-                </div>
-                <div class="question-wrapper">
-                    <label class="question-label">24. Why might people check reviews before buying something?</label>
-                    <textarea id="a4_q24" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["any good", "happy", "wasting money", "trusted"]], "feedback": "Acceptable: To see if it's good, check if others were happy, avoid wasting money, or check if it can be trusted."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q24')">👨‍🏫 Override Score</button></div>
-                </div>
-                <div class="question-wrapper">
-                    <label class="question-label">25. How can a business respond to a negative review?</label>
-                    <textarea id="a4_q25" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["apologise", "investigate", "put it right", "politely", "improve"]], "feedback": "Acceptable: Apologise, investigate the problem, offer to put it right, contact them politely, or explain how it will improve."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q25')">👨‍🏫 Override Score</button></div>
-                </div>
-                <div class="question-wrapper">
-                    <label class="question-label">26. Why should a business not ignore customer complaints?</label>
-                    <textarea id="a4_q26" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["worse", "bad review", "lose future sales", "do not matter"]], "feedback": "Acceptable: The problem may get worse, customer leaves bad review, lose future sales, or customers feel they do not matter."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q26" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q26')">👨‍🏫 Override Score</button></div>
-                </div>
-                <div class="question-wrapper">
-                    <label class="question-label">27. Why might a bad reputation spread quickly?</label>
-                    <textarea id="a4_q27" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["online", "lots of people", "friends tell others", "shared widely"]], "feedback": "Acceptable: Experiences are shared online, reviews are seen by lots of people, friends tell others, or posts are shared widely."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q27" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q27')">👨‍🏫 Override Score</button></div>
-                </div>
-                <div class="question-wrapper">
-                    <label class="question-label">28. Can one bad review destroy a business's reputation? Explain.</label>
-                    <textarea id="a4_q28" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["not necessarily", "unusual", "several", "bigger problem"]], "feedback": "Acceptable: Not necessarily (one may be unusual), but several similar complaints could make people think there is a bigger problem."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q28" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q28')">👨‍🏫 Override Score</button></div>
-                </div>
-                <div class="question-wrapper">
-                    <label class="question-label">29. Why is it important for a business to provide consistent service?</label>
-                    <textarea id="a4_q29" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["what to expect", "trust", "more likely each time", "inconsistent", "put people off"]], "feedback": "Acceptable: Know what to expect, more likely to trust it, good experience is likely each time, inconsistent service puts people off."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q29" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q29')">👨‍🏫 Override Score</button></div>
-                </div>
-                <div class="question-wrapper">
-                    <label class="question-label">30. Give an example of a business action that could improve its reputation after a mistake.</label>
-                    <textarea id="a4_q30" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["replace", "refund", "apologise", "deliver", "fix", "change procedures"]], "feedback": "Acceptable: Replace a faulty product, give a refund, apologise, deliver a missing order, fix quickly, or change procedures."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q30" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q30')">👨‍🏫 Override Score</button></div>
-                </div>
+        function checkSentenceAnswer(inputId, keywords) {
+            const inputElement = document.getElementById(inputId);
+            const studentAnswer = inputElement.value.toLowerCase().trim();
+            
+            if (studentAnswer === "") {
+                inputElement.classList.add('incorrect');
+                inputElement.classList.remove('correct');
+                return 0;
+            }
 
-                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Part 4: Customer loyalty</h3>
-                <div class="question-wrapper">
-                    <label class="question-label">31. Why are loyal customers valuable to a business?</label>
-                    <textarea id="a4_q31" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["keep buying", "repeat sales", "recommend", "reliable income"]], "feedback": "Acceptable: Keep buying, provide repeat sales, may recommend the business, or help create reliable income."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q31" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q31')">👨‍🏫 Override Score</button></div>
-                </div>
-                <div class="question-wrapper">
-                    <label class="question-label">32. Why might it be cheaper to keep existing customers than attract new ones?</label>
-                    <textarea id="a4_q32" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["advertising", "already know", "easier to encourage"]], "feedback": "Acceptable: Doesn't need to spend as much on advertising, they already know the business, or it's easier to encourage another purchase."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q32" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q32')">👨‍🏫 Override Score</button></div>
-                </div>
-                <div class="question-wrapper">
-                    <label class="question-label">33. How can a loyalty card encourage customers to return?</label>
-                    <textarea id="a4_q33" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["points", "rewards", "discounts", "reason to choose"]], "feedback": "Acceptable: Earn points/rewards, get discounts after several purchases, or have a reason to choose that business again."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q33" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q33')">👨‍🏫 Override Score</button></div>
-                </div>
-                <div class="question-wrapper">
-                    <label class="question-label">34. Why might good customer service encourage loyalty?</label>
-                    <textarea id="a4_q34" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["valued", "problems are sorted", "enjoy", "return"]], "feedback": "Acceptable: Customers feel valued, problems are sorted out, they enjoy the experience, or are more likely to return."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_q34" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q34')">👨‍🏫 Override Score</button></div>
-                </div>
-                <div class="question-wrapper">
-                    <label class="question-label">35. How can discounts encourage repeat purchases?</label>
-                    <textarea id="a4_q35" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["save money", "reason to come back", "instead of a competitor"]], "feedback": "Acceptable: Save money, have a reason to come back, or choose the business instead of a competitor."}' placeholder="Type answer here..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-a4_
+            let isCorrect = keywords.some(keyword => studentAnswer.includes(keyword.toLowerCase()));
+
+            if (isCorrect) {
+                inputElement.classList.add('correct');
+                inputElement.classList.remove('incorrect');
+            } else {
+                inputElement.classList.add('incorrect');
+                inputElement.classList.remove('correct');
+            }
+        }
+
+        function addPracticeRow(word1 = '', word2 = '', word3 = '', word4 = '') {
+            const container = document.getElementById('practice-rows-container');
+            const row = document.createElement('div');
+            row.className = 'practice-row';
+            row.innerHTML = `
+                <input type="text" class="spag-input" value="${word1}" placeholder="Word...">
+                <input type="text" class="spag-input" value="${word2}" placeholder="Attempt 1...">
+                <input type="text" class="spag-input" value="${word3}" placeholder="Attempt 2...">
+                <input type="text" class="spag-input" value="${word4}" placeholder="Attempt 3...">
+                <button type="button" class="btn-remove-row no-print" onclick="removePracticeRow(this)" title="Remove row">❌</button>
+            `;
+            container.appendChild(row);
+
+            row.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', saveToLocalStorage);
+            });
+            saveToLocalStorage();
+        }
+
+        function removePracticeRow(button) {
+            const row = button.parentElement;
+            row.remove();
+            saveToLocalStorage();
+        }
+
+        function lockSpellcheckTextarea(textarea) {
+            if (!textarea || textarea.dataset.spellcheckLocked === 'true') return;
+
+            textarea.dataset.spellcheckLocked = 'true';
+            textarea.classList.add('spellcheck-locked');
+            
+            textarea.readOnly = false;
+
+            textarea.addEventListener('beforeinput', function(e) { e.preventDefault(); });
+            textarea.addEventListener('paste', function(e) { e.preventDefault(); });
+            textarea.addEventListener('cut', function(e) { e.preventDefault(); });
+            textarea.addEventListener('drop', function(e) { e.preventDefault(); });
+            textarea.addEventListener('keydown', function(e) {
+                const allowed = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown', 'Tab', 'Escape'];
+                const editingKey = e.key.length === 1 || ['Backspace', 'Delete', 'Enter'].includes(e.key);
+
+                if (editingKey && !allowed.includes(e.key) && !(e.ctrlKey || e.metaKey) && !e.altKey) {
+                    e.preventDefault();
+                }
+
+                if ((e.ctrlKey || e.metaKey) && ['v', 'x', 'z', 'y', 'a'].includes(e.key.toLowerCase())) {
+                    e.preventDefault();
+                }
+            });
+        }
+
+        function recalculateScore() {
+            let newScore = 0;
+            for (let i = 1; i <= 5; i++) {
+                if (document.getElementById('q' + i).classList.contains('correct')) {
+                    newScore++;
+                }
+            }
+
+            const scoreDisplay = document.getElementById('score-display');
+            scoreDisplay.classList.remove('hidden');
+            scoreDisplay.innerText = `You scored ${newScore} out of 5!`;
+
+            // Hide all task cards initially
+            document.getElementById('task-red').classList.add('hidden');
+            document.getElementById('task-amber').classList.add('hidden');
+            document.getElementById('task-green').classList.add('hidden');
+
+            // Reveal appropriate task card based on dynamic score
+            if (newScore <= 2) {
+                scoreDisplay.style.backgroundColor = "#ffebee";
+                scoreDisplay.style.color = "#d32f2f";
+                document.getElementById('task-red').classList.remove('hidden');
+            } else if (newScore >= 3 && newScore <= 4) {
+                scoreDisplay.style.backgroundColor = "#fff3e0";
+                scoreDisplay.style.color = "#ef6c00";
+                document.getElementById('task-amber').classList.remove('hidden');
+            } else if (newScore === 5) {
+                scoreDisplay.style.backgroundColor = "#e8f5e9";
+                scoreDisplay.style.color = "#2e7d32";
+                document.getElementById('task-green').classList.remove('hidden');
+            }
+
+            document.getElementById('action-buttons').classList.remove('hidden');
+        }
+
+        function markStage1() {
+            // Apply grading logic
+            checkSentenceAnswer('q1', qKeywords[1]);
+            checkSentenceAnswer('q2', qKeywords[2]);
+            checkSentenceAnswer('q3', qKeywords[3]);
+            checkSentenceAnswer('q4', qKeywords[4]);
+            checkSentenceAnswer('q5', qKeywords[5]);
+
+            // Lock text areas and show override buttons
+            for (let i = 1; i <= 5; i++) {
+                lockSpellcheckTextarea(document.getElementById('q' + i));
+                document.getElementById('override-q' + i).classList.remove('hidden');
+            }
+            document.getElementById('stage1-buttons').style.display = 'none';
+
+            // Reveal spelling section
+            document.getElementById('spag-section').classList.remove('hidden');
+            if (document.getElementById('practice-rows-container').children.length === 0) {
+                addPracticeRow();
+            }
+
+            // Centralized calculation updates the UI, Score, and shows the PDF buttons
+            recalculateScore();
+            saveToLocalStorage();
+        }
+
+        // --- TEACHER VERIFICATION & OVERRIDE MODAL LOGIC ---
+        let activeLevel = null;
+        function openVerifyModal(level) {
+            activeLevel = level;
+            document.getElementById('teacher-password-input').value = '';
+            document.getElementById('modal-error-msg').style.display = 'none';
+            
+            const feedbackInput = document.getElementById('teacher-feedback-input');
+
+            // Set automatic feedback based on task status
+            if (level.includes('-correct') || level.includes('-incorrect')) {
+                const [taskLevel, status] = level.split('-');
+                
+                if (status === 'correct') {
+                    feedbackInput.value = "Well done! Great work.";
+                } else {
+                    feedbackInput.value = modelAnswers[taskLevel];
+                }
+                
+                feedbackInput.classList.remove('hidden');
+            } else {
+                feedbackInput.value = '';
+                feedbackInput.classList.add('hidden');
+            }
+
+            document.getElementById('verify-modal').style.display = 'flex';
+            document.getElementById('teacher-password-input').focus();
+        }
+
+        function closeVerifyModal() {
+            document.getElementById('verify-modal').style.display = 'none';
+            activeLevel = null;
+        }
+
+        function submitVerify() {
+            const pass = document.getElementById('teacher-password-input').value;
+            if (pass === '2525') {
+                if (activeLevel.includes('-correct') || activeLevel.includes('-incorrect')) {
+                    // New Connect Task Logic
+                    const [level, status] = activeLevel.split('-');
+                    const textarea = document.getElementById('connect-' + level);
+                    const taskCard = document.getElementById('task-' + level);
+                    const feedbackDiv = document.getElementById('feedback-' + level);
+                    const feedbackText = document.getElementById('teacher-feedback-input').value.trim();
+
+                    if (status === 'correct') {
+                        textarea.classList.add('correct');
+                        textarea.classList.remove('incorrect');
+                        taskCard.classList.add('teacher-verified-correct');
+                        taskCard.classList.remove('teacher-verified-incorrect');
+                    } else {
+                        textarea.classList.add('incorrect');
+                        textarea.classList.remove('correct');
+                        taskCard.classList.add('teacher-verified-incorrect');
+                        taskCard.classList.remove('teacher-verified-correct');
+                    }
+                    
+                    // Display Teacher Feedback if provided
+                    if (feedbackText) {
+                        feedbackDiv.innerHTML = "<strong>👨‍🏫 Teacher Feedback:</strong><br><br>" + feedbackText.replace(/\n/g, '<br>');
+                        feedbackDiv.classList.remove('hidden');
+                    } else {
+                        feedbackDiv.classList.add('hidden');
+                        feedbackDiv.innerHTML = "";
+                    }
+
+                } else if (activeLevel.startsWith('q')) {
+                    // Question Override Logic (Toggles correct/incorrect)
+                    let el = document.getElementById(activeLevel);
+                    if (el.classList.contains('incorrect')) {
+                        el.classList.remove('incorrect');
+                        el.classList.add('correct');
+                    } else {
+                        el.classList.remove('correct');
+                        el.classList.add('incorrect');
+                    }
+                    recalculateScore(); // Instantly adjusts the score and the Connect task below
+                }
+                closeVerifyModal();
+                saveToLocalStorage();
+            } else {
+                document.getElementById('modal-error-msg').style.display = 'block';
+            }
+        }
+
+        // Allow pressing Enter from either the password or feedback box
+        document.getElementById('teacher-password-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') submitVerify();
+        });
+        
+        // Prevent accidental enters inside feedback box from submitting if they just want a new line, 
+        // but let Ctrl+Enter submit it
+        document.getElementById('teacher-feedback-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                submitVerify();
+            }
+        });
+
+        // --- BULLETPROOF PDF GENERATION LOGIC ---
+        function downloadPDF() {
+            var buttonsToHide = document.querySelectorAll('.no-print');
+            for(var b = 0; b < buttonsToHide.length; b++) buttonsToHide[b].style.display = 'none';
+            document.getElementById('action-buttons').style.display = 'none';
+
+            var textInputs = document.querySelectorAll('input[type="text"]');
+            for (var i = 0; i < textInputs.length; i++) {
+                textInputs[i].setAttribute('value', textInputs[i].value);
+            }
+
+            var textAreas = document.querySelectorAll('textarea');
+            for (var j = 0; j < textAreas.length; j++) {
+                textAreas[j].innerHTML = textAreas[j].value;
+                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
+            }
+
+            var element = document.getElementById('pdf-content');
+
+            var opt = {
+                margin:       0.3,
+                filename:     'Y9_HT1_Python_Demonstrate_Connect.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            html2pdf().set(opt).from(element).save().then(function() {
+                for(var b = 0; b < buttonsToHide.length; b++) buttonsToHide[b].style.display = 'block';
+                document.getElementById('action-buttons').style.display = 'flex';
+                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
+            });
+        }
+
+        // --- LOCAL STORAGE PERSISTENCE (UNIQUE KEY FOR Y9 PYTHON) ---
+        function saveToLocalStorage() {
+            try {
+                const data = {
+                    q1: document.getElementById('q1').value,
+                    q2: document.getElementById('q2').value,
+                    q3: document.getElementById('q3').value,
+                    q4: document.getElementById('q4').value,
+                    q5: document.getElementById('q5').value,
+                    q1_class: document.getElementById('q1').className,
+                    q2_class: document.getElementById('q2').className,
+                    q3_class: document.getElementById('q3').className,
+                    q4_class: document.getElementById('q4').className,
+                    q5_class: document.getElementById('q5').className,
+                    q1_locked: document.getElementById('q1').dataset.spellcheckLocked === 'true',
+                    buttons_hidden: document.getElementById('stage1-buttons').style.display === 'none',
+                    actions_hidden: document.getElementById('action-buttons').classList.contains('hidden'),
+                    spag_hidden: document.getElementById('spag-section').classList.contains('hidden'),
+                    
+                    // Added backwards compatibility for old saves
+                    red_verified: document.getElementById('task-red').classList.contains('teacher-verified-correct'),
+                    amber_verified: document.getElementById('task-amber').classList.contains('teacher-verified-correct'),
+                    green_verified: document.getElementById('task-green').classList.contains('teacher-verified-correct'),
+                    
+                    // Save specific verified status (correct or incorrect)
+                    task_red_status: document.getElementById('task-red').classList.contains('teacher-verified-incorrect') ? 'incorrect' : (document.getElementById('task-red').classList.contains('teacher-verified-correct') ? 'correct' : ''),
+                    task_amber_status: document.getElementById('task-amber').classList.contains('teacher-verified-incorrect') ? 'incorrect' : (document.getElementById('task-amber').classList.contains('teacher-verified-correct') ? 'correct' : ''),
+                    task_green_status: document.getElementById('task-green').classList.contains('teacher-verified-incorrect') ? 'incorrect' : (document.getElementById('task-green').classList.contains('teacher-verified-correct') ? 'correct' : ''),
+                    
+                    // Added classes for the connect textareas to save state correctly
+                    connectRed: document.getElementById('connect-red').value,
+                    connectRed_class: document.getElementById('connect-red').className,
+                    connectAmber: document.getElementById('connect-amber').value,
+                    connectAmber_class: document.getElementById('connect-amber').className,
+                    connectGreen: document.getElementById('connect-green').value,
+                    connectGreen_class: document.getElementById('connect-green').className,
+                    
+                    // Teacher feedback persistence
+                    feedbackRed: document.getElementById('feedback-red').innerHTML,
+                    feedbackRed_hidden: document.getElementById('feedback-red').classList.contains('hidden'),
+                    feedbackAmber: document.getElementById('feedback-amber').innerHTML,
+                    feedbackAmber_hidden: document.getElementById('feedback-amber').classList.contains('hidden'),
+                    feedbackGreen: document.getElementById('feedback-green').innerHTML,
+                    feedbackGreen_hidden: document.getElementById('feedback-green').classList.contains('hidden'),
+                    
+                    spagRows: []
+                };
+
+                document.querySelectorAll('.practice-row').forEach(row => {
+                    const inputs = row.querySelectorAll('input');
+                    data.spagRows.push({
+                        w0: inputs[0].value,
+                        w1: inputs[1].value,
+                        w2: inputs[2].value,
+                        w3: inputs[3].value
+                    });
+                });
+
+                localStorage.setItem('y9_ht1_python_data', JSON.stringify(data));
+            } catch (e) {
+                console.log("Local storage restricted.");
+            }
+        }
+
+        function loadFromLocalStorage() {
+            try {
+                const saved = localStorage.getItem('y9_ht1_python_data');
+                if (!saved) return;
+                const data = JSON.parse(saved);
+
+                document.getElementById('q1').value = data.q1 || '';
+                document.getElementById('q2').value = data.q2 || '';
+                document.getElementById('q3').value = data.q3 || '';
+                document.getElementById('q4').value = data.q4 || '';
+                document.getElementById('q5').value = data.q5 || '';
+
+                if (data.q1_class) document.getElementById('q1').className = data.q1_class;
+                if (data.q2_class) document.getElementById('q2').className = data.q2_class;
+                if (data.q3_class) document.getElementById('q3').className = data.q3_class;
+                if (data.q4_class) document.getElementById('q4').className = data.q4_class;
+                if (data.q5_class) document.getElementById('q5').className = data.q5_class;
+
+                if (data.q1_locked) {
+                    for (let i = 1; i <= 5; i++) {
+                        lockSpellcheckTextarea(document.getElementById('q' + i));
+                        document.getElementById('override-q' + i).classList.remove('hidden');
+                    }
+                }
+
+                if (data.buttons_hidden) {
+                    document.getElementById('stage1-buttons').style.display = 'none';
+                }
+
+                if (data.actions_hidden === false) {
+                    document.getElementById('action-buttons').classList.remove('hidden');
+                }
+
+                if (!data.spag_hidden) {
+                    document.getElementById('spag-section').classList.remove('hidden');
+                }
+
+                // Handle old save formats turning straight to correct
+                if (data.red_verified && !data.task_red_status) document.getElementById('task-red').classList.add('teacher-verified-correct');
+                if (data.amber_verified && !data.task_amber_status) document.getElementById('task-amber').classList.add('teacher-verified-correct');
+                if (data.green_verified && !data.task_green_status) document.getElementById('task-green').classList.add('teacher-verified-correct');
+
+                // Load accurate status formatting
+                if (data.task_red_status === 'correct') document.getElementById('task-red').classList.add('teacher-verified-correct');
+                if (data.task_red_status === 'incorrect') document.getElementById('task-red').classList.add('teacher-verified-incorrect');
+                
+                if (data.task_amber_status === 'correct') document.getElementById('task-amber').classList.add('teacher-verified-correct');
+                if (data.task_amber_status === 'incorrect') document.getElementById('task-amber').classList.add('teacher-verified-incorrect');
+                
+                if (data.task_green_status === 'correct') document.getElementById('task-green').classList.add('teacher-verified-correct');
+                if (data.task_green_status === 'incorrect') document.getElementById('task-green').classList.add('teacher-verified-incorrect');
+
+                document.getElementById('connect-red').value = data.connectRed || '';
+                if (data.connectRed_class) document.getElementById('connect-red').className = data.connectRed_class;
+                
+                document.getElementById('connect-amber').value = data.connectAmber || '';
+                if (data.connectAmber_class) document.getElementById('connect-amber').className = data.connectAmber_class;
+                
+                document.getElementById('connect-green').value = data.connectGreen || '';
+                if (data.connectGreen_class) document.getElementById('connect-green').className = data.connectGreen_class;
+
+                // Load Feedback
+                if (data.feedbackRed) document.getElementById('feedback-red').innerHTML = data.feedbackRed;
+                if (data.feedbackRed_hidden === false) document.getElementById('feedback-red').classList.remove('hidden');
+
+                if (data.feedbackAmber) document.getElementById('feedback-amber').innerHTML = data.feedbackAmber;
+                if (data.feedbackAmber_hidden === false) document.getElementById('feedback-amber').classList.remove('hidden');
+
+                if (data.feedbackGreen) document.getElementById('feedback-green').innerHTML = data.feedbackGreen;
+                if (data.feedbackGreen_hidden === false) document.getElementById('feedback-green').classList.remove('hidden');
+
+                const container = document.getElementById('practice-rows-container');
+                container.innerHTML = '';
+                if (data.spagRows && data.spagRows.length > 0) {
+                    data.spagRows.forEach(row => {
+                        addPracticeRow(row.w0, row.w1, row.w2, row.w3);
+                    });
+                } else {
+                    addPracticeRow(); 
+                }
+
+                // Ensures the correct RAG task is shown based on the saved classes
+                if (data.q1_locked) {
+                    recalculateScore();
+                }
+            } catch (e) {
+                console.log("Local storage read blocked.");
+            }
+        }
+
+        function clearData() {
+            if (confirm("Are you sure you want to clear all your work on this page?")) {
+                localStorage.removeItem('y9_ht1_python_data');
+                window.location.reload();
+            }
+        }
+
+        window.onload = function() {
+            loadFromLocalStorage();
+
+            if (document.getElementById('practice-rows-container').children.length === 0) {
+                addPracticeRow();
+            }
+
+            document.querySelectorAll('.persist-input').forEach(el => {
+                el.addEventListener('input', saveToLocalStorage);
+            });
+
+            document.querySelectorAll('.spag-input').forEach(el => {
+                el.addEventListener('input', saveToLocalStorage);
+            });
+        };
+    </script>
+</body>
+</html>
