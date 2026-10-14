@@ -82,7 +82,10 @@
             measurementId: "G-HDNYEE11WV"
         };
 
-        firebase.initializeApp(firebaseConfig);
+        // Initialize Firebase safely
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         const db = firebase.firestore();
 
         // Check teacher authentication state
@@ -97,10 +100,16 @@
             const listDiv = document.getElementById('student-list');
             listDiv.innerHTML = "<p style='color: #000;'>Loading students from database...</p>";
 
+            // Safety timeout in case Firebase hangs
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error("Connection timeout. Firebase took too long to respond. Check your internet connection or ad-blocker.")), 5000)
+            );
+
             try {
-                const snapshot = await db.collection("users").get();
-                allStudents = [];
+                const fetchPromise = db.collection("users").get();
+                const snapshot = await Promise.race([fetchPromise, timeoutPromise]);
                 
+                allStudents = [];
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     allStudents.push({
@@ -116,8 +125,8 @@
                 console.error("Error fetching students:", err);
                 listDiv.innerHTML = `
                     <div style="background: #ffebee; border: 1px solid #f44336; padding: 12px; border-radius: 4px; color: #c62828; font-size: 0.85em;">
-                        <strong>Database Error:</strong><br>${err.message}<br><br>
-                        <em>Tip: Check your Firebase Console &rarr; Firestore &rarr; Rules to ensure read access is allowed.</em>
+                        <strong>Loading Failed:</strong><br>${err.message}<br><br>
+                        <em>Tip: Check if an ad-blocker is blocking Firebase, or check your Firestore Security Rules.</em>
                     </div>
                 `;
             }
