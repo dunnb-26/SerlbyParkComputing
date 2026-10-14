@@ -12,103 +12,33 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
-        /* Full-Screen Login Gate */
         #login-gate {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, #1e3a8a 0%, #0d1b42 100%);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.4s ease;
+            z-index: 9999; display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.5s ease;
         }
         .gate-card {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            text-align: center;
-            width: 90%;
-            max-width: 400px;
-            border-top: 8px solid #dfaa2b;
+            background: white; padding: 40px; border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center;
+            width: 90%; max-width: 400px; border-top: 8px solid #dfaa2b; 
         }
-        .gate-card img {
-            max-width: 150px;
-            margin-bottom: 15px;
-        }
-        .gate-card h2 {
-            color: #1e3a8a;
-            margin-top: 0;
-            margin-bottom: 25px;
-        }
+        .gate-card img { max-width: 150px; margin-bottom: 20px; }
+        .gate-card h2 { color: #1e3a8a; margin-top: 0; margin-bottom: 30px; }
         .role-btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 15px;
-            font-size: 1.15em;
-            font-weight: bold;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: transform 0.1s, background-color 0.2s;
+            display: block; width: 100%; padding: 15px; margin-bottom: 15px;
+            font-size: 1.2em; font-weight: bold; border: none; border-radius: 6px;
+            cursor: pointer; transition: transform 0.1s, background-color 0.2s;
         }
         .btn-student { background-color: #dfaa2b; color: #1e3a8a; }
         .btn-student:hover { background-color: #c99722; }
-        
         .btn-teacher { background-color: #f8f9fa; color: #555; border: 2px solid #ccc; }
         .btn-teacher:hover { background-color: #e2e6ea; }
-
         .gate-input, .gate-select {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 2px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
-            box-sizing: border-box;
-            text-align: center;
-            background: white;
+            width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #ccc;
+            border-radius: 6px; font-size: 16px; box-sizing: border-box; text-align: center; background: white;
         }
-        .gate-input:focus, .gate-select:focus {
-            outline: none;
-            border-color: #1e3a8a;
-        }
-
-        #login-error {
-            color: #d32f2f;
-            font-size: 0.9em;
-            font-weight: bold;
-            margin-bottom: 15px;
-            display: none;
-        }
-
         body.locked { overflow: hidden; }
-
-        .user-status-bar {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.9em;
-            color: white;
-        }
-        .user-badge {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-        .logout-btn {
-            background: #d32f2f;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .logout-btn:hover { background: #b71c1c; }
 
         .dnc-btn {
             display: block; width: 100%; padding: 15px; background-color: #dfaa2b; 
@@ -121,7 +51,7 @@
 </head>
 <body class="locked">
 
-    <!-- LOGIN GATE OVERLAY -->
+    <!-- LOGIN GATE -->
     <div id="login-gate">
         <div class="gate-card">
             <img src="logo.jpg" alt="Delta Serlby Park Logo">
@@ -129,37 +59,20 @@
             
             <div id="role-selection">
                 <button class="role-btn btn-student" onclick="showStudentForm()">🎓 I am a Student</button>
-                <button class="role-btn btn-teacher" onclick="showTeacherForm()">👨‍🏫 I am a Teacher</button>
+                <button class="role-btn btn-teacher" onclick="teacherLogin()">👨‍🏫 I am a Teacher</button>
             </div>
 
-            <!-- Student Login Form -->
             <div id="student-login-form" style="display: none;">
-                <div id="login-error">Incorrect username or password.</div>
-                <input type="text" id="student-username" class="gate-input" placeholder="Username">
-                <input type="password" id="student-password" class="gate-input" placeholder="Password">
+                <div id="login-error" style="color:red; font-size:0.9em; margin-bottom:10px; display:none;"></div>
+                <input type="text" id="student-username" class="gate-input" placeholder="Username (e.g. jsmith)">
+                <input type="password" id="student-pin" class="gate-input" placeholder="4-Digit PIN / Password" maxlength="6">
                 
-                <select id="student-class" class="gate-select">
-                    <option value="Unassigned" disabled selected>Select your Class...</option>
-                    <option value="7x1">7x1</option><option value="7x2">7x2</option><option value="7y1">7y1</option><option value="7y2">7y2</option>
-                    <option value="8x1">8x1</option><option value="8x2">8x2</option><option value="8y1">8y1</option><option value="8y2">8y2</option>
-                    <option value="9x1">9x1</option><option value="9x2">9x2</option><option value="9y1">9y1</option><option value="9y2">9y2</option>
-                </select>
-
                 <button class="role-btn btn-student" id="btn-student-submit" onclick="processStudentLogin()">Log In</button>
-                <button class="role-btn btn-teacher" onclick="resetGateForms()">Back</button>
-            </div>
-
-            <!-- Teacher Login Form -->
-            <div id="teacher-login-form" style="display: none;">
-                <input type="password" id="teacher-passcode" class="gate-input" placeholder="Enter Teacher Passcode">
-                
-                <button class="role-btn btn-student" onclick="processTeacherLogin()">Open Teacher Portal</button>
-                <button class="role-btn btn-teacher" onclick="resetGateForms()">Back</button>
+                <button class="role-btn btn-teacher" onclick="hideStudentForm()">Cancel</button>
             </div>
         </div>
     </div>
 
-    <!-- HEADER -->
     <header>
         <div class="header-left">
             <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
@@ -167,16 +80,9 @@
         <div class="header-center">
             <h1>Serlby Park Computing</h1>
         </div>
-        <div class="header-right">
-            <div class="user-status-bar" id="header-user-bar" style="display: none;">
-                <button class="header-btn" id="teacher-portal-link" style="display:none; background:#dfaa2b; color:#1e3a8a; border:none; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer;" onclick="window.location.href='teacher-dashboard.html'">📊 Teacher Portal</button>
-                <span class="user-badge" id="logged-in-label"></span>
-                <button class="logout-btn" onclick="logoutUser()">Log Out</button>
-            </div>
-        </div>
+        <div class="header-right"></div>
     </header>
 
-    <!-- NAVIGATION -->
     <nav>
         <button id="btn-year7" class="active" onclick="loadYear('year7')">Year 7</button>
         <button id="btn-year8" onclick="loadYear('year8')">Year 8</button>
@@ -184,7 +90,6 @@
         <button id="btn-gcse" onclick="loadYear('gcse')">GCSE</button>
     </nav>
 
-    <!-- MAIN CONTENT -->
     <main>
         <h2 id="year-title">Year 7 Curriculum</h2>
         <div id="dnc-container"></div>
@@ -196,6 +101,7 @@
     </footer>
 
     <script>
+        // --- FIREBASE CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
             authDomain: "serlby-park-computing.firebaseapp.com",
@@ -212,41 +118,16 @@
 
         function showStudentForm() {
             document.getElementById('role-selection').style.display = 'none';
-            document.getElementById('teacher-login-form').style.display = 'none';
             document.getElementById('student-login-form').style.display = 'block';
             document.getElementById('student-username').focus();
         }
 
-        function showTeacherForm() {
-            document.getElementById('role-selection').style.display = 'none';
+        function hideStudentForm() {
             document.getElementById('student-login-form').style.display = 'none';
-            document.getElementById('teacher-login-form').style.display = 'block';
-            document.getElementById('teacher-passcode').focus();
-        }
-
-        function resetGateForms() {
-            document.getElementById('student-login-form').style.display = 'none';
-            document.getElementById('teacher-login-form').style.display = 'none';
             document.getElementById('role-selection').style.display = 'block';
-            document.getElementById('login-error').style.display = 'none';
             document.getElementById('student-username').value = "";
-            document.getElementById('student-password').value = "";
-            document.getElementById('teacher-passcode').value = "";
-        }
-
-        function unlockWebsite(displayLabel, isTeacher = false) {
-            const gate = document.getElementById('login-gate');
-            gate.style.opacity = '0';
-            setTimeout(() => {
-                gate.style.display = 'none';
-                document.body.classList.remove('locked');
-            }, 400);
-
-            document.getElementById('logged-in-label').innerText = displayLabel;
-            document.getElementById('header-user-bar').style.display = 'flex';
-            if (isTeacher) {
-                document.getElementById('teacher-portal-link').style.display = 'inline-block';
-            }
+            document.getElementById('student-pin').value = "";
+            document.getElementById('login-error').style.display = 'none';
         }
 
         function formatEmail(username) {
@@ -254,77 +135,72 @@
             return clean.includes('@') ? clean : clean + "@deltaschool.local";
         }
 
-        function processStudentLogin() {
+        async function processStudentLogin() {
             const user = document.getElementById('student-username').value.trim();
-            const pass = document.getElementById('student-password').value.trim();
-            const className = document.getElementById('student-class').value;
+            const pin = document.getElementById('student-pin').value.trim();
             const errorBox = document.getElementById('login-error');
             const submitBtn = document.getElementById('btn-student-submit');
 
-            if (user === "" || pass === "" || className === "Unassigned") {
-                errorBox.innerText = "Please fill in username, password, and select your class.";
+            if (user === "" || pin === "") {
+                errorBox.innerText = "Please enter both your Username and PIN.";
                 errorBox.style.display = 'block';
                 return;
             }
 
             errorBox.style.display = 'none';
-            submitBtn.innerText = "Signing in...";
+            submitBtn.innerText = "Logging in...";
 
-            auth.signInWithEmailAndPassword(formatEmail(user), pass)
-                .then(async (cred) => {
-                    sessionStorage.removeItem('teacherMode');
-                    sessionStorage.removeItem('inspectStudentUid');
-                    const cleanName = cred.user.email.replace('@deltaschool.local', '');
-                    
-                    // Register student profile in Firestore so they appear on the Teacher Portal
-                    await db.collection("users").doc(cred.user.uid).set({
-                        username: cleanName,
-                        className: className,
+            try {
+                // Authenticate with Firebase Auth using pseudo-email
+                const userCredential = await auth.signInWithEmailAndPassword(formatEmail(user), pin);
+                const uid = userCredential.user.uid;
+
+                // Check if user profile exists in Firestore users collection
+                const userDoc = await db.collection("users").doc(uid).get();
+                if (!userDoc.exists) {
+                    // If first login, create basic profile record
+                    await db.collection("users").doc(uid).set({
+                        username: user,
+                        className: "7x1", // Default class if unallocated, you can update in Firebase Console
                         lastLogin: Date.now()
-                    }, { merge: true });
+                    });
+                }
 
-                    submitBtn.innerText = "Log In";
-                })
-                .catch(err => {
-                    submitBtn.innerText = "Log In";
-                    errorBox.innerText = "Incorrect username or password.";
-                    errorBox.style.display = 'block';
-                });
+                document.getElementById('login-gate').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('login-gate').style.display = 'none';
+                    document.body.classList.remove('locked');
+                }, 500);
+            } catch (err) {
+                submitBtn.innerText = "Log In";
+                errorBox.innerText = "Incorrect username or PIN.";
+                errorBox.style.display = 'block';
+            }
         }
 
-        function processTeacherLogin() {
-            const passcode = document.getElementById('teacher-passcode').value.trim();
+        function teacherLogin() {
+            const passcode = prompt("Enter Teacher Passcode to access Dashboard:");
             if (passcode === "2525" || passcode === "delta") {
                 sessionStorage.setItem('teacherMode', 'true');
                 window.location.href = "teacher-dashboard.html";
-            } else {
-                alert("Incorrect Teacher Passcode.");
+            } else if (passcode !== null) {
+                alert("Incorrect passcode. Access denied.");
             }
         }
 
-        function logoutUser() {
-            sessionStorage.removeItem('teacherMode');
-            auth.signOut().then(() => {
-                window.location.reload();
-            });
-        }
-
-        auth.onAuthStateChanged((user) => {
-            if (sessionStorage.getItem('teacherMode') === 'true') {
-                unlockWebsite("👨‍🏫 Teacher Mode", true);
-            } else if (user) {
-                const cleanName = user.email.replace('@deltaschool.local', '');
-                unlockWebsite("🎓 " + cleanName, false);
-            }
-        });
-
-        document.getElementById('student-password').addEventListener('keypress', function (e) {
+        document.getElementById('student-pin').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') processStudentLogin();
         });
-        document.getElementById('teacher-passcode').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') processTeacherLogin();
+
+        // Auto-unlock if session active
+        auth.onAuthStateChanged((user) => {
+            if (user || sessionStorage.getItem('teacherMode') === 'true') {
+                document.getElementById('login-gate').style.display = 'none';
+                document.body.classList.remove('locked');
+            }
         });
 
+        // --- CURRICULUM DATA ---
         const curriculumData = {
           year7: [
             { title: "Delta Welcome", description: "<ul><li>Introduction/Computational Thinking</li><li>Keyboard Skills</li><li>Mouse Skills</li><li>File Management & Researching</li><li>E-Safety</li><li>Assessment</li></ul>" },
@@ -387,7 +263,7 @@
                 dncContainer.innerHTML = '';
             }
 
-            try { localStorage.setItem('lastViewedYearGroup', year); } catch (error) {}
+            try { localStorage.setItem('lastViewedYearGroup', year); } catch (e) {}
 
             const grid = document.getElementById('content-grid');
             grid.innerHTML = ''; 
@@ -411,7 +287,7 @@
 
         window.onload = () => {
             let savedYear = 'year7';
-            try { savedYear = localStorage.getItem('lastViewedYearGroup') || 'year7'; } catch (error) {}
+            try { savedYear = localStorage.getItem('lastViewedYearGroup') || 'year7'; } catch (e) {}
             if (!curriculumData[savedYear]) savedYear = 'year7';
             loadYear(savedYear);
         };
