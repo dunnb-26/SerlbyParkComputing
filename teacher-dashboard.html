@@ -1,249 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Teacher Dashboard - Live Roster</title>
-
     <link rel="stylesheet" href="style.css">
-
+    
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
-        .dashboard-layout {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 20px;
-            max-width: 1400px;
-            margin: 20px auto;
-            padding: 0 20px;
-        }
-
-        .sidebar {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-            border-top: 6px solid #1e3a8a;
-            height: 85vh;
-            overflow-y: auto;
-        }
-
-        .main-view {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-            border-top: 6px solid #dfaa2b;
-            height: 85vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .student-btn {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 8px;
-            background: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            text-align: left;
-            font-weight: bold;
-            font-size: 1em;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .student-btn:hover,
-        .student-btn.active {
-            background: #1e3a8a;
-            color: white;
-            border-color: #1e3a8a;
-        }
-
-        .class-badge {
-            float: right;
-            background: #dfaa2b;
-            color: #1e3a8a;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.85em;
-        }
-
-        select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            font-weight: bold;
-        }
-
-        iframe {
-            flex-grow: 1;
-            width: 100%;
-            border: 2px solid #eee;
-            border-radius: 8px;
-            background: #f8f9fa;
-        }
-
-        .header-right {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .header-right button {
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .refresh-btn {
-            background: #dfaa2b;
-            color: #1e3a8a;
-        }
-
-        .logout-btn {
-            background: #b91c1c;
-            color: white;
-        }
-
-        .header-right button:hover {
-            opacity: 0.85;
-        }
-
-        @media (max-width: 800px) {
-            .dashboard-layout {
-                grid-template-columns: 1fr;
-            }
-
-            .sidebar,
-            .main-view {
-                height: auto;
-                min-height: 350px;
-            }
-
-            .main-view {
-                min-height: 500px;
-                padding: 15px;
-            }
-
-            header {
-                flex-wrap: wrap;
-                gap: 10px;
-            }
-
-            .header-right {
-                flex-wrap: wrap;
-            }
-        }
+        .dashboard-layout { display: grid; grid-template-columns: 300px 1fr; gap: 20px; max-width: 1400px; margin: 20px auto; padding: 0 20px; box-sizing: border-box; }
+        .sidebar { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #1e3a8a; height: 85vh; overflow-y: auto; box-sizing: border-box; }
+        .main-view { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #dfaa2b; height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; }
+        
+        .student-btn { display: block; width: 100%; padding: 12px; margin-bottom: 8px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; text-align: left; font-weight: bold; font-size: 1em; cursor: pointer; transition: 0.2s; }
+        .student-btn:hover, .student-btn.active { background: #1e3a8a; color: white; border-color: #1e3a8a; }
+        .class-badge { float: right; background: #dfaa2b; color: #1e3a8a; padding: 2px 8px; border-radius: 12px; font-size: 0.85em; }
+        
+        select { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #ccc; font-weight: bold; box-sizing: border-box; }
+        iframe { flex-grow: 1; width: 100%; border: 2px solid #eee; border-radius: 8px; background: #f8f9fa; }
     </style>
 </head>
-
 <body>
-
-    <!-- Header -->
     <header>
-
-        <div class="header-left">
-            <a href="index.html">
-                <img src="logo.jpg" alt="Logo">
-            </a>
-        </div>
-
-        <div class="header-center">
-            <h1>Teacher Dashboard</h1>
-        </div>
-
-        <div class="header-right">
-
-            <button class="refresh-btn" onclick="fetchStudents()">
-                ↻ Refresh
-            </button>
-
-            <button class="logout-btn" onclick="teacherLogout()">
-                Log Out
-            </button>
-
-        </div>
-
+        <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
+        <div class="header-center"><h1>Teacher Dashboard</h1></div>
+        <div class="header-right"><button onclick="fetchStudents()" style="background:#dfaa2b; color:#1e3a8a; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer;">↻ Refresh</button></div>
     </header>
 
     <div class="dashboard-layout">
-
-        <!-- Sidebar: Class Roster -->
+        <!-- Sidebar: Class Roster with all classes & options -->
         <div class="sidebar">
-
             <h3>Class Roster</h3>
-
             <select id="class-filter" onchange="renderSidebar()">
-
                 <option value="ALL">All Classes</option>
-
                 <optgroup label="Year 7">
-                    <option value="7x1">7x1</option>
-                    <option value="7x2">7x2</option>
-                    <option value="7y1">7y1</option>
-                    <option value="7y2">7y2</option>
+                    <option value="7x1">7x1</option><option value="7x2">7x2</option><option value="7y1">7y1</option><option value="7y2">7y2</option>
                 </optgroup>
-
                 <optgroup label="Year 8">
-                    <option value="8x1">8x1</option>
-                    <option value="8x2">8x2</option>
-                    <option value="8y1">8y1</option>
-                    <option value="8y2">8y2</option>
+                    <option value="8x1">8x1</option><option value="8x2">8x2</option><option value="8y1">8y1</option><option value="8y2">8y2</option>
                 </optgroup>
-
                 <optgroup label="Year 9">
-                    <option value="9x1">9x1</option>
-                    <option value="9x2">9x2</option>
-                    <option value="9y1">9y1</option>
-                    <option value="9y2">9y2</option>
+                    <option value="9x1">9x1</option><option value="9x2">9x2</option><option value="9y1">9y1</option><option value="9y2">9y2</option>
                 </optgroup>
-
-                <optgroup label="Year 10">
-                    <option value="10aEnt1">10aEnt1</option>
-                    <option value="10bCim1">10bCim1</option>
+                <optgroup label="GCSE Options">
+                    <option value="10aEnt1">10aEnt1 (Enterprise)</option>
+                    <option value="11aEnt1">11aEnt1 (Enterprise)</option>
+                    <option value="10bCim1">10bCim1 (iMedia)</option>
+                    <option value="11bCim1">11bCim1 (iMedia)</option>
                 </optgroup>
-
-                <optgroup label="Year 11">
-                    <option value="11aEnt1">11aEnt1</option>
-                    <option value="11bCim1">11bCim1</option>
-                </optgroup>
-
             </select>
-
-            <div id="student-list" style="margin-top: 20px;">
-                <p style="color: #666; font-size: 0.9em;">
-                    Loading students...
-                </p>
-            </div>
-
+            <div id="student-list" style="margin-top: 20px;"><p style="color: #666; font-size: 0.9em;">Loading students...</p></div>
         </div>
 
-        <!-- Main View: Student Workspace -->
+        <!-- Main View: Student Workspace Iframe -->
         <div class="main-view" id="work-view">
-
-            <h2 style="color: #666; text-align: center; margin-top: 50px;">
-                &larr; Select a student to view their profile
-            </h2>
-
+            <h2 style="color: #666; text-align: center; margin-top: 50px;">&larr; Select a student to view their profile</h2>
         </div>
-
     </div>
 
     <script>
-        // Firebase configuration
+        // --- FIREBASE CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
             authDomain: "serlby-park-computing.firebaseapp.com",
@@ -254,206 +74,101 @@
             measurementId: "G-HDNYEE11WV"
         };
 
-        // Initialise Firebase
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
-
         const db = firebase.firestore();
+
+        // Teacher security check
+        if (sessionStorage.getItem('teacherMode') !== 'true') {
+            alert("Unauthorized. Please log in as a teacher first.");
+            window.location.href = "index.html";
+        }
 
         let allStudents = [];
 
-        // Fetch students from Firestore
         async function fetchStudents() {
             const listDiv = document.getElementById('student-list');
-
             listDiv.innerHTML = "<p>Loading...</p>";
 
             try {
                 const snapshot = await db.collection("users").get();
-
                 allStudents = [];
-
                 snapshot.forEach(doc => {
                     const data = doc.data();
-
                     allStudents.push({
                         uid: doc.id,
-                        username: data.username || "Unknown",
+                        username: data.username || data.fullName || "Unknown",
                         className: data.className || "Unassigned"
                     });
                 });
-
-                allStudents.sort((a, b) =>
-                    a.username.localeCompare(b.username)
-                );
-
+                allStudents.sort((a, b) => a.username.localeCompare(b.username));
                 renderSidebar();
-
             } catch (err) {
                 console.error("Error fetching students:", err);
-
-                listDiv.innerHTML =
-                    `<p style="color:red;">Error: ${err.message}</p>`;
+                listDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
             }
         }
 
-        // Render and filter the class roster
         function renderSidebar() {
-            const classFilter =
-                document.getElementById('class-filter').value;
-
-            const listDiv =
-                document.getElementById('student-list');
-
+            const classFilter = document.getElementById('class-filter').value;
+            const listDiv = document.getElementById('student-list');
             listDiv.innerHTML = "";
 
-            const filtered = allStudents.filter(student =>
-                classFilter === "ALL" ||
-                student.className === classFilter
-            );
+            const filtered = allStudents.filter(s => classFilter === "ALL" || s.className === classFilter);
 
             if (filtered.length === 0) {
-                listDiv.innerHTML = `
-                    <p style="color:#666; font-size:0.9em;">
-                        No students found in this class.
-                        <br>
-                        <small>
-                            Students appear here automatically after
-                            logging in on the homepage.
-                        </small>
-                    </p>
-                `;
+                listDiv.innerHTML = "<p style='color: #666; font-size: 0.9em;'>No students found in this class.</p>";
                 return;
             }
 
             filtered.forEach(student => {
                 const btn = document.createElement('button');
-
                 btn.className = 'student-btn';
-
-                // Use textContent for student names to avoid
-                // interpreting names as HTML.
-                const nameSpan = document.createElement('span');
-                nameSpan.textContent = student.username;
-
-                const badge = document.createElement('span');
-                badge.className = 'class-badge';
-                badge.textContent = student.className;
-
-                btn.appendChild(nameSpan);
-                btn.appendChild(badge);
-
+                btn.innerHTML = `${student.username} <span class="class-badge">${student.className}</span>`;
                 btn.onclick = () => {
-                    document.querySelectorAll('.student-btn')
-                        .forEach(button =>
-                            button.classList.remove('active')
-                        );
-
+                    document.querySelectorAll('.student-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-
                     openStudentWorkspace(student);
                 };
-
                 listDiv.appendChild(btn);
             });
         }
 
-        // Open the selected student's workspace
         function openStudentWorkspace(student) {
             const viewDiv = document.getElementById('work-view');
 
+            // Store inspecting credentials so lesson pages fetch this student's Firebase cloud record
             sessionStorage.setItem('teacherMode', 'true');
             sessionStorage.setItem('inspectStudentUid', student.uid);
             sessionStorage.setItem('inspectStudentName', student.username);
 
-            viewDiv.replaceChildren();
-
-            const heading = document.createElement('div');
-
-            heading.style.cssText = `
-                display:flex;
-                justify-content:space-between;
-                align-items:center;
-                border-bottom:3px solid #1e3a8a;
-                padding-bottom:10px;
-                margin-bottom:15px;
-                flex-shrink:0;
+            viewDiv.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 15px; flex-shrink: 0;">
+                    <div>
+                        <h2 style="margin: 0; color: #1e3a8a;">Viewing: ${student.username}</h2>
+                        <p style="margin: 0; color: #dfaa2b; font-weight: bold;">Class: ${student.className}</p>
+                    </div>
+                </div>
+                <iframe src="index.html" onload="lockStudentInputs(this)"></iframe>
             `;
-
-            const details = document.createElement('div');
-
-            const title = document.createElement('h2');
-            title.style.cssText = 'margin:0; color:#1e3a8a;';
-            title.textContent = `Viewing: ${student.username}`;
-
-            const classText = document.createElement('p');
-            classText.style.cssText =
-                'margin:0; color:#dfaa2b; font-weight:bold;';
-            classText.textContent = `Class: ${student.className}`;
-
-            details.appendChild(title);
-            details.appendChild(classText);
-            heading.appendChild(details);
-
-            const iframe = document.createElement('iframe');
-            iframe.src = 'index.html';
-            iframe.title = `Workspace for ${student.username}`;
-
-            iframe.onload = function () {
-                lockStudentInputs(iframe);
-            };
-
-            viewDiv.appendChild(heading);
-            viewDiv.appendChild(iframe);
         }
 
-        // Lock text inputs in the embedded student workspace
         function lockStudentInputs(iframe) {
             try {
                 const doc = iframe.contentWindow.document;
-
                 const loginGate = doc.getElementById('login-gate');
-
                 if (loginGate) {
                     loginGate.style.display = 'none';
                     doc.body.classList.remove('locked');
                 }
-
-                doc.querySelectorAll(
-                    'input[type="text"], textarea'
-                ).forEach(el => {
-                    el.readOnly = true;
-                });
-
-            } catch (e) {
+                doc.querySelectorAll('input[type="text'], textarea').forEach(el => el.readOnly = true);
+            } catch(e) {
                 console.log("Iframe lockdown active.");
             }
         }
 
-        // Log out the currently authenticated Firebase user
-        async function teacherLogout() {
-            try {
-                await firebase.auth().signOut();
-
-                // Clear the teacher workspace session data
-                sessionStorage.removeItem('teacherMode');
-                sessionStorage.removeItem('inspectStudentUid');
-                sessionStorage.removeItem('inspectStudentName');
-
-                // Return to the homepage
-                window.location.href = 'index.html';
-
-            } catch (error) {
-                console.error('Logout error:', error);
-
-                alert('Unable to log out. Please try again.');
-            }
-        }
-
-        // Load the student roster when the dashboard opens
         window.onload = fetchStudents;
     </script>
-
 </body>
 </html>
