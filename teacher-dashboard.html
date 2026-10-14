@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Dashboard - Live Roster</title>
+    <title>Delta Serlby Park - Computing</title>
     <link rel="stylesheet" href="style.css">
     
     <!-- Firebase SDKs -->
@@ -12,57 +12,104 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
-        .dashboard-layout { display: grid; grid-template-columns: 300px 1fr; gap: 20px; max-width: 1400px; margin: 20px auto; padding: 0 20px; box-sizing: border-box; }
-        .sidebar { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #1e3a8a; height: 85vh; overflow-y: auto; box-sizing: border-box; }
-        .main-view { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #dfaa2b; height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; }
+        #login-gate {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #1e3a8a 0%, #0d1b42 100%);
+            z-index: 9999; display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.5s ease;
+        }
+        .gate-card {
+            background: white; padding: 40px; border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center;
+            width: 90%; max-width: 400px; border-top: 8px solid #dfaa2b; 
+        }
+        .gate-card img { max-width: 150px; margin-bottom: 20px; }
+        .gate-card h2 { color: #1e3a8a; margin-top: 0; margin-bottom: 30px; }
+        .role-btn {
+            display: block; width: 100%; padding: 15px; margin-bottom: 15px;
+            font-size: 1.2em; font-weight: bold; border: none; border-radius: 6px;
+            cursor: pointer; transition: transform 0.1s, background-color 0.2s;
+        }
+        .btn-student { background-color: #dfaa2b; color: #1e3a8a; }
+        .btn-student:hover { background-color: #c99722; }
+        .btn-teacher { background-color: #f8f9fa; color: #555; border: 2px solid #ccc; }
+        .btn-teacher:hover { background-color: #e2e6ea; }
+        .gate-input {
+            width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #ccc;
+            border-radius: 6px; font-size: 16px; box-sizing: border-box; text-align: center; background: white;
+        }
+        body.locked { overflow: hidden; }
+
+        .dnc-btn {
+            display: block; width: 100%; padding: 15px; background-color: #dfaa2b; 
+            color: #1e3a8a; text-align: center; border: none; border-radius: 6px;
+            font-size: 1.2em; font-weight: bold; cursor: pointer; margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: background-color 0.2s;
+        }
+        .dnc-btn:hover { background-color: #c99722; }
         
-        .student-btn { display: block; width: 100%; padding: 12px; margin-bottom: 8px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; text-align: left; font-weight: bold; font-size: 1em; cursor: pointer; transition: 0.2s; }
-        .student-btn:hover, .student-btn.active { background: #1e3a8a; color: white; border-color: #1e3a8a; }
-        .class-badge { float: right; background: #dfaa2b; color: #1e3a8a; padding: 2px 8px; border-radius: 12px; font-size: 0.85em; }
-        
-        select { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #ccc; font-weight: bold; box-sizing: border-box; }
-        iframe { flex-grow: 1; width: 100%; border: 2px solid #eee; border-radius: 8px; background: #f8f9fa; }
+        .logout-btn {
+            background-color: #b91c1c; color: white; border: none; padding: 8px 15px;
+            border-radius: 4px; font-weight: bold; cursor: pointer; transition: opacity 0.2s;
+        }
+        .logout-btn:hover { opacity: 0.85; }
     </style>
 </head>
-<body>
-    <header>
-        <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
-        <div class="header-center"><h1>Teacher Dashboard</h1></div>
-        <div class="header-right"><button onclick="fetchStudents()" style="background:#dfaa2b; color:#1e3a8a; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer;">↻ Refresh</button></div>
-    </header>
+<body class="locked">
 
-    <div class="dashboard-layout">
-        <!-- Sidebar: Class Roster with all classes & options -->
-        <div class="sidebar">
-            <h3>Class Roster</h3>
-            <select id="class-filter" onchange="renderSidebar()">
-                <option value="ALL">All Classes</option>
-                <optgroup label="Year 7">
-                    <option value="7x1">7x1</option><option value="7x2">7x2</option><option value="7y1">7y1</option><option value="7y2">7y2</option>
-                </optgroup>
-                <optgroup label="Year 8">
-                    <option value="8x1">8x1</option><option value="8x2">8x2</option><option value="8y1">8y1</option><option value="8y2">8y2</option>
-                </optgroup>
-                <optgroup label="Year 9">
-                    <option value="9x1">9x1</option><option value="9x2">9x2</option><option value="9y1">9y1</option><option value="9y2">9y2</option>
-                </optgroup>
-                <optgroup label="GCSE Options">
-                    <option value="10aEnt1">10aEnt1</option>
-                    <option value="11aEnt1">11aEnt1</option>
-                    <option value="10bCim1">10bCim1</option>
-                    <option value="11bCim1">11bCim1</option>
-                </optgroup>
-            </select>
-            <div id="student-list" style="margin-top: 20px;"><p style="color: #666; font-size: 0.9em;">Loading students...</p></div>
-        </div>
+    <!-- LOGIN GATE -->
+    <div id="login-gate">
+        <div class="gate-card">
+            <img src="HCrfldpu_400x400.jpg" alt="Delta Serlby Park Logo">
+            <h2>Welcome to Computing</h2>
+            
+            <div id="role-selection">
+                <button class="role-btn btn-student" onclick="showStudentForm()">🎓 I am a Student</button>
+                <button class="role-btn btn-teacher" onclick="teacherLogin()">👨‍🏫 I am a Teacher</button>
+            </div>
 
-        <!-- Main View: Student Workspace Iframe -->
-        <div class="main-view" id="work-view">
-            <h2 style="color: #666; text-align: center; margin-top: 50px;">&larr; Select a student to view their profile</h2>
+            <div id="student-login-form" style="display: none;">
+                <div id="login-error" style="color:red; font-size:0.9em; margin-bottom:10px; display:none;"></div>
+                <input type="text" id="student-username" class="gate-input" placeholder="Username (e.g. jsmith)">
+                <input type="password" id="student-pin" class="gate-input" placeholder="4-Digit PIN / Password" maxlength="10">
+                
+                <button class="role-btn btn-student" id="btn-student-submit" onclick="processStudentLogin()">Log In</button>
+                <button class="role-btn btn-teacher" onclick="hideStudentForm()">Cancel</button>
+            </div>
         </div>
     </div>
 
+    <header>
+        <div class="header-left">
+            <a href="index.html"><img src="HCrfldpu_400x400.jpg" alt="Logo"></a>
+        </div>
+        <div class="header-center">
+            <h1>Serlby Park Computing</h1>
+        </div>
+        <div class="header-right">
+            <button class="logout-btn" onclick="performLogout()">Log Out</button>
+        </div>
+    </header>
+
+    <nav>
+        <button id="btn-year7" class="active" onclick="loadYear('year7')">Year 7</button>
+        <button id="btn-year8" onclick="loadYear('year8')">Year 8</button>
+        <button id="btn-year9" onclick="loadYear('year9')">Year 9</button>
+        <button id="btn-gcse" onclick="loadYear('gcse')">GCSE</button>
+    </nav>
+
+    <main>
+        <h2 id="year-title">Year 7 Curriculum</h2>
+        <div id="dnc-container"></div>
+        <div id="content-grid" class="grid"></div>
+    </main>
+
+    <footer>
+        &copy; 2026 Delta Serlby Park - Computing Department
+    </footer>
+
     <script>
+        // --- FIREBASE CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
             authDomain: "serlby-park-computing.firebaseapp.com",
@@ -73,95 +120,202 @@
             measurementId: "G-HDNYEE11WV"
         };
 
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
         const db = firebase.firestore();
 
-        if (sessionStorage.getItem('teacherMode') !== 'true') {
-            alert("Unauthorized. Please log in as a teacher first.");
-            window.location.href = "index.html";
+        function showStudentForm() {
+            document.getElementById('role-selection').style.display = 'none';
+            document.getElementById('student-login-form').style.display = 'block';
+            document.getElementById('student-username').focus();
         }
 
-        let allStudents = [];
-
-        async function fetchStudents() {
-            const listDiv = document.getElementById('student-list');
-            listDiv.innerHTML = "<p>Loading...</p>";
-
-            try {
-                const snapshot = await db.collection("users").get();
-                allStudents = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    allStudents.push({
-                        uid: doc.id,
-                        username: data.username || data.fullName || "Unknown",
-                        className: data.className || "Unassigned"
-                    });
-                });
-                allStudents.sort((a, b) => a.username.localeCompare(b.username));
-                renderSidebar();
-            } catch (err) {
-                console.error("Error fetching students:", err);
-                listDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
-            }
+        function hideStudentForm() {
+            document.getElementById('student-login-form').style.display = 'none';
+            document.getElementById('role-selection').style.display = 'block';
+            document.getElementById('student-username').value = "";
+            document.getElementById('student-pin').value = "";
+            document.getElementById('login-error').style.display = 'none';
         }
 
-        function renderSidebar() {
-            const classFilter = document.getElementById('class-filter').value;
-            const listDiv = document.getElementById('student-list');
-            listDiv.innerHTML = "";
+        function formatEmail(username) {
+            let clean = username.trim().toLowerCase();
+            return clean.includes('@') ? clean : clean + "@deltaschool.local";
+        }
 
-            const filtered = allStudents.filter(s => classFilter === "ALL" || s.className === classFilter);
+        async function processStudentLogin() {
+            const user = document.getElementById('student-username').value.trim();
+            const pin = document.getElementById('student-pin').value.trim();
+            const errorBox = document.getElementById('login-error');
+            const submitBtn = document.getElementById('btn-student-submit');
 
-            if (filtered.length === 0) {
-                listDiv.innerHTML = "<p style='color: #666; font-size: 0.9em;'>No students found in this class.</p>";
+            if (user === "" || pin === "") {
+                errorBox.innerText = "Please enter both your Username and PIN.";
+                errorBox.style.display = 'block';
                 return;
             }
 
-            filtered.forEach(student => {
-                const btn = document.createElement('button');
-                btn.className = 'student-btn';
-                btn.innerHTML = `${student.username} <span class="class-badge">${student.className}</span>`;
-                btn.onclick = () => {
-                    document.querySelectorAll('.student-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    openStudentWorkspace(student);
-                };
-                listDiv.appendChild(btn);
+            errorBox.style.display = 'none';
+            submitBtn.innerText = "Logging in...";
+
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(formatEmail(user), pin);
+                const uid = userCredential.user.uid;
+
+                const userDoc = await db.collection("users").doc(uid).get();
+                if (!userDoc.exists) {
+                    await db.collection("users").doc(uid).set({
+                        username: user,
+                        className: "7x1",
+                        lastLogin: Date.now()
+                    });
+                }
+
+                document.getElementById('login-gate').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('login-gate').style.display = 'none';
+                    document.body.classList.remove('locked');
+                }, 500);
+            } catch (err) {
+                submitBtn.innerText = "Log In";
+                errorBox.innerText = "Incorrect username or PIN.";
+                errorBox.style.display = 'block';
+            }
+        }
+
+        function teacherLogin() {
+            const passcode = prompt("Enter Teacher Passcode to access Dashboard:");
+            if (passcode === "2525" || passcode === "delta") {
+                sessionStorage.setItem('teacherMode', 'true');
+                window.location.href = "teacher-dashboard.html";
+            } else if (passcode !== null) {
+                alert("Incorrect passcode. Access denied.");
+            }
+        }
+
+        // --- FULLY FUNCTIONAL LOG OUT LOGIC ---
+        async function performLogout() {
+            try {
+                await auth.signOut();
+                sessionStorage.clear();
+                localStorage.clear();
+                window.location.reload();
+            } catch (error) {
+                console.error("Logout error:", error);
+                window.location.reload();
+            }
+        }
+
+        document.getElementById('student-pin').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') processStudentLogin();
+        });
+
+        auth.onAuthStateChanged((user) => {
+            if (user || sessionStorage.getItem('teacherMode') === 'true') {
+                document.getElementById('login-gate').style.display = 'none';
+                document.body.classList.remove('locked');
+            } else {
+                document.getElementById('login-gate').style.display = 'flex';
+                document.body.classList.add('locked');
+            }
+        });
+
+        const curriculumData = {
+          year7: [
+            { title: "Delta Welcome", description: "<ul><li>Introduction/Computational Thinking</li><li>Keyboard Skills</li><li>Mouse Skills</li><li>File Management & Researching</li><li>E-Safety</li><li>Assessment</li></ul>" },
+            { title: "Microsoft Tools", description: "<ul><li>Word</li><li>PowerPoint</li><li>Email</li></ul>" },
+            { title: "Binary", description: "<ul><li>Binary to Denary</li><li>Denary to Binary</li></ul>" },
+            { title: "Assessment", description: "<ul><li>Revision</li><li>Assessment</li></ul>" },
+            { title: "Xmas", description: "<ul><li>TBA</li></ul>" },
+            { title: "Vector Graphics", description: "<ul><li>Pixel Power</li><li>Shape Squad</li><li>Build & Combine</li><li>Path Pros</li><li>Design Mission</li><li>Graphics Gallery</li></ul>" },
+            { title: "Computational Thinking", description: "<ul><li>Abstraction</li><li>Decomposition</li><li>Pattern Recognition</li><li>Algorithms</li><li>Flowcharts</li></ul>" },
+            { title: "Hardware & Software", description: "<ul><li>Hardware vs Software</li><li>Computer Systems</li><li>Inputs & Outputs</li><li>Storage</li><li>Graphics & Processing</li><li>TBA</li></ul>" },
+            { title: "Assessment", description: "<ul><li>Consolidation/Revision</li><li>Revision</li><li>Assessment</li></ul>" },
+            { title: "iDEA Award", description: "<ul><li>Citizen</li><li>Worker</li><li>Maker</li><li>Entrepreneur</li><li>Bronze Award</li></ul>" }
+          ],
+          year8: [
+            { title: "E-Safety", description: "<ul><li>E-Safety</li></ul>" },
+            { title: "Spreadsheets", description: "<ul><li>Data Entry</li><li>Formulas</li><li>Functions</li><li>Assessment</li></ul>" },
+            { title: "Pixel Art", description: "<ul><li>Basic Designs</li><li>Character Creation</li></ul>" },
+            { title: "Logical Thinking", description: "<ul><li>Computational Thinking Recap</li><li>Binary to Denary Recap</li><li>Denary to Binary Recap</li><li>Addition</li></ul>" },
+            { title: "Assessment", description: "<ul><li>Revision</li><li>Assessment</li></ul>" },
+            { title: "Xmas", description: "<ul><li>TBA</li></ul>" },
+            { title: "Edu Blocks", description: "<ul><li>Code Kickoff</li><li>Variable Vault</li><li>Input Impact</li><li>Choice Control</li><li>Loop Lab</li><li>The Big Build</li></ul>" },
+            { title: "Gaming", description: "<ul><li>Gaming Hardware</li><li>Objectives</li><li>Characters</li><li>Project</li><li>Showcase</li></ul>" },
+            { title: "Computing History", description: "<ul><li>1940 - 1959</li><li>1960 - 1979</li><li>1980 - 1999</li><li>2000 - 2019</li><li>2020 - Present Day</li><li>Timeline</li></ul>" },
+            { title: "Assessment", description: "<ul><li>Consolidation/Revision</li><li>Revision</li><li>Assessment</li></ul>" },
+            { title: "Minecraft Coding", description: "<ul><li>Python Option Available</li></ul>" }
+          ],
+          year9: [
+            { title: "E-Safety", description: "<ul><li>E-Safety</li></ul>" },
+            { title: "Python Programming", description: "<ul><li>Sequence</li><li>Selection</li><li>Iteration</li><li>Assessment</li></ul>" },
+            { title: "Binary & Hex", description: "<ul><li>Binary Conversions</li><li>Binary Addition & Shifts</li><li>Hexadecimal</li></ul>" },
+            { title: "Cyber Security", description: "<ul><li>Cyber Security</li><li>Hero or Criminal?</li><li>Malware</li></ul>" },
+            { title: "Assessment", description: "<ul><li>Revision</li><li>Assessment</li></ul>" },
+            { title: "Xmas", description: "<ul><li>TBA</li></ul>" },
+            { title: "Business", description: "<ul><li>Business Basics</li><li>Behind the Scenes</li><li>Brand Power</li><li>Decision Making</li><li>The Apprentice Challenge</li><li>The Big Showcase</li></ul>" },
+            { title: "Digital World", description: "<ul><li>Images</li><li>Compression (Lossy / Lossless)</li><li>Networks (LAN & WAN)</li><li>Logic Gates inc Boolean</li><li>Character Sets (ASCII / UNICODE)</li></ul>" },
+            { title: "AI & Ethics", description: "<ul><li>What is AI?</li><li>The Reality of AI</li><li>How AI Learns</li><li>Algorithmic Bias</li><li>Responsibility & Policy</li><li>The Grand Summary</li></ul>" },
+            { title: "Assessment", description: "<ul><li>Consolidation/Revision</li><li>Revision</li><li>Assessment</li></ul>" },
+            { title: "Photoshop", description: "<ul><li>Object Selection</li><li>Airbrushing</li><li>Filters</li><li>Composites</li><li>Project</li></ul>" }
+          ],
+          gcse: [
+            { title: "Creative iMedia - R093", description: "<ul><li>Exam Unit</li><li>Media Industry & Pre-Production</li><li>Understanding & Planning</li></ul>" },
+            { title: "Creative iMedia - R094", description: "<ul><li>Coursework Unit</li><li>Visual Identity & Digital Graphics</li><li>Creation & Evaluation</li></ul>" },
+            { title: "Creative iMedia - R097", description: "<ul><li>Coursework Unit</li><li>Interactive Digital Media</li><li>Publishing & Testing</li></ul>" },
+            { title: "Enterprise - Component 1", description: "<ul><li>Coursework Unit</li><li>Exploring Enterprises</li><li>Market Research & Customer Needs</li></ul>" },
+            { title: "Enterprise - Component 2", description: "<ul><li>Coursework Unit</li><li>Planning for and Pitching an Enterprise</li><li>Financial Planning & Proposals</li></ul>" },
+            { title: "Enterprise - Component 3", description: "<ul><li>Exam Unit</li><li>Promotion and Finance for Enterprise</li><li>Business Growth & Success</li></ul>" }
+          ]
+        };
+
+        function loadYear(year) {
+            if (!curriculumData[year]) year = 'year7';
+            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById('btn-' + year);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            const titles = { year7: 'Year 7 Curriculum', year8: 'Year 8 Curriculum', year9: 'Year 9 Curriculum', gcse: 'GCSE Curriculum' };
+            document.getElementById('year-title').innerText = titles[year];
+
+            const dncContainer = document.getElementById('dnc-container');
+            if (['year7', 'year8', 'year9'].includes(year)) {
+                const yearNum = year.replace('year', ''); 
+                dncContainer.innerHTML = `<button class="dnc-btn" onclick="window.location.href='y${yearNum}-dnc.html'">📝 View Year ${yearNum} Demonstrate & Connect Tasks</button>`;
+            } else {
+                dncContainer.innerHTML = '';
+            }
+
+            try { localStorage.setItem('lastViewedYearGroup', year); } catch (e) {}
+
+            const grid = document.getElementById('content-grid');
+            grid.innerHTML = ''; 
+            
+            curriculumData[year].forEach((unit, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                const fileName = unit.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.html';
+                card.onclick = () => { window.location.href = fileName; };
+
+                let subtitleHtml = year === 'gcse' ? `<div class="card-subtitle">GCSE COURSE</div>` : `<div class="card-subtitle">UNIT ${index + 1} &bull; COMPUTING</div>`;
+                card.innerHTML = `
+                    ${subtitleHtml}
+                    <div class="card-title">${unit.title}</div>
+                    <div class="card-body">${unit.description}</div>
+                    <button class="card-btn">View Lesson Materials</button>
+                `;
+                grid.appendChild(card);
             });
         }
 
-        function openStudentWorkspace(student) {
-            const viewDiv = document.getElementById('work-view');
-
-            sessionStorage.setItem('teacherMode', 'true');
-            sessionStorage.setItem('inspectStudentUid', student.uid);
-            sessionStorage.setItem('inspectStudentName', student.username);
-
-            viewDiv.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 15px; flex-shrink: 0;">
-                    <div>
-                        <h2 style="margin: 0; color: #1e3a8a;">Viewing: ${student.username}</h2>
-                        <p style="margin: 0; color: #dfaa2b; font-weight: bold;">Class: ${student.className}</p>
-                    </div>
-                </div>
-                <iframe src="index.html" onload="lockStudentInputs(this)"></iframe>
-            `;
-        }
-
-        function lockStudentInputs(iframe) {
-            try {
-                const doc = iframe.contentWindow.document;
-                const loginGate = doc.getElementById('login-gate');
-                if (loginGate) {
-                    loginGate.style.display = 'none';
-                    doc.body.classList.remove('locked');
-                }
-                doc.querySelectorAll('input[type="text'], textarea').forEach(el => el.readOnly = true);
-            } catch(e) {}
-        }
-
-        window.onload = fetchStudents;
+        window.onload = () => {
+            let savedYear = 'year7';
+            try { savedYear = localStorage.getItem('lastViewedYearGroup') || 'year7'; } catch (e) {}
+            if (!curriculumData[savedYear]) savedYear = 'year7';
+            loadYear(savedYear);
+        };
     </script>
 </body>
 </html>
