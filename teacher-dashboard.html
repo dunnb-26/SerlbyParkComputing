@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Dashboard - Live Roster</title>
+    <title>Teacher Dashboard - Debug Mode</title>
     <link rel="stylesheet" href="style.css">
     
     <!-- Firebase SDKs -->
@@ -27,7 +27,7 @@
 <body>
     <header>
         <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
-        <div class="header-center"><h1>Teacher Dashboard</h1></div>
+        <div class="header-center"><h1>Teacher Dashboard (Debug)</h1></div>
         <div class="header-right"><button onclick="fetchStudents()" style="background:#dfaa2b; color:#1e3a8a; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer;">↻ Refresh</button></div>
     </header>
 
@@ -53,7 +53,7 @@
                     <option value="11bCim1">11bCim1 (iMedia)</option>
                 </optgroup>
             </select>
-            <div id="student-list" style="margin-top: 20px;"><p style="color: #666; font-size: 0.9em;">Loading students...</p></div>
+            <div id="student-list" style="margin-top: 20px;"><p style="color: #666; font-size: 0.9em;">Initializing...</p></div>
         </div>
 
         <!-- Main View: Student Workspace Iframe -->
@@ -63,6 +63,10 @@
     </div>
 
     <script>
+        const logBox = (msg, color = "#333") => {
+            document.getElementById('student-list').innerHTML = `<p style="color: ${color}; font-family: monospace; font-size: 0.9em;">${msg}</p>`;
+        };
+
         const firebaseConfig = {
             apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
             authDomain: "serlby-park-computing.firebaseapp.com",
@@ -73,7 +77,7 @@
             measurementId: "G-HDNYEE11WV"
         };
 
-        // Safely initialize Firebase without duplicate errors
+        logBox("Step 1: Initializing Firebase...");
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
@@ -82,25 +86,42 @@
         let allStudents = [];
 
         async function fetchStudents() {
-            const listDiv = document.getElementById('student-list');
-            listDiv.innerHTML = "<p>Loading...</p>";
+            logBox("Step 2: Connecting to Firestore database ('users')...");
 
             try {
                 const snapshot = await db.collection("users").get();
+                logBox(`Step 3: Query successful! Found ${snapshot.size} documents in 'users'.`, "green");
+                
                 allStudents = [];
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     allStudents.push({
                         uid: doc.id,
                         username: data.username || "Unknown",
-                        className: data.className || "Unassigned"
+                        className: data.className || "7x1"
                     });
                 });
+
+                if (allStudents.length === 0) {
+                    document.getElementById('student-list').innerHTML = `
+                        <div style="background: #fff3cd; color: #856404; padding: 10px; border-radius: 4px; font-size: 0.9em;">
+                            <strong>Database is empty!</strong><br>
+                            0 users found in Firestore. Go to your homepage and log in as a student at least once to create a record.
+                        </div>
+                    `;
+                    return;
+                }
+
                 allStudents.sort((a, b) => a.username.localeCompare(b.username));
                 renderSidebar();
             } catch (err) {
-                console.error("Error fetching students:", err);
-                listDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+                console.error("Firestore Error:", err);
+                document.getElementById('student-list').innerHTML = `
+                    <div style="background: #f8d7da; color: #721c24; padding: 12px; border-radius: 4px; font-size: 0.85em;">
+                        <strong>Firestore Blocked / Error:</strong><br>${err.message}<br><br>
+                        <em>This usually means your Firebase Security Rules are blocking unauthenticated reads.</em>
+                    </div>
+                `;
             }
         }
 
@@ -112,7 +133,7 @@
             const filtered = allStudents.filter(s => classFilter === "ALL" || s.className === classFilter);
 
             if (filtered.length === 0) {
-                listDiv.innerHTML = "<p style='color: #666; font-size: 0.9em;'>No students found in this class.<br><small>Students appear here automatically after logging in on the homepage.</small></p>";
+                listDiv.innerHTML = "<p style='color: #666; font-size: 0.9em;'>No students match this class filter.</p>";
                 return;
             }
 
@@ -131,7 +152,6 @@
 
         function openStudentWorkspace(student) {
             const viewDiv = document.getElementById('work-view');
-
             sessionStorage.setItem('teacherMode', 'true');
             sessionStorage.setItem('inspectStudentUid', student.uid);
             sessionStorage.setItem('inspectStudentName', student.username);
@@ -156,9 +176,7 @@
                     doc.body.classList.remove('locked');
                 }
                 doc.querySelectorAll('input[type="text'], textarea').forEach(el => el.readOnly = true);
-            } catch(e) {
-                console.log("Iframe lockdown active.");
-            }
+            } catch(e) {}
         }
 
         window.onload = fetchStudents;
