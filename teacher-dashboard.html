@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Dashboard - Bulletproof</title>
+    <title>Teacher Dashboard - Live Roster</title>
     <link rel="stylesheet" href="style.css">
     
     <!-- Firebase SDKs -->
@@ -53,7 +53,7 @@
                     <option value="11bCim1">11bCim1 (iMedia)</option>
                 </optgroup>
             </select>
-            <div id="student-list" style="margin-top: 20px;"><p style="color: #666; font-size: 0.9em;">Waiting for DOM...</p></div>
+            <div id="student-list" style="margin-top: 20px;"><p style="color: blue;">Loading dashboard...</p></div>
         </div>
 
         <!-- Main View: Student Workspace Iframe -->
@@ -62,47 +62,36 @@
         </div>
     </div>
 
+    <!-- SCRIPT MOVED TO BOTTOM TO ENSURE HTML ELEMENTS EXIST -->
     <script>
+        const studentListEl = document.getElementById('student-list');
         let db;
         let allStudents = [];
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const studentListEl = document.getElementById('student-list');
-            studentListEl.innerHTML = "<p style='color: blue;'>DOM loaded. Initializing Firebase...</p>";
-
-            try {
-                if (typeof firebase === 'undefined') {
-                    throw new Error("Firebase SDK failed to load (blocked by network or ad-blocker).");
-                }
-                if (!firebase.apps.length) {
-                    firebase.initializeApp({
-                        apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
-                        authDomain: "serlby-park-computing.firebaseapp.com",
-                        projectId: "serlby-park-computing",
-                        storageBucket: "serlby-park-computing.firebasestorage.app",
-                        messagingSenderId: "648533806051",
-                        appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
-                        measurementId: "G-HDNYEE11WV"
-                    });
-                }
-                db = firebase.firestore();
-                studentListEl.innerHTML = "<p style='color: green;'>Firebase connected! Fetching students...</p>";
-                
-                // Automatically fetch students now that DOM and Firebase are ready
-                fetchStudents();
-            } catch (err) {
-                studentListEl.innerHTML = `<p style='color: red;'><strong>Setup Error:</strong><br>${err.message}</p>`;
+        try {
+            if (typeof firebase === 'undefined') {
+                throw new Error("Firebase SDK failed to load.");
             }
-        });
+            if (!firebase.apps.length) {
+                firebase.initializeApp({
+                    apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+                    authDomain: "serlby-park-computing.firebaseapp.com",
+                    projectId: "serlby-park-computing",
+                    storageBucket: "serlby-park-computing.firebasestorage.app",
+                    messagingSenderId: "648533806051",
+                    appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+                    measurementId: "G-HDNYEE11WV"
+                });
+            }
+            db = firebase.firestore();
+            studentListEl.innerHTML = "<p style='color: green;'>Connected! Fetching students...</p>";
+        } catch (err) {
+            studentListEl.innerHTML = `<p style='color: red;'><strong>Error:</strong><br>${err.message}</p>`;
+        }
 
         async function fetchStudents() {
-            const studentListEl = document.getElementById('student-list');
-            if (!db) {
-                studentListEl.innerHTML = "<p style='color: red;'>Database not ready.</p>";
-                return;
-            }
-
-            studentListEl.innerHTML = "<p>Querying Firestore 'users' collection...</p>";
+            if (!db) return;
+            studentListEl.innerHTML = "<p>Querying database...</p>";
 
             try {
                 const snapshot = await db.collection("users").get();
@@ -117,7 +106,7 @@
                 });
 
                 if (allStudents.length === 0) {
-                    studentListEl.innerHTML = "<p style='color: orange;'>Connected, but 0 students found in database. Log in as a student on index.html first.</p>";
+                    studentListEl.innerHTML = "<p style='color: orange;'>Database connected, but 0 students found. Log in as a student on index.html first.</p>";
                     return;
                 }
 
@@ -130,7 +119,6 @@
 
         function renderSidebar() {
             const classFilter = document.getElementById('class-filter').value;
-            const studentListEl = document.getElementById('student-list');
             studentListEl.innerHTML = "";
 
             const filtered = allStudents.filter(s => classFilter === "ALL" || s.className === classFilter);
@@ -181,6 +169,9 @@
                 doc.querySelectorAll('input[type="text'], textarea').forEach(el => el.readOnly = true);
             } catch(e) {}
         }
+
+        // Run immediately when script loads at bottom of body
+        fetchStudents();
     </script>
 </body>
 </html>
