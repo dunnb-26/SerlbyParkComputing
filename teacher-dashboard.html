@@ -93,12 +93,68 @@
             border-radius: 8px;
             background: #f8f9fa;
         }
+
+        .header-right {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .header-right button {
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .refresh-btn {
+            background: #dfaa2b;
+            color: #1e3a8a;
+        }
+
+        .logout-btn {
+            background: #b91c1c;
+            color: white;
+        }
+
+        .header-right button:hover {
+            opacity: 0.85;
+        }
+
+        @media (max-width: 800px) {
+            .dashboard-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar,
+            .main-view {
+                height: auto;
+                min-height: 350px;
+            }
+
+            .main-view {
+                min-height: 500px;
+                padding: 15px;
+            }
+
+            header {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .header-right {
+                flex-wrap: wrap;
+            }
+        }
     </style>
 </head>
 
 <body>
 
+    <!-- Header -->
     <header>
+
         <div class="header-left">
             <a href="index.html">
                 <img src="logo.jpg" alt="Logo">
@@ -110,11 +166,17 @@
         </div>
 
         <div class="header-right">
-            <button onclick="fetchStudents()"
-                style="background:#dfaa2b; color:#1e3a8a; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer;">
+
+            <button class="refresh-btn" onclick="fetchStudents()">
                 ↻ Refresh
             </button>
+
+            <button class="logout-btn" onclick="teacherLogout()">
+                Log Out
+            </button>
+
         </div>
+
     </header>
 
     <div class="dashboard-layout">
@@ -125,6 +187,7 @@
             <h3>Class Roster</h3>
 
             <select id="class-filter" onchange="renderSidebar()">
+
                 <option value="ALL">All Classes</option>
 
                 <optgroup label="Year 7">
@@ -148,17 +211,16 @@
                     <option value="9y2">9y2</option>
                 </optgroup>
 
-                <!-- NEW: Year 10 -->
                 <optgroup label="Year 10">
                     <option value="10aEnt1">10aEnt1</option>
                     <option value="10bCim1">10bCim1</option>
                 </optgroup>
 
-                <!-- NEW: Year 11 -->
                 <optgroup label="Year 11">
                     <option value="11aEnt1">11aEnt1</option>
                     <option value="11bCim1">11bCim1</option>
                 </optgroup>
+
             </select>
 
             <div id="student-list" style="margin-top: 20px;">
@@ -169,7 +231,7 @@
 
         </div>
 
-        <!-- Main View: Student Workspace Iframe -->
+        <!-- Main View: Student Workspace -->
         <div class="main-view" id="work-view">
 
             <h2 style="color: #666; text-align: center; margin-top: 50px;">
@@ -181,6 +243,7 @@
     </div>
 
     <script>
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
             authDomain: "serlby-park-computing.firebaseapp.com",
@@ -191,12 +254,16 @@
             measurementId: "G-HDNYEE11WV"
         };
 
-        firebase.initializeApp(firebaseConfig);
+        // Initialise Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
 
         const db = firebase.firestore();
 
         let allStudents = [];
 
+        // Fetch students from Firestore
         async function fetchStudents() {
             const listDiv = document.getElementById('student-list');
 
@@ -231,6 +298,7 @@
             }
         }
 
+        // Render and filter the class roster
         function renderSidebar() {
             const classFilter =
                 document.getElementById('class-filter').value;
@@ -247,7 +315,7 @@
 
             if (filtered.length === 0) {
                 listDiv.innerHTML = `
-                    <p style="color: #666; font-size: 0.9em;">
+                    <p style="color:#666; font-size:0.9em;">
                         No students found in this class.
                         <br>
                         <small>
@@ -264,12 +332,17 @@
 
                 btn.className = 'student-btn';
 
-                btn.innerHTML = `
-                    ${student.username}
-                    <span class="class-badge">
-                        ${student.className}
-                    </span>
-                `;
+                // Use textContent for student names to avoid
+                // interpreting names as HTML.
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = student.username;
+
+                const badge = document.createElement('span');
+                badge.className = 'class-badge';
+                badge.textContent = student.className;
+
+                btn.appendChild(nameSpan);
+                btn.appendChild(badge);
 
                 btn.onclick = () => {
                     document.querySelectorAll('.student-btn')
@@ -286,6 +359,7 @@
             });
         }
 
+        // Open the selected student's workspace
         function openStudentWorkspace(student) {
             const viewDiv = document.getElementById('work-view');
 
@@ -293,34 +367,48 @@
             sessionStorage.setItem('inspectStudentUid', student.uid);
             sessionStorage.setItem('inspectStudentName', student.username);
 
-            viewDiv.innerHTML = `
-                <div style="
-                    display:flex;
-                    justify-content:space-between;
-                    align-items:center;
-                    border-bottom:3px solid #1e3a8a;
-                    padding-bottom:10px;
-                    margin-bottom:15px;
-                    flex-shrink:0;
-                ">
-                    <div>
-                        <h2 style="margin:0; color:#1e3a8a;">
-                            Viewing: ${student.username}
-                        </h2>
+            viewDiv.replaceChildren();
 
-                        <p style="margin:0; color:#dfaa2b; font-weight:bold;">
-                            Class: ${student.className}
-                        </p>
-                    </div>
-                </div>
+            const heading = document.createElement('div');
 
-                <iframe
-                    src="index.html"
-                    onload="lockStudentInputs(this)">
-                </iframe>
+            heading.style.cssText = `
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                border-bottom:3px solid #1e3a8a;
+                padding-bottom:10px;
+                margin-bottom:15px;
+                flex-shrink:0;
             `;
+
+            const details = document.createElement('div');
+
+            const title = document.createElement('h2');
+            title.style.cssText = 'margin:0; color:#1e3a8a;';
+            title.textContent = `Viewing: ${student.username}`;
+
+            const classText = document.createElement('p');
+            classText.style.cssText =
+                'margin:0; color:#dfaa2b; font-weight:bold;';
+            classText.textContent = `Class: ${student.className}`;
+
+            details.appendChild(title);
+            details.appendChild(classText);
+            heading.appendChild(details);
+
+            const iframe = document.createElement('iframe');
+            iframe.src = 'index.html';
+            iframe.title = `Workspace for ${student.username}`;
+
+            iframe.onload = function () {
+                lockStudentInputs(iframe);
+            };
+
+            viewDiv.appendChild(heading);
+            viewDiv.appendChild(iframe);
         }
 
+        // Lock text inputs in the embedded student workspace
         function lockStudentInputs(iframe) {
             try {
                 const doc = iframe.contentWindow.document;
@@ -343,6 +431,27 @@
             }
         }
 
+        // Log out the currently authenticated Firebase user
+        async function teacherLogout() {
+            try {
+                await firebase.auth().signOut();
+
+                // Clear the teacher workspace session data
+                sessionStorage.removeItem('teacherMode');
+                sessionStorage.removeItem('inspectStudentUid');
+                sessionStorage.removeItem('inspectStudentName');
+
+                // Return to the homepage
+                window.location.href = 'index.html';
+
+            } catch (error) {
+                console.error('Logout error:', error);
+
+                alert('Unable to log out. Please try again.');
+            }
+        }
+
+        // Load the student roster when the dashboard opens
         window.onload = fetchStudents;
     </script>
 
