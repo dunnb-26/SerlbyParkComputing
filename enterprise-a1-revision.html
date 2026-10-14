@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A1: Targeting and Segmenting - Revision</title>
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
@@ -38,9 +44,12 @@
         .btn-submit:hover { background-color: #152960; }
         .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
         .btn-pdf:hover { background-color: #124d2d; }
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; justify-content: center; align-items: center; font-size: 1.5em; color: #1e3a8a; font-weight: bold; transition: opacity 0.5s; }
     </style>
 </head>
 <body>
+    <div id="loading-overlay">Loading your workspace from cloud...</div>
+
     <div id="pdf-content">
         <header>
             <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
@@ -53,7 +62,7 @@
                 <h2>A1 Revision Notes</h2>
                 <div class="instruction-box center-text">Use this space to write out your complete notes on Target Markets, Market Segmentation, and Markets (B2B, B2C, Mass, Niche).</div>
                 <div class="question-wrapper">
-                    <textarea class="auto-input" rows="12" placeholder="Type your revision notes here..."></textarea>
+                    <textarea class="auto-input notes-textarea" rows="12" placeholder="Type your revision notes here..."></textarea>
                 </div>
             </div>
 
@@ -346,40 +355,87 @@
     <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
 
     <script>
-        function saveProgress() {
-            var inputs = document.querySelectorAll('.auto-input');
-            var dataToSave = {};
-            for (var i = 0; i < inputs.length; i++) { 
-                dataToSave['input_' + i] = inputs[i].value; 
-                dataToSave['class_' + i] = inputs[i].className; 
-                dataToSave['id_' + i] = inputs[i].id || ('input_' + i);
-            }
-            try { localStorage.setItem('enterpriseA1Memory_Smart_v3', JSON.stringify(dataToSave)); } catch (e) {}
+        // --- FIREBASE INITIALIZATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
-        function loadProgress() {
-            var saved = localStorage.getItem('enterpriseA1Memory_Smart_v3');
-            if (saved) {
-                var data = JSON.parse(saved);
-                var inputs = document.querySelectorAll('.auto-input');
-                for (var i = 0; i < inputs.length; i++) {
-                    if (data['input_' + i]) {
-                        inputs[i].value = data['input_' + i];
-                        if (data['class_' + i]) {
-                            inputs[i].className = data['class_' + i];
-                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
-                                var btnId = "override-" + inputs[i].id;
-                                var btn = document.getElementById(btnId);
-                                if (btn) btn.classList.remove('hidden');
+        const LESSON_ID = "enterprise-a1-targeting";
+
+        // --- LOAD DATA FROM FIREBASE ON START ---
+        auth.onAuthStateChanged(async (user) => {
+            if (!user && sessionStorage.getItem('teacherMode') !== 'true') {
+                alert("Please log in on the home page first!");
+                window.location.href = "index.html";
+                return;
+            }
+
+            if (user) {
+                try {
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        var data = doc.data();
+                        var inputs = document.querySelectorAll('.auto-input');
+                        for (var i = 0; i < inputs.length; i++) {
+                            if (data['input_' + i] !== undefined) {
+                                inputs[i].value = data['input_' + i];
+                                if (data['class_' + i]) {
+                                    inputs[i].className = data['class_' + i];
+                                    if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
+                                        var btnId = "override-" + inputs[i].id;
+                                        var btn = document.getElementById(btnId);
+                                        if (btn) btn.classList.remove('hidden');
+                                    }
+                                }
+                                if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                                    inputs[i].style.height = 'auto'; 
+                                    inputs[i].style.height = inputs[i].scrollHeight + 'px';
+                                }
                             }
                         }
-                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                            inputs[i].style.height = 'auto'; 
-                            inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                        }
                     }
+                } catch (err) {
+                    console.error("Error loading cloud data:", err);
                 }
             }
+            document.getElementById('loading-overlay').style.opacity = '0';
+            setTimeout(() => { document.getElementById('loading-overlay').style.display = 'none'; }, 500);
+        });
+
+        // --- AUTO-SAVE TO FIREBASE CLOUD ---
+        let saveTimer;
+        function saveProgress() {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            var inputs = document.querySelectorAll('.auto-input');
+            var dataToSave = { lastUpdated: Date.now() };
+
+            for (var i = 0; i < inputs.length; i++) {
+                dataToSave['input_' + i] = inputs[i].value;
+                dataToSave['class_' + i] = inputs[i].className;
+                if (inputs[i].id) {
+                    dataToSave['id_' + i] = inputs[i].id;
+                }
+            }
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
+                  .set(dataToSave, { merge: true })
+                  .catch(err => console.error("Cloud save error:", err));
+            }, 600);
         }
 
         document.addEventListener('input', function(e) {
@@ -392,14 +448,18 @@
             }
         });
 
-        function clearData() { 
-            if (confirm("Clear all work?")) { 
-                localStorage.removeItem('enterpriseA1Memory_Smart_v3'); 
+        // --- RESET / CLEAR DATA FROM FIREBASE CLOUD ---
+        async function clearData() { 
+            if (confirm("Clear all work on this page?")) { 
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
+                    } catch (e) {}
+                }
                 window.location.reload(); 
             } 
         }
-
-        window.onload = loadProgress;
 
         let activeQuestionId = null;
         function openVerifyModal(qId) {
