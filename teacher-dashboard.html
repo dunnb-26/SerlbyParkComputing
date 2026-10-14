@@ -22,13 +22,22 @@
         
         select { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #ccc; font-weight: bold; box-sizing: border-box; }
         iframe { flex-grow: 1; width: 100%; border: 2px solid #eee; border-radius: 8px; background: #f8f9fa; }
+        
+        .header-actions { display: flex; gap: 10px; align-items: center; }
+        .header-btn { background: #dfaa2b; color: #1e3a8a; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; }
+        .header-btn:hover { background: #c99722; }
     </style>
 </head>
 <body>
     <header>
         <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
         <div class="header-center"><h1>Teacher Dashboard</h1></div>
-        <div class="header-right"><button onclick="fetchStudents()" style="background:#dfaa2b; color:#1e3a8a; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer;">↻ Refresh</button></div>
+        <div class="header-right">
+            <div class="header-actions">
+                <button class="header-btn" onclick="fetchStudents()">↻ Refresh</button>
+                <a href="index.html" class="header-btn" style="background:#f8f9fa; border:2px solid #dfaa2b;" onclick="sessionStorage.removeItem('teacherMode')">Log Out</a>
+            </div>
+        </div>
     </header>
 
     <div class="dashboard-layout">
@@ -76,6 +85,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // Check teacher authentication state
         if (sessionStorage.getItem('teacherMode') !== 'true') {
             alert("Unauthorized. Please log in as a teacher first.");
             window.location.href = "index.html";
@@ -85,24 +95,31 @@
 
         async function fetchStudents() {
             const listDiv = document.getElementById('student-list');
-            listDiv.innerHTML = "<p>Loading...</p>";
+            listDiv.innerHTML = "<p style='color: #000;'>Loading students from database...</p>";
 
             try {
                 const snapshot = await db.collection("users").get();
                 allStudents = [];
+                
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     allStudents.push({
                         uid: doc.id,
                         username: data.username || "Unknown",
-                        className: data.className || "Unassigned"
+                        className: data.className || "7x1"
                     });
                 });
+
                 allStudents.sort((a, b) => a.username.localeCompare(b.username));
                 renderSidebar();
             } catch (err) {
                 console.error("Error fetching students:", err);
-                listDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+                listDiv.innerHTML = `
+                    <div style="background: #ffebee; border: 1px solid #f44336; padding: 12px; border-radius: 4px; color: #c62828; font-size: 0.85em;">
+                        <strong>Database Error:</strong><br>${err.message}<br><br>
+                        <em>Tip: Check your Firebase Console &rarr; Firestore &rarr; Rules to ensure read access is allowed.</em>
+                    </div>
+                `;
             }
         }
 
@@ -114,7 +131,7 @@
             const filtered = allStudents.filter(s => classFilter === "ALL" || s.className === classFilter);
 
             if (filtered.length === 0) {
-                listDiv.innerHTML = "<p style='color: #666; font-size: 0.9em;'>No students found in this class.</p>";
+                listDiv.innerHTML = "<p style='color: #666; font-size: 0.9em;'>No student accounts found matching this filter. Have students logged in yet?</p>";
                 return;
             }
 
