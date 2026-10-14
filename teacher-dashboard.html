@@ -3,24 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Dashboard - Live Roster</title>
+    <title>Teacher Dashboard - Live Portfolio</title>
     <link rel="stylesheet" href="style.css">
     
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <!-- Supabase Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         .dashboard-layout { display: grid; grid-template-columns: 300px 1fr; gap: 20px; max-width: 1400px; margin: 20px auto; padding: 0 20px; }
-        .sidebar { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #1e3a8a; height: 85vh; overflow-y: auto; }
-        .main-view { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #dfaa2b; height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
+        .sidebar { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #1e3a8a; height: 85vh; overflow-y: auto; box-sizing: border-box; }
+        .main-view { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #dfaa2b; height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; }
         
         .student-btn { display: block; width: 100%; padding: 12px; margin-bottom: 8px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; text-align: left; font-weight: bold; font-size: 1em; cursor: pointer; transition: 0.2s; }
         .student-btn:hover, .student-btn.active { background: #1e3a8a; color: white; border-color: #1e3a8a; }
-        .class-badge { float: right; background: #dfaa2b; color: #1e3a8a; padding: 2px 8px; border-radius: 12px; font-size: 0.85em; }
+        .lesson-count-badge { float: right; background: #dfaa2b; color: #1e3a8a; padding: 2px 8px; border-radius: 12px; font-size: 0.85em; }
         
-        select { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #ccc; font-weight: bold; }
+        select { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #ccc; font-weight: bold; box-sizing: border-box; }
+        
+        .lesson-btn { display: inline-block; padding: 15px 25px; margin: 10px 10px 10px 0; background: #f0f4f8; border: 2px solid #1e3a8a; color: #1e3a8a; border-radius: 8px; font-weight: bold; font-size: 1.1em; cursor: pointer; transition: 0.2s; }
+        .lesson-btn:hover { background: #1e3a8a; color: white; }
+        
+        /* Live student preview window */
         iframe { flex-grow: 1; width: 100%; border: 2px solid #eee; border-radius: 8px; background: #f8f9fa; }
     </style>
 </head>
@@ -28,14 +31,14 @@
     <header>
         <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
         <div class="header-center"><h1>Teacher Dashboard</h1></div>
-        <div class="header-right"><button onclick="fetchStudents()" style="background:#dfaa2b; color:#1e3a8a; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer;">↻ Refresh</button></div>
+        <div class="header-right"><button onclick="fetchData()" style="background:#dfaa2b; color:#1e3a8a; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer;">↻ Refresh</button></div>
     </header>
 
     <div class="dashboard-layout">
-        <!-- Sidebar: Class Roster -->
+        <!-- Sidebar: Roster with all 12 Classes -->
         <div class="sidebar">
             <h3>Class Roster</h3>
-            <select id="class-filter" onchange="renderSidebar()">
+            <select id="class-filter" onchange="fetchData()">
                 <option value="ALL">All Classes</option>
                 <optgroup label="Year 7">
                     <option value="7x1">7x1</option><option value="7x2">7x2</option><option value="7y1">7y1</option><option value="7y2">7y2</option>
@@ -47,112 +50,146 @@
                     <option value="9x1">9x1</option><option value="9x2">9x2</option><option value="9y1">9y1</option><option value="9y2">9y2</option>
                 </optgroup>
             </select>
-            <div id="student-list" style="margin-top: 20px;"><p style="color: #666; font-size: 0.9em;">Loading students...</p></div>
+            <div id="student-list" style="margin-top: 20px;"><p style="color: #666; font-size: 0.9em;">Loading class list...</p></div>
         </div>
 
-        <!-- Main View: Student Workspace Iframe -->
+        <!-- Main View: Dynamic Iframe Window -->
         <div class="main-view" id="work-view">
-            <h2 style="color: #666; text-align: center; margin-top: 50px;">&larr; Select a student to view their profile</h2>
+            <h2 style="color: #666; text-align: center; margin-top: 50px;">&larr; Select a student to view their portfolio</h2>
         </div>
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
-            authDomain: "serlby-park-computing.firebaseapp.com",
-            projectId: "serlby-park-computing",
-            storageBucket: "serlby-park-computing.firebasestorage.app",
-            messagingSenderId: "648533806051",
-            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
-            measurementId: "G-HDNYEE11WV"
+        // --- MASTER LESSON DIRECTORY ---
+        const taskMap = {
+            'Y7-HT1': 'y7-ht1-d-c.html',
+            'Y8-HT1': 'y8-ht1-d-c.html',
+            'Y9-HT1': 'y9-ht1-d-c.html',
+            'binary-conversions': 'binary-conversions.html',
+            'Word Processing': 'word-processing.html',
+            'File Management': 'file-management-and-researching.html'
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        const supabaseUrl = 'https://zqvmrmhiqxmghtxgjrtk.supabase.co';
+        const supabaseKey = 'sb_publishable_iD26_DKTKRUWP7Jj3giEPA_f2xd5OCW';
+        let db = null;
+        try { if (window.supabase) db = window.supabase.createClient(supabaseUrl, supabaseKey); } catch (e) { console.error("DB init failed"); }
+        
+        let uniqueStudents = {};
 
-        let allStudents = [];
-
-        async function fetchStudents() {
+        async function fetchData() {
+            const classFilter = document.getElementById('class-filter').value;
             const listDiv = document.getElementById('student-list');
             listDiv.innerHTML = "<p>Loading...</p>";
+            if (!db) return;
 
-            try {
-                const snapshot = await db.collection("users").get();
-                allStudents = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    allStudents.push({
-                        uid: doc.id,
-                        username: data.username || "Unknown",
-                        className: data.className || "Unassigned"
-                    });
-                });
-                allStudents.sort((a, b) => a.username.localeCompare(b.username));
-                renderSidebar();
-            } catch (err) {
-                console.error("Error fetching students:", err);
-                listDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
-            }
+            let query = db.from('dnc_responses').select('*').order('created_at', { ascending: false });
+            if (classFilter !== "ALL") query = query.eq('class_name', classFilter);
+
+            const { data, error } = await query;
+            if (error) { listDiv.innerHTML = `<p style="color:red">Error: ${error.message}</p>`; return; }
+
+            uniqueStudents = {};
+            (data || []).forEach(record => {
+                if (!uniqueStudents[record.student_name]) uniqueStudents[record.student_name] = [];
+                uniqueStudents[record.student_name].push(record);
+            });
+
+            renderSidebar();
         }
 
         function renderSidebar() {
-            const classFilter = document.getElementById('class-filter').value;
             const listDiv = document.getElementById('student-list');
             listDiv.innerHTML = "";
+            const studentNames = Object.keys(uniqueStudents).sort();
 
-            const filtered = allStudents.filter(s => classFilter === "ALL" || s.className === classFilter);
-
-            if (filtered.length === 0) {
-                listDiv.innerHTML = "<p style='color: #666; font-size: 0.9em;'>No students found in this class.<br><small>Students appear here automatically after logging in on the homepage.</small></p>";
+            if (studentNames.length === 0) {
+                listDiv.innerHTML = "<p style='color: #666; font-size: 0.9em;'>No students found in this class.</p>";
                 return;
             }
 
-            filtered.forEach(student => {
+            studentNames.forEach(name => {
                 const btn = document.createElement('button');
                 btn.className = 'student-btn';
-                btn.innerHTML = `${student.username} <span class="class-badge">${student.className}</span>`;
+                btn.innerHTML = `${name} <span class="lesson-count-badge">${uniqueStudents[name].length} Lessons</span>`;
                 btn.onclick = () => {
                     document.querySelectorAll('.student-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    openStudentWorkspace(student);
+                    showLessonMenu(name);
                 };
                 listDiv.appendChild(btn);
             });
         }
 
-        function openStudentWorkspace(student) {
+        function showLessonMenu(studentName) {
+            const studentWork = uniqueStudents[studentName];
+            const className = studentWork[0].class_name;
             const viewDiv = document.getElementById('work-view');
-
-            sessionStorage.setItem('teacherMode', 'true');
-            sessionStorage.setItem('inspectStudentUid', student.uid);
-            sessionStorage.setItem('inspectStudentName', student.username);
-
-            viewDiv.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 15px; flex-shrink: 0;">
-                    <div>
-                        <h2 style="margin: 0; color: #1e3a8a;">Viewing: ${student.username}</h2>
-                        <p style="margin: 0; color: #dfaa2b; font-weight: bold;">Class: ${student.className}</p>
-                    </div>
+            
+            let html = `
+                <div style="border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 20px; flex-shrink: 0;">
+                    <h1 style="margin: 0; color: #1e3a8a;">${studentName}</h1>
+                    <p style="margin: 5px 0 0 0; color: #666; font-size: 1.1em; font-weight: bold;">Class: ${className}</p>
+                    <p style="color: #555; margin-top: 15px;">Select a completed lesson below to view their live work:</p>
                 </div>
-                <iframe src="index.html" onload="lockStudentInputs(this)"></iframe>
+                <div style="overflow-y: auto; flex-grow: 1;">
             `;
+
+            studentWork.forEach(record => {
+                html += `<button class="lesson-btn" onclick="openLiveView('${studentName}', '${className}', '${record.task_id}')">${record.task_id}</button>`;
+            });
+
+            html += `</div>`;
+            viewDiv.innerHTML = html;
+        }
+
+        function openLiveView(studentName, className, taskId) {
+            const viewDiv = document.getElementById('work-view');
+            const filename = taskMap[taskId];
+
+            localStorage.setItem('studentName', studentName);
+            localStorage.setItem('className', className);
+            localStorage.setItem('loggedInName', studentName);
+            localStorage.setItem('loggedInClass', className);
+
+            if (filename) {
+                viewDiv.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 15px; flex-shrink: 0;">
+                        <div>
+                            <h2 style="margin: 0; color: #1e3a8a;">${studentName} - ${taskId}</h2>
+                            <p style="margin: 0; color: #dfaa2b; font-weight: bold;">Over-The-Shoulder View</p>
+                        </div>
+                        <button onclick="showLessonMenu('${studentName}')" style="padding: 10px 20px; background: #eee; border: 1px solid #ccc; font-weight:bold; cursor: pointer; border-radius: 4px;">&larr; Back to Menu</button>
+                    </div>
+                    <iframe src="${filename}" onload="lockStudentInputs(this)"></iframe>
+                `;
+            } else {
+                viewDiv.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 15px; flex-shrink: 0;">
+                        <div>
+                            <h2 style="margin: 0; color: #d32f2f;">Lesson Not Linked</h2>
+                            <p style="margin: 0; color: #666;">Task ID: ${taskId}</p>
+                        </div>
+                        <button onclick="showLessonMenu('${studentName}')" style="padding: 10px 20px; background: #eee; border: 1px solid #ccc; font-weight:bold; cursor: pointer; border-radius: 4px;">&larr; Back to Menu</button>
+                    </div>
+                    <div style="padding: 20px; background: #f8f9fa; border: 2px solid #ccc; border-radius: 6px;">
+                        To view this lesson visually, add <strong>'${taskId}': 'filename.html'</strong> to the <em>taskMap</em> directory at the top of your Teacher Dashboard script[cite: 2].
+                    </div>
+                `;
+            }
         }
 
         function lockStudentInputs(iframe) {
             try {
                 const doc = iframe.contentWindow.document;
-                const loginGate = doc.getElementById('login-gate');
-                if (loginGate) {
-                    loginGate.style.display = 'none';
-                    doc.body.classList.remove('locked');
-                }
-                doc.querySelectorAll('input[type="text"], textarea').forEach(el => el.readOnly = true);
+                doc.querySelectorAll('input[type="text'], textarea').forEach(el => el.readOnly = true);
+                doc.querySelectorAll('button:not(.teacher-verify-btn)').forEach(el => el.style.display = 'none');
             } catch(e) {
                 console.log("Iframe lockdown active.");
             }
         }
 
-        window.onload = fetchStudents;
+        window.onload = () => { fetchData(); };
     </script>
 </body>
 </html>
