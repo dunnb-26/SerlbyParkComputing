@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Dashboard - Live Portfolio</title>
+    <title>Teacher Dashboard - Live Roster</title>
     <link rel="stylesheet" href="style.css">
     
     <!-- Firebase SDKs -->
@@ -12,37 +12,29 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
-        .dashboard-layout { display: grid; grid-template-columns: 300px 1fr; gap: 20px; max-width: 1450px; margin: 20px auto; padding: 0 20px; }
-        .sidebar { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #1e3a8a; height: 85vh; overflow-y: auto; box-sizing: border-box; }
-        .main-view { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #dfaa2b; height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; }
+        .dashboard-layout { display: grid; grid-template-columns: 300px 1fr; gap: 20px; max-width: 1400px; margin: 20px auto; padding: 0 20px; }
+        .sidebar { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #1e3a8a; height: 85vh; overflow-y: auto; }
+        .main-view { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #dfaa2b; height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
         
         .student-btn { display: block; width: 100%; padding: 12px; margin-bottom: 8px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; text-align: left; font-weight: bold; font-size: 1em; cursor: pointer; transition: 0.2s; }
         .student-btn:hover, .student-btn.active { background: #1e3a8a; color: white; border-color: #1e3a8a; }
-        .class-badge { float: right; background: #dfaa2b; color: #1e3a8a; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; }
+        .class-badge { float: right; background: #dfaa2b; color: #1e3a8a; padding: 2px 8px; border-radius: 12px; font-size: 0.85em; }
         
-        select, .sidebar-search { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 4px; border: 1px solid #ccc; font-weight: bold; box-sizing: border-box; }
-        
-        /* Live Iframe Viewing Window */
+        select { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #ccc; font-weight: bold; }
         iframe { flex-grow: 1; width: 100%; border: 2px solid #eee; border-radius: 8px; background: #f8f9fa; }
-
-        .header-btn { background: #dfaa2b; color: #1e3a8a; border: none; padding: 8px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-left: 8px; }
-        .header-btn:hover { background: #c99722; }
     </style>
 </head>
 <body>
     <header>
         <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
-        <div class="header-center"><h1>Teacher Live Portal</h1></div>
-        <div class="header-right">
-            <button class="header-btn" onclick="fetchStudents()">↻ Refresh</button>
-            <button class="header-btn" style="background:white;" onclick="window.location.href='index.html'">&larr; Curriculum</button>
-        </div>
+        <div class="header-center"><h1>Teacher Dashboard</h1></div>
+        <div class="header-right"><button onclick="fetchStudents()" style="background:#dfaa2b; color:#1e3a8a; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer;">↻ Refresh</button></div>
     </header>
 
     <div class="dashboard-layout">
-        <!-- Sidebar: Class Filter & Student Roster -->
+        <!-- Sidebar: Class Roster -->
         <div class="sidebar">
-            <h3 style="margin-top:0; color:#1e3a8a;">Class Roster</h3>
+            <h3>Class Roster</h3>
             <select id="class-filter" onchange="renderSidebar()">
                 <option value="ALL">All Classes</option>
                 <optgroup label="Year 7">
@@ -55,22 +47,16 @@
                     <option value="9x1">9x1</option><option value="9x2">9x2</option><option value="9y1">9y1</option><option value="9y2">9y2</option>
                 </optgroup>
             </select>
-
-            <input type="text" id="student-search" class="sidebar-search" placeholder="🔍 Search username..." oninput="renderSidebar()">
-
-            <div id="student-list" style="margin-top: 10px;">
-                <p style="color: #666; font-size: 0.9em;">Loading students...</p>
-            </div>
+            <div id="student-list" style="margin-top: 20px;"><p style="color: #666; font-size: 0.9em;">Loading students...</p></div>
         </div>
 
-        <!-- Main View: Student's Live Website View -->
+        <!-- Main View: Student Workspace Iframe -->
         <div class="main-view" id="work-view">
-            <h2 style="color: #666; text-align: center; margin-top: 60px;">&larr; Select a student from the roster to view their live workspace</h2>
+            <h2 style="color: #666; text-align: center; margin-top: 50px;">&larr; Select a student to view their profile</h2>
         </div>
     </div>
 
     <script>
-        /* --- 1. FIREBASE CONFIGURATION --- */
         const firebaseConfig = {
             apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
             authDomain: "serlby-park-computing.firebaseapp.com",
@@ -84,22 +70,11 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Security check: Only allow access if Teacher Mode is unlocked
-        if (sessionStorage.getItem('teacherMode') !== 'true') {
-            const code = prompt("Enter Teacher Passcode to access Portal:");
-            if (code === "2525" || code === "delta") {
-                sessionStorage.setItem('teacherMode', 'true');
-            } else {
-                window.location.href = "index.html";
-            }
-        }
-
         let allStudents = [];
 
-        /* --- 2. FETCH ALL REGISTERED STUDENTS FROM FIREBASE --- */
         async function fetchStudents() {
             const listDiv = document.getElementById('student-list');
-            listDiv.innerHTML = "<p style='color:#666;'>Loading students...</p>";
+            listDiv.innerHTML = "<p>Loading...</p>";
 
             try {
                 const snapshot = await db.collection("users").get();
@@ -112,8 +87,6 @@
                         className: data.className || "Unassigned"
                     });
                 });
-
-                // Sort alphabetically by username
                 allStudents.sort((a, b) => a.username.localeCompare(b.username));
                 renderSidebar();
             } catch (err) {
@@ -122,21 +95,15 @@
             }
         }
 
-        /* --- 3. FILTER & RENDER STUDENT BUTTONS --- */
         function renderSidebar() {
             const classFilter = document.getElementById('class-filter').value;
-            const searchQuery = document.getElementById('student-search').value.toLowerCase().trim();
             const listDiv = document.getElementById('student-list');
             listDiv.innerHTML = "";
 
-            const filtered = allStudents.filter(s => {
-                const matchesClass = (classFilter === "ALL") || (s.className === classFilter);
-                const matchesSearch = s.username.toLowerCase().includes(searchQuery);
-                return matchesClass && matchesSearch;
-            });
+            const filtered = allStudents.filter(s => classFilter === "ALL" || s.className === classFilter);
 
             if (filtered.length === 0) {
-                listDiv.innerHTML = "<p style='color: #666; font-size: 0.9em;'>No students found.<br><small>Students appear here automatically once they log in on the home page.</small></p>";
+                listDiv.innerHTML = "<p style='color: #666; font-size: 0.9em;'>No students found in this class.<br><small>Students appear here automatically after logging in on the homepage.</small></p>";
                 return;
             }
 
@@ -153,52 +120,24 @@
             });
         }
 
-        /* --- 4. LOAD STUDENT'S LIVE WORKSPACE IN IFRAME --- */
         function openStudentWorkspace(student) {
             const viewDiv = document.getElementById('work-view');
 
-            // Tell sessionStorage which student the teacher is currently inspecting
             sessionStorage.setItem('teacherMode', 'true');
             sessionStorage.setItem('inspectStudentUid', student.uid);
             sessionStorage.setItem('inspectStudentName', student.username);
 
             viewDiv.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 12px; flex-shrink: 0;">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 15px; flex-shrink: 0;">
                     <div>
                         <h2 style="margin: 0; color: #1e3a8a;">Viewing: ${student.username}</h2>
-                        <span style="color: #666; font-size: 0.9em;">Click any unit or lesson below to view their saved answers live.</span>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <label style="font-weight:bold; color:#1e3a8a;">Class:</label>
-                        <select onchange="updateStudentClass('${student.uid}', this.value)" style="width:auto; margin:0; padding:6px;">
-                            <option value="Unassigned" ${student.className === 'Unassigned' ? 'selected' : ''}>Unassigned</option>
-                            <option value="7x1" ${student.className === '7x1' ? 'selected' : ''}>7x1</option>
-                            <option value="7x2" ${student.className === '7x2' ? 'selected' : ''}>7x2</option>
-                            <option value="7y1" ${student.className === '7y1' ? 'selected' : ''}>7y1</option>
-                            <option value="7y2" ${student.className === '7y2' ? 'selected' : ''}>7y2</option>
-                            <option value="8x1" ${student.className === '8x1' ? 'selected' : ''}>8x1</option>
-                            <option value="8x2" ${student.className === '8x2' ? 'selected' : ''}>8x2</option>
-                            <option value="8y1" ${student.className === '8y1' ? 'selected' : ''}>8y1</option>
-                            <option value="8y2" ${student.className === '8y2' ? 'selected' : ''}>8y2</option>
-                            <option value="9x1" ${student.className === '9x1' ? 'selected' : ''}>9x1</option>
-                            <option value="9x2" ${student.className === '9x2' ? 'selected' : ''}>9x2</option>
-                            <option value="9y1" ${student.className === '9y1' ? 'selected' : ''}>9y1</option>
-                            <option value="9y2" ${student.className === '9y2' ? 'selected' : ''}>9y2</option>
-                        </select>
+                        <p style="margin: 0; color: #dfaa2b; font-weight: bold;">Class: ${student.className}</p>
                     </div>
                 </div>
                 <iframe src="index.html" onload="lockStudentInputs(this)"></iframe>
             `;
         }
 
-        async function updateStudentClass(uid, newClass) {
-            await db.collection("users").doc(uid).set({ className: newClass }, { merge: true });
-            const st = allStudents.find(s => s.uid === uid);
-            if (st) st.className = newClass;
-            renderSidebar();
-        }
-
-        // Prevent accidental typing/overwriting while teacher browses student's pages
         function lockStudentInputs(iframe) {
             try {
                 const doc = iframe.contentWindow.document;
@@ -208,7 +147,9 @@
                     doc.body.classList.remove('locked');
                 }
                 doc.querySelectorAll('input[type="text"], textarea').forEach(el => el.readOnly = true);
-            } catch (e) {}
+            } catch(e) {
+                console.log("Iframe lockdown active.");
+            }
         }
 
         window.onload = fetchStudents;
