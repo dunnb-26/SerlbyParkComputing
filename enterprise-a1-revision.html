@@ -53,7 +53,7 @@
                 <h2>A1 Revision Notes</h2>
                 <div class="instruction-box center-text">Use this space to write out your complete notes on Target Markets, Market Segmentation, and Markets (B2B, B2C, Mass, Niche).</div>
                 <div class="question-wrapper">
-                    <textarea class="auto-input" rows="12" placeholder="Type your revision notes here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                    <textarea class="auto-input" rows="12" placeholder="Type your revision notes here..."></textarea>
                 </div>
             </div>
 
@@ -349,9 +349,14 @@
         function saveProgress() {
             var inputs = document.querySelectorAll('.auto-input');
             var dataToSave = {};
-            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
+            for (var i = 0; i < inputs.length; i++) { 
+                dataToSave['input_' + i] = inputs[i].value; 
+                dataToSave['class_' + i] = inputs[i].className; 
+                dataToSave['id_' + i] = inputs[i].id || ('input_' + i);
+            }
             try { localStorage.setItem('enterpriseA1Memory_Smart_v3', JSON.stringify(dataToSave)); } catch (e) {}
         }
+
         function loadProgress() {
             var saved = localStorage.getItem('enterpriseA1Memory_Smart_v3');
             if (saved) {
@@ -369,21 +374,31 @@
                             }
                         }
                         if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                            inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
+                            inputs[i].style.height = 'auto'; 
+                            inputs[i].style.height = inputs[i].scrollHeight + 'px';
                         }
                     }
                 }
             }
         }
+
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('auto-input')) {
                 saveProgress();
                 if (e.target.tagName.toLowerCase() === 'textarea') {
-                    e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';
+                    e.target.style.height = 'auto'; 
+                    e.target.style.height = e.target.scrollHeight + 'px';
                 }
             }
         });
-        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterpriseA1Memory_Smart_v3'); window.location.reload(); } }
+
+        function clearData() { 
+            if (confirm("Clear all work?")) { 
+                localStorage.removeItem('enterpriseA1Memory_Smart_v3'); 
+                window.location.reload(); 
+            } 
+        }
+
         window.onload = loadProgress;
 
         let activeQuestionId = null;
