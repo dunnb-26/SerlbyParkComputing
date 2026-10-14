@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delta Serlby Park - Computing & Enterprise</title>
+    <title>Delta Serlby Park - Computing</title>
     <link rel="stylesheet" href="style.css">
     
     <!-- Firebase SDKs -->
@@ -12,85 +12,166 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
+        /* Full-Screen Login Gate */
         #login-gate {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, #1e3a8a 0%, #0d1b42 100%);
-            z-index: 9999; display: flex; justify-content: center; align-items: center;
-            transition: opacity 0.5s ease;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.4s ease;
         }
         .gate-card {
-            background: white; padding: 40px; border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center;
-            width: 90%; max-width: 400px; border-top: 8px solid #dfaa2b; 
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            border-top: 8px solid #dfaa2b;
         }
-        .gate-card img { max-width: 150px; margin-bottom: 20px; }
-        .gate-card h2 { color: #1e3a8a; margin-top: 0; margin-bottom: 30px; }
+        .gate-card img {
+            max-width: 150px;
+            margin-bottom: 15px;
+        }
+        .gate-card h2 {
+            color: #1e3a8a;
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
         .role-btn {
-            display: block; width: 100%; padding: 15px; margin-bottom: 15px;
-            font-size: 1.2em; font-weight: bold; border: none; border-radius: 6px;
-            cursor: pointer; transition: transform 0.1s, background-color 0.2s;
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-size: 1.15em;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
         }
         .btn-student { background-color: #dfaa2b; color: #1e3a8a; }
         .btn-student:hover { background-color: #c99722; }
+        
         .btn-teacher { background-color: #f8f9fa; color: #555; border: 2px solid #ccc; }
         .btn-teacher:hover { background-color: #e2e6ea; }
+
         .gate-input {
-            width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #ccc;
-            border-radius: 6px; font-size: 16px; box-sizing: border-box; text-align: center; background: white;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+            text-align: center;
         }
+        .gate-input:focus {
+            outline: none;
+            border-color: #1e3a8a;
+        }
+
+        #login-error {
+            color: #d32f2f;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        /* Prevent scrolling while locked behind the login gate */
         body.locked { overflow: hidden; }
 
+        /* User Status & Logout Button in Header */
+        .user-status-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9em;
+            color: white;
+        }
+        .user-badge {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .logout-btn {
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .logout-btn:hover { background: #b71c1c; }
+
+        /* D&C Banner */
         .dnc-btn {
             display: block; width: 100%; padding: 15px; background-color: #dfaa2b; 
             color: #1e3a8a; text-align: center; border: none; border-radius: 6px;
             font-size: 1.2em; font-weight: bold; cursor: pointer; margin-bottom: 30px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: background-color 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: background-color 0.2s, transform 0.1s;
         }
         .dnc-btn:hover { background-color: #c99722; }
-        
-        .logout-btn {
-            background-color: #b91c1c; color: white; border: none; padding: 8px 15px;
-            border-radius: 4px; font-weight: bold; cursor: pointer; transition: opacity 0.2s;
-        }
-        .logout-btn:hover { opacity: 0.85; }
     </style>
 </head>
 <body class="locked">
 
-    <!-- LOGIN GATE -->
+    <!-- LOGIN GATE OVERLAY -->
     <div id="login-gate">
         <div class="gate-card">
             <img src="logo.jpg" alt="Delta Serlby Park Logo">
-            <h2>Welcome to Portal</h2>
+            <h2>Welcome to Computing</h2>
             
+            <!-- Step 1: Role Selection -->
             <div id="role-selection">
                 <button class="role-btn btn-student" onclick="showStudentForm()">🎓 I am a Student</button>
-                <button class="role-btn btn-teacher" onclick="teacherLogin()">👨‍🏫 I am a Teacher</button>
+                <button class="role-btn btn-teacher" onclick="showTeacherForm()">👨‍🏫 I am a Teacher</button>
             </div>
 
+            <!-- Step 2A: Student Login Form -->
             <div id="student-login-form" style="display: none;">
-                <div id="login-error" style="color:red; font-size:0.9em; margin-bottom:10px; display:none;"></div>
-                <input type="text" id="student-username" class="gate-input" placeholder="Username (e.g. jsmith)">
-                <input type="password" id="student-pin" class="gate-input" placeholder="4-Digit PIN / Password" maxlength="10">
+                <div id="login-error">Incorrect username or password.</div>
+                <input type="text" id="student-username" class="gate-input" placeholder="Username">
+                <input type="password" id="student-password" class="gate-input" placeholder="Password">
                 
                 <button class="role-btn btn-student" id="btn-student-submit" onclick="processStudentLogin()">Log In</button>
-                <button class="role-btn btn-teacher" onclick="hideStudentForm()">Cancel</button>
+                <button class="role-btn btn-teacher" onclick="resetGateForms()">Back</button>
+            </div>
+
+            <!-- Step 2B: Teacher Login Form -->
+            <div id="teacher-login-form" style="display: none;">
+                <input type="password" id="teacher-passcode" class="gate-input" placeholder="Enter Teacher Passcode">
+                
+                <button class="role-btn btn-student" onclick="processTeacherLogin()">Unlock All Content</button>
+                <button class="role-btn btn-teacher" onclick="resetGateForms()">Back</button>
             </div>
         </div>
     </div>
 
+    <!-- HEADER -->
     <header>
         <div class="header-left">
-            <a href="index.html"><img src="logo.jpg" alt="Logo"></a>
+            <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
         </div>
         <div class="header-center">
-            <h1>Serlby Park Portal</h1>
+            <h1>Serlby Park Computing</h1>
         </div>
         <div class="header-right">
-            <button class="logout-btn" onclick="performLogout()">Log Out</button>
+            <div class="user-status-bar" id="header-user-bar" style="display: none;">
+                <span class="user-badge" id="logged-in-label"></span>
+                <button class="logout-btn" onclick="logoutUser()">Log Out</button>
+            </div>
         </div>
     </header>
 
+    <!-- NAVIGATION -->
     <nav>
         <button id="btn-year7" class="active" onclick="loadYear('year7')">Year 7</button>
         <button id="btn-year8" onclick="loadYear('year8')">Year 8</button>
@@ -98,18 +179,22 @@
         <button id="btn-gcse" onclick="loadYear('gcse')">GCSE</button>
     </nav>
 
+    <!-- MAIN CONTENT -->
     <main>
         <h2 id="year-title">Year 7 Curriculum</h2>
         <div id="dnc-container"></div>
-        <div id="content-grid" class="grid"></div>
+        <div id="content-grid" class="grid">
+            <!-- Cards dynamically injected here -->
+        </div>
     </main>
 
     <footer>
-        &copy; 2026 Delta Serlby Park - Department
+        &copy; 2026 Delta Serlby Park - Computing Department
     </footer>
 
+    <!-- JAVASCRIPT ENGINE -->
     <script>
-        // --- FIREBASE CONFIGURATION ---
+        /* --- 1. FIREBASE CONFIGURATION --- */
         const firebaseConfig = {
             apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
             authDomain: "serlby-park-computing.firebaseapp.com",
@@ -120,106 +205,114 @@
             measurementId: "G-HDNYEE11WV"
         };
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        /* --- 2. LOGIN GATE UI FUNCTIONS --- */
         function showStudentForm() {
             document.getElementById('role-selection').style.display = 'none';
+            document.getElementById('teacher-login-form').style.display = 'none';
             document.getElementById('student-login-form').style.display = 'block';
             document.getElementById('student-username').focus();
         }
 
-        function hideStudentForm() {
+        function showTeacherForm() {
+            document.getElementById('role-selection').style.display = 'none';
             document.getElementById('student-login-form').style.display = 'none';
-            document.getElementById('role-selection').style.display = 'block';
-            document.getElementById('student-username').value = "";
-            document.getElementById('student-pin').value = "";
-            document.getElementById('login-error').style.display = 'none';
+            document.getElementById('teacher-login-form').style.display = 'block';
+            document.getElementById('teacher-passcode').focus();
         }
 
+        function resetGateForms() {
+            document.getElementById('student-login-form').style.display = 'none';
+            document.getElementById('teacher-login-form').style.display = 'none';
+            document.getElementById('role-selection').style.display = 'block';
+            document.getElementById('login-error').style.display = 'none';
+            document.getElementById('student-username').value = "";
+            document.getElementById('student-password').value = "";
+            document.getElementById('teacher-passcode').value = "";
+        }
+
+        function unlockWebsite(displayLabel) {
+            const gate = document.getElementById('login-gate');
+            gate.style.opacity = '0';
+            setTimeout(() => {
+                gate.style.display = 'none';
+                document.body.classList.remove('locked');
+            }, 400);
+
+            document.getElementById('logged-in-label').innerText = displayLabel;
+            document.getElementById('header-user-bar').style.display = 'flex';
+        }
+
+        /* --- 3. STUDENT & TEACHER AUTHENTICATION --- */
         function formatEmail(username) {
             let clean = username.trim().toLowerCase();
             return clean.includes('@') ? clean : clean + "@deltaschool.local";
         }
 
-        async function processStudentLogin() {
+        function processStudentLogin() {
             const user = document.getElementById('student-username').value.trim();
-            const pin = document.getElementById('student-pin').value.trim();
+            const pass = document.getElementById('student-password').value.trim();
             const errorBox = document.getElementById('login-error');
             const submitBtn = document.getElementById('btn-student-submit');
 
-            if (user === "" || pin === "") {
-                errorBox.innerText = "Please enter both your Username and PIN.";
+            if (user === "" || pass === "") {
+                errorBox.innerText = "Please enter both your username and password.";
                 errorBox.style.display = 'block';
                 return;
             }
 
             errorBox.style.display = 'none';
-            submitBtn.innerText = "Logging in...";
+            submitBtn.innerText = "Signing in...";
 
-            try {
-                const userCredential = await auth.signInWithEmailAndPassword(formatEmail(user), pin);
-                const uid = userCredential.user.uid;
-
-                const userDoc = await db.collection("users").doc(uid).get();
-                if (!userDoc.exists) {
-                    await db.collection("users").doc(uid).set({
-                        username: user,
-                        className: "7x1",
-                        lastLogin: Date.now()
-                    });
-                }
-
-                document.getElementById('login-gate').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('login-gate').style.display = 'none';
-                    document.body.classList.remove('locked');
-                }, 500);
-            } catch (err) {
-                submitBtn.innerText = "Log In";
-                errorBox.innerText = "Incorrect username or PIN.";
-                errorBox.style.display = 'block';
-            }
+            auth.signInWithEmailAndPassword(formatEmail(user), pass)
+                .then(() => {
+                    sessionStorage.removeItem('teacherMode');
+                    submitBtn.innerText = "Log In";
+                })
+                .catch(err => {
+                    submitBtn.innerText = "Log In";
+                    errorBox.innerText = "Incorrect username or password.";
+                    errorBox.style.display = 'block';
+                });
         }
 
-        function teacherLogin() {
-            const passcode = prompt("Enter Teacher Passcode to access Dashboard:");
+        function processTeacherLogin() {
+            const passcode = document.getElementById('teacher-passcode').value.trim();
             if (passcode === "2525" || passcode === "delta") {
                 sessionStorage.setItem('teacherMode', 'true');
-                window.location.href = "teacher-dashboard.html";
-            } else if (passcode !== null) {
-                alert("Incorrect passcode. Access denied.");
+                unlockWebsite("👨‍🏫 Teacher Mode");
+            } else {
+                alert("Incorrect Teacher Passcode.");
             }
         }
 
-        async function performLogout() {
-            try {
-                await auth.signOut();
-                sessionStorage.clear();
-                localStorage.clear();
+        function logoutUser() {
+            sessionStorage.removeItem('teacherMode');
+            auth.signOut().then(() => {
                 window.location.reload();
-            } catch (error) {
-                window.location.reload();
-            }
+            });
         }
-
-        document.getElementById('student-pin').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') processStudentLogin();
-        });
 
         auth.onAuthStateChanged((user) => {
-            if (user || sessionStorage.getItem('teacherMode') === 'true') {
-                document.getElementById('login-gate').style.display = 'none';
-                document.body.classList.remove('locked');
-            } else {
-                document.getElementById('login-gate').style.display = 'flex';
-                document.body.classList.add('locked');
+            if (sessionStorage.getItem('teacherMode') === 'true') {
+                unlockWebsite("👨‍🏫 Teacher Mode");
+            } else if (user) {
+                const cleanName = user.email.replace('@deltaschool.local', '');
+                unlockWebsite("🎓 " + cleanName);
             }
         });
 
+        document.getElementById('student-password').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') processStudentLogin();
+        });
+        document.getElementById('teacher-passcode').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') processTeacherLogin();
+        });
+
+        /* --- 4. CURRICULUM GRID LOGIC --- */
         const curriculumData = {
           year7: [
             { title: "Delta Welcome", description: "<ul><li>Introduction/Computational Thinking</li><li>Keyboard Skills</li><li>Mouse Skills</li><li>File Management & Researching</li><li>E-Safety</li><li>Assessment</li></ul>" },
@@ -229,7 +322,7 @@
             { title: "Xmas", description: "<ul><li>TBA</li></ul>" },
             { title: "Vector Graphics", description: "<ul><li>Pixel Power</li><li>Shape Squad</li><li>Build & Combine</li><li>Path Pros</li><li>Design Mission</li><li>Graphics Gallery</li></ul>" },
             { title: "Computational Thinking", description: "<ul><li>Abstraction</li><li>Decomposition</li><li>Pattern Recognition</li><li>Algorithms</li><li>Flowcharts</li></ul>" },
-            { title: "Hardware & Software", description: "<ul><li>Hardware vs Software</li><li>Computer Systems</li><li>Inputs & Outputs</li><li>Storage</li><li>Graphics & Processing</li></ul>" },
+            { title: "Hardware & Software", description: "<ul><li>Hardware vs Software</li><li>Computer Systems</li><li>Inputs & Outputs</li><li>Storage</li><li>Graphics & Processing</li><li>TBA</li></ul>" },
             { title: "Assessment", description: "<ul><li>Consolidation/Revision</li><li>Revision</li><li>Assessment</li></ul>" },
             { title: "iDEA Award", description: "<ul><li>Citizen</li><li>Worker</li><li>Maker</li><li>Entrepreneur</li><li>Bronze Award</li></ul>" }
           ],
@@ -260,13 +353,14 @@
             { title: "Photoshop", description: "<ul><li>Object Selection</li><li>Airbrushing</li><li>Filters</li><li>Composites</li><li>Project</li></ul>" }
           ],
           gcse: [
-            { title: "Creative iMedia", description: "<ul><li>R093: Media Industry & Pre-Production</li><li>R094: Visual Identity & Digital Graphics</li><li>R097: Interactive Digital Media</li></ul>", link: "imedia-revision.html" },
-            { title: "Enterprise", description: "<ul><li>Component 1: Exploring Enterprises</li><li>Component 2: Planning & Pitching</li><li>Component 3: Promotion & Finance</li></ul>", link: "enterprise-revision.html" }
+            { title: "Creative iMedia", description: "<ul><li>R093 - Exam</li><li>R094 - Coursework</li><li>R097 - Coursework</li></ul>" },
+            { title: "Enterprise", description: "<ul><li>Component 1 - Coursework</li><li>Component 2 - Coursework</li><li>Component 3 - Exam</li></ul>" }
           ]
         };
 
         function loadYear(year) {
             if (!curriculumData[year]) year = 'year7';
+
             document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
             const activeBtn = document.getElementById('btn-' + year);
             if (activeBtn) activeBtn.classList.add('active');
@@ -275,14 +369,16 @@
             document.getElementById('year-title').innerText = titles[year];
 
             const dncContainer = document.getElementById('dnc-container');
-            if (['year7', 'year8', 'year9'].includes(year)) {
+            if (year === 'year7' || year === 'year8' || year === 'year9') {
                 const yearNum = year.replace('year', ''); 
                 dncContainer.innerHTML = `<button class="dnc-btn" onclick="window.location.href='y${yearNum}-dnc.html'">📝 View Year ${yearNum} Demonstrate & Connect Tasks</button>`;
             } else {
                 dncContainer.innerHTML = '';
             }
 
-            try { localStorage.setItem('lastViewedYearGroup', year); } catch (e) {}
+            try {
+                localStorage.setItem('lastViewedYearGroup', year);
+            } catch (error) {}
 
             const grid = document.getElementById('content-grid');
             grid.innerHTML = ''; 
@@ -291,15 +387,21 @@
                 const card = document.createElement('div');
                 card.className = 'card';
                 
-                const targetLink = unit.link || (unit.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.html');
-                card.onclick = () => { window.location.href = targetLink; };
+                const fileName = unit.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.html';
+                
+                card.onclick = () => {
+                    window.location.href = fileName;
+                };
 
-                let subtitleHtml = year === 'gcse' ? `<div class="card-subtitle">GCSE OPTION</div>` : `<div class="card-subtitle">UNIT ${index + 1} &bull; COMPUTING</div>`;
+                let subtitleHtml = year === 'gcse' ? '' : `<div class="card-subtitle">UNIT ${index + 1} &bull; COMPUTING</div>`;
+
                 card.innerHTML = `
                     ${subtitleHtml}
                     <div class="card-title">${unit.title}</div>
-                    <div class="card-body">${unit.description}</div>
-                    <button class="card-btn">View Hub</button>
+                    <div class="card-body">
+                        ${unit.description}
+                    </div>
+                    <button class="card-btn">View Lesson Materials</button>
                 `;
                 grid.appendChild(card);
             });
@@ -307,7 +409,9 @@
 
         window.onload = () => {
             let savedYear = 'year7';
-            try { savedYear = localStorage.getItem('lastViewedYearGroup') || 'year7'; } catch (e) {}
+            try {
+                savedYear = localStorage.getItem('lastViewedYearGroup') || 'year7';
+            } catch (error) {}
             if (!curriculumData[savedYear]) savedYear = 'year7';
             loadYear(savedYear);
         };
