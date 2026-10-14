@@ -218,6 +218,25 @@
         }
         .teacher-override-btn:hover { background-color: #757575; }
 
+        /* Teacher Feedback Display */
+        .teacher-feedback-display {
+            background-color: #f8f9fa;
+            border-left: 4px solid #607d8b;
+            padding: 12px 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+            color: #333;
+            font-size: 0.95em;
+        }
+        .teacher-verified-correct .teacher-feedback-display {
+            background-color: #fff;
+            border-left-color: #388e3c;
+        }
+        .teacher-verified-incorrect .teacher-feedback-display {
+            background-color: #fff;
+            border-left-color: #d32f2f;
+        }
+
         /* CORRECT & INCORRECT DYNAMIC STATUS STYLING */
         .teacher-verified-correct {
             border-top-color: #388e3c !important;
@@ -251,7 +270,7 @@
             background: white;
             padding: 25px;
             border-radius: 8px;
-            width: 300px;
+            width: 350px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             text-align: center;
             border-top: 6px solid #1e3a8a;
@@ -263,7 +282,7 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
-            font-size: 16px;
+            font-size: 14px;
         }
         .modal-btn-row {
             display: flex;
@@ -412,6 +431,10 @@
                     <label>List 3 different functions you have learned in Excel (e.g., SUM) and briefly describe what one of them does:</label>
                     <textarea id="connect-red" class="persist-input" placeholder="Type your list here..."></textarea>
                 </div>
+
+                <!-- Feedback Display -->
+                <div id="feedback-red" class="teacher-feedback-display hidden"></div>
+
                 <div style="text-align: right; gap: 10px; display: flex; justify-content: flex-end;">
                     <button class="teacher-verify-btn no-print" style="background-color: #388e3c;" onclick="openVerifyModal('red-correct')">✅ Correct</button>
                     <button class="teacher-verify-btn no-print" style="background-color: #d32f2f;" onclick="openVerifyModal('red-incorrect')">❌ Incorrect</button>
@@ -430,6 +453,10 @@
                     <label>Explain the difference between a basic Formula (like =A2*B2) and a Function (like =AVERAGE(A1:A10)):</label>
                     <textarea id="connect-amber" class="persist-input" placeholder="Type your explanation here..."></textarea>
                 </div>
+
+                <!-- Feedback Display -->
+                <div id="feedback-amber" class="teacher-feedback-display hidden"></div>
+
                 <div style="text-align: right; gap: 10px; display: flex; justify-content: flex-end;">
                     <button class="teacher-verify-btn no-print" style="background-color: #388e3c;" onclick="openVerifyModal('amber-correct')">✅ Correct</button>
                     <button class="teacher-verify-btn no-print" style="background-color: #d32f2f;" onclick="openVerifyModal('amber-incorrect')">❌ Incorrect</button>
@@ -448,6 +475,10 @@
                     <label>Explain what an Absolute Cell Reference is (e.g., $B$6) and give an example of when you would need to use one instead of a normal reference:</label>
                     <textarea id="connect-green" class="persist-input" placeholder="Type your response here..."></textarea>
                 </div>
+
+                <!-- Feedback Display -->
+                <div id="feedback-green" class="teacher-feedback-display hidden"></div>
+
                 <div style="text-align: right; gap: 10px; display: flex; justify-content: flex-end;">
                     <button class="teacher-verify-btn no-print" style="background-color: #388e3c;" onclick="openVerifyModal('green-correct')">✅ Correct</button>
                     <button class="teacher-verify-btn no-print" style="background-color: #d32f2f;" onclick="openVerifyModal('green-incorrect')">❌ Incorrect</button>
@@ -463,12 +494,15 @@
         </div>
     </main>
 
-    <!-- SECURE PASSWORD MODAL -->
+    <!-- SECURE PASSWORD & FEEDBACK MODAL -->
     <div class="modal-overlay" id="verify-modal">
         <div class="modal-content">
             <h3>Teacher Verification</h3>
             <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
             <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter Passcode">
+            
+            <textarea id="teacher-feedback-input" class="modal-input hidden" placeholder="Optional Feedback for student..." style="resize: vertical; min-height: 120px; font-family: inherit; margin-top: 5px;"></textarea>
+            
             <div class="modal-btn-row">
                 <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
                 <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
@@ -488,6 +522,13 @@
             3: ['max', 'maximum', 'largest', 'biggest', 'highest'],
             4: ['d8', 'd 8'],
             5: ['update', 'change', 'automatically', 'recalculate', 'dynamic', 'quicker', 'easier']
+        };
+
+        // Model Answers for Automatic Feedback (Tailored for Y8 Spreadsheets)
+        const modelAnswers = {
+            'red': "Here is the correct answer to help you:\n\n- =SUM(): Adds a range of numbers together to find the total\n- =MAX(): Finds the highest (largest) number in a range\n- =MIN(): Finds the lowest (smallest) number in a range\n- =AVERAGE(): Calculates the mean average of a range of numbers",
+            'amber': "Here is the correct answer to help you:\n\nA basic formula is a simple calculation that you type yourself using mathematical symbols like +, -, *, or / (e.g., =A2*B2).\n\nA function is a built-in, pre-programmed command in Excel that performs a more complex calculation over a range of cells (e.g., =AVERAGE(A1:A10) or =SUM(A1:A10)).",
+            'green': "Here is the correct answer to help you:\n\nAn Absolute Cell Reference (like $B$6) uses dollar signs to lock a specific cell in place so it does not change when you drag or copy a formula (autofill) down a column.\n\nExample: You would use one when multiplying a list of different item prices by a single fixed VAT rate or discount percentage stored in one specific cell."
         };
 
         function checkSentenceAnswer(inputId, keywords) {
@@ -629,6 +670,25 @@
             activeLevel = level;
             document.getElementById('teacher-password-input').value = '';
             document.getElementById('modal-error-msg').style.display = 'none';
+            
+            const feedbackInput = document.getElementById('teacher-feedback-input');
+
+            // Set automatic feedback based on task status
+            if (level.includes('-correct') || level.includes('-incorrect')) {
+                const [taskLevel, status] = level.split('-');
+                
+                if (status === 'correct') {
+                    feedbackInput.value = "Well done! Great work.";
+                } else {
+                    feedbackInput.value = modelAnswers[taskLevel];
+                }
+                
+                feedbackInput.classList.remove('hidden');
+            } else {
+                feedbackInput.value = '';
+                feedbackInput.classList.add('hidden');
+            }
+
             document.getElementById('verify-modal').style.display = 'flex';
             document.getElementById('teacher-password-input').focus();
         }
@@ -646,6 +706,8 @@
                     const [level, status] = activeLevel.split('-');
                     const textarea = document.getElementById('connect-' + level);
                     const taskCard = document.getElementById('task-' + level);
+                    const feedbackDiv = document.getElementById('feedback-' + level);
+                    const feedbackText = document.getElementById('teacher-feedback-input').value.trim();
 
                     if (status === 'correct') {
                         textarea.classList.add('correct');
@@ -658,6 +720,16 @@
                         taskCard.classList.add('teacher-verified-incorrect');
                         taskCard.classList.remove('teacher-verified-correct');
                     }
+                    
+                    // Display Teacher Feedback if provided
+                    if (feedbackText) {
+                        feedbackDiv.innerHTML = "<strong>👨‍🏫 Teacher Feedback:</strong><br><br>" + feedbackText.replace(/\n/g, '<br>');
+                        feedbackDiv.classList.remove('hidden');
+                    } else {
+                        feedbackDiv.classList.add('hidden');
+                        feedbackDiv.innerHTML = "";
+                    }
+
                 } else if (activeLevel.startsWith('q')) {
                     // Question Override Logic (Toggles correct/incorrect)
                     let el = document.getElementById(activeLevel);
@@ -677,8 +749,17 @@
             }
         }
 
+        // Allow pressing Enter from either the password or feedback box
         document.getElementById('teacher-password-input').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') submitVerify();
+        });
+        
+        // Prevent accidental enters inside feedback box from submitting if they just want a new line, 
+        // but let Ctrl+Enter submit it
+        document.getElementById('teacher-feedback-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                submitVerify();
+            }
         });
 
         // --- BULLETPROOF PDF GENERATION LOGIC ---
@@ -752,6 +833,14 @@
                     connectAmber_class: document.getElementById('connect-amber').className,
                     connectGreen: document.getElementById('connect-green').value,
                     connectGreen_class: document.getElementById('connect-green').className,
+                    
+                    // Teacher feedback persistence
+                    feedbackRed: document.getElementById('feedback-red').innerHTML,
+                    feedbackRed_hidden: document.getElementById('feedback-red').classList.contains('hidden'),
+                    feedbackAmber: document.getElementById('feedback-amber').innerHTML,
+                    feedbackAmber_hidden: document.getElementById('feedback-amber').classList.contains('hidden'),
+                    feedbackGreen: document.getElementById('feedback-green').innerHTML,
+                    feedbackGreen_hidden: document.getElementById('feedback-green').classList.contains('hidden'),
                     
                     spagRows: []
                 };
@@ -833,6 +922,16 @@
                 
                 document.getElementById('connect-green').value = data.connectGreen || '';
                 if (data.connectGreen_class) document.getElementById('connect-green').className = data.connectGreen_class;
+
+                // Load Feedback
+                if (data.feedbackRed) document.getElementById('feedback-red').innerHTML = data.feedbackRed;
+                if (data.feedbackRed_hidden === false) document.getElementById('feedback-red').classList.remove('hidden');
+
+                if (data.feedbackAmber) document.getElementById('feedback-amber').innerHTML = data.feedbackAmber;
+                if (data.feedbackAmber_hidden === false) document.getElementById('feedback-amber').classList.remove('hidden');
+
+                if (data.feedbackGreen) document.getElementById('feedback-green').innerHTML = data.feedbackGreen;
+                if (data.feedbackGreen_hidden === false) document.getElementById('feedback-green').classList.remove('hidden');
 
                 const container = document.getElementById('practice-rows-container');
                 container.innerHTML = '';
