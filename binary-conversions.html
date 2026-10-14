@@ -9,6 +9,11 @@
     <!-- HTML to PDF Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         /* Task Container Styling */
         .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
@@ -19,7 +24,7 @@
             padding: 25px; 
             margin-bottom: 30px; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-            page-break-inside: avoid; /* Stops the PDF from cutting cards in half! */
+            page-break-inside: avoid;
         }
         
         /* Section Header Colors */
@@ -55,7 +60,7 @@
         
         .auto-input { 
             width: 100%; 
-            max-width: 350px; /* Keeps the number boxes from stretching too wide */
+            max-width: 350px;
             padding: 12px; 
             font-size: 16px; 
             border: 2px solid #ccc; 
@@ -63,7 +68,7 @@
             transition: all 0.3s ease; 
             box-sizing: border-box; 
             background-color: white; 
-            font-family: inherit; /* Uses standard readable font */
+            font-family: inherit;
         }
         .auto-input:focus { outline: none; border-color: #666; }
         textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; max-width: 100%; }
@@ -82,14 +87,32 @@
         .btn-submit:hover { background-color: #152960; }
         .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
         .btn-pdf:hover { background-color: #124d2d; }
+
+        /* Subtle Floating Auto-Save Status Pill */
+        #save-status-pill {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1e3a8a;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
+    <!-- Subtle Cloud Sync Indicator in bottom-right corner -->
+    <div id="save-status-pill" class="no-print">☁️ Loading your work...</div>
+
     <div id="pdf-content">
         <header>
             <div class="header-left">
-    <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
-</div>
+                <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
+            </div>
             <div class="header-center"><h1>Binary Conversions</h1></div>
             <div class="header-right"><a href="binary-hex.html" class="back-btn">&larr; Back to Unit</a></div>
         </header>
@@ -153,7 +176,7 @@
                     <input type="text" class="auto-input red-input" data-answers='["8"]' placeholder="Enter answer here...">
                 </div>
 
-                <button class="btn-submit no-print" onclick="checkAnswers('red-input')">Check Answers</button>
+                <button class="btn-submit no-print" onclick="checkAnswers('red-input'); saveProgress(true);">Check Answers</button>
             </div>
 
             <!-- AMBER TASK: 8-Bit Binary to Denary -->
@@ -185,7 +208,7 @@
                     <input type="text" class="auto-input amber-input" data-answers='["255"]' placeholder="Enter answer here...">
                 </div>
 
-                <button class="btn-submit no-print" onclick="checkAnswers('amber-input')">Check Answers</button>
+                <button class="btn-submit no-print" onclick="checkAnswers('amber-input'); saveProgress(true);">Check Answers</button>
             </div>
 
             <!-- GREEN TASK: 4-Bit Denary to Binary -->
@@ -217,7 +240,7 @@
                     <input type="text" class="auto-input green-input" data-answers='["1111"]' placeholder="Enter answer here...">
                 </div>
 
-                <button class="btn-submit no-print" onclick="checkAnswers('green-input')">Check Answers</button>
+                <button class="btn-submit no-print" onclick="checkAnswers('green-input'); saveProgress(true);">Check Answers</button>
             </div>
 
             <!-- BLUE TASK: 8-Bit Denary to Binary -->
@@ -249,14 +272,16 @@
                     <input type="text" class="auto-input navy-input" data-answers='["00001111"]' placeholder="Enter answer here...">
                 </div>
 
-                <button class="btn-submit no-print" onclick="checkAnswers('navy-input')">Check Answers</button>
+                <button class="btn-submit no-print" onclick="checkAnswers('navy-input'); saveProgress(true);">Check Answers</button>
             </div>
-<!-- CHALLENGE GAME LINK -->
-        <div class="task-card no-print" style="border: 2px solid #dfaa2b; text-align: center; background-color: #fdfbf7;">
-            <h2 style="color: #1e3a8a; margin-top: 0; font-size: 24px;">🎮 Finished Early? Play Binary Time Attack!</h2>
-            <p style="font-size: 16px; color: #555; margin-bottom: 20px;">Test your conversion speed against the clock in the Delta Binary Time Attack game. Race to convert as many denary and binary numbers as you can in 60 seconds!</p>
-            <a href="binary-game.html" class="btn-submit" style="margin: 0 auto; background-color: #dfaa2b; color: #1e3a8a; text-decoration: none; display: inline-block; width: 250px;">Start Game &rarr;</a>
-        </div>
+
+            <!-- CHALLENGE GAME LINK -->
+            <div class="task-card no-print" style="border: 2px solid #dfaa2b; text-align: center; background-color: #fdfbf7;">
+                <h2 style="color: #1e3a8a; margin-top: 0; font-size: 24px;">🎮 Finished Early? Play Binary Time Attack!</h2>
+                <p style="font-size: 16px; color: #555; margin-bottom: 20px;">Test your conversion speed against the clock in the Delta Binary Time Attack game. Race to convert as many denary and binary numbers as you can in 60 seconds!</p>
+                <a href="binary-game.html" class="btn-submit" style="margin: 0 auto; background-color: #dfaa2b; color: #1e3a8a; text-decoration: none; display: inline-block; width: 250px;">Start Game &rarr;</a>
+            </div>
+
             <!-- PLENARY: 3 Key Takeaways -->
             <div class="task-card task-plenary">
                 <h2>Lesson Plenary</h2>
@@ -290,44 +315,101 @@
     </footer>
 
     <script>
-        /* --- AUTO-SAVE MEMORY LOGIC --- */
-        function saveProgress() {
-            var inputs = document.querySelectorAll('.auto-input');
-            var dataToSave = {};
+        /* --- 1. PASTE YOUR FIREBASE CONFIG KEYS HERE --- */
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Unique ID for this specific lesson page
+        const LESSON_ID = "binary-conversions";
+
+        /* --- 2. SILENT AUTO-SAVE & AUTO-LOAD ENGINE --- */
+        let saveTimer;
+        function saveProgress(immediate = false) {
+            const inputs = document.querySelectorAll('.auto-input');
+            const dataToSave = { lastUpdated: Date.now() };
             
-            for (var i = 0; i < inputs.length; i++) {
+            for (let i = 0; i < inputs.length; i++) {
                 dataToSave['input_' + i] = inputs[i].value;
             }
+
+            // Local backup on the PC
             localStorage.setItem('binaryConversionsMemory', JSON.stringify(dataToSave));
+
+            // Cloud save to the logged-in student's Firebase account
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const statusPill = document.getElementById('save-status-pill');
+            if (statusPill) statusPill.innerText = "⏳ Saving...";
+
+            clearTimeout(saveTimer);
+            const delay = immediate ? 0 : 800; // Save immediately on button click, or 800ms after typing stops
+
+            saveTimer = setTimeout(() => {
+                db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
+                  .set(dataToSave, { merge: true })
+                  .then(() => {
+                      if (statusPill) statusPill.innerText = "☁️ Saved to Cloud";
+                  })
+                  .catch(err => {
+                      console.error("Cloud save error:", err);
+                      if (statusPill) statusPill.innerText = "⚠️ Offline (Saved locally)";
+                  });
+            }, delay);
         }
 
-        function loadProgress() {
-            var savedDataStr = localStorage.getItem('binaryConversionsMemory');
-            if (savedDataStr) {
-                var data = JSON.parse(savedDataStr);
-                var inputs = document.querySelectorAll('.auto-input');
-                
-                for (var i = 0; i < inputs.length; i++) {
-                    if (data['input_' + i]) {
-                        inputs[i].value = data['input_' + i];
-                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                            inputs[i].style.height = 'auto';
-                            inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                        }
+        function populateInputs(data) {
+            const inputs = document.querySelectorAll('.auto-input');
+            for (let i = 0; i < inputs.length; i++) {
+                if (data['input_' + i] !== undefined) {
+                    inputs[i].value = data['input_' + i];
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto';
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
                     }
                 }
-                
-                // Auto-mark previously saved answers
-                checkAnswers('red-input');
-                checkAnswers('amber-input');
-                checkAnswers('green-input');
-                checkAnswers('navy-input');
             }
+            // Automatically re-mark any completed tasks so green/red boxes appear immediately
+            checkAnswers('red-input');
+            checkAnswers('amber-input');
+            checkAnswers('green-input');
+            checkAnswers('navy-input');
         }
 
+        // Automatically runs the moment the page opens
+        auth.onAuthStateChanged(async (user) => {
+            const statusPill = document.getElementById('save-status-pill');
+            if (user) {
+                try {
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        populateInputs(doc.data());
+                    }
+                    if (statusPill) statusPill.innerText = "☁️ Saved to Cloud";
+                } catch (err) {
+                    console.error("Error loading cloud data:", err);
+                    if (statusPill) statusPill.innerText = "⚠️ Offline Mode";
+                }
+            } else {
+                // If the student is not logged in, send them back to the index login screen
+                window.location.href = "index.html";
+            }
+        });
+
+        // Auto-save whenever a student types in any box
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('auto-input')) {
-                saveProgress();
+                saveProgress(false);
                 if (e.target.tagName.toLowerCase() === 'textarea') {
                     e.target.style.height = 'auto';
                     e.target.style.height = e.target.scrollHeight + 'px';
@@ -335,16 +417,18 @@
             }
         });
 
-        function clearData() {
+        async function clearData() {
             if (confirm("Are you sure you want to clear all your work on this page?")) {
                 localStorage.removeItem('binaryConversionsMemory');
+                const user = auth.currentUser;
+                if (user) {
+                    await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
+                }
                 window.location.reload();
             }
         }
 
-        window.onload = loadProgress;
-
-        /* --- BATCH-MARKING TEXT INPUT LOGIC --- */
+        /* --- 3. BATCH-MARKING TEXT INPUT LOGIC --- */
         function checkAnswers(groupClass) {
             var inputs = document.getElementsByClassName(groupClass);
             
@@ -374,20 +458,17 @@
             }
         }
 
-        /* --- BULLETPROOF PDF GENERATION LOGIC --- */
+        /* --- 4. BULLETPROOF PDF GENERATION LOGIC --- */
         function downloadPDF() {
-            // Hide buttons
             var buttonsToHide = document.querySelectorAll('.no-print');
             for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'none';
             document.getElementById('action-buttons').style.display = 'none';
 
-            // Lock text inputs
             var textInputs = document.querySelectorAll('input[type="text"]');
             for (var i = 0; i < textInputs.length; i++) {
                 textInputs[i].setAttribute('value', textInputs[i].value);
             }
 
-            // Expand textareas
             var textAreas = document.querySelectorAll('textarea');
             for (var j = 0; j < textAreas.length; j++) {
                 textAreas[j].innerHTML = textAreas[j].value;
@@ -406,7 +487,7 @@
             };
 
             html2pdf().set(opt).from(element).save().then(function() {
-                for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'block';
+                for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = '';
                 document.getElementById('action-buttons').style.display = 'flex';
                 
                 for (var k = 0; k < textAreas.length; k++) {
