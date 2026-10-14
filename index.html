@@ -47,6 +47,31 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: background-color 0.2s;
         }
         .dnc-btn:hover { background-color: #c99722; }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .user-info {
+            color: white;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+        .logout-btn {
+            background-color: #f8f9fa;
+            color: #1e3a8a;
+            border: 2px solid #dfaa2b;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .logout-btn:hover {
+            background-color: #dfaa2b;
+            color: #1e3a8a;
+        }
     </style>
 </head>
 <body class="locked">
@@ -80,7 +105,10 @@
         <div class="header-center">
             <h1>Serlby Park Computing</h1>
         </div>
-        <div class="header-right"></div>
+        <div class="header-right" id="header-right" style="display: none;">
+            <span id="user-display-name" class="user-info"></span>
+            <button id="logout-btn" class="logout-btn" onclick="logoutUser()">Log Out</button>
+        </div>
     </header>
 
     <nav>
@@ -153,9 +181,10 @@
                 const userCredential = await auth.signInWithEmailAndPassword(formatEmail(user), pin);
                 const uid = userCredential.user.uid;
 
-                const userDoc = await db.collection("users").doc(uid).get();
+                const userDocRef = db.collection("users").doc(uid);
+                const userDoc = await userDocRef.get();
                 if (!userDoc.exists) {
-                    await db.collection("users").doc(uid).set({
+                    await userDocRef.set({
                         username: user,
                         className: "7x1",
                         lastLogin: Date.now()
@@ -184,14 +213,47 @@
             }
         }
 
+        function logoutUser() {
+            auth.signOut().then(() => {
+                sessionStorage.removeItem('teacherMode');
+                location.reload();
+            }).catch((error) => {
+                console.error('Sign out error', error);
+            });
+        }
+
         document.getElementById('student-pin').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') processStudentLogin();
         });
 
-        auth.onAuthStateChanged((user) => {
+        auth.onAuthStateChanged(async (user) => {
+            const headerRight = document.getElementById('header-right');
+            const displayNameSpan = document.getElementById('user-display-name');
+            const loginGate = document.getElementById('login-gate');
+
             if (user || sessionStorage.getItem('teacherMode') === 'true') {
-                document.getElementById('login-gate').style.display = 'none';
+                loginGate.style.display = 'none';
                 document.body.classList.remove('locked');
+                headerRight.style.display = 'flex';
+
+                if (sessionStorage.getItem('teacherMode') === 'true') {
+                    displayNameSpan.innerText = "👨‍🏫 Teacher Mode";
+                } else if (user) {
+                    try {
+                        const userDoc = await db.collection("users").doc(user.uid).get();
+                        if (userDoc.exists && userDoc.data().username) {
+                            displayNameSpan.innerText = `🎓 ${userDoc.data().username}`;
+                        } else {
+                            displayNameSpan.innerText = `🎓 ${user.email.split('@')[0]}`;
+                        }
+                    } catch (e) {
+                        displayNameSpan.innerText = `🎓 Student`;
+                    }
+                }
+            } else {
+                loginGate.style.display = 'flex';
+                document.body.classList.add('locked');
+                headerRight.style.display = 'none';
             }
         });
 
