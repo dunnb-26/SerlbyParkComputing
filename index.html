@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delta Serlby Park - Computing</title>
+    <title>Delta Serlby Park - Computing & Enterprise</title>
     <link rel="stylesheet" href="style.css">
     
     <!-- Firebase SDKs -->
@@ -34,12 +34,11 @@
         .btn-student:hover { background-color: #c99722; }
         .btn-teacher { background-color: #f8f9fa; color: #555; border: 2px solid #ccc; }
         .btn-teacher:hover { background-color: #e2e6ea; }
-        .gate-input, .gate-select {
+        .gate-input {
             width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #ccc;
             border-radius: 6px; font-size: 16px; box-sizing: border-box; text-align: center; background: white;
         }
         body.locked { overflow: hidden; }
-
         .dnc-btn {
             display: block; width: 100%; padding: 15px; background-color: #dfaa2b; 
             color: #1e3a8a; text-align: center; border: none; border-radius: 6px;
@@ -47,31 +46,6 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: background-color 0.2s;
         }
         .dnc-btn:hover { background-color: #c99722; }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .user-info {
-            color: white;
-            font-weight: bold;
-            font-size: 0.95em;
-        }
-        .logout-btn {
-            background-color: #f8f9fa;
-            color: #1e3a8a;
-            border: 2px solid #dfaa2b;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
-        }
-        .logout-btn:hover {
-            background-color: #dfaa2b;
-            color: #1e3a8a;
-        }
     </style>
 </head>
 <body class="locked">
@@ -80,34 +54,39 @@
     <div id="login-gate">
         <div class="gate-card">
             <img src="logo.jpg" alt="Delta Serlby Park Logo">
-            <h2>Welcome to Computing</h2>
+            <h2>Welcome</h2>
             
             <div id="role-selection">
                 <button class="role-btn btn-student" onclick="showStudentForm()">🎓 I am a Student</button>
-                <button class="role-btn btn-teacher" onclick="teacherLogin()">👨‍🏫 I am a Teacher</button>
+                <button class="role-btn btn-teacher" onclick="showTeacherForm()">👨‍🏫 I am a Teacher</button>
             </div>
 
             <div id="student-login-form" style="display: none;">
-                <div id="login-error" style="color:red; font-size:0.9em; margin-bottom:10px; display:none;"></div>
+                <div id="student-login-error" style="color:red; font-size:0.9em; margin-bottom:10px; display:none;"></div>
                 <input type="text" id="student-username" class="gate-input" placeholder="Username (e.g. jsmith)">
-                <input type="password" id="student-pin" class="gate-input" placeholder="4-Digit PIN / Password" maxlength="10">
-                
+                <input type="password" id="student-pin" class="gate-input" placeholder="4-Digit PIN / Password">
                 <button class="role-btn btn-student" id="btn-student-submit" onclick="processStudentLogin()">Log In</button>
-                <button class="role-btn btn-teacher" onclick="hideStudentForm()">Cancel</button>
+                <button class="role-btn btn-teacher" onclick="hideForms()">Cancel</button>
+            </div>
+
+            <div id="teacher-login-form" style="display: none;">
+                <div id="teacher-login-error" style="color:red; font-size:0.9em; margin-bottom:10px; display:none;"></div>
+                <input type="password" id="teacher-passcode" class="gate-input" placeholder="Enter Teacher PIN">
+                <button class="role-btn btn-student" onclick="processTeacherLogin()">Access Portal</button>
+                <button class="role-btn btn-teacher" onclick="hideForms()">Cancel</button>
             </div>
         </div>
     </div>
 
     <header>
         <div class="header-left">
-            <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
+            <a href="index.html"><img src="logo.jpg" alt="Logo"></a>
         </div>
         <div class="header-center">
-            <h1>Serlby Park Computing</h1>
+            <h1>Serlby Park Portal</h1>
         </div>
-        <div class="header-right" id="header-right" style="display: none;">
-            <span id="user-display-name" class="user-info"></span>
-            <button id="logout-btn" class="logout-btn" onclick="logoutUser()">Log Out</button>
+        <div class="header-right">
+            <button onclick="auth.signOut().then(() => location.reload())" style="background:#b91c1c; color:white; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer;">Log Out</button>
         </div>
     </header>
 
@@ -125,7 +104,7 @@
     </main>
 
     <footer>
-        &copy; 2026 Delta Serlby Park - Computing Department
+        &copy; 2026 Delta Serlby Park - Department
     </footer>
 
     <script>
@@ -139,7 +118,7 @@
             measurementId: "G-HDNYEE11WV"
         };
 
-        firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
@@ -149,12 +128,16 @@
             document.getElementById('student-username').focus();
         }
 
-        function hideStudentForm() {
+        function showTeacherForm() {
+            document.getElementById('role-selection').style.display = 'none';
+            document.getElementById('teacher-login-form').style.display = 'block';
+            document.getElementById('teacher-passcode').focus();
+        }
+
+        function hideForms() {
             document.getElementById('student-login-form').style.display = 'none';
+            document.getElementById('teacher-login-form').style.display = 'none';
             document.getElementById('role-selection').style.display = 'block';
-            document.getElementById('student-username').value = "";
-            document.getElementById('student-pin').value = "";
-            document.getElementById('login-error').style.display = 'none';
         }
 
         function formatEmail(username) {
@@ -165,95 +148,40 @@
         async function processStudentLogin() {
             const user = document.getElementById('student-username').value.trim();
             const pin = document.getElementById('student-pin').value.trim();
-            const errorBox = document.getElementById('login-error');
-            const submitBtn = document.getElementById('btn-student-submit');
+            const errorBox = document.getElementById('student-login-error');
 
-            if (user === "" || pin === "") {
-                errorBox.innerText = "Please enter both your Username and PIN.";
+            if (!user || !pin) {
+                errorBox.innerText = "Please enter username and PIN.";
                 errorBox.style.display = 'block';
                 return;
             }
 
-            errorBox.style.display = 'none';
-            submitBtn.innerText = "Logging in...";
-
             try {
-                const userCredential = await auth.signInWithEmailAndPassword(formatEmail(user), pin);
-                const uid = userCredential.user.uid;
-
-                const userDocRef = db.collection("users").doc(uid);
-                const userDoc = await userDocRef.get();
-                if (!userDoc.exists) {
-                    await userDocRef.set({
-                        username: user,
-                        className: "7x1",
-                        lastLogin: Date.now()
-                    });
-                }
-
-                document.getElementById('login-gate').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('login-gate').style.display = 'none';
-                    document.body.classList.remove('locked');
-                }, 500);
+                const cred = await auth.signInWithEmailAndPassword(formatEmail(user), pin);
+                await db.collection("users").doc(cred.user.uid).set({ username: user, lastLogin: Date.now() }, { merge: true });
+                document.getElementById('login-gate').style.display = 'none';
+                document.body.classList.remove('locked');
             } catch (err) {
-                submitBtn.innerText = "Log In";
                 errorBox.innerText = "Incorrect username or PIN.";
                 errorBox.style.display = 'block';
             }
         }
 
-        function teacherLogin() {
-            const passcode = prompt("Enter Teacher Passcode to access Dashboard:");
-            if (passcode === "2525" || passcode === "delta") {
+        function processTeacherLogin() {
+            const pass = document.getElementById('teacher-passcode').value.trim();
+            if (pass === "2525" || pass === "delta") {
                 sessionStorage.setItem('teacherMode', 'true');
                 window.location.href = "teacher-dashboard.html";
-            } else if (passcode !== null) {
-                alert("Incorrect passcode. Access denied.");
+            } else {
+                document.getElementById('teacher-login-error').innerText = "Incorrect PIN.";
+                document.getElementById('teacher-login-error').style.display = 'block';
             }
         }
 
-        function logoutUser() {
-            auth.signOut().then(() => {
-                sessionStorage.removeItem('teacherMode');
-                location.reload();
-            }).catch((error) => {
-                console.error('Sign out error', error);
-            });
-        }
-
-        document.getElementById('student-pin').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') processStudentLogin();
-        });
-
-        auth.onAuthStateChanged(async (user) => {
-            const headerRight = document.getElementById('header-right');
-            const displayNameSpan = document.getElementById('user-display-name');
-            const loginGate = document.getElementById('login-gate');
-
+        auth.onAuthStateChanged((user) => {
             if (user || sessionStorage.getItem('teacherMode') === 'true') {
-                loginGate.style.display = 'none';
+                document.getElementById('login-gate').style.display = 'none';
                 document.body.classList.remove('locked');
-                headerRight.style.display = 'flex';
-
-                if (sessionStorage.getItem('teacherMode') === 'true') {
-                    displayNameSpan.innerText = "👨‍🏫 Teacher Mode";
-                } else if (user) {
-                    try {
-                        const userDoc = await db.collection("users").doc(user.uid).get();
-                        if (userDoc.exists && userDoc.data().username) {
-                            displayNameSpan.innerText = `🎓 ${userDoc.data().username}`;
-                        } else {
-                            displayNameSpan.innerText = `🎓 ${user.email.split('@')[0]}`;
-                        }
-                    } catch (e) {
-                        displayNameSpan.innerText = `🎓 Student`;
-                    }
-                }
-            } else {
-                loginGate.style.display = 'flex';
-                document.body.classList.add('locked');
-                headerRight.style.display = 'none';
             }
         });
 
@@ -266,7 +194,7 @@
             { title: "Xmas", description: "<ul><li>TBA</li></ul>" },
             { title: "Vector Graphics", description: "<ul><li>Pixel Power</li><li>Shape Squad</li><li>Build & Combine</li><li>Path Pros</li><li>Design Mission</li><li>Graphics Gallery</li></ul>" },
             { title: "Computational Thinking", description: "<ul><li>Abstraction</li><li>Decomposition</li><li>Pattern Recognition</li><li>Algorithms</li><li>Flowcharts</li></ul>" },
-            { title: "Hardware & Software", description: "<ul><li>Hardware vs Software</li><li>Computer Systems</li><li>Inputs & Outputs</li><li>Storage</li><li>Graphics & Processing</li><li>TBA</li></ul>" },
+            { title: "Hardware & Software", description: "<ul><li>Hardware vs Software</li><li>Computer Systems</li><li>Inputs & Outputs</li><li>Storage</li><li>Graphics & Processing</li></ul>" },
             { title: "Assessment", description: "<ul><li>Consolidation/Revision</li><li>Revision</li><li>Assessment</li></ul>" },
             { title: "iDEA Award", description: "<ul><li>Citizen</li><li>Worker</li><li>Maker</li><li>Entrepreneur</li><li>Bronze Award</li></ul>" }
           ],
@@ -297,8 +225,12 @@
             { title: "Photoshop", description: "<ul><li>Object Selection</li><li>Airbrushing</li><li>Filters</li><li>Composites</li><li>Project</li></ul>" }
           ],
           gcse: [
-            { title: "Creative iMedia", description: "<ul><li>R093 - Exam</li><li>R094 - Coursework</li><li>R097 - Coursework</li></ul>" },
-            { title: "Enterprise", description: "<ul><li>Component 1 - Coursework</li><li>Component 2 - Coursework</li><li>Component 3 - Exam</li></ul>" }
+            { title: "Creative iMedia - R093", description: "<ul><li>Exam Unit</li><li>Media Industry & Pre-Production</li><li>Understanding & Planning</li></ul>" },
+            { title: "Creative iMedia - R094", description: "<ul><li>Coursework Unit</li><li>Visual Identity & Digital Graphics</li><li>Creation & Evaluation</li></ul>" },
+            { title: "Creative iMedia - R097", description: "<ul><li>Coursework Unit</li><li>Interactive Digital Media</li><li>Publishing & Testing</li></ul>" },
+            { title: "Enterprise - Component 1", description: "<ul><li>Coursework Unit</li><li>Exploring Enterprises</li><li>Market Research & Customer Needs</li></ul>" },
+            { title: "Enterprise - Component 2", description: "<ul><li>Coursework Unit</li><li>Planning for and Pitching an Enterprise</li><li>Financial Planning & Proposals</li></ul>" },
+            { title: "Enterprise - Component 3", description: "<ul><li>Exam Unit</li><li>Promotion and Finance for Enterprise</li><li>Business Growth & Success</li></ul>" }
           ]
         };
 
@@ -312,14 +244,12 @@
             document.getElementById('year-title').innerText = titles[year];
 
             const dncContainer = document.getElementById('dnc-container');
-            if (year === 'year7' || year === 'year8' || year === 'year9') {
+            if (['year7', 'year8', 'year9'].includes(year)) {
                 const yearNum = year.replace('year', ''); 
                 dncContainer.innerHTML = `<button class="dnc-btn" onclick="window.location.href='y${yearNum}-dnc.html'">📝 View Year ${yearNum} Demonstrate & Connect Tasks</button>`;
             } else {
                 dncContainer.innerHTML = '';
             }
-
-            try { localStorage.setItem('lastViewedYearGroup', year); } catch (e) {}
 
             const grid = document.getElementById('content-grid');
             grid.innerHTML = ''; 
@@ -330,7 +260,7 @@
                 const fileName = unit.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.html';
                 card.onclick = () => { window.location.href = fileName; };
 
-                let subtitleHtml = year === 'gcse' ? '' : `<div class="card-subtitle">UNIT ${index + 1} &bull; COMPUTING</div>`;
+                let subtitleHtml = year === 'gcse' ? `<div class="card-subtitle">GCSE COURSE</div>` : `<div class="card-subtitle">UNIT ${index + 1} &bull; COMPUTING</div>`;
                 card.innerHTML = `
                     ${subtitleHtml}
                     <div class="card-title">${unit.title}</div>
@@ -341,12 +271,7 @@
             });
         }
 
-        window.onload = () => {
-            let savedYear = 'year7';
-            try { savedYear = localStorage.getItem('lastViewedYearGroup') || 'year7'; } catch (e) {}
-            if (!curriculumData[savedYear]) savedYear = 'year7';
-            loadYear(savedYear);
-        };
+        window.onload = () => loadYear('year7');
     </script>
 </body>
 </html>
