@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Binary Addition & Shifts - Lesson</title>
     
+    <!-- Firebase SDKs for Teacher Cloud Markbook -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         :root {
             /* Official Delta Serlby Park Color Scheme */
@@ -35,12 +40,22 @@
 
         .header-left { display: flex; justify-content: flex-start; }
         .header-center { text-align: center; }
-        .header-right { display: flex; justify-content: flex-end; align-items: center; }
+        .header-right { display: flex; justify-content: flex-end; align-items: center; gap: 12px; }
         header img { height: 80px; background-color: white; border-radius: 8px; padding: 5px; }
         header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; }
         
         .back-btn { background-color: var(--yellow); color: var(--navy); text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; transition: transform 0.2s; }
         .back-btn:hover { transform: scale(1.05); }
+
+        #save-status-pill {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
 
         .task-container { max-width: 1050px; margin: 30px auto; padding: 20px; }
         .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid; }
@@ -128,7 +143,8 @@
                 <h1>Binary Addition & Shifts</h1>
             </div>
             <div class="header-right">
-                <a href="javascript:history.back()" class="back-btn">&larr; Back to Unit</a>
+                <span id="save-status-pill" class="no-print">💾 Local Mode</span>
+                <a href="javascript:history.back()" class="back-btn no-print">&larr; Back to Unit</a>
             </div>
         </header>
 
@@ -141,24 +157,24 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">4 Key Words</h3>
                 <div class="question-row">
                     <label class="question-label">Bit</label>
-                    <input type="text" class="auto-input" placeholder="Type definition here...">
+                    <input type="text" class="auto-input prep-input" data-label="Key Word: Bit" placeholder="Type definition here...">
                 </div>
                 <div class="question-row">
                     <label class="question-label">Carry</label>
-                    <input type="text" class="auto-input" placeholder="Type definition here...">
+                    <input type="text" class="auto-input prep-input" data-label="Key Word: Carry" placeholder="Type definition here...">
                 </div>
                 <div class="question-row">
                     <label class="question-label">Overflow</label>
-                    <input type="text" class="auto-input" placeholder="Type definition here...">
+                    <input type="text" class="auto-input prep-input" data-label="Key Word: Overflow" placeholder="Type definition here...">
                 </div>
                 <div class="question-row">
                     <label class="question-label">Sum</label>
-                    <input type="text" class="auto-input" placeholder="Type definition here...">
+                    <input type="text" class="auto-input prep-input" data-label="Key Word: Sum" placeholder="Type definition here...">
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Lesson Notes</h3>
                 <div class="question-row" style="margin-bottom: 0;">
-                    <textarea class="auto-input" rows="6" placeholder="Write your notes about today's lesson here..."></textarea>
+                    <textarea class="auto-input prep-input" data-label="Lesson Notes" rows="6" placeholder="Write your notes about today's lesson here..."></textarea>
                 </div>
             </div>
 
@@ -172,7 +188,7 @@
 
                 <div class="sum-grid">
                     <!-- Q1 -->
-                    <div class="math-sum answer-group red-input" data-answers='["1001"]' data-carries='["1100"]'>
+                    <div class="math-sum answer-group red-input" data-label="Red Task Q1 (0110 + 0011)" data-answers='["1001"]' data-carries='["1100"]'>
                         <div class="sum-number">1.</div>
                         <table class="sum-table">
                             <tr><td></td><td>0</td><td>1</td><td>1</td><td>0</td></tr>
@@ -195,7 +211,7 @@
                         </table>
                     </div>
                     <!-- Q2 -->
-                    <div class="math-sum answer-group red-input" data-answers='["1001"]' data-carries='["1000"]'>
+                    <div class="math-sum answer-group red-input" data-label="Red Task Q2 (0101 + 0100)" data-answers='["1001"]' data-carries='["1000"]'>
                         <div class="sum-number">2.</div>
                         <table class="sum-table">
                             <tr><td></td><td>0</td><td>1</td><td>0</td><td>1</td></tr>
@@ -218,7 +234,7 @@
                         </table>
                     </div>
                     <!-- Q3 -->
-                    <div class="math-sum answer-group red-input" data-answers='["1111"]' data-carries='["0000"]'>
+                    <div class="math-sum answer-group red-input" data-label="Red Task Q3 (1010 + 0101)" data-answers='["1111"]' data-carries='["0000"]'>
                         <div class="sum-number">3.</div>
                         <table class="sum-table">
                             <tr><td></td><td>1</td><td>0</td><td>1</td><td>0</td></tr>
@@ -241,7 +257,7 @@
                         </table>
                     </div>
                     <!-- Q4 (Overflow) -->
-                    <div class="math-sum answer-group red-input" data-answers='["10010"]' data-carries='["0010"]'>
+                    <div class="math-sum answer-group red-input" data-label="Red Task Q4 (1001 + 1001)" data-answers='["10010"]' data-carries='["0010"]'>
                         <div class="sum-number">4.</div>
                         <table class="sum-table">
                             <tr><td></td><td>1</td><td>0</td><td>0</td><td>1</td></tr>
@@ -264,7 +280,7 @@
                         </table>
                     </div>
                     <!-- Q5 (Overflow) -->
-                    <div class="math-sum answer-group red-input" data-answers='["10011"]' data-carries='["1000"]'>
+                    <div class="math-sum answer-group red-input" data-label="Red Task Q5 (1100 + 0111)" data-answers='["10011"]' data-carries='["1000"]'>
                         <div class="sum-number">5.</div>
                         <table class="sum-table">
                             <tr><td></td><td>1</td><td>1</td><td>0</td><td>0</td></tr>
@@ -287,7 +303,7 @@
                         </table>
                     </div>
                     <!-- Q6 (Overflow) -->
-                    <div class="math-sum answer-group red-input" data-answers='["10000"]' data-carries='["1110"]'>
+                    <div class="math-sum answer-group red-input" data-label="Red Task Q6 (1111 + 0001)" data-answers='["10000"]' data-carries='["1110"]'>
                         <div class="sum-number">6.</div>
                         <table class="sum-table">
                             <tr><td></td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
@@ -322,7 +338,7 @@
 
                 <div class="sum-grid">
                     <!-- Q1 -->
-                    <div class="math-sum answer-group amber-input" data-answers='["11111"]' data-carries='["00000000"]'>
+                    <div class="math-sum answer-group amber-input" data-label="Amber Task Q1 (00001111 + 00010000)" data-answers='["11111"]' data-carries='["00000000"]'>
                         <div class="sum-number">1.</div>
                         <table class="sum-table">
                             <tr><td></td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
@@ -353,7 +369,7 @@
                         </table>
                     </div>
                     <!-- Q2 -->
-                    <div class="math-sum answer-group amber-input" data-answers='["1111111"]' data-carries='["00000000"]'>
+                    <div class="math-sum answer-group amber-input" data-label="Amber Task Q2 (01010101 + 00101010)" data-answers='["1111111"]' data-carries='["00000000"]'>
                         <div class="sum-number">2.</div>
                         <table class="sum-table">
                             <tr><td></td><td>0</td><td>1</td><td>0</td><td>1</td><td>0</td><td>1</td><td>0</td><td>1</td></tr>
@@ -384,7 +400,7 @@
                         </table>
                     </div>
                     <!-- Q3 -->
-                    <div class="math-sum answer-group amber-input" data-answers='["11000111"]' data-carries='["00000000"]'>
+                    <div class="math-sum answer-group amber-input" data-label="Amber Task Q3 (10000011 + 01000100)" data-answers='["11000111"]' data-carries='["00000000"]'>
                         <div class="sum-number">3.</div>
                         <table class="sum-table">
                             <tr><td></td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
@@ -415,7 +431,7 @@
                         </table>
                     </div>
                     <!-- Q4 (Overflow) -->
-                    <div class="math-sum answer-group amber-input" data-answers='["111100000"]' data-carries='["11100000"]'>
+                    <div class="math-sum answer-group amber-input" data-label="Amber Task Q4 (11110000 + 11110000)" data-answers='["111100000"]' data-carries='["11100000"]'>
                         <div class="sum-number">4.</div>
                         <table class="sum-table">
                             <tr><td></td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
@@ -446,7 +462,7 @@
                         </table>
                     </div>
                     <!-- Q5 (Overflow) -->
-                    <div class="math-sum answer-group amber-input" data-answers='["101110110"]' data-carries='["00010000"]'>
+                    <div class="math-sum answer-group amber-input" data-label="Amber Task Q5 (10101010 + 11001100)" data-answers='["101110110"]' data-carries='["00010000"]'>
                         <div class="sum-number">5.</div>
                         <table class="sum-table">
                             <tr><td></td><td>1</td><td>0</td><td>1</td><td>0</td><td>1</td><td>0</td><td>1</td><td>0</td></tr>
@@ -477,7 +493,7 @@
                         </table>
                     </div>
                     <!-- Q6 (Overflow) -->
-                    <div class="math-sum answer-group amber-input" data-answers='["100000000"]' data-carries='["11111110"]'>
+                    <div class="math-sum answer-group amber-input" data-label="Amber Task Q6 (11111111 + 00000001)" data-answers='["100000000"]' data-carries='["11111110"]'>
                         <div class="sum-number">6.</div>
                         <table class="sum-table">
                             <tr><td></td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
@@ -520,42 +536,42 @@
 
                 <div class="question-row">
                     <label class="question-label">1. Shift <code>0000 1111</code> <strong>Left</strong> by 1 place:</label>
-                    <div class="answer-group shift-flex-row green-input" data-answers='["00011110"]'>
+                    <div class="answer-group shift-flex-row green-input" data-label="Green Task Q1 (Shift 0000 1111 Left by 1)" data-answers='["00011110"]'>
                         <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
                         <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
                     </div>
                 </div>
                 <div class="question-row">
                     <label class="question-label">2. Shift <code>1111 0000</code> <strong>Right</strong> by 1 place:</label>
-                    <div class="answer-group shift-flex-row green-input" data-answers='["01111000"]'>
+                    <div class="answer-group shift-flex-row green-input" data-label="Green Task Q2 (Shift 1111 0000 Right by 1)" data-answers='["01111000"]'>
                         <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
                         <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
                     </div>
                 </div>
                 <div class="question-row">
                     <label class="question-label">3. Shift <code>0000 0101</code> <strong>Left</strong> by 2 places:</label>
-                    <div class="answer-group shift-flex-row green-input" data-answers='["00010100"]'>
+                    <div class="answer-group shift-flex-row green-input" data-label="Green Task Q3 (Shift 0000 0101 Left by 2)" data-answers='["00010100"]'>
                         <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
                         <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
                     </div>
                 </div>
                 <div class="question-row">
                     <label class="question-label">4. Shift <code>1010 1000</code> <strong>Right</strong> by 2 places:</label>
-                    <div class="answer-group shift-flex-row green-input" data-answers='["00101010"]'>
+                    <div class="answer-group shift-flex-row green-input" data-label="Green Task Q4 (Shift 1010 1000 Right by 2)" data-answers='["00101010"]'>
                         <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
                         <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
                     </div>
                 </div>
                 <div class="question-row">
                     <label class="question-label">5. Shift <code>0000 0011</code> <strong>Left</strong> by 3 places:</label>
-                    <div class="answer-group shift-flex-row green-input" data-answers='["00011000"]'>
+                    <div class="answer-group shift-flex-row green-input" data-label="Green Task Q5 (Shift 0000 0011 Left by 3)" data-answers='["00011000"]'>
                         <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
                         <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
                     </div>
                 </div>
                 <div class="question-row">
                     <label class="question-label">6. Shift <code>1100 0000</code> <strong>Right</strong> by 3 places:</label>
-                    <div class="answer-group shift-flex-row green-input" data-answers='["00011000"]'>
+                    <div class="answer-group shift-flex-row green-input" data-label="Green Task Q6 (Shift 1100 0000 Right by 3)" data-answers='["00011000"]'>
                         <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
                         <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
                     </div>
@@ -572,42 +588,42 @@
 
                 <div class="question-row">
                     <label class="question-label">1. <code>0000 0011</code> &rarr; <code>0000 0110</code></label>
-                    <div class="blue-input-row">
+                    <div class="blue-input-row" data-label="Blue Task Q1 (0000 0011 → 0000 0110)">
                         <input type="text" class="auto-input blue-input" data-answers='["left", "l"]' placeholder="Direction (Left/Right)">
                         <input type="text" class="auto-input blue-input" data-answers='["1", "one"]' placeholder="Places (e.g. 1)">
                     </div>
                 </div>
                 <div class="question-row">
                     <label class="question-label">2. <code>1111 0000</code> &rarr; <code>0011 1100</code></label>
-                    <div class="blue-input-row">
+                    <div class="blue-input-row" data-label="Blue Task Q2 (1111 0000 → 0011 1100)">
                         <input type="text" class="auto-input blue-input" data-answers='["right", "r"]' placeholder="Direction (Left/Right)">
                         <input type="text" class="auto-input blue-input" data-answers='["2", "two"]' placeholder="Places (e.g. 2)">
                     </div>
                 </div>
                 <div class="question-row">
                     <label class="question-label">3. <code>0000 1010</code> &rarr; <code>0101 0000</code></label>
-                    <div class="blue-input-row">
+                    <div class="blue-input-row" data-label="Blue Task Q3 (0000 1010 → 0101 0000)">
                         <input type="text" class="auto-input blue-input" data-answers='["left", "l"]' placeholder="Direction (Left/Right)">
                         <input type="text" class="auto-input blue-input" data-answers='["3", "three"]' placeholder="Places (e.g. 3)">
                     </div>
                 </div>
                 <div class="question-row">
                     <label class="question-label">4. <code>1110 0000</code> &rarr; <code>0001 1100</code></label>
-                    <div class="blue-input-row">
+                    <div class="blue-input-row" data-label="Blue Task Q4 (1110 0000 → 0001 1100)">
                         <input type="text" class="auto-input blue-input" data-answers='["right", "r"]' placeholder="Direction (Left/Right)">
                         <input type="text" class="auto-input blue-input" data-answers='["3", "three"]' placeholder="Places (e.g. 3)">
                     </div>
                 </div>
                 <div class="question-row">
                     <label class="question-label">5. <code>0000 0001</code> &rarr; <code>0001 0000</code></label>
-                    <div class="blue-input-row">
+                    <div class="blue-input-row" data-label="Blue Task Q5 (0000 0001 → 0001 0000)">
                         <input type="text" class="auto-input blue-input" data-answers='["left", "l"]' placeholder="Direction (Left/Right)">
                         <input type="text" class="auto-input blue-input" data-answers='["4", "four"]' placeholder="Places (e.g. 4)">
                     </div>
                 </div>
                 <div class="question-row">
                     <label class="question-label">6. <code>1000 0000</code> &rarr; <code>0000 1000</code></label>
-                    <div class="blue-input-row">
+                    <div class="blue-input-row" data-label="Blue Task Q6 (1000 0000 → 0000 1000)">
                         <input type="text" class="auto-input blue-input" data-answers='["right", "r"]' placeholder="Direction (Left/Right)">
                         <input type="text" class="auto-input blue-input" data-answers='["4", "four"]' placeholder="Places (e.g. 4)">
                     </div>
@@ -629,15 +645,15 @@
                 
                 <div class="question-row">
                     <label class="question-label">1.</label>
-                    <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type first takeaway here...">
+                    <input type="text" class="auto-input plenary-input" data-label="Plenary Takeaway 1" style="max-width: 100%;" placeholder="Type first takeaway here...">
                 </div>
                 <div class="question-row">
                     <label class="question-label">2.</label>
-                    <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type second takeaway here...">
+                    <input type="text" class="auto-input plenary-input" data-label="Plenary Takeaway 2" style="max-width: 100%;" placeholder="Type second takeaway here...">
                 </div>
                 <div class="question-row">
                     <label class="question-label">3.</label>
-                    <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type third takeaway here...">
+                    <input type="text" class="auto-input plenary-input" data-label="Plenary Takeaway 3" style="max-width: 100%;" placeholder="Type third takeaway here...">
                 </div>
             </div>
 
@@ -658,7 +674,166 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <script>
-        /* --- KEYBOARD NAVIGATION (Left/Right Arrows for Math Grids) --- */
+        /* ==========================================================================
+           1. FIREBASE CLOUD INITIALIZATION & MARKBOOK SYNC (Method 1)
+           ========================================================================== */
+        const LESSON_ID = "y9-binary-addition-shifts";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+
+        let auth = null;
+        let db = null;
+
+        if (typeof firebase !== 'undefined') {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            auth = firebase.auth();
+            db = firebase.firestore();
+        }
+
+        // Builds a clean, grouped summary array for the Teacher Cloud Markbook
+        function buildStructuredMarkbookItems() {
+            const items = [];
+            let correctCount = 0;
+            let totalGradable = 24; // 6 Red + 6 Amber + 6 Green + 6 Blue
+
+            // A. Lesson Preparation & Notes
+            document.querySelectorAll('.prep-input').forEach(inp => {
+                items.push({
+                    label: inp.getAttribute('data-label') || 'Preparation',
+                    value: inp.value.trim(),
+                    status: 'neutral'
+                });
+            });
+
+            // B. Red, Amber, and Green Bit-Box Groups
+            document.querySelectorAll('.answer-group').forEach(group => {
+                const label = group.getAttribute('data-label') || 'Binary Question';
+                const bitInputs = Array.from(group.querySelectorAll('.bit-box'));
+                const carryInputs = Array.from(group.querySelectorAll('.carry-box'));
+
+                const hasTypedBit = bitInputs.some(inp => inp.value.trim() !== '');
+                const bitStr = hasTypedBit
+                    ? bitInputs.map(inp => inp.value.trim() === '' ? '0' : inp.value.trim()).join('')
+                    : '';
+
+                let displayValue = bitStr;
+                if (carryInputs.length > 0 && hasTypedBit) {
+                    const carryStr = carryInputs.map(inp => inp.value.trim() === '' ? '0' : inp.value.trim()).join('');
+                    displayValue = `Answer: ${bitStr}  |  Carries: ${carryStr}`;
+                }
+
+                let status = 'neutral';
+                if (bitInputs.length > 0 && bitInputs[0].classList.contains('input-correct')) {
+                    const carriesAllCorrect = carryInputs.every(c => !c.classList.contains('input-incorrect'));
+                    status = carriesAllCorrect ? 'correct' : 'incorrect';
+                } else if (bitInputs.length > 0 && bitInputs[0].classList.contains('input-incorrect')) {
+                    status = 'incorrect';
+                }
+
+                if (status === 'correct') correctCount++;
+
+                items.push({
+                    label: label,
+                    value: displayValue,
+                    status: status
+                });
+            });
+
+            // C. Blue Task: Identify the Shift (Direction + Places)
+            document.querySelectorAll('.blue-input-row').forEach(row => {
+                const label = row.getAttribute('data-label') || 'Blue Task';
+                const inputs = Array.from(row.querySelectorAll('.blue-input'));
+                const dirVal = inputs[0] ? inputs[0].value.trim() : '';
+                const placesVal = inputs[1] ? inputs[1].value.trim() : '';
+
+                const isEmpty = !dirVal && !placesVal;
+                const displayValue = isEmpty ? '' : `Direction: ${dirVal || '(blank)'}  |  Places: ${placesVal || '(blank)'}`;
+
+                let status = 'neutral';
+                if (!isEmpty) {
+                    const bothCorrect = inputs.every(i => i.classList.contains('input-correct'));
+                    const anyIncorrect = inputs.some(i => i.classList.contains('input-incorrect'));
+                    if (bothCorrect) {
+                        status = 'correct';
+                        correctCount++;
+                    } else if (anyIncorrect) {
+                        status = 'incorrect';
+                    }
+                }
+
+                items.push({
+                    label: label,
+                    value: displayValue,
+                    status: status
+                });
+            });
+
+            // D. Plenary Takeaways
+            document.querySelectorAll('.plenary-input').forEach(inp => {
+                items.push({
+                    label: inp.getAttribute('data-label') || 'Plenary',
+                    value: inp.value.trim(),
+                    status: 'neutral'
+                });
+            });
+
+            return {
+                items: items,
+                scoreText: `Score: ${correctCount} / ${totalGradable}`
+            };
+        }
+
+        let cloudSyncTimer;
+        function syncWorkToCloud(immediate = false) {
+            if (!auth || !db || !auth.currentUser) return;
+
+            const user = auth.currentUser;
+            const statusPill = document.getElementById('save-status-pill');
+            if (statusPill) statusPill.innerText = "⏳ Saving...";
+
+            clearTimeout(cloudSyncTimer);
+            cloudSyncTimer = setTimeout(() => {
+                const inputs = document.querySelectorAll('.auto-input');
+                const structured = buildStructuredMarkbookItems();
+
+                const payload = {
+                    pageTitle: "Y9 Binary Addition & Shifts",
+                    lastUpdated: Date.now(),
+                    scoreText: structured.scoreText,
+                    items: structured.items
+                };
+
+                // Also save exact per-box values so student's grid reloads seamlessly
+                inputs.forEach((el, i) => {
+                    payload['input_' + i] = el.value;
+                    payload['class_' + i] = el.className;
+                });
+
+                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
+                  .set(payload, { merge: true })
+                  .then(() => {
+                      if (statusPill) statusPill.innerText = "☁️ Saved to Cloud";
+                  })
+                  .catch(err => {
+                      console.error("Cloud sync error:", err);
+                      if (statusPill) statusPill.innerText = "⚠️ Local Backup Only";
+                  });
+            }, immediate ? 50 : 600);
+        }
+
+        /* ==========================================================================
+           2. KEYBOARD NAVIGATION (Left/Right Arrows for Math Grids)
+           ========================================================================== */
         document.addEventListener('keydown', function(e) {
             if(e.target.classList.contains('bit-box') || e.target.classList.contains('carry-box')) {
                 var td = e.target.parentElement;
@@ -678,8 +853,10 @@
             }
         });
 
-        /* --- FIREWALL-PROOF AUTO-SAVE MEMORY LOGIC --- */
-        function saveProgress() {
+        /* ==========================================================================
+           3. AUTO-SAVE & LOAD LOGIC (Cloud + LocalStorage Fallback)
+           ========================================================================== */
+        function saveProgress(immediate = false) {
             try {
                 var inputs = document.querySelectorAll('.auto-input');
                 var dataToSave = {};
@@ -688,39 +865,68 @@
                 }
                 localStorage.setItem('binaryPerBitMemory', JSON.stringify(dataToSave));
             } catch (error) {
-                console.log("Memory saving blocked by browser - ignoring safely.");
+                console.log("Local memory saving blocked - ignoring safely.");
             }
+            syncWorkToCloud(immediate);
+        }
+
+        function applySavedInputs(data) {
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                if (data['input_' + i] !== undefined && data['input_' + i] !== "") {
+                    inputs[i].value = data['input_' + i];
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto';
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
+                    }
+                }
+            }
+            checkAnswers('red-input', false);
+            checkAnswers('amber-input', false);
+            checkAnswers('green-input', false);
+            checkTextAnswers('blue-input', false);
         }
 
         function loadProgress() {
+            // 1. Load LocalStorage first for instant display
             try {
                 var savedDataStr = localStorage.getItem('binaryPerBitMemory');
                 if (savedDataStr) {
-                    var data = JSON.parse(savedDataStr);
-                    var inputs = document.querySelectorAll('.auto-input');
-                    for (var i = 0; i < inputs.length; i++) {
-                        if (data['input_' + i]) {
-                            inputs[i].value = data['input_' + i];
-                            if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                                inputs[i].style.height = 'auto';
-                                inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                            }
-                        }
-                    }
-                    // Auto-mark previously saved answers
-                    checkAnswers('red-input');
-                    checkAnswers('amber-input');
-                    checkAnswers('green-input');
-                    checkTextAnswers('blue-input'); // Added new text checker for the blue task
+                    applySavedInputs(JSON.parse(savedDataStr));
                 }
             } catch (error) {
-                console.log("Memory loading blocked by browser - ignoring safely.");
+                console.log("Local memory loading blocked - ignoring safely.");
+            }
+
+            // 2. Listen for Firebase Cloud Login & load cloud data
+            if (auth && db) {
+                auth.onAuthStateChanged(async (user) => {
+                    const statusPill = document.getElementById('save-status-pill');
+                    if (!user) {
+                        if (statusPill) statusPill.innerText = "💾 Local Mode (Not Logged In)";
+                        return;
+                    }
+
+                    if (statusPill) statusPill.innerText = "☁️ Cloud Sync Active";
+
+                    try {
+                        const doc = await db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).get();
+                        if (doc.exists) {
+                            applySavedInputs(doc.data());
+                        } else {
+                            // If student already typed locally before Firebase finished loading, push it to cloud
+                            syncWorkToCloud(true);
+                        }
+                    } catch (err) {
+                        console.error("Error loading cloud work:", err);
+                    }
+                });
             }
         }
 
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('auto-input')) {
-                saveProgress();
+                saveProgress(false);
                 if (e.target.tagName.toLowerCase() === 'textarea') {
                     e.target.style.height = 'auto';
                     e.target.style.height = e.target.scrollHeight + 'px';
@@ -728,17 +934,24 @@
             }
         });
 
-        function clearData() {
+        async function clearData() {
             if (confirm("Are you sure you want to clear all your work on this page?")) {
                 try { localStorage.removeItem('binaryPerBitMemory'); } catch(e) {}
+                if (auth && db && auth.currentUser) {
+                    try {
+                        await db.collection('users').doc(auth.currentUser.uid).collection('lessons').doc(LESSON_ID).delete();
+                    } catch (e) {}
+                }
                 window.location.reload();
             }
         }
 
         window.onload = loadProgress;
 
-        /* --- UPGRADED BATCH-MARKING PER-BIT AND CARRY LOGIC (Red, Amber, Green) --- */
-        function checkAnswers(taskClass) {
+        /* ==========================================================================
+           4. BATCH-MARKING PER-BIT AND CARRY LOGIC (Red, Amber, Green, Blue)
+           ========================================================================== */
+        function checkAnswers(taskClass, triggerSync = true) {
             var groups = document.querySelectorAll('.' + taskClass);
             groups.forEach(function(group) {
                 
@@ -747,7 +960,6 @@
                 var hasTypedBit = Array.from(bitInputs).some(inp => inp.value.trim() !== '');
                 
                 if (hasTypedBit) {
-                    // Blank inputs safely default to 0 for binary decimal comparison
                     var studentBinaryString = Array.from(bitInputs).map(inp => inp.value.trim() === '' ? '0' : inp.value.trim()).join('');
                     var studentDecimal = parseInt(studentBinaryString, 2);
                     
@@ -780,14 +992,15 @@
                     }
                 }
             });
+
+            if (triggerSync) saveProgress(true);
         }
 
-        /* --- NEW TEXT-MARKING LOGIC (For the Blue Reverse Engineering Task) --- */
-        function checkTextAnswers(className) {
+        function checkTextAnswers(className, triggerSync = true) {
             var inputs = document.querySelectorAll('.' + className);
             inputs.forEach(function(inp) {
                 var studentAnswer = inp.value.replace(/\s+/g, '').toLowerCase(); 
-                if(studentAnswer === '') return; // Skip if they haven't typed anything
+                if(studentAnswer === '') return;
                 
                 var acceptedAnswers = JSON.parse(inp.getAttribute('data-answers'));
                 var isCorrect = acceptedAnswers.some(ans => studentAnswer === ans.toLowerCase());
@@ -795,9 +1008,13 @@
                 inp.classList.remove('input-correct', 'input-incorrect');
                 inp.classList.add(isCorrect ? 'input-correct' : 'input-incorrect');
             });
+
+            if (triggerSync) saveProgress(true);
         }
 
-        /* --- BULLETPROOF PDF GENERATION LOGIC --- */
+        /* ==========================================================================
+           5. BULLETPROOF PDF GENERATION LOGIC
+           ========================================================================== */
         function downloadPDF() {
             if (typeof html2pdf === 'undefined') {
                 alert("The PDF creator is currently blocked by your school's network filter. Please take a screenshot of your work to save it instead.");
@@ -830,7 +1047,7 @@
             };
 
             html2pdf().set(opt).from(element).save().then(function() {
-                for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'block';
+                for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = '';
                 document.getElementById('action-buttons').style.display = 'flex';
                 for (var k = 0; k < textAreas.length; k++) {
                     textAreas[k].style.height = "";
