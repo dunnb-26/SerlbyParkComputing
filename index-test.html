@@ -78,47 +78,58 @@
         const db = firebase.firestore();
 
         // Login Logic
-        async function studentLogin() {
-            const username = document.getElementById('login-username').value.trim().toLowerCase();
-            const pin = document.getElementById('login-pin').value;
-            const err = document.getElementById('login-error');
-            
-            if (!username || !pin) {
-                err.innerText = "Please fill in all fields.";
-                err.style.display = "block";
+       async function processStudentLogin() {
+            const user = document.getElementById('student-username').value.trim();
+            const pin = document.getElementById('student-pin').value.trim();
+            const errorBox = document.getElementById('login-error');
+            const submitBtn = document.getElementById('btn-student-submit');
+
+            if (user === "" || pin === "") {
+                errorBox.innerText = "Please enter both your Username and PIN.";
+                errorBox.style.display = 'block';
                 return;
             }
-            if (pin !== "1234") {
-                err.innerText = "Incorrect PIN.";
-                err.style.display = "block";
-                return;
-            }
-            
+
+            errorBox.style.display = 'none';
+            submitBtn.innerText = "Logging in...";
+
             try {
-                const fakeEmail = `${username}@serlby.student`;
-                let userCredential;
-                
-                try {
-                    userCredential = await firebase.auth().signInWithEmailAndPassword(fakeEmail, pin + "xyz");
-                } catch(e) {
-                    userCredential = await firebase.auth().createUserWithEmailAndPassword(fakeEmail, pin + "xyz");
-                }
-                
+                const userCredential = await auth.signInWithEmailAndPassword(formatEmail(user), pin);
                 const uid = userCredential.user.uid;
                 
-                // Save/Update student profile in Firestore WITHOUT overwriting their allocated class
-                await db.collection("users").doc(uid).set({
-                    username: username,
-                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
+                let displayName = user; // Fallback to username
 
-                document.getElementById('login-modal').style.display = "none";
-                document.getElementById('welcome-msg').innerText = "Logged in: " + username;
-                loadYear('year7');
-                
-            } catch (error) {
-                err.innerText = "Login failed: " + error.message;
-                err.style.display = "block";
+                const userDoc = await db.collection("users").doc(uid).get();
+                if (!userDoc.exists) {
+                    await db.collection("users").doc(uid).set({
+                        username: user,
+                        fullName: user,
+                        className: "Unassigned",
+                        lastLogin: Date.now()
+                    });
+                } else {
+                    // Grab their actual full name from Firebase instantly
+                    const data = userDoc.data();
+                    if (data.fullName) {
+                        displayName = data.fullName;
+                    }
+                }
+
+                // Instantly update the header with their Full Name
+                const welcomeMsg = document.getElementById('welcome-msg');
+                if (welcomeMsg) {
+                    welcomeMsg.innerText = "Logged in: " + displayName;
+                }
+
+                document.getElementById('login-gate').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('login-gate').style.display = 'none';
+                    document.body.classList.remove('locked');
+                }, 500);
+            } catch (err) {
+                submitBtn.innerText = "Log In";
+                errorBox.innerText = "Incorrect username or PIN.";
+                errorBox.style.display = 'block';
             }
         }
 
