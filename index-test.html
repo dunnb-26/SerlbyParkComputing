@@ -334,19 +334,32 @@
                 let displayFullName = cleanUsername;
                 let displayClass = "";
 
-                try {
-                    const userDoc = await db.collection("users").doc(user.uid).get();
-                    if (userDoc.exists) {
-                        const data = userDoc.data();
-                        // Pulls the student's Full Name from Firestore
-                        displayFullName = data.fullName || data.full_name || data.name || cleanUsername;
-                        if (data.className && data.className !== "Unassigned") {
-                            displayClass = ` (${data.className})`;
-                        }
-                    }
-                } catch (err) {
-                    console.error("Error fetching user profile:", err);
-                }
+               try {
+    const userDoc = await db.collection("users").doc(user.uid).get();
+
+    console.log("Logged in UID:", user.uid);
+    console.log("Logged in email:", user.email);
+    console.log("Firestore document exists:", userDoc.exists);
+
+    if (userDoc.exists) {
+        const data = userDoc.data();
+
+        console.log("Firestore user data:", data);
+        console.log("Full name field:", data.fullName);
+
+        if (data.fullName && data.fullName.trim() !== "") {
+            displayFullName = data.fullName.trim();
+        }
+
+        if (data.className && data.className !== "Unassigned") {
+            displayClass = ` (${data.className})`;
+        }
+    } else {
+        console.error("No Firestore user document found for UID:", user.uid);
+    }
+} catch (err) {
+    console.error("Error fetching user profile:", err);
+}
 
                 // Show Full Name + Log Out button in the top header
                 document.getElementById('logged-in-label').innerText = `🎓 ${displayFullName}${displayClass}`;
