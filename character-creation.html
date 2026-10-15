@@ -500,7 +500,7 @@
                   })
                   .catch(err => {
                       console.error("Cloud sync error:", err);
-                      if (statusPill) statusPill.innerText = "⚠️ Local Backup Only";
+                      if (statusPill) statusPill.innerText = "⚠️ Sync Error";
                   });
             }, immediate ? 50 : 600);
         }
@@ -549,7 +549,6 @@
                 for (var i = 0; i < inputs.length; i++) {
                     userBinaryDesigns['note_' + i] = inputs[i].value;
                 }
-                localStorage.setItem('binaryStudioMemory', JSON.stringify(userBinaryDesigns));
                 syncWorkToCloud(false);
             }
         });
@@ -575,20 +574,12 @@
         }
 
         function loadProgress() {
-            try {
-                var savedDataStr = localStorage.getItem('binaryStudioMemory');
-                if (savedDataStr) {
-                    applySavedData(JSON.parse(savedDataStr));
-                }
-            } catch (error) {
-                console.log("Local memory loading blocked - ignoring safely.");
-            }
-
             if (auth && db) {
                 auth.onAuthStateChanged(async (user) => {
                     const statusPill = document.getElementById('save-status-pill');
                     if (!user) {
                         if (statusPill) statusPill.innerText = "💾 Local Mode (Not Logged In)";
+                        switchTask();
                         return;
                     }
 
@@ -600,9 +591,11 @@
                             applySavedData(doc.data());
                         } else {
                             syncWorkToCloud(true);
+                            switchTask();
                         }
                     } catch (err) {
                         console.error("Error loading cloud work:", err);
+                        switchTask();
                     }
                 });
             } else {
@@ -709,7 +702,6 @@
             updateScoreboard();
 
             if (triggerSync) {
-                localStorage.setItem('binaryStudioMemory', JSON.stringify(userBinaryDesigns));
                 syncWorkToCloud(false);
             }
         }
@@ -739,8 +731,6 @@
 
         async function clearAllData() {
             if (confirm("Are you sure you want to clear EVERYTHING including your text notes and all 4 binary drawings?")) {
-                localStorage.removeItem('binaryStudioMemory');
-                
                 if (auth && db && auth.currentUser) {
                     try {
                         await db.collection('users').doc(auth.currentUser.uid).collection('lessons').doc(LESSON_ID).delete();
