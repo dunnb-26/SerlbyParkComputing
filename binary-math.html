@@ -129,8 +129,6 @@
         /* Buttons */
         .btn-submit { background-color: var(--navy); color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; max-width: 200px; transition: background-color 0.2s; }
         .btn-submit:hover { background-color: #152960; }
-        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
-        .btn-pdf:hover { background-color: #124d2d; }
     </style>
 </head>
 <body>
@@ -142,8 +140,8 @@
             <h1>Binary Addition & Shifts</h1>
         </div>
         <div class="header-right">
-            <span id="save-status-pill" class="no-print">💾 Local Mode</span>
-            <a href="javascript:history.back()" class="back-btn no-print">&larr; Back to Unit</a>
+            <span id="save-status-pill">💾 Local Mode</span>
+            <a href="javascript:history.back()" class="back-btn">&larr; Back to Unit</a>
         </div>
     </header>
 
@@ -325,7 +323,7 @@
                     </table>
                 </div>
             </div>
-            <button class="btn-submit no-print" style="background-color: var(--maroon);" onclick="checkAnswers('red-input')">Check Answers</button>
+            <button class="btn-submit" style="background-color: var(--maroon);" onclick="checkAnswers('red-input')">Check Answers</button>
         </div>
 
         <!-- AMBER TASK: 8-Bit Binary Addition -->
@@ -523,7 +521,7 @@
                     </table>
                 </div>
             </div>
-            <button class="btn-submit no-print" style="background-color: var(--yellow); color: var(--navy);" onclick="checkAnswers('amber-input')">Check Answers</button>
+            <button class="btn-submit" style="background-color: var(--yellow); color: var(--navy);" onclick="checkAnswers('amber-input')">Check Answers</button>
         </div>
 
         <!-- GREEN TASK: Left & Right Shifts -->
@@ -575,7 +573,7 @@
                     <input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1"><input type="text" class="auto-input bit-box" maxlength="1">
                 </div>
             </div>
-            <button class="btn-submit no-print" style="background-color: #008f39;" onclick="checkAnswers('green-input')">Check Answers</button>
+            <button class="btn-submit" style="background-color: #008f39;" onclick="checkAnswers('green-input')">Check Answers</button>
         </div>
 
         <!-- BLUE TASK: Identify the Shift -->
@@ -627,14 +625,7 @@
                     <input type="text" class="auto-input blue-input" data-answers='["4", "four"]' placeholder="Places (e.g. 4)">
                 </div>
             </div>
-            <button class="btn-submit no-print" onclick="checkTextAnswers('blue-input')">Check Answers</button>
-        </div>
-
-        <!-- CHALLENGE GAME LINK -->
-        <div class="task-card no-print" style="border: 2px solid #dfaa2b; text-align: center; background-color: #fdfbf7;">
-            <h2 style="color: #1e3a8a; margin-top: 0; font-size: 24px;">🎮 Finished Early? Play Binary Drop!</h2>
-            <p style="font-size: 16px; color: #555; margin-bottom: 20px;">Test your conversion speed against the clock in the Delta Time Attack game. Race to convert as many denary and binary numbers as you can in 60 seconds!</p>
-            <a href="binary-game.html" class="btn-submit" style="margin: 0 auto; background-color: #dfaa2b; color: #1e3a8a; text-decoration: none; display: inline-block; width: 250px;">Start Time Attack Game &rarr;</a>
+            <button class="btn-submit" onclick="checkTextAnswers('blue-input')">Check Answers</button>
         </div>
 
         <!-- PLENARY: 3 Key Takeaways -->
@@ -658,18 +649,13 @@
 
     </main>
 
-    <!-- ACTION BUTTONS -->
-    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 180px;" onclick="clearData()">Reset Page</button>
-    </div>
-    
     <footer>
         &copy; 2026 Delta Serlby Park - Computing Department
     </footer>
 
     <script>
         /* ==========================================================================
-           1. FIREBASE CLOUD INITIALIZATION & MARKBOOK SYNC (Method 1)
+           1. FIREBASE CLOUD INITIALIZATION & MARKBOOK SYNC
            ========================================================================== */
         const LESSON_ID = "y9-binary-addition-shifts";
 
@@ -694,13 +680,11 @@
             db = firebase.firestore();
         }
 
-        // Builds a clean, grouped summary array for the Teacher Cloud Markbook
         function buildStructuredMarkbookItems() {
             const items = [];
             let correctCount = 0;
-            let totalGradable = 24; // 6 Red + 6 Amber + 6 Green + 6 Blue
+            let totalGradable = 24; 
 
-            // A. Lesson Preparation & Notes
             document.querySelectorAll('.prep-input').forEach(inp => {
                 items.push({
                     label: inp.getAttribute('data-label') || 'Preparation',
@@ -709,7 +693,6 @@
                 });
             });
 
-            // B. Red, Amber, and Green Bit-Box Groups
             document.querySelectorAll('.answer-group').forEach(group => {
                 const label = group.getAttribute('data-label') || 'Binary Question';
                 const bitInputs = Array.from(group.querySelectorAll('.bit-box'));
@@ -743,7 +726,6 @@
                 });
             });
 
-            // C. Blue Task: Identify the Shift (Direction + Places)
             document.querySelectorAll('.blue-input-row').forEach(row => {
                 const label = row.getAttribute('data-label') || 'Blue Task';
                 const inputs = Array.from(row.querySelectorAll('.blue-input'));
@@ -772,7 +754,6 @@
                 });
             });
 
-            // D. Plenary Takeaways
             document.querySelectorAll('.plenary-input').forEach(inp => {
                 items.push({
                     label: inp.getAttribute('data-label') || 'Plenary',
@@ -807,7 +788,6 @@
                     items: structured.items
                 };
 
-                // Also save exact per-box values so student's grid reloads seamlessly
                 inputs.forEach((el, i) => {
                     payload['input_' + i] = el.value;
                     payload['class_' + i] = el.className;
@@ -820,14 +800,11 @@
                   })
                   .catch(err => {
                       console.error("Cloud sync error:", err);
-                      if (statusPill) statusPill.innerText = "⚠️ Local Backup Only";
+                      if (statusPill) statusPill.innerText = "⚠️ Sync Error";
                   });
             }, immediate ? 50 : 600);
         }
 
-        /* ==========================================================================
-           2. KEYBOARD NAVIGATION (Left/Right Arrows for Math Grids)
-           ========================================================================== */
         document.addEventListener('keydown', function(e) {
             if(e.target.classList.contains('bit-box') || e.target.classList.contains('carry-box')) {
                 var td = e.target.parentElement;
@@ -847,23 +824,6 @@
             }
         });
 
-        /* ==========================================================================
-           3. AUTO-SAVE & LOAD LOGIC (Cloud + LocalStorage Fallback)
-           ========================================================================== */
-        function saveProgress(immediate = false) {
-            try {
-                var inputs = document.querySelectorAll('.auto-input');
-                var dataToSave = {};
-                for (var i = 0; i < inputs.length; i++) {
-                    dataToSave['input_' + i] = inputs[i].value;
-                }
-                localStorage.setItem('binaryPerBitMemory', JSON.stringify(dataToSave));
-            } catch (error) {
-                console.log("Local memory saving blocked - ignoring safely.");
-            }
-            syncWorkToCloud(immediate);
-        }
-
         function applySavedInputs(data) {
             var inputs = document.querySelectorAll('.auto-input');
             for (var i = 0; i < inputs.length; i++) {
@@ -882,17 +842,6 @@
         }
 
         function loadProgress() {
-            // 1. Load LocalStorage first for instant display
-            try {
-                var savedDataStr = localStorage.getItem('binaryPerBitMemory');
-                if (savedDataStr) {
-                    applySavedInputs(JSON.parse(savedDataStr));
-                }
-            } catch (error) {
-                console.log("Local memory loading blocked - ignoring safely.");
-            }
-
-            // 2. Listen for Firebase Cloud Login & load cloud data
             if (auth && db) {
                 auth.onAuthStateChanged(async (user) => {
                     const statusPill = document.getElementById('save-status-pill');
@@ -908,7 +857,6 @@
                         if (doc.exists) {
                             applySavedInputs(doc.data());
                         } else {
-                            // If student already typed locally before Firebase finished loading, push it to cloud
                             syncWorkToCloud(true);
                         }
                     } catch (err) {
@@ -920,7 +868,7 @@
 
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('auto-input')) {
-                saveProgress(false);
+                syncWorkToCloud(false);
                 if (e.target.tagName.toLowerCase() === 'textarea') {
                     e.target.style.height = 'auto';
                     e.target.style.height = e.target.scrollHeight + 'px';
@@ -928,28 +876,11 @@
             }
         });
 
-        async function clearData() {
-            if (confirm("Are you sure you want to clear all your work on this page?")) {
-                try { localStorage.removeItem('binaryPerBitMemory'); } catch(e) {}
-                if (auth && db && auth.currentUser) {
-                    try {
-                        await db.collection('users').doc(auth.currentUser.uid).collection('lessons').doc(LESSON_ID).delete();
-                    } catch (e) {}
-                }
-                window.location.reload();
-            }
-        }
-
         window.onload = loadProgress;
 
-        /* ==========================================================================
-           4. BATCH-MARKING PER-BIT AND CARRY LOGIC (Red, Amber, Green, Blue)
-           ========================================================================== */
         function checkAnswers(taskClass, triggerSync = true) {
             var groups = document.querySelectorAll('.' + taskClass);
             groups.forEach(function(group) {
-                
-                // 1. Grade the Main Answer Bits
                 var bitInputs = group.querySelectorAll('.bit-box');
                 var hasTypedBit = Array.from(bitInputs).some(inp => inp.value.trim() !== '');
                 
@@ -967,7 +898,6 @@
                         inp.classList.add(isCorrect ? 'input-correct' : 'input-incorrect');
                     });
 
-                    // 2. Grade the Carry Bits Box-by-Box (Only if they exist)
                     var carryInputs = group.querySelectorAll('.carry-box');
                     if (carryInputs.length > 0) {
                         var expectedCarries = JSON.parse(group.getAttribute('data-carries'))[0];
@@ -987,7 +917,7 @@
                 }
             });
 
-            if (triggerSync) saveProgress(true);
+            if (triggerSync) syncWorkToCloud(false);
         }
 
         function checkTextAnswers(className, triggerSync = true) {
@@ -1003,7 +933,7 @@
                 inp.classList.add(isCorrect ? 'input-correct' : 'input-incorrect');
             });
 
-            if (triggerSync) saveProgress(true);
+            if (triggerSync) syncWorkToCloud(false);
         }
     </script>
 </body>
