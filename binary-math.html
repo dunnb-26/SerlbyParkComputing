@@ -3,48 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lesson 1 - Binary Conversions</title>
-    <link rel="stylesheet" href="style.css">
-
-    <!-- Firebase SDKs -->
+    <title>Binary Addition & Shifts - Lesson</title>
+    
+    <!-- Firebase SDKs for Teacher Cloud Markbook -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
-        .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
+        :root {
+            /* Official Delta Serlby Park Color Scheme */
+            --navy: #1B1464; 
+            --yellow: #F7931D;
+            --maroon: #822433;
+            --bg-color: #f4f6f8;
+            --text-color: #333;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+        }
+
+        header { 
+            background-color: var(--navy); 
+            color: white; 
+            padding: 20px; 
+            display: grid; 
+            grid-template-columns: 1fr auto 1fr; 
+            align-items: center; 
+            border-bottom: 6px solid var(--maroon); 
+        }
+
+        .header-left { display: flex; justify-content: flex-start; }
+        .header-center { text-align: center; }
+        .header-right { display: flex; justify-content: flex-end; align-items: center; gap: 12px; }
+        header img { height: 80px; background-color: white; border-radius: 8px; padding: 5px; }
+        header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; }
+        
+        .back-btn { background-color: var(--yellow); color: var(--navy); text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; transition: transform 0.2s; }
+        .back-btn:hover { transform: scale(1.05); }
+
+        #save-status-pill {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .task-container { max-width: 1050px; margin: 30px auto; padding: 20px; }
         .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid; }
         
-        .task-prep { border-top: 6px solid #607d8b; } .task-prep h2 { color: #607d8b; margin-top: 0; }
-        .task-plenary { border-top: 6px solid #673ab7; } .task-plenary h2 { color: #673ab7; margin-top: 0; }
-
-        .task-maroon { border-top: 6px solid #800000; } .task-maroon h2 { color: #800000; margin-top: 0; } .task-maroon .instruction-box { border-left: 4px solid #800000; }
-        .task-amber { border-top: 6px solid #ffb300; } .task-amber h2 { color: #ffb300; margin-top: 0; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); } .task-amber .instruction-box { border-left: 4px solid #ffb300; }
-        .task-green { border-top: 6px solid #008f39; } .task-green h2 { color: #008f39; margin-top: 0; } .task-green .instruction-box { border-left: 4px solid #008f39; }
-        .task-navy { border-top: 6px solid #1e3a8a; } .task-navy h2 { color: #1e3a8a; margin-top: 0; } .task-navy .instruction-box { border-left: 4px solid #1e3a8a; }
-
-        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; text-align: center; }
+        /* Section Header Colors */
+        .task-prep { border-top: 6px solid #607d8b; } 
+        .task-prep h2 { color: #607d8b; margin-top: 0; }
         
+        .task-plenary { border-top: 6px solid #673ab7; } 
+        .task-plenary h2 { color: #673ab7; margin-top: 0; }
+
+        .task-maroon { border-top: 6px solid var(--maroon); } 
+        .task-maroon h2 { color: var(--maroon); margin-top: 0; }
+        .task-maroon .instruction-box { border-left: 4px solid var(--maroon); }
+
+        .task-amber { border-top: 6px solid var(--yellow); } 
+        .task-amber h2 { color: var(--yellow); margin-top: 0; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
+        .task-amber .instruction-box { border-left: 4px solid var(--yellow); }
+
+        .task-green { border-top: 6px solid #008f39; } 
+        .task-green h2 { color: #008f39; margin-top: 0; }
+        .task-green .instruction-box { border-left: 4px solid #008f39; }
+
+        .task-navy { border-top: 6px solid var(--navy); } 
+        .task-navy h2 { color: var(--navy); margin-top: 0; }
+        .task-navy .instruction-box { border-left: 4px solid var(--navy); }
+
+        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 25px; text-align: center; }
+        
+        /* Notes & Prep Inputs */
         .question-row { margin-bottom: 20px; }
-        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
+        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: var(--text-color); font-weight: bold; }
         
         .auto-input { 
-            width: 100%; max-width: 350px; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; 
-            transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit;
+            width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; 
+            border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; 
+            background-color: white; font-family: inherit;
         }
         .auto-input:focus { outline: none; border-color: #666; }
-        textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; max-width: 100%; }
+        textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; }
 
-        .helper-headings { display: flex; gap: 4px; max-width: 250px; margin-bottom: 4px; }
-        .helper-headings span { flex: 1; text-align: center; font-size: 11px; font-weight: bold; color: #666; background: #e9ecef; border-radius: 2px; padding: 2px 0; }
-        .helper-headings-8bit { max-width: 400px; }
-
-        .input-correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
-        .input-incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
+        /* --- PER-BIT MATH GRID STYLING --- */
+        .sum-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 30px; margin-bottom: 20px; }
+        .math-sum { background: #fdfdfd; padding: 20px; border-radius: 8px; border: 1px solid #ddd; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .sum-number { position: absolute; top: 15px; left: 15px; font-family: 'Segoe UI', sans-serif; font-size: 18px; font-weight: bold; color: #888; }
         
-        .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; max-width: 200px; transition: background-color 0.2s; }
-        .btn-submit:hover { background-color: #152960; }
+        .sum-table { border-collapse: collapse; font-family: 'Courier New', Courier, monospace; font-size: 22px; font-weight: bold; margin: 0 auto; }
+        .sum-table td { text-align: center; padding: 4px; width: 35px; }
+        .sum-line td { border-top: 3px solid #333; height: 8px; padding: 0; }
+        
+        .bit-box, .carry-box { 
+            width: 100%; height: 40px; text-align: center; font-family: 'Courier New', monospace; 
+            font-size: 20px; font-weight: bold; border: 2px solid #ccc; border-radius: 4px; 
+            padding: 0; box-sizing: border-box; transition: all 0.2s; background: white;
+        }
+        .bit-box:focus { border-color: var(--navy); background-color: #e6f2ff; outline: none; }
+        
+        /* Carry Row - Below the answer */
+        .carry-box { border-color: #d32f2f; color: #d32f2f; font-size: 16px; height: 30px; background: #fffafb; }
+        .carry-box:focus { border-color: var(--maroon); background-color: #ffebee; outline: none; }
+        .carry-label { font-family: 'Segoe UI', sans-serif; font-size: 12px; color: #d32f2f; text-transform: uppercase; text-align: right; padding-right: 10px; font-weight: bold; }
 
+        .input-correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100 !important; font-weight: bold; }
+        .input-incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c !important; font-weight: bold; }
+
+        /* Shifts Flex Row */
+        .shift-flex-row { display: flex; gap: 6px; max-width: 400px; margin-top: 8px; }
+        .blue-input-row { display: flex; gap: 15px; margin-top: 5px; }
+        .blue-input-row input { flex: 1; }
+
+        /* Buttons */
+        .btn-submit { background-color: var(--navy); color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; max-width: 200px; transition: background-color 0.2s; }
+        .btn-submit:hover { background-color: #152960; }
+        
         .btn-reset { 
             background-color: #d32f2f; 
             color: white; 
@@ -61,291 +146,244 @@
             max-width: 180px; 
         }
         .btn-reset:hover { background-color: #b71c1c; }
-
-        #save-status-pill {
-            position: fixed; bottom: 20px; right: 20px; background: #1e3a8a; color: white; padding: 8px 16px; border-radius: 20px;
-            font-size: 13px; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.2); z-index: 1000;
-        }
     </style>
 </head>
 <body>
-    <div id="save-status-pill">☁️ Loading your work...</div>
+    <header>
+        <div class="header-left">
+            <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
+        </div>
+        <div class="header-center">
+            <h1>Binary Addition & Shifts</h1>
+        </div>
+        <div class="header-right">
+            <span id="save-status-pill">💾 Local Mode</span>
+            <a href="javascript:history.back()" class="back-btn">&larr; Back to Unit</a>
+        </div>
+    </header>
 
-    <div id="pdf-content">
-        <header>
-            <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a></div>
-            <div class="header-center"><h1>Binary Conversions</h1></div>
-            <div class="header-right"><a href="binary-hex.html" class="back-btn">&larr; Back to Unit</a></div>
-        </header>
+    <main class="task-container">
 
-        <main class="task-container">
-            <div class="task-card task-prep">
-                <h2>Lesson Preparation</h2>
-                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">4 Key Words</h3>
-                <div class="question-row"><label class="question-label">Binary</label><input type="text" class="auto-input prep-input" data-label="Key Word: Binary" style="max-width: 100%;" placeholder="Type definition here..."></div>
-                <div class="question-row"><label class="question-label">Denary / Decimal</label><input type="text" class="auto-input prep-input" data-label="Key Word: Denary" style="max-width: 100%;" placeholder="Type definition here..."></div>
-                <div class="question-row"><label class="question-label">Bit</label><input type="text" class="auto-input prep-input" data-label="Key Word: Bit" style="max-width: 100%;" placeholder="Type definition here..."></div>
-                <div class="question-row"><label class="question-label">Byte</label><input type="text" class="auto-input prep-input" data-label="Key Word: Byte" style="max-width: 100%;" placeholder="Type definition here..."></div>
-
-                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Lesson Notes</h3>
-                <div class="question-row"><textarea class="auto-input prep-input" data-label="Lesson Notes" rows="6" placeholder="Write your notes about today's lesson here..."></textarea></div>
+        <!-- PREPARATION -->
+        <div class="task-card task-prep">
+            <h2>Lesson Preparation</h2>
+            
+            <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">4 Key Words</h3>
+            <div class="question-row">
+                <label class="question-label">Bit</label>
+                <input type="text" class="auto-input prep-input" data-label="Key Word: Bit" placeholder="Type definition here...">
+            </div>
+            <div class="question-row">
+                <label class="question-label">Carry</label>
+                <input type="text" class="auto-input prep-input" data-label="Key Word: Carry" placeholder="Type definition here...">
+            </div>
+            <div class="question-row">
+                <label class="question-label">Overflow</label>
+                <input type="text" class="auto-input prep-input" data-label="Key Word: Overflow" placeholder="Type definition here...">
+            </div>
+            <div class="question-row">
+                <label class="question-label">Sum</label>
+                <input type="text" class="auto-input prep-input" data-label="Key Word: Sum" placeholder="Type definition here...">
             </div>
 
-            <div class="task-card task-maroon">
-                <h2>Red Task: 4-Bit Binary to Denary</h2>
-                <div class="instruction-box">Convert the 4-bit binary numbers into denary (decimal) numbers. <em>(Hint: Use the place-value headings 8, 4, 2, 1)</em></div>
-                <div class="question-row"><label class="question-label">1. Convert binary <code>1011</code> to denary:</label><div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div><input type="text" class="auto-input red-input graded-input" data-label="Red Task Q1 (1011)" data-answers='["11"]' placeholder="Enter answer here..."></div>
-                <div class="question-row"><label class="question-label">2. Convert binary <code>0101</code> to denary:</label><div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div><input type="text" class="auto-input red-input graded-input" data-label="Red Task Q2 (0101)" data-answers='["5"]' placeholder="Enter answer here..."></div>
-                <div class="question-row"><label class="question-label">3. Convert binary <code>1110</code> to denary:</label><input type="text" class="auto-input red-input graded-input" data-label="Red Task Q3 (1110)" data-answers='["14"]' placeholder="Enter answer here..."></div>
-                <div class="question-row"><label class="question-label">4. Convert binary <code>1000</code> to denary:</label><input type="text" class="auto-input red-input graded-input" data-label="Red Task Q4 (1000)" data-answers='["8"]' placeholder="Enter answer here..."></div>
-                <button class="btn-submit" onclick="checkAnswers('red-input'); syncWorkToCloud(true);">Check Answers</button>
+            <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Lesson Notes</h3>
+            <div class="question-row" style="margin-bottom: 0;">
+                <textarea class="auto-input prep-input" data-label="Lesson Notes" rows="6" placeholder="Write your notes about today's lesson here..."></textarea>
+            </div>
+        </div>
+
+        <!-- RED TASK: 4-Bit Binary Addition -->
+        <div class="task-card task-maroon">
+            <h2>Red Task: 4-Bit Binary Addition</h2>
+            <div class="instruction-box">
+                Calculate the sums starting from the right. Type your answer bits into the grey boxes, and use the smaller red boxes underneath to track your <strong>Carries</strong>.<br>
+                <em>(Tip: If a carry is 0, you can safely leave the box blank!)</em>
             </div>
 
-            <div class="task-card task-amber">
-                <h2>Amber Task: 8-Bit Binary to Denary</h2>
-                <div class="instruction-box">Convert the 8-bit binary numbers into denary numbers. <em>(Hint: 128, 64, 32, 16, 8, 4, 2, 1)</em></div>
-                <div class="question-row"><label class="question-label">1. Convert binary <code>10010110</code> to denary:</label><div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div><input type="text" class="auto-input amber-input graded-input" data-label="Amber Task Q1 (10010110)" data-answers='["150"]' placeholder="Enter answer here..."></div>
-                <div class="question-row"><label class="question-label">2. Convert binary <code>00011101</code> to denary:</label><div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div><input type="text" class="auto-input amber-input graded-input" data-label="Amber Task Q2 (00011101)" data-answers='["29"]' placeholder="Enter answer here..."></div>
-                <div class="question-row"><label class="question-label">3. Convert binary <code>11000011</code> to denary:</label><input type="text" class="auto-input amber-input graded-input" data-label="Amber Task Q3 (11000011)" data-answers='["195"]' placeholder="Enter answer here..."></div>
-                <div class="question-row"><label class="question-label">4. Convert binary <code>11111111</code> to denary:</label><input type="text" class="auto-input amber-input graded-input" data-label="Amber Task Q4 (11111111)" data-answers='["255"]' placeholder="Enter answer here..."></div>
-                <button class="btn-submit" onclick="checkAnswers('amber-input'); syncWorkToCloud(true);">Check Answers</button>
+            <div class="sum-grid">
+                <!-- Q1 -->
+                <div class="math-sum answer-group red-input" data-label="Red Task Q1 (0110 + 0011)" data-answers='["1001"]' data-carries='["1100"]'>
+                    <div class="sum-number">1.</div>
+                    <table class="sum-table">
+                        <tr><td></td><td>0</td><td>1</td><td>1</td><td>0</td></tr>
+                        <tr><td>+</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="sum-line"><td colspan="5"></td></tr>
+                        <tr>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                        </tr>
+                        <tr>
+                            <td class="carry-label">Carry</td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                        </tr>
+                    </table>
+                </div>
+                <!-- Q2 -->
+                <div class="math-sum answer-group red-input" data-label="Red Task Q2 (0101 + 0100)" data-answers='["1001"]' data-carries='["1000"]'>
+                    <div class="sum-number">2.</div>
+                    <table class="sum-table">
+                        <tr><td></td><td>0</td><td>1</td><td>0</td><td>1</td></tr>
+                        <tr><td>+</td><td>0</td><td>1</td><td>0</td><td>0</td></tr>
+                        <tr class="sum-line"><td colspan="5"></td></tr>
+                        <tr>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                        </tr>
+                        <tr>
+                            <td class="carry-label">Carry</td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                        </tr>
+                    </table>
+                </div>
+                <!-- Q3 -->
+                <div class="math-sum answer-group red-input" data-label="Red Task Q3 (1010 + 0101)" data-answers='["1111"]' data-carries='["0000"]'>
+                    <div class="sum-number">3.</div>
+                    <table class="sum-table">
+                        <tr><td></td><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr><td>+</td><td>0</td><td>1</td><td>0</td><td>1</td></tr>
+                        <tr class="sum-line"><td colspan="5"></td></tr>
+                        <tr>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                        </tr>
+                        <tr>
+                            <td class="carry-label">Carry</td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                        </tr>
+                    </table>
+                </div>
+                <!-- Q4 (Overflow) -->
+                <div class="math-sum answer-group red-input" data-label="Red Task Q4 (1001 + 1001)" data-answers='["10010"]' data-carries='["0010"]'>
+                    <div class="sum-number">4.</div>
+                    <table class="sum-table">
+                        <tr><td></td><td>1</td><td>0</td><td>0</td><td>1</td></tr>
+                        <tr><td>+</td><td>1</td><td>0</td><td>0</td><td>1</td></tr>
+                        <tr class="sum-line"><td colspan="5"></td></tr>
+                        <tr>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                        </tr>
+                        <tr>
+                            <td class="carry-label">Carry</td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                        </tr>
+                    </table>
+                </div>
+                <!-- Q5 (Overflow) -->
+                <div class="math-sum answer-group red-input" data-label="Red Task Q5 (1100 + 0111)" data-answers='["10011"]' data-carries='["1000"]'>
+                    <div class="sum-number">5.</div>
+                    <table class="sum-table">
+                        <tr><td></td><td>1</td><td>1</td><td>0</td><td>0</td></tr>
+                        <tr><td>+</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="sum-line"><td colspan="5"></td></tr>
+                        <tr>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                        </tr>
+                        <tr>
+                            <td class="carry-label">Carry</td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                        </tr>
+                    </table>
+                </div>
+                <!-- Q6 (Overflow) -->
+                <div class="math-sum answer-group red-input" data-label="Red Task Q6 (1111 + 0001)" data-answers='["10000"]' data-carries='["1110"]'>
+                    <div class="sum-number">6.</div>
+                    <table class="sum-table">
+                        <tr><td></td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr><td>+</td><td>0</td><td>0</td><td>0</td><td>1</td></tr>
+                        <tr class="sum-line"><td colspan="5"></td></tr>
+                        <tr>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                        </tr>
+                        <tr>
+                            <td class="carry-label">Carry</td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <button class="btn-submit" style="background-color: var(--maroon);" onclick="checkAnswers('red-input')">Check Answers</button>
+        </div>
+
+        <!-- AMBER TASK: 8-Bit Binary Addition -->
+        <div class="task-card task-amber">
+            <h2>Amber Task: 8-Bit Binary Addition</h2>
+            <div class="instruction-box">
+                Level up to 8-bit addition. Make sure to track your carries, and be aware that <strong>overflow errors</strong> will result in a 9-bit answer!
             </div>
 
-            <div class="task-card task-green">
-                <h2>Green Task: 4-Bit Denary to Binary</h2>
-                <div class="instruction-box">Convert the denary numbers into 4-bit binary codes.</div>
-                <div class="question-row"><label class="question-label">1. Convert denary <code>7</code> to 4-bit binary:</label><div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div><input type="text" class="auto-input green-input graded-input" data-label="Green Task Q1 (7)" data-answers='["0111", "7"]' placeholder="Enter answer here..."></div>
-                <div class="question-row"><label class="question-label">2. Convert denary <code>12</code> to 4-bit binary:</label><div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div><input type="text" class="auto-input green-input graded-input" data-label="Green Task Q2 (12)" data-answers='["1100"]' placeholder="Enter answer here..."></div>
-                <div class="question-row"><label class="question-label">3. Convert denary <code>9</code> to 4-bit binary:</label><input type="text" class="auto-input green-input graded-input" data-label="Green Task Q3 (9)" data-answers='["1001"]' placeholder="Enter answer here..."></div>
-                <div class="question-row"><label class="question-label">4. Convert denary <code>15</code> to 4-bit binary:</label><input type="text" class="auto-input green-input graded-input" data-label="Green Task Q4 (15)" data-answers='["1111"]' placeholder="Enter answer here..."></div>
-                <button class="btn-submit" onclick="checkAnswers('green-input'); syncWorkToCloud(true);">Check Answers</button>
-            </div>
-
-            <div class="task-card task-navy">
-                <h2>Blue Task: 8-Bit Denary to Binary</h2>
-                <div class="instruction-box">Convert the denary numbers into full 8-bit binary codes.</div>
-                <div class="question-row"><label class="question-label">1. Convert denary <code>45</code> to 8-bit binary:</label><div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div><input type="text" class="auto-input navy-input graded-input" data-label="Blue Task Q1 (45)" data-answers='["00101101"]' placeholder="Enter answer here..."></div>
-                <div class="question-row"><label class="question-label">2. Convert denary <code>168</code> to 8-bit binary:</label><div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div><input type="text" class="auto-input navy-input graded-input" data-label="Blue Task Q2 (168)" data-answers='["10101000"]' placeholder="Enter answer here..."></div>
-                <div class="question-row"><label class="question-label">3. Convert denary <code>210</code> to 8-bit binary:</label><input type="text" class="auto-input navy-input graded-input" data-label="Blue Task Q3 (210)" data-answers='["11010010"]' placeholder="Enter answer here..."></div>
-                <div class="question-row"><label class="question-label">4. Convert denary <code>15</code> to 8-bit binary:</label><input type="text" class="auto-input navy-input graded-input" data-label="Blue Task Q4 (15)" data-answers='["00001111"]' placeholder="Enter answer here..."></div>
-                <button class="btn-submit" onclick="checkAnswers('navy-input'); syncWorkToCloud(true);">Check Answers</button>
-            </div>
-
-            <div class="task-card task-plenary">
-                <h2>Lesson Plenary</h2>
-                <h3 style="color: #444; margin-bottom: 15px;">My 3 Key Takeaways</h3>
-                <div class="question-row"><label class="question-label">1.</label><input type="text" class="auto-input prep-input" data-label="Plenary Takeaway 1" style="max-width: 100%;" placeholder="Type first takeaway here..."></div>
-                <div class="question-row"><label class="question-label">2.</label><input type="text" class="auto-input prep-input" data-label="Plenary Takeaway 2" style="max-width: 100%;" placeholder="Type second takeaway here..."></div>
-                <div class="question-row"><label class="question-label">3.</label><input type="text" class="auto-input prep-input" data-label="Plenary Takeaway 3" style="max-width: 100%;" placeholder="Type third takeaway here..."></div>
-            </div>
-        </main>
-    </div>
-
-    <!-- RESET ACTION BUTTON -->
-    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-reset" onclick="clearData()">Reset Page</button>
-    </div>
-    
-    <footer>&copy; 2026 Delta Serlby Park - Computing Department</footer>
-
-    <script>
-        /* ==========================================================================
-           1. FIREBASE CLOUD INITIALIZATION & MARKBOOK SYNC
-           ========================================================================== */
-        const firebaseConfig = {
-            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
-            authDomain: "serlby-park-computing.firebaseapp.com",
-            projectId: "serlby-park-computing",
-            storageBucket: "serlby-park-computing.firebasestorage.app",
-            messagingSenderId: "648533806051",
-            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
-            measurementId: "G-HDNYEE11WV"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        const LESSON_ID = "binary-conversions";
-
-        // Builds a clean, grouped summary array for the Teacher Cloud Markbook
-        function buildStructuredMarkbookItems() {
-            const items = [];
-            let correctCount = 0;
-            let totalGradable = 16; // 4 Red + 4 Amber + 4 Green + 4 Blue
-
-            // A. Lesson Preparation & Notes (Non-Graded)
-            document.querySelectorAll('.prep-input').forEach(inp => {
-                items.push({
-                    label: inp.getAttribute('data-label') || 'Note',
-                    value: inp.value.trim(),
-                    status: 'neutral'
-                });
-            });
-
-            // B. RAGB Tasks (Graded Inputs)
-            document.querySelectorAll('.graded-input').forEach(inp => {
-                let status = 'neutral';
-                
-                if (inp.classList.contains('input-correct')) {
-                    status = 'correct';
-                    correctCount++;
-                } else if (inp.classList.contains('input-incorrect')) {
-                    status = 'incorrect';
-                }
-
-                items.push({
-                    label: inp.getAttribute('data-label') || 'Question',
-                    value: inp.value.trim(),
-                    status: status
-                });
-            });
-
-            return {
-                items: items,
-                scoreText: `Score: ${correctCount} / ${totalGradable}`
-            };
-        }
-
-        let cloudSyncTimer;
-        function syncWorkToCloud(immediate = false) {
-            // Prevent saving if teacher is inspecting a student's file
-            if (sessionStorage.getItem('teacherMode') === 'true' && sessionStorage.getItem('inspectStudentUid')) return;
-
-            // Cloud Save Setup
-            const user = auth.currentUser;
-            if (!user) return; // Completely ignores local storage
-
-            const statusPill = document.getElementById('save-status-pill');
-            if (statusPill) statusPill.innerText = "⏳ Saving...";
-
-            const inputs = document.querySelectorAll('.auto-input');
-
-            clearTimeout(cloudSyncTimer);
-            cloudSyncTimer = setTimeout(() => {
-                const structured = buildStructuredMarkbookItems();
-
-                const payload = {
-                    pageTitle: "Y9 Binary Conversions",
-                    lastUpdated: Date.now(),
-                    scoreText: structured.scoreText,
-                    items: structured.items
-                };
-
-                // Add exact inputs so the page can reload properly next lesson
-                for (let i = 0; i < inputs.length; i++) {
-                    payload['input_' + i] = inputs[i].value;
-                }
-
-                db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
-                  .set(payload, { merge: true })
-                  .then(() => {
-                      if (statusPill) statusPill.innerText = "☁️ Saved to Cloud";
-                  })
-                  .catch(err => {
-                      console.error("Cloud save error:", err);
-                      if (statusPill) statusPill.innerText = "⚠️ Sync Error";
-                  });
-            }, immediate ? 50 : 600);
-        }
-
-        function populateInputs(data) {
-            const inputs = document.querySelectorAll('.auto-input');
-            for (let i = 0; i < inputs.length; i++) {
-                if (data['input_' + i] !== undefined) {
-                    inputs[i].value = data['input_' + i];
-                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                        inputs[i].style.height = 'auto';
-                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                    }
-                }
-            }
-            checkAnswers('red-input');
-            checkAnswers('amber-input');
-            checkAnswers('green-input');
-            checkAnswers('navy-input');
-        }
-
-        auth.onAuthStateChanged(async (user) => {
-            const statusPill = document.getElementById('save-status-pill');
-            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
-            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
-
-            // 1. Teacher Inspection Mode
-            if (isTeacher && inspectedUid) {
-                try {
-                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
-                    if (doc.exists) populateInputs(doc.data());
-                    if (statusPill) statusPill.innerText = "👨‍🏫 Viewing: " + sessionStorage.getItem('inspectStudentName');
-                } catch (err) {
-                    console.error("Error loading student work:", err);
-                }
-                return;
-            }
-
-            // 2. Normal Student Load
-            if (!user) {
-                if (statusPill) statusPill.innerText = "💾 Local Mode (Not Logged In)";
-                return;
-            }
-
-            try {
-                const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
-                if (doc.exists) {
-                    populateInputs(doc.data());
-                } else {
-                    syncWorkToCloud(true);
-                }
-                if (statusPill) statusPill.innerText = "☁️ Saved to Cloud";
-            } catch (err) {
-                console.error("Error loading cloud data:", err);
-                if (statusPill) statusPill.innerText = "⚠️ Sync Error";
-            }
-        });
-
-        document.addEventListener('input', function(e) {
-            if (e.target.classList.contains('auto-input')) {
-                syncWorkToCloud(false);
-                if (e.target.tagName.toLowerCase() === 'textarea') {
-                    e.target.style.height = 'auto';
-                    e.target.style.height = e.target.scrollHeight + 'px';
-                }
-            }
-        });
-
-        async function clearData() {
-            if (confirm("Are you sure you want to clear all your work on this page?")) {
-                const user = auth.currentUser;
-                // Prevent teacher from wiping student data while viewing
-                if (user && !(sessionStorage.getItem('teacherMode') === 'true' && sessionStorage.getItem('inspectStudentUid'))) {
-                    await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
-                }
-                window.location.reload();
-            }
-        }
-
-        function checkAnswers(groupClass) {
-            var inputs = document.getElementsByClassName(groupClass);
-            for (var i = 0; i < inputs.length; i++) {
-                var inputElement = inputs[i];
-                var studentAnswer = inputElement.value.toLowerCase().trim();
-                var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers'));
-                var isCorrect = false;
-                
-                for (var j = 0; j < acceptedAnswers.length; j++) {
-                    if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
-                        isCorrect = true;
-                        break;
-                    }
-                }
-
-                inputElement.classList.remove('input-correct', 'input-incorrect');
-                if (studentAnswer !== "") {
-                    if (isCorrect) inputElement.classList.add('input-correct');
-                    else inputElement.classList.add('input-incorrect');
-                }
-            }
-        }
-    </script>
-</body>
-</html>
+            <div class="sum-grid">
+                <!-- Q1 -->
+                <div class="math-sum answer-group amber-input" data-label="Amber Task Q1 (00001111 + 00010000)" data-answers='["11111"]' data-carries='["00000000"]'>
+                    <div class="sum-number">1.</div>
+                    <table class="sum-table">
+                        <tr><td></td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr><td>+</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                        <tr class="sum-line"><td colspan="9"></td></tr>
+                        <tr>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input bit-box" maxlength="1"></td>
+                        </tr>
+                        <tr>
+                            <td class="carry-label">Carry</td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                            <td><input type="text" class="auto-input carry-box" maxlength="1"></td>
+                        </tr>
+                    </table>
+                </div>
+                <!-- Q2 -->
+                <div class="math-sum answer-group amber-input" data-label="Amber Task Q2 (01010101 + 00101010)" data-answers='["1111111"]' data-carries='["00000000"]'>
+                    <div class="sum-number">2.</div>
+                    <table class="sum-table">
+                        <tr><td></td><td>0</td><td>1</td><td>0</td><td>1
