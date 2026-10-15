@@ -14,26 +14,39 @@
         .dashboard-layout { display: grid; grid-template-columns: 320px 1fr; gap: 20px; max-width: 1400px; margin: 20px auto; padding: 0 20px; }
         
         /* Sidebar Styles */
-        .sidebar { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #1e3a8a; height: 85vh; display: flex; flex-direction: column; }
+        .sidebar { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #1e3a8a; height: 85vh; display: flex; flex-direction: column; box-sizing: border-box; }
         .sidebar h3 { color: #1e3a8a; margin-top: 0; margin-bottom: 10px; }
         select, .search-box { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 4px; border: 1px solid #ccc; font-weight: bold; box-sizing: border-box; }
         .search-box { font-weight: normal; }
-        #student-list { flex-grow: 1; overflow-y: auto; margin-top: 10px; padding-right: 4px; }
+        #student-list { flex-grow: 1; overflow-y: auto; margin-top: 6px; padding-right: 4px; }
         
         .student-btn { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 12px; margin-bottom: 8px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 6px; text-align: left; font-weight: bold; font-size: 0.95em; cursor: pointer; transition: 0.2s; color: #333; }
         .student-btn:hover, .student-btn.active { background: #1e3a8a; color: white; border-color: #1e3a8a; }
         .class-pill { background: #dfaa2b; color: #1e3a8a; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; font-weight: bold; flex-shrink: 0; }
 
         /* Main Markbook View */
-        .main-view { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #dfaa2b; height: 85vh; overflow-y: auto; }
-        .student-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #1e3a8a; padding-bottom: 15px; margin-bottom: 25px; }
+        .main-view { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #dfaa2b; height: 85vh; overflow-y: auto; box-sizing: border-box; }
+        .student-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px; border-bottom: 3px solid #1e3a8a; padding-bottom: 15px; margin-bottom: 20px; }
+        .toolbar-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 18px; background: #f8f9fa; padding: 12px 15px; border-radius: 6px; border: 1px solid #e2e8f0; }
+
+        /* Collapsible Lesson Accordion Cards */
+        .lesson-card { border: 2px solid #cbd5e1; border-radius: 8px; margin-bottom: 10px; overflow: hidden; background: #fff; transition: border-color 0.2s, box-shadow 0.2s; }
+        .lesson-card.open { border-color: #1e3a8a; box-shadow: 0 4px 12px rgba(30, 58, 138, 0.12); margin-bottom: 18px; }
         
-        /* Lesson Portfolio Cards */
-        .lesson-card { border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 25px; overflow: hidden; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.04); }
-        .lesson-card-header { background: #1e3a8a; color: white; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .lesson-card-header h3 { margin: 0; color: white; font-size: 1.15em; text-transform: uppercase; letter-spacing: 0.5px; }
-        .lesson-meta { font-size: 0.85em; color: #dfaa2b; font-weight: bold; }
-        .lesson-card-body { padding: 20px; }
+        .lesson-card-header { background: #f8fafc; color: #1e3a8a; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; transition: background 0.15s, color 0.15s; }
+        .lesson-card-header:hover { background: #e2e8f0; }
+        .lesson-card.open .lesson-card-header { background: #1e3a8a; color: white; }
+        
+        .lesson-title-wrap { display: flex; align-items: center; gap: 12px; font-weight: bold; font-size: 1.05em; }
+        .chevron { display: inline-block; transition: transform 0.2s ease; font-size: 0.85em; color: #dfaa2b; }
+        .lesson-card.open .chevron { transform: rotate(90deg); }
+
+        .lesson-meta { font-size: 0.85em; color: #64748b; font-weight: bold; margin-left: 10px; }
+        .lesson-card.open .lesson-meta { color: #dfaa2b; }
+
+        /* Hidden by default - only shown when lesson is clicked */
+        .lesson-card-body { display: none; padding: 20px; border-top: 2px solid #e2e8f0; background: #ffffff; }
+        .lesson-card.open .lesson-card-body { display: block; }
 
         /* Question & Answer Grid */
         .qa-row { border-bottom: 1px solid #eee; padding: 12px 0; }
@@ -48,11 +61,13 @@
         .status-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 0.78em; font-weight: bold; text-transform: uppercase; }
         .badge-correct { background: #2e7d32; color: white; }
         .badge-incorrect { background: #d32f2f; color: white; }
-        .badge-verified { background: #dfaa2b; color: #1e3a8a; margin-right: 8px; }
+        .badge-verified { background: #dfaa2b; color: #1e3a8a; margin-right: 6px; }
 
         .screenshot-img { max-width: 100%; max-height: 350px; border: 2px solid #1e3a8a; border-radius: 6px; margin-top: 8px; display: block; }
-        .btn-gold { background: #dfaa2b; color: #1e3a8a; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .btn-gold { background: #dfaa2b; color: #1e3a8a; border: none; padding: 8px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-gold:hover { background: #c99722; }
+        .btn-outline { background: white; color: #1e3a8a; border: 1px solid #1e3a8a; padding: 7px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.85em; }
+        .btn-outline:hover { background: #1e3a8a; color: white; }
     </style>
 </head>
 <body>
@@ -93,10 +108,10 @@
                     <option value="9y2">9y2</option>
                 </optgroup>
                 <optgroup label="GCSE Options">
-                    <option value="10aEnt1">10aEnt1</option>
-                    <option value="11aEnt1">11aEnt1</option>
-                    <option value="10bCim1">10bCim1</option>
-                    <option value="11bCim1">11bCim1</option>
+                    <option value="10aEnt1">10aEnt1 (Enterprise)</option>
+                    <option value="11aEnt1">11aEnt1 (Enterprise)</option>
+                    <option value="10bCim1">10bCim1 (iMedia)</option>
+                    <option value="11bCim1">11bCim1 (iMedia)</option>
                 </optgroup>
                 <option value="Unassigned">Unassigned</option>
             </select>
@@ -108,9 +123,9 @@
             </div>
         </div>
 
-        <!-- Main View: Direct Cloud Portfolio -->
+        <!-- Main View: Collapsible Lesson List -->
         <div class="main-view" id="work-view">
-            <h2 style="color: #666; text-align: center; margin-top: 80px;">&larr; Select a student from the roster to view all their cloud-saved lessons</h2>
+            <h2 style="color: #666; text-align: center; margin-top: 80px;">&larr; Select a student from the roster to view their lesson list</h2>
         </div>
     </div>
 
@@ -153,7 +168,6 @@
                     });
                 });
 
-                // Sort alphabetically by name
                 allStudents.sort((a, b) => a.fullName.localeCompare(b.fullName));
                 renderSidebar();
             } catch (err) {
@@ -199,10 +213,10 @@
             });
         }
 
-        // 4. Directly Pull All Lesson Documents for Selected Student (No Iframes!)
+        // 4. Load Student's Lesson List (All Lessons Collapsed by Default)
         async function loadStudentPortfolio(student) {
             const viewDiv = document.getElementById('work-view');
-            viewDiv.innerHTML = `<h3 style="color:#1e3a8a;">⏳ Loading cloud work for ${escapeHtml(student.fullName)}...</h3>`;
+            viewDiv.innerHTML = `<h3 style="color:#1e3a8a;">⏳ Loading lesson list for ${escapeHtml(student.fullName)}...</h3>`;
 
             try {
                 const lessonsSnap = await db.collection('users').doc(student.uid).collection('lessons').get();
@@ -215,13 +229,25 @@
                 // Sort lessons with most recently updated at the top
                 lessons.sort((a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0));
 
+                const classOptions = ['Unassigned','7x1','7x2','7y1','7y2','8x1','8x2','8y1','8y2','9x1','9x2','9y1','9y2','10aEnt1','11aEnt1','10bCim1','11bCim1']
+                    .map(c => `<option value="${c}" ${student.className === c ? 'selected' : ''}>${c}</option>`)
+                    .join('');
+
                 let html = `
                     <div class="student-header">
                         <div>
                             <h2 style="margin: 0; color: #1e3a8a;">${escapeHtml(student.fullName)} <span style="font-weight:normal; font-size:0.75em; color:#666;">(@${escapeHtml(student.username)})</span></h2>
-                            <p style="margin: 5px 0 0 0; color: #dfaa2b; font-weight: bold;">Class: ${escapeHtml(student.className)} | Cloud Lessons Saved: ${lessons.length}</p>
+                            <p style="margin: 5px 0 0 0; color: #64748b; font-weight: bold;">
+                                Saved Lessons: <strong style="color:#1e3a8a;">${lessons.length}</strong> (Click any lesson below to open its work)
+                            </p>
                         </div>
-                        <button class="btn-gold" onclick="loadStudentPortfolio(activeStudent)">↻ Refresh Student Work</button>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <label style="font-weight:bold; color:#1e3a8a; font-size:0.9em;">Class:</label>
+                            <select onchange="updateStudentClass('${student.uid}', this.value)" style="width:auto; margin:0; padding:7px 10px;">
+                                ${classOptions}
+                            </select>
+                            <button class="btn-gold" onclick="loadStudentPortfolio(activeStudent)">↻ Refresh</button>
+                        </div>
                     </div>
                 `;
 
@@ -229,18 +255,31 @@
                     html += `
                         <div style="text-align:center; padding: 50px 20px; background:#f8f9fa; border-radius:8px; border: 2px dashed #cbd5e1;">
                             <h3 style="color:#64748b; margin-bottom:8px;">No Cloud Work Saved Yet</h3>
-                            <p style="color:#94a3b8; margin:0;">Once ${escapeHtml(student.fullName)} logs in and types on a cloud-enabled lesson page, their answers will appear here automatically.</p>
+                            <p style="color:#94a3b8; margin:0;">Once ${escapeHtml(student.fullName)} logs in and types on a cloud-enabled lesson page, their lessons will appear in a list here.</p>
                         </div>
                     `;
                     viewDiv.innerHTML = html;
                     return;
                 }
 
-                // Build a card for each lesson
-                lessons.forEach(lesson => {
-                    html += renderLessonCard(lesson);
+                // Filter bar for quickly finding 1 lesson out of 39
+                html += `
+                    <div class="toolbar-row">
+                        <input type="text" id="lesson-filter-input" class="search-box" style="margin:0; max-width: 380px; background:white;" placeholder="🔍 Filter ${lessons.length} lessons by name (e.g. Binary, HT1)..." oninput="filterLessonBars()">
+                        <div>
+                            <button class="btn-outline" onclick="toggleAllLessons(false)">Collapse All</button>
+                            <button class="btn-outline" onclick="toggleAllLessons(true)">Expand All</button>
+                        </div>
+                    </div>
+                    <div id="lessons-accordion-container">
+                `;
+
+                // Build a collapsed clickable bar for each lesson
+                lessons.forEach((lesson, index) => {
+                    html += renderLessonCard(lesson, index);
                 });
 
+                html += `</div>`;
                 viewDiv.innerHTML = html;
 
             } catch (err) {
@@ -249,19 +288,19 @@
             }
         }
 
-        // 5. Universal Card Renderer (Supports both cloud-sync.js and older Firebase lesson formats)
-        function renderLessonCard(lesson) {
+        // 5. Render Collapsible Lesson Bar + Hidden Body
+        function renderLessonCard(lesson, index) {
             const title = lesson.pageTitle || lesson.id.replace(/-/g, ' ');
-            const updatedDate = lesson.lastUpdated ? new Date(lesson.lastUpdated).toLocaleString('en-GB') : 'Unknown Date';
+            const updatedDate = lesson.lastUpdated ? new Date(lesson.lastUpdated).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Saved';
             
             let badgesHtml = '';
             if (lesson.scoreText) badgesHtml += `<span class="status-badge badge-verified">${escapeHtml(lesson.scoreText)}</span>`;
-            if (lesson.maroon_verified) badgesHtml += `<span class="status-badge badge-verified">✓ Maroon Verified</span>`;
-            if (lesson.navy_verified) badgesHtml += `<span class="status-badge badge-verified">✓ Navy Verified</span>`;
+            if (lesson.maroon_verified) badgesHtml += `<span class="status-badge badge-verified">✓ Maroon</span>`;
+            if (lesson.navy_verified) badgesHtml += `<span class="status-badge badge-verified">✓ Navy</span>`;
 
             let bodyHtml = '';
 
-            // Format A: Structured items array from universal cloud-sync.js
+            // Format A: Structured items array (from cloud-sync.js / Y9 Binary Addition)
             if (Array.isArray(lesson.items) && lesson.items.length > 0) {
                 lesson.items.forEach((item, idx) => {
                     const val = (item.value || '').trim();
@@ -288,7 +327,7 @@
                     `;
                 });
             } 
-            // Format B: Older lesson script format (input_0, input_1, q1, etc.)
+            // Format B: Older lesson script format (input_0, input_1, etc.)
             else {
                 const inputKeys = Object.keys(lesson)
                     .filter(k => k.startsWith('input_'))
@@ -324,7 +363,7 @@
                 });
             }
 
-            // Render any pasted screenshots (Maroon / Navy / Universal)
+            // Pasted screenshots
             if (lesson.img_maroon) {
                 bodyHtml += `<div class="qa-row"><div class="qa-label">📸 Maroon Task Screenshot</div><img class="screenshot-img" src="${lesson.img_maroon}"></div>`;
             }
@@ -338,16 +377,19 @@
             }
 
             if (!bodyHtml) {
-                bodyHtml = `<p style="color:#94a3b8; font-style:italic;">Student opened this lesson, but no inputs were recorded.</p>`;
+                bodyHtml = `<p style="color:#94a3b8; font-style:italic; margin:0;">Student opened this lesson, but no inputs were recorded.</p>`;
             }
 
             return `
-                <div class="lesson-card">
-                    <div class="lesson-card-header">
-                        <h3>📄 ${escapeHtml(title)}</h3>
-                        <div>
+                <div class="lesson-card" id="lesson-card-${index}" data-title="${escapeHtml(title.toLowerCase())}">
+                    <div class="lesson-card-header" onclick="toggleLessonCard(${index})">
+                        <div class="lesson-title-wrap">
+                            <span class="chevron">&#9654;</span>
+                            <span>📄 ${escapeHtml(title)}</span>
+                        </div>
+                        <div style="display:flex; align-items:center;">
                             ${badgesHtml}
-                            <span class="lesson-meta">Last Saved: ${updatedDate}</span>
+                            <span class="lesson-meta">${updatedDate}</span>
                         </div>
                     </div>
                     <div class="lesson-card-body">
@@ -355,6 +397,53 @@
                     </div>
                 </div>
             `;
+        }
+
+        // 6. Click to Open One Lesson (and automatically close others)
+        function toggleLessonCard(index) {
+            const clickedCard = document.getElementById(`lesson-card-${index}`);
+            if (!clickedCard) return;
+
+            const isAlreadyOpen = clickedCard.classList.contains('open');
+
+            // Close all open lesson cards first so only 1 lesson is open at a time
+            document.querySelectorAll('.lesson-card').forEach(card => {
+                card.classList.remove('open');
+            });
+
+            // If it was closed, open it
+            if (!isAlreadyOpen) {
+                clickedCard.classList.add('open');
+            }
+        }
+
+        // Expand or Collapse All button helper
+        function toggleAllLessons(expand) {
+            document.querySelectorAll('.lesson-card').forEach(card => {
+                if (expand) card.classList.add('open');
+                else card.classList.remove('open');
+            });
+        }
+
+        // Filter the 39 lesson bars by title keyword
+        function filterLessonBars() {
+            const q = (document.getElementById('lesson-filter-input')?.value || '').toLowerCase().trim();
+            document.querySelectorAll('.lesson-card').forEach(card => {
+                const title = card.getAttribute('data-title') || '';
+                card.style.display = (!q || title.includes(q)) ? 'block' : 'none';
+            });
+        }
+
+        // Update student's class in Firebase directly from the dashboard header
+        async function updateStudentClass(uid, newClass) {
+            try {
+                await db.collection('users').doc(uid).set({ className: newClass }, { merge: true });
+                const st = allStudents.find(s => s.uid === uid);
+                if (st) st.className = newClass;
+                renderSidebar();
+            } catch (err) {
+                alert("Error updating class: " + err.message);
+            }
         }
 
         function escapeHtml(str) {
