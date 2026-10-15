@@ -159,4 +159,182 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        /* =================================================
+        /* ==========================================================================
+           2. LOGIN UI CONTROLS
+           ========================================================================== */
+        function showStudentForm() {
+            document.getElementById('role-selection').style.display = 'none';
+            document.getElementById('teacher-login-form').style.display = 'none';
+            document.getElementById('student-login-form').style.display = 'block';
+            document.getElementById('student-username').focus();
+        }
+
+        function showTeacherForm() {
+            document.getElementById('role-selection').style.display = 'none';
+            document.getElementById('student-login-form').style.display = 'none';
+            document.getElementById('teacher-login-form').style.display = 'block';
+            document.getElementById('teacher-passcode').focus();
+        }
+
+        function hideForms() {
+            document.getElementById('student-login-form').style.display = 'none';
+            document.getElementById('teacher-login-form').style.display = 'none';
+            document.getElementById('role-selection').style.display = 'block';
+            document.getElementById('login-error').style.display = 'none';
+            document.getElementById('teacher-login-error').style.display = 'none';
+            document.getElementById('student-username').value = "";
+            document.getElementById('student-pin').value = "";
+            document.getElementById('teacher-passcode').value = "";
+        }
+
+        function formatEmail(username) {
+            let clean = username.trim().toLowerCase();
+            return clean.includes('@') ? clean : clean + "@deltaschool.local";
+        }
+
+        /* ==========================================================================
+           3. AUTHENTICATION LOGIC
+           ========================================================================== */
+        async function processStudentLogin() {
+            const user = document.getElementById('student-username').value.trim().toLowerCase();
+            const pin = document.getElementById('student-pin').value.trim();
+            const errorBox = document.getElementById('login-error');
+            const submitBtn = document.getElementById('btn-student-submit');
+
+            if (user === "" || pin === "") {
+                errorBox.innerText = "Please enter both your Username and PIN.";
+                errorBox.style.display = 'block';
+                return;
+            }
+
+            errorBox.style.display = 'none';
+            submitBtn.innerText = "Logging in...";
+
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(formatEmail(user), pin);
+                const uid = userCredential.user.uid;
+                
+                let displayName = user; 
+
+                const userDoc = await db.collection("users").doc(uid).get();
+                if (!userDoc.exists) {
+                    await db.collection("users").doc(uid).set({
+                        username: user,
+                        fullName: user,
+                        className: "Unassigned",
+                        lastLogin: Date.now()
+                    });
+                } else {
+                    const data = userDoc.data();
+                    if (data.fullName) {
+                        displayName = data.fullName;
+                    }
+                    // Update login timestamp
+                    await db.collection("users").doc(uid).set({ lastLogin: Date.now() }, { merge: true });
+                }
+
+                // Instantly update the header
+                document.getElementById('welcome-msg').innerText = "Logged in: " + displayName;
+                document.getElementById('logout-btn').style.display = "inline-block";
+
+                document.getElementById('login-gate').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('login-gate').style.display = 'none';
+                    document.body.classList.remove('locked');
+                }, 400);
+
+                loadYear('year7');
+                submitBtn.innerText = "Log In";
+            } catch (err) {
+                submitBtn.innerText = "Log In";
+                errorBox.innerText = "Incorrect username or PIN.";
+                errorBox.style.display = 'block';
+            }
+        }
+
+        function processTeacherLogin() {
+            const pass = document.getElementById('teacher-passcode').value.trim();
+            const errorBox = document.getElementById('teacher-login-error');
+
+            if (pass === "2525" || pass === "delta") {
+                document.getElementById('welcome-msg').innerText = "👨‍🏫 Teacher Mode";
+                document.getElementById('logout-btn').style.display = "inline-block";
+                
+                document.getElementById('login-gate').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('login-gate').style.display = 'none';
+                    document.body.classList.remove('locked');
+                }, 400);
+
+                loadYear('year7');
+            } else {
+                errorBox.style.display = 'block';
+            }
+        }
+
+        async function logoutUser() {
+            if (auth.currentUser) {
+                await auth.signOut();
+            }
+            window.location.reload();
+        }
+
+        // Enter key shortcuts
+        document.getElementById('student-pin').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') processStudentLogin();
+        });
+        document.getElementById('teacher-passcode').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') processTeacherLogin();
+        });
+
+        /* ==========================================================================
+           4. CURRICULUM GRID LOGIC
+           ========================================================================== */
+        const curriculumData = {
+            year7: [
+                { title: "Delta Welcome", description: "<ul><li>Introduction to Computational Thinking</li><li>Keyboard & Mouse Skills</li><li>File Management</li><li>Researching</li><li>E-Safety</li></ul>" },
+                { title: "Microsoft Tools", description: "<ul><li>Word</li><li>PowerPoint</li><li>Email</li></ul>" },
+                { title: "Binary", description: "<ul><li>Binary to Denary</li><li>Denary to Binary</li></ul>" }
+            ],
+            year8: [
+                { title: "E-Safety & Spreadsheets", description: "<ul><li>E-Safety rules</li><li>Data Entry</li><li>Formulas</li><li>Functions</li></ul>" },
+                { title: "Pixel Art", description: "<ul><li>Basic Designs</li><li>Character Creation</li></ul>" }
+            ],
+            year9: [
+                { title: "E-Safety & Python Programming", description: "<ul><li>E-Safety rules</li><li>Sequence</li><li>Selection</li><li>Iteration</li></ul>" },
+                { title: "Binary & Cyber Security", description: "<ul><li>Binary Conversions</li><li>Addition & Shifts</li><li>Hexadecimal</li><li>Security Basics</li></ul>" }
+            ],
+            year10: [
+                { title: "Enterprise", description: "<ul><li>Introduction to Enterprise</li><li>Business Planning</li><li>Marketing</li></ul>" },
+                { title: "iMedia", description: "<ul><li>Pre-production Skills</li><li>Digital Graphics</li><li>Interactive Multimedia</li></ul>" }
+            ],
+            year11: [
+                { title: "Enterprise Coursework", description: "<ul><li>Component 1 Completion</li><li>Component 2 Final Polish</li></ul>" },
+                { title: "iMedia Exam & Revision", description: "<ul><li>R093 Exam Prep</li><li>Coursework Finalisation</li></ul>" }
+            ]
+        };
+
+        function loadYear(year) {
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + year).classList.add('active');
+            
+            const titles = { year7: 'Year 7 Curriculum', year8: 'Year 8 Curriculum', year9: 'Year 9 Curriculum', year10: 'Year 10 Curriculum', year11: 'Year 11 Curriculum' };
+            document.getElementById('year-title').innerText = titles[year];
+            
+            const grid = document.getElementById('content-grid');
+            grid.innerHTML = "";
+            
+            curriculumData[year].forEach((unit, index) => {
+                grid.innerHTML += `
+                    <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #800000; display: flex; flex-direction: column;">
+                        <div style="color: #800000; font-weight: bold; font-size: 0.85em; margin-bottom: 10px;">UNIT ${index + 1}</div>
+                        <h3 style="color: #1e3a8a; margin-top: 0;">${unit.title}</h3>
+                        <div style="color: #555; flex-grow: 1;">${unit.description}</div>
+                        <button onclick="window.location.href='${unit.title.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}.html'" style="background: #dfaa2b; color: #1e3a8a; font-weight: bold; border: none; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 20px;">View Unit Modules</button>
+                    </div>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>
