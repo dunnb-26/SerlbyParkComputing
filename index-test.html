@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delta Serlby Park - Computing Curriculum</title>
+    <title>Delta Serlby Park - Computing & Enterprise</title>
     <link rel="stylesheet" href="style.css">
     
     <!-- Firebase SDKs -->
@@ -43,10 +43,6 @@
         }
         .gate-input:focus { outline: none; border-color: #1e3a8a; }
 
-        #login-error, #teacher-login-error {
-            color: #d32f2f; font-size: 0.95em; font-weight: bold; margin-bottom: 15px; display: none;
-        }
-
         /* Hide main content completely until authenticated */
         body.locked { overflow: hidden; }
         body.locked header, body.locked nav, body.locked main, body.locked footer {
@@ -65,6 +61,29 @@
             align-items: center;
             gap: 10px;
         }
+        .user-badge {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.95em;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            white-space: nowrap;
+        }
+        .portal-btn {
+            background-color: #dfaa2b;
+            color: #1e3a8a;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: background-color 0.2s;
+        }
+        .portal-btn:hover { background-color: #c99722; }
         .logout-btn {
             background-color: #b91c1c;
             color: white;
@@ -77,6 +96,15 @@
             transition: background-color 0.2s;
         }
         .logout-btn:hover { background-color: #991b1b; }
+
+        /* D&C Banner */
+        .dnc-btn {
+            display: block; width: 100%; padding: 15px; background-color: #dfaa2b; 
+            color: #1e3a8a; text-align: center; border: none; border-radius: 6px;
+            font-size: 1.2em; font-weight: bold; cursor: pointer; margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: background-color 0.2s;
+        }
+        .dnc-btn:hover { background-color: #c99722; }
     </style>
 </head>
 <body class="locked">
@@ -85,28 +113,28 @@
     <div id="login-gate">
         <div class="gate-card">
             <img src="logo.jpg" alt="Delta Serlby Park Logo">
-            <h2>Welcome to Computing & Business</h2>
+            <h2>Welcome to Computing</h2>
             
-            <!-- Step 1: Choose Student or Teacher -->
             <div id="role-selection">
                 <button class="role-btn btn-student" onclick="showStudentForm()">🎓 I am a Student</button>
                 <button class="role-btn btn-teacher" onclick="showTeacherForm()">👨‍🏫 I am a Teacher</button>
             </div>
 
-            <!-- Step 2A: Student Login Form -->
+            <!-- Student Login Form -->
             <div id="student-login-form" style="display: none;">
-                <div id="login-error">Incorrect username or PIN.</div>
+                <div id="student-login-error" style="color:#d32f2f; font-weight:bold; font-size:0.9em; margin-bottom:10px; display:none;"></div>
                 <input type="text" id="student-username" class="gate-input" placeholder="Username (e.g. jsmith)" autocomplete="off">
                 <input type="password" id="student-pin" class="gate-input" placeholder="PIN / Password" autocomplete="off">
                 <button class="role-btn btn-student" id="btn-student-submit" onclick="processStudentLogin()">Log In</button>
                 <button class="role-btn btn-teacher" onclick="hideForms()">Back</button>
             </div>
 
-            <!-- Step 2B: Teacher Login Form -->
+            <!-- Teacher Login Form -->
             <div id="teacher-login-form" style="display: none;">
-                <div id="teacher-login-error">Incorrect Teacher Passcode.</div>
+                <div id="teacher-login-error" style="color:#d32f2f; font-weight:bold; font-size:0.9em; margin-bottom:10px; display:none;"></div>
                 <input type="password" id="teacher-passcode" class="gate-input" placeholder="Enter Teacher Passcode" autocomplete="off">
-                <button class="role-btn btn-student" onclick="processTeacherLogin()">Unlock Content &rarr;</button>
+                <button class="role-btn btn-student" onclick="processTeacherLogin(false)">Unlock Curriculum Page</button>
+                <button class="role-btn btn-student" style="background-color:#1e3a8a; color:white;" onclick="processTeacherLogin(true)">Go Straight to Markbook &rarr;</button>
                 <button class="role-btn btn-teacher" onclick="hideForms()">Back</button>
             </div>
         </div>
@@ -118,11 +146,14 @@
             <a href="index.html"><img src="logo.jpg" alt="Logo"></a>
         </div>
         <div class="header-center">
-            <h1>Computing Curriculum</h1>
+            <h1>Serlby Park Computing</h1>
         </div>
         <div class="header-right">
-            <span id="welcome-msg" style="color: white; font-weight: bold; margin-right: 15px;"></span>
-            <button class="logout-btn" id="logout-btn" style="display: none;" onclick="logoutUser()">Log Out</button>
+            <div class="user-status-bar" id="header-user-bar" style="display: none;">
+                <span class="user-badge" id="logged-in-label">👤 Loading...</span>
+                <a href="teacher-dashboard.html" class="portal-btn" id="teacher-portal-link" style="display: none;">📊 Teacher Markbook</a>
+                <button class="logout-btn" onclick="logoutUser()">Log Out</button>
+            </div>
         </div>
     </header>
 
@@ -130,21 +161,21 @@
         <button id="btn-year7" class="active" onclick="loadYear('year7')">Year 7</button>
         <button id="btn-year8" onclick="loadYear('year8')">Year 8</button>
         <button id="btn-year9" onclick="loadYear('year9')">Year 9</button>
-        <button id="btn-year10" onclick="loadYear('year10')">Year 10</button>
-        <button id="btn-year11" onclick="loadYear('year11')">Year 11</button>
+        <button id="btn-gcse" onclick="loadYear('gcse')">GCSE</button>
     </nav>
 
     <main>
-        <h2 id="year-title" style="color: #1e3a8a; text-align: center; margin-top: 30px;">Year 7 Curriculum</h2>
-        <div id="content-grid" class="grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-width: 1200px; margin: 20px auto; padding: 20px;">
-            <!-- Curriculum Cards Inject Here -->
-        </div>
+        <h2 id="year-title">Year 7 Curriculum</h2>
+        <div id="dnc-container"></div>
+        <div id="content-grid" class="grid"></div>
     </main>
 
+    <footer>
+        &copy; 2026 Delta Serlby Park - Computing Department
+    </footer>
+
     <script>
-        /* ==========================================================================
-           1. FIREBASE SETUP
-           ========================================================================== */
+        // --- FIREBASE CONFIGURATION & SECURITY ---
         const firebaseConfig = {
             apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
             authDomain: "serlby-park-computing.firebaseapp.com",
@@ -159,9 +190,7 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        /* ==========================================================================
-           2. LOGIN UI CONTROLS
-           ========================================================================== */
+        // UI Controls (Declared top-level so buttons never fail)
         function showStudentForm() {
             document.getElementById('role-selection').style.display = 'none';
             document.getElementById('teacher-login-form').style.display = 'none';
@@ -180,7 +209,7 @@
             document.getElementById('student-login-form').style.display = 'none';
             document.getElementById('teacher-login-form').style.display = 'none';
             document.getElementById('role-selection').style.display = 'block';
-            document.getElementById('login-error').style.display = 'none';
+            document.getElementById('student-login-error').style.display = 'none';
             document.getElementById('teacher-login-error').style.display = 'none';
             document.getElementById('student-username').value = "";
             document.getElementById('student-pin').value = "";
@@ -192,50 +221,51 @@
             return clean.includes('@') ? clean : clean + "@deltaschool.local";
         }
 
-        /* ==========================================================================
-           3. AUTHENTICATION LOGIC
-           ========================================================================== */
+        // --- AUTHENTICATION LOGIC ---
         async function processStudentLogin() {
-            const user = document.getElementById('student-username').value.trim().toLowerCase();
+            const user = document.getElementById('student-username').value.trim();
             const pin = document.getElementById('student-pin').value.trim();
-            const errorBox = document.getElementById('login-error');
+            const errorBox = document.getElementById('student-login-error');
             const submitBtn = document.getElementById('btn-student-submit');
 
-            if (user === "" || pin === "") {
+            if (!user || !pin) {
                 errorBox.innerText = "Please enter both your Username and PIN.";
                 errorBox.style.display = 'block';
                 return;
             }
 
             errorBox.style.display = 'none';
-            submitBtn.innerText = "Logging in...";
+            submitBtn.innerText = "Signing in...";
 
             try {
-                const userCredential = await auth.signInWithEmailAndPassword(formatEmail(user), pin);
-                const uid = userCredential.user.uid;
-                
-                let displayName = user; 
+                sessionStorage.removeItem('teacherMode');
+                const cred = await auth.signInWithEmailAndPassword(formatEmail(user), pin);
+                const uid = cred.user.uid;
+
+                // Grab Full Name from Firestore immediately before closing gate
+                let displayFullName = user;
+                let displayClass = "";
 
                 const userDoc = await db.collection("users").doc(uid).get();
                 if (!userDoc.exists) {
                     await db.collection("users").doc(uid).set({
-                        username: user,
+                        username: user.toLowerCase(),
                         fullName: user,
                         className: "Unassigned",
                         lastLogin: Date.now()
                     });
                 } else {
                     const data = userDoc.data();
-                    if (data.fullName) {
-                        displayName = data.fullName;
+                    displayFullName = data.fullName || data.full_name || data.name || user;
+                    if (data.className && data.className !== "Unassigned") {
+                        displayClass = ` (${data.className})`;
                     }
-                    // Update login timestamp
                     await db.collection("users").doc(uid).set({ lastLogin: Date.now() }, { merge: true });
                 }
 
-                // Instantly update the header
-                document.getElementById('welcome-msg').innerText = "Logged in: " + displayName;
-                document.getElementById('logout-btn').style.display = "inline-block";
+                document.getElementById('logged-in-label').innerText = `🎓 ${displayFullName}${displayClass}`;
+                document.getElementById('teacher-portal-link').style.display = 'none';
+                document.getElementById('header-user-bar').style.display = 'flex';
 
                 document.getElementById('login-gate').style.opacity = '0';
                 setTimeout(() => {
@@ -243,7 +273,6 @@
                     document.body.classList.remove('locked');
                 }, 400);
 
-                loadYear('year7');
                 submitBtn.innerText = "Log In";
             } catch (err) {
                 submitBtn.innerText = "Log In";
@@ -252,89 +281,180 @@
             }
         }
 
-        function processTeacherLogin() {
+        async function processTeacherLogin(goToMarkbook = false) {
             const pass = document.getElementById('teacher-passcode').value.trim();
             const errorBox = document.getElementById('teacher-login-error');
 
             if (pass === "2525" || pass === "delta") {
-                document.getElementById('welcome-msg').innerText = "👨‍🏫 Teacher Mode";
-                document.getElementById('logout-btn').style.display = "inline-block";
-                
-                document.getElementById('login-gate').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('login-gate').style.display = 'none';
-                    document.body.classList.remove('locked');
-                }, 400);
+                if (auth.currentUser) await auth.signOut();
+                sessionStorage.setItem('teacherMode', 'true');
 
-                loadYear('year7');
+                if (goToMarkbook) {
+                    window.location.href = "teacher-dashboard.html";
+                } else {
+                    unlockPageAsTeacher();
+                }
             } else {
+                errorBox.innerText = "Incorrect Teacher Passcode.";
                 errorBox.style.display = 'block';
             }
         }
 
+        function unlockPageAsTeacher() {
+            document.getElementById('login-gate').style.display = 'none';
+            document.body.classList.remove('locked');
+            document.getElementById('header-user-bar').style.display = 'flex';
+            document.getElementById('logged-in-label').innerText = "👨‍🏫 Teacher Mode";
+            document.getElementById('teacher-portal-link').style.display = 'inline-block';
+        }
+
         async function logoutUser() {
-            if (auth.currentUser) {
-                await auth.signOut();
-            }
+            try { sessionStorage.clear(); } catch (e) {}
+            if (auth.currentUser) await auth.signOut();
             window.location.reload();
         }
 
-        // Enter key shortcuts
         document.getElementById('student-pin').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') processStudentLogin();
         });
         document.getElementById('teacher-passcode').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') processTeacherLogin();
+            if (e.key === 'Enter') processTeacherLogin(false);
         });
 
-        /* ==========================================================================
-           4. CURRICULUM GRID LOGIC
-           ========================================================================== */
+        // --- AUTH STATE PERSISTENCE ---
+        auth.onAuthStateChanged(async (user) => {
+            if (sessionStorage.getItem('teacherMode') === 'true') {
+                unlockPageAsTeacher();
+                return;
+            }
+
+            if (user) {
+                const cleanUsername = user.email ? user.email.replace('@deltaschool.local', '') : 'Student';
+                let displayFullName = cleanUsername;
+                let displayClass = "";
+
+                try {
+                    const userDoc = await db.collection("users").doc(user.uid).get();
+                    if (userDoc.exists) {
+                        const data = userDoc.data();
+                        displayFullName = data.fullName || data.full_name || data.name || cleanUsername;
+                        if (data.className && data.className !== "Unassigned") {
+                            displayClass = ` (${data.className})`;
+                        }
+                    }
+                } catch (err) {
+                    console.error("Error fetching user profile:", err);
+                }
+
+                document.getElementById('logged-in-label').innerText = `🎓 ${displayFullName}${displayClass}`;
+                document.getElementById('teacher-portal-link').style.display = 'none';
+                document.getElementById('header-user-bar').style.display = 'flex';
+
+                document.getElementById('login-gate').style.display = 'none';
+                document.body.classList.remove('locked');
+            } else {
+                document.getElementById('header-user-bar').style.display = 'none';
+                document.getElementById('login-gate').style.display = 'flex';
+                document.getElementById('login-gate').style.opacity = '1';
+                document.body.classList.add('locked');
+                hideForms();
+            }
+        });
+
+        // --- FULL CURRICULUM DATA ---
         const curriculumData = {
-            year7: [
-                { title: "Delta Welcome", description: "<ul><li>Introduction to Computational Thinking</li><li>Keyboard & Mouse Skills</li><li>File Management</li><li>Researching</li><li>E-Safety</li></ul>" },
-                { title: "Microsoft Tools", description: "<ul><li>Word</li><li>PowerPoint</li><li>Email</li></ul>" },
-                { title: "Binary", description: "<ul><li>Binary to Denary</li><li>Denary to Binary</li></ul>" }
-            ],
-            year8: [
-                { title: "E-Safety & Spreadsheets", description: "<ul><li>E-Safety rules</li><li>Data Entry</li><li>Formulas</li><li>Functions</li></ul>" },
-                { title: "Pixel Art", description: "<ul><li>Basic Designs</li><li>Character Creation</li></ul>" }
-            ],
-            year9: [
-                { title: "E-Safety & Python Programming", description: "<ul><li>E-Safety rules</li><li>Sequence</li><li>Selection</li><li>Iteration</li></ul>" },
-                { title: "Binary & Cyber Security", description: "<ul><li>Binary Conversions</li><li>Addition & Shifts</li><li>Hexadecimal</li><li>Security Basics</li></ul>" }
-            ],
-            year10: [
-                { title: "Enterprise", description: "<ul><li>Introduction to Enterprise</li><li>Business Planning</li><li>Marketing</li></ul>" },
-                { title: "iMedia", description: "<ul><li>Pre-production Skills</li><li>Digital Graphics</li><li>Interactive Multimedia</li></ul>" }
-            ],
-            year11: [
-                { title: "Enterprise Coursework", description: "<ul><li>Component 1 Completion</li><li>Component 2 Final Polish</li></ul>" },
-                { title: "iMedia Exam & Revision", description: "<ul><li>R093 Exam Prep</li><li>Coursework Finalisation</li></ul>" }
-            ]
+          year7: [
+            { title: "Delta Welcome", description: "<ul><li>Introduction/Computational Thinking</li><li>Keyboard Skills</li><li>Mouse Skills</li><li>File Management & Researching</li><li>E-Safety</li><li>Assessment</li></ul>" },
+            { title: "Microsoft Tools", description: "<ul><li>Word</li><li>PowerPoint</li><li>Email</li></ul>" },
+            { title: "Binary", description: "<ul><li>Binary to Denary</li><li>Denary to Binary</li></ul>" },
+            { title: "Assessment", description: "<ul><li>Revision</li><li>Assessment</li></ul>" },
+            { title: "Xmas", description: "<ul><li>TBA</li></ul>" },
+            { title: "Vector Graphics", description: "<ul><li>Pixel Power</li><li>Shape Squad</li><li>Build & Combine</li><li>Path Pros</li><li>Design Mission</li><li>Graphics Gallery</li></ul>" },
+            { title: "Computational Thinking", description: "<ul><li>Abstraction</li><li>Decomposition</li><li>Pattern Recognition</li><li>Algorithms</li><li>Flowcharts</li></ul>" },
+            { title: "Hardware & Software", description: "<ul><li>Hardware vs Software</li><li>Computer Systems</li><li>Inputs & Outputs</li><li>Storage</li><li>Graphics & Processing</li></ul>" },
+            { title: "Assessment", description: "<ul><li>Consolidation/Revision</li><li>Revision</li><li>Assessment</li></ul>" },
+            { title: "iDEA Award", description: "<ul><li>Citizen</li><li>Worker</li><li>Maker</li><li>Entrepreneur</li><li>Bronze Award</li></ul>" }
+          ],
+          year8: [
+            { title: "E-Safety", description: "<ul><li>E-Safety</li></ul>" },
+            { title: "Spreadsheets", description: "<ul><li>Data Entry</li><li>Formulas</li><li>Functions</li><li>Assessment</li></ul>" },
+            { title: "Pixel Art", description: "<ul><li>Basic Designs</li><li>Character Creation</li></ul>" },
+            { title: "Logical Thinking", description: "<ul><li>Computational Thinking Recap</li><li>Binary to Denary Recap</li><li>Denary to Binary Recap</li><li>Addition</li></ul>" },
+            { title: "Assessment", description: "<ul><li>Revision</li><li>Assessment</li></ul>" },
+            { title: "Xmas", description: "<ul><li>TBA</li></ul>" },
+            { title: "Edu Blocks", description: "<ul><li>Code Kickoff</li><li>Variable Vault</li><li>Input Impact</li><li>Choice Control</li><li>Loop Lab</li><li>The Big Build</li></ul>" },
+            { title: "Gaming", description: "<ul><li>Gaming Hardware</li><li>Objectives</li><li>Characters</li><li>Project</li><li>Showcase</li></ul>" },
+            { title: "Computing History", description: "<ul><li>1940 - 1959</li><li>1960 - 1979</li><li>1980 - 1999</li><li>2000 - 2019</li><li>2020 - Present Day</li><li>Timeline</li></ul>" },
+            { title: "Assessment", description: "<ul><li>Consolidation/Revision</li><li>Revision</li><li>Assessment</li></ul>" },
+            { title: "Minecraft Coding", description: "<ul><li>Python Option Available</li></ul>" }
+          ],
+          year9: [
+            { title: "E-Safety", description: "<ul><li>E-Safety</li></ul>" },
+            { title: "Python Programming", description: "<ul><li>Sequence</li><li>Selection</li><li>Iteration</li><li>Assessment</li></ul>" },
+            { title: "Binary & Hex", description: "<ul><li>Binary Conversions</li><li>Binary Addition & Shifts</li><li>Hexadecimal</li></ul>" },
+            { title: "Cyber Security", description: "<ul><li>Cyber Security</li><li>Hero or Criminal?</li><li>Malware</li></ul>" },
+            { title: "Assessment", description: "<ul><li>Revision</li><li>Assessment</li></ul>" },
+            { title: "Xmas", description: "<ul><li>TBA</li></ul>" },
+            { title: "Business", description: "<ul><li>Business Basics</li><li>Behind the Scenes</li><li>Brand Power</li><li>Decision Making</li><li>The Apprentice Challenge</li><li>The Big Showcase</li></ul>" },
+            { title: "Digital World", description: "<ul><li>Images</li><li>Compression (Lossy / Lossless)</li><li>Networks (LAN & WAN)</li><li>Logic Gates inc Boolean</li><li>Character Sets (ASCII / UNICODE)</li></ul>" },
+            { title: "AI & Ethics", description: "<ul><li>What is AI?</li><li>The Reality of AI</li><li>How AI Learns</li><li>Algorithmic Bias</li><li>Responsibility & Policy</li><li>The Grand Summary</li></ul>" },
+            { title: "Assessment", description: "<ul><li>Consolidation/Revision</li><li>Revision</li><li>Assessment</li></ul>" },
+            { title: "Photoshop", description: "<ul><li>Object Selection</li><li>Airbrushing</li><li>Filters</li><li>Composites</li><li>Project</li></ul>" }
+          ],
+          gcse: [
+            { title: "Creative iMedia - R093", description: "<ul><li>Exam Unit</li><li>Media Industry & Pre-Production</li><li>Understanding & Planning</li></ul>" },
+            { title: "Creative iMedia - R094", description: "<ul><li>Coursework Unit</li><li>Visual Identity & Digital Graphics</li><li>Creation & Evaluation</li></ul>" },
+            { title: "Creative iMedia - R097", description: "<ul><li>Coursework Unit</li><li>Interactive Digital Media</li><li>Publishing & Testing</li></ul>" },
+            { title: "Enterprise - Component 1", description: "<ul><li>Coursework Unit</li><li>Exploring Enterprises</li><li>Market Research & Customer Needs</li></ul>" },
+            { title: "Enterprise - Component 2", description: "<ul><li>Coursework Unit</li><li>Planning for and Pitching an Enterprise</li><li>Financial Planning & Proposals</li></ul>" },
+            { title: "Enterprise - Component 3", description: "<ul><li>Exam Unit</li><li>Promotion and Finance for Enterprise</li><li>Business Growth & Success</li></ul>" }
+          ]
         };
 
         function loadYear(year) {
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-            document.getElementById('btn-' + year).classList.add('active');
-            
-            const titles = { year7: 'Year 7 Curriculum', year8: 'Year 8 Curriculum', year9: 'Year 9 Curriculum', year10: 'Year 10 Curriculum', year11: 'Year 11 Curriculum' };
+            if (!curriculumData[year]) year = 'year7';
+            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById('btn-' + year);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            const titles = { year7: 'Year 7 Curriculum', year8: 'Year 8 Curriculum', year9: 'Year 9 Curriculum', gcse: 'GCSE Curriculum' };
             document.getElementById('year-title').innerText = titles[year];
-            
+
+            const dncContainer = document.getElementById('dnc-container');
+            if (['year7', 'year8', 'year9'].includes(year)) {
+                const yearNum = year.replace('year', ''); 
+                dncContainer.innerHTML = `<button class="dnc-btn" onclick="window.location.href='y${yearNum}-dnc.html'">📝 View Year ${yearNum} Demonstrate & Connect Tasks</button>`;
+            } else {
+                dncContainer.innerHTML = '';
+            }
+
+            try { sessionStorage.setItem('activeYearTab', year); } catch (e) {}
+
             const grid = document.getElementById('content-grid');
-            grid.innerHTML = "";
+            grid.innerHTML = ''; 
             
             curriculumData[year].forEach((unit, index) => {
-                grid.innerHTML += `
-                    <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #800000; display: flex; flex-direction: column;">
-                        <div style="color: #800000; font-weight: bold; font-size: 0.85em; margin-bottom: 10px;">UNIT ${index + 1}</div>
-                        <h3 style="color: #1e3a8a; margin-top: 0;">${unit.title}</h3>
-                        <div style="color: #555; flex-grow: 1;">${unit.description}</div>
-                        <button onclick="window.location.href='${unit.title.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}.html'" style="background: #dfaa2b; color: #1e3a8a; font-weight: bold; border: none; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 20px;">View Unit Modules</button>
-                    </div>
+                const card = document.createElement('div');
+                card.className = 'card';
+                const fileName = unit.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.html';
+                card.onclick = () => { window.location.href = fileName; };
+
+                let subtitleHtml = year === 'gcse' ? `<div class="card-subtitle">GCSE COURSE</div>` : `<div class="card-subtitle">UNIT ${index + 1} &bull; COMPUTING</div>`;
+                card.innerHTML = `
+                    ${subtitleHtml}
+                    <div class="card-title">${unit.title}</div>
+                    <div class="card-body">${unit.description}</div>
+                    <button class="card-btn">View Lesson Materials</button>
                 `;
+                grid.appendChild(card);
             });
         }
+
+        window.onload = () => {
+            let startYear = 'year7';
+            try { startYear = sessionStorage.getItem('activeYearTab') || 'year7'; } catch (e) {}
+            loadYear(startYear);
+        };
     </script>
 </body>
 </html>
