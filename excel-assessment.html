@@ -4,14 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lesson 4 - Assessment</title>
-    <link rel="stylesheet" href="style.css">
-
+    
     <!-- Firebase SDKs for Teacher Cloud Markbook -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
+        :root {
+            /* Delta Serlby Park Color Scheme */
+            --navy: #1B1464; 
+            --yellow: #F7931D;
+            --maroon: #822433;
+            --bg-color: #f4f6f8;
+            --text-color: #333;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+        }
+
+        header { 
+            background-color: var(--navy); 
+            color: white; 
+            padding: 20px; 
+            display: grid; 
+            grid-template-columns: 1fr auto 1fr; 
+            align-items: center; 
+            border-bottom: 6px solid var(--maroon); 
+        }
+
+        .header-left { display: flex; justify-content: flex-start; }
+        .header-center { text-align: center; }
+        .header-right { display: flex; justify-content: flex-end; align-items: center; gap: 12px; }
+        header img { height: 80px; background-color: white; border-radius: 8px; padding: 5px; }
+        header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; }
+        
+        .back-btn { background-color: var(--yellow); color: var(--navy); text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; transition: transform 0.2s; }
+        .back-btn:hover { transform: scale(1.05); }
+
         /* Scoreboard Banner */
         .scoreboard {
             max-width: 1450px;
@@ -284,19 +319,21 @@
         }
         .progress-table th { background-color: #1e3a8a; color: white; padding: 8px; }
         .progress-table td { padding: 12px 8px; font-weight: bold; font-size: 16px; border: 1px solid #ddd; }
+        
+        footer { text-align: center; padding: 25px; color: #666; margin-top: 50px; border-top: 1px solid #ddd; background-color: white; }
     </style>
 </head>
 <body>
-    <header style="background-color: var(--navy); padding: 20px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; border-bottom: 6px solid var(--maroon);">
+    <header>
         <div class="header-left">
-            <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo" style="height: 80px; background-color: white; border-radius: 8px; padding: 5px;"></a>
+            <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
         </div>
         <div class="header-center">
-            <h1 style="color: white; margin: 0; font-size: 28px; letter-spacing: 1px;">Assessment</h1>
+            <h1>Spreadsheets Assessment</h1>
         </div>
-        <div class="header-right" style="display: flex; justify-content: flex-end; align-items: center;">
+        <div class="header-right">
             <span id="save-status-pill">💾 Local Mode</span>
-            <a href="spreadsheets.html" style="background-color: var(--yellow); color: var(--navy); text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold;">&larr; Back to Curriculum</a>
+            <a href="spreadsheets.html" class="back-btn">&larr; Back to Unit</a>
         </div>
     </header>
 
@@ -342,7 +379,7 @@
 
             <div class="ide-panel output-panel">
                 <h3 style="color: var(--maroon);">3. Section Progress</h3>
-                <p style="font-size: 13px; color: #666; margin-top: 0;">Your answers are evaluated instantly.</p>
+                <p style="font-size: 13px; color: #666; margin-top: 0;">Your answers are evaluated instantly and saved to the cloud.</p>
                 <div id="feedback" class="feedback-box">Loading progress...</div>
             </div>
         </div>
@@ -369,12 +406,17 @@
         let auth = null;
         let db = null;
 
-        if (typeof firebase !== 'undefined') {
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
+        // Safely initialize Firebase so network blockers don't break the page
+        try {
+            if (typeof firebase !== 'undefined') {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                auth = firebase.auth();
+                db = firebase.firestore();
             }
-            auth = firebase.auth();
-            db = firebase.firestore();
+        } catch (e) {
+            console.warn("Firebase init blocked or failed. Running in Local Mode.", e);
         }
 
         function buildStructuredMarkbookItems() {
@@ -501,9 +543,10 @@
         /* ==========================================================================
            2. EXCEL SPREADSHEET LOGIC & RENDERING
            ========================================================================== */
+
+        // Graceful error handling (no UI nuking)
         window.onerror = function(msg, url, line) {
-            var panel = document.getElementById("instruction-panel");
-            if (panel) panel.innerHTML = "<h3 style='color:red;'>Startup Alert</h3><p>An error blocked the page from loading: " + msg + "</p>";
+            console.error("Runtime Error:", msg, "at", url, line);
             return false;
         };
 
@@ -715,7 +758,7 @@
         }
 
         async function clearScores() {
-            if (confirm("Are you sure you want to clear all scores for this student?")) {
+            if (confirm("Are you sure you want to clear all scores and start this assessment over?")) {
                 try {
                     var tasks = ['t1', 't2', 't3', 't4'];
                     for(var i=0; i<tasks.length; i++) {
@@ -733,7 +776,7 @@
                     }
                 } catch(e) { }
                 switchTask(); 
-                alert("Scores and typed answers have been reset.");
+                alert("Scores and typed answers have been successfully reset.");
             }
         }
 
@@ -852,10 +895,16 @@
             }, 10);
         }
 
+        // Live updating the cell while typing in the formula bar
         function handleFxInput() {
             if (activeCell) {
                 var val = document.getElementById('formula-bar').value;
-                document.getElementById('cell-' + activeCell.r + '-' + activeCell.c).value = val;
+                var cellInput = document.getElementById('cell-' + activeCell.r + '-' + activeCell.c);
+                if (cellInput) {
+                    cellInput.value = val;
+                    taskData[currentTask][activeCell.r][activeCell.c] = val;
+                    evaluateAllCells();
+                }
             }
         }
 
@@ -984,6 +1033,8 @@
                     incorrect++;
                 }
 
+                // If user isn't currently typing in the cell directly, calculate it 
+                // so they see the result while the formula bar shows the raw formula
                 if (document.activeElement !== inputEl) {
                     if (cleanVal.startsWith('=')) {
                         inputEl.value = calculateFormula(cleanVal);
@@ -1029,8 +1080,8 @@
             try {
                 loadProgress();
             } catch (e) {
-                var panel = document.getElementById("instruction-panel");
-                if (panel) panel.innerHTML = "<h3 style='color:red;'>Startup Error</h3><p>" + e.message + "</p>";
+                console.error("Startup Error:", e.message);
+                switchTask();
             }
         };
     </script>
