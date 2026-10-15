@@ -17,28 +17,9 @@
         <div class="modal-content">
             <img src="logo.jpg" alt="Delta Logo" style="max-width: 150px; margin-bottom: 20px;">
             <h2 style="color: #1e3a8a; margin-top: 0;">Student Portal Login</h2>
-            <p style="color: #666; font-size: 0.9em; margin-bottom: 20px;">Enter your school username and class to access your saved work.</p>
+            <p style="color: #666; font-size: 0.9em; margin-bottom: 20px;">Enter your school username and PIN to access your saved work.</p>
             
             <input type="text" id="login-username" class="search-box" placeholder="School Username (e.g., jsmith)">
-            
-            <select id="login-class" class="search-box">
-                <option value="" disabled selected>Select your class...</option>
-                <optgroup label="Year 7">
-                    <option value="7x1">7x1</option><option value="7x2">7x2</option><option value="7y1">7y1</option><option value="7y2">7y2</option>
-                </optgroup>
-                <optgroup label="Year 8">
-                    <option value="8x1">8x1</option><option value="8x2">8x2</option><option value="8y1">8y1</option><option value="8y2">8y2</option>
-                </optgroup>
-                <optgroup label="Year 9">
-                    <option value="9x1">9x1</option><option value="9x2">9x2</option><option value="9y1">9y1</option><option value="9y2">9y2</option>
-                </optgroup>
-                <optgroup label="GCSE Options">
-                    <option value="10aEnt1">10aEnt1 (Enterprise)</option>
-                    <option value="11aEnt1">11aEnt1 (Enterprise)</option>
-                    <option value="10bCim1">10bCim1 (iMedia)</option>
-                    <option value="11bCim1">11bCim1 (iMedia)</option>
-                </optgroup>
-            </select>
             
             <input type="password" id="login-pin" class="search-box" placeholder="PIN (default: 1234)">
             
@@ -52,7 +33,9 @@
 
     <header>
         <div class="header-left">
-            <img src="logo.jpg" alt="Delta Serlby Park Logo">
+            <a href="index.html">
+                <img src="logo.jpg" alt="Delta Serlby Park Logo">
+            </a>
         </div>
         <div class="header-center">
             <h1>Computing Curriculum</h1>
@@ -97,11 +80,10 @@
         // Login Logic
         async function studentLogin() {
             const username = document.getElementById('login-username').value.trim().toLowerCase();
-            const selectedClass = document.getElementById('login-class').value;
             const pin = document.getElementById('login-pin').value;
             const err = document.getElementById('login-error');
             
-            if (!username || !selectedClass || !pin) {
+            if (!username || !pin) {
                 err.innerText = "Please fill in all fields.";
                 err.style.display = "block";
                 return;
@@ -124,11 +106,9 @@
                 
                 const uid = userCredential.user.uid;
                 
-                // Save/Update student profile in Firestore
+                // Save/Update student profile in Firestore WITHOUT overwriting their allocated class
                 await db.collection("users").doc(uid).set({
                     username: username,
-                    fullName: username,
-                    className: selectedClass,
                     lastLogin: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
 
