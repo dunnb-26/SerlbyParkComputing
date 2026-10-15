@@ -901,69 +901,28 @@
             // 2. Listen for Firebase Cloud Login & load cloud data
             if (auth && db) {
                 auth.onAuthStateChanged(async (user) => {
-        if (!user && sessionStorage.getItem('teacherMode') !== 'true') {
-            window.location.href = "index.html";
-            return;
-        }
-
-        if (user) {
-            try {
-                const docRef = db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID);
-                const doc = await docRef.get();
-                
-                // --- ONE-TIME MIGRATION SCRIPT ---
-                const LOCAL_STORAGE_KEY = 'y7_ht1_full_data'; // CHANGE THIS TO MATCH YOUR LESSON'S OLD KEY
-                
-                if (!doc.exists) {
-                    // If no cloud data exists, check for local data
-                    const savedLocal = localStorage.getItem(LOCAL_STORAGE_KEY);
-                    if (savedLocal) {
-                        const localData = JSON.parse(savedLocal);
-                        localData.lastUpdated = Date.now();
-                        
-                        // Upload local work to Firebase
-                        await docRef.set(localData, { merge: true });
-                        
-                        // Delete local memory so the next student doesn't see it
-                        localStorage.removeItem(LOCAL_STORAGE_KEY);
-                        
-                        // Reload to pull the fresh cloud data
-                        window.location.reload();
+                    const statusPill = document.getElementById('save-status-pill');
+                    if (!user) {
+                        if (statusPill) statusPill.innerText = "💾 Local Mode (Not Logged In)";
                         return;
                     }
-                } else {
-                    // If they already have cloud data, wipe local memory to protect shared PCs
-                    localStorage.removeItem(LOCAL_STORAGE_KEY);
-                }
-                // --- END MIGRATION SCRIPT ---
 
-                // Standard Loading Logic
-                if (doc.exists) {
-                    var data = doc.data();
-                    var inputs = document.querySelectorAll('.auto-input');
-                    for (var i = 0; i < inputs.length; i++) {
-                        if (data['input_' + i] !== undefined) {
-                            inputs[i].value = data['input_' + i];
-                            if (data['class_' + i]) {
-                                inputs[i].className = data['class_' + i];
-                            }
-                            if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                                inputs[i].style.height = 'auto'; 
-                                inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                            }
+                    if (statusPill) statusPill.innerText = "☁️ Cloud Sync Active";
+
+                    try {
+                        const doc = await db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).get();
+                        if (doc.exists) {
+                            applySavedInputs(doc.data());
+                        } else {
+                            // If student already typed locally before Firebase finished loading, push it to cloud
+                            syncWorkToCloud(true);
                         }
+                    } catch (err) {
+                        console.error("Error loading cloud work:", err);
                     }
-                    
-                    if (typeof checkAnswers === "function") {
-                        checkAnswers('amber-input');
-                        checkAnswers('green-input');
-                    }
-                }
-            } catch (err) {
-                console.error("Error loading cloud data:", err);
+                });
             }
         }
-    });
 
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('auto-input')) {
