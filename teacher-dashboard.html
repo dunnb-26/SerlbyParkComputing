@@ -5,455 +5,101 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teacher Dashboard - Cloud Markbook</title>
     <link rel="stylesheet" href="style.css">
-
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f4f6f8;
-            margin: 0;
-        }
-
-        .dashboard-layout {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 20px;
-            max-width: 1400px;
-            margin: 20px auto;
-            padding: 0 20px;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            border-top: 6px solid #1e3a8a;
-            height: 85vh;
-            display: flex;
-            flex-direction: column;
-            box-sizing: border-box;
-        }
-
-        .sidebar h3 {
-            color: #1e3a8a;
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
-
-        select, .search-box {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            font-weight: bold;
-            box-sizing: border-box;
-        }
-
-        .search-box {
-            font-weight: normal;
-        }
-
-        #student-list {
-            flex-grow: 1;
-            overflow-y: auto;
-            margin-top: 6px;
-            padding-right: 4px;
-        }
-
-        .student-btn {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 8px;
-            background: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            text-align: left;
-            font-weight: bold;
-            font-size: 0.95em;
-            cursor: pointer;
-            transition: 0.2s;
-            color: #333;
-        }
-
-        .student-btn:hover,
-        .student-btn.active {
-            background: #1e3a8a;
-            color: white;
-            border-color: #1e3a8a;
-        }
-
-        .student-btn > span:first-child {
-            overflow-wrap: anywhere;
-        }
-
-        .class-pill {
-            background: #dfaa2b;
-            color: #1e3a8a;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: bold;
-            flex-shrink: 0;
-        }
-
-        .sidebar-message {
-            color: #64748b;
-            font-size: 0.9em;
-            text-align: center;
-            line-height: 1.5;
-            margin: 20px 5px;
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f8; margin: 0; }
+        .dashboard-layout { display: grid; grid-template-columns: 320px 1fr; gap: 20px; max-width: 1400px; margin: 20px auto; padding: 0 20px; }
+        
+        /* Sidebar Styles */
+        .sidebar { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #1e3a8a; height: 85vh; display: flex; flex-direction: column; }
+        .sidebar h3 { color: #1e3a8a; margin-top: 0; margin-bottom: 10px; }
+        select, .search-box { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 4px; border: 1px solid #ccc; font-weight: bold; box-sizing: border-box; }
+        .search-box { font-weight: normal; }
+        #student-list { flex-grow: 1; overflow-y: auto; margin-top: 10px; padding-right: 4px; }
+        
+        .student-btn { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 12px; margin-bottom: 8px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 6px; text-align: left; font-weight: bold; font-size: 0.95em; cursor: pointer; transition: 0.2s; color: #333; }
+        .student-btn:hover, .student-btn.active { background: #1e3a8a; color: white; border-color: #1e3a8a; }
+        .class-pill { background: #dfaa2b; color: #1e3a8a; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; font-weight: bold; flex-shrink: 0; }
 
         /* Main Markbook View */
-        .main-view {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            border-top: 6px solid #dfaa2b;
-            height: 85vh;
-            overflow-y: auto;
-            box-sizing: border-box;
-        }
+        .main-view { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #dfaa2b; height: 85vh; overflow-y: auto; }
+        .student-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #1e3a8a; padding-bottom: 15px; margin-bottom: 25px; }
+        
+        /* Lesson Portfolio Cards */
+        .lesson-card { border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 25px; overflow: hidden; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.04); }
+        .lesson-card-header { background: #1e3a8a; color: white; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .lesson-card-header h3 { margin: 0; color: white; font-size: 1.15em; text-transform: uppercase; letter-spacing: 0.5px; }
+        .lesson-meta { font-size: 0.85em; color: #dfaa2b; font-weight: bold; }
+        .lesson-card-body { padding: 20px; }
 
-        .student-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            gap: 15px;
-            border-bottom: 3px solid #1e3a8a;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
-
-        .toolbar-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 18px;
-            background: #f8f9fa;
-            padding: 12px 15px;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-        }
-
-        /* Lesson Accordion */
-        .lesson-card {
-            border: 2px solid #cbd5e1;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            overflow: hidden;
-            background: #fff;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .lesson-card.open {
-            border-color: #1e3a8a;
-            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.12);
-            margin-bottom: 18px;
-        }
-
-        .lesson-card-header {
-            background: #f8fafc;
-            color: #1e3a8a;
-            padding: 14px 18px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            user-select: none;
-            transition: background 0.15s, color 0.15s;
-        }
-
-        .lesson-card-header:hover {
-            background: #e2e8f0;
-        }
-
-        .lesson-card.open .lesson-card-header {
-            background: #1e3a8a;
-            color: white;
-        }
-
-        .lesson-title-wrap {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: bold;
-            font-size: 1.05em;
-        }
-
-        .chevron {
-            display: inline-block;
-            transition: transform 0.2s ease;
-            font-size: 0.85em;
-            color: #dfaa2b;
-        }
-
-        .lesson-card.open .chevron {
-            transform: rotate(90deg);
-        }
-
-        .lesson-meta {
-            font-size: 0.85em;
-            color: #64748b;
-            font-weight: bold;
-            margin-left: 10px;
-            white-space: nowrap;
-        }
-
-        .lesson-card.open .lesson-meta {
-            color: #dfaa2b;
-        }
-
-        .lesson-card-body {
-            display: none;
-            padding: 20px;
-            border-top: 2px solid #e2e8f0;
-            background: #ffffff;
-        }
-
-        .lesson-card.open .lesson-card-body {
-            display: block;
-        }
-
-        /* Questions and Answers */
-        .qa-row {
-            border-bottom: 1px solid #eee;
-            padding: 12px 0;
-        }
-
-        .qa-row:last-child {
-            border-bottom: none;
-        }
-
-        .qa-label {
-            font-weight: bold;
-            color: #1e3a8a;
-            margin-bottom: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.95em;
-        }
-
-        .answer-box {
-            background: #f8f9fa;
-            border: 2px solid #cbd5e1;
-            padding: 12px;
-            border-radius: 6px;
-            color: #1e293b;
-            white-space: pre-wrap;
-            overflow-wrap: anywhere;
-            font-family: inherit;
-            min-height: 24px;
-        }
-
-        .answer-box.empty {
-            color: #94a3b8;
-            font-style: italic;
-            background: #f1f5f9;
-            border-style: dashed;
-        }
-
-        .answer-box.correct {
-            border-color: #2e7d32;
-            background: #e8f5e9;
-        }
-
-        .answer-box.incorrect {
-            border-color: #d32f2f;
-            background: #ffebee;
-        }
+        /* Question & Answer Grid */
+        .qa-row { border-bottom: 1px solid #eee; padding: 12px 0; }
+        .qa-row:last-child { border-bottom: none; }
+        .qa-label { font-weight: bold; color: #1e3a8a; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 0.95em; }
+        .answer-box { background: #f8f9fa; border: 2px solid #cbd5e1; padding: 12px; border-radius: 6px; color: #1e293b; white-space: pre-wrap; font-family: inherit; min-height: 24px; }
+        .answer-box.empty { color: #94a3b8; font-style: italic; background: #f1f5f9; border-style: dashed; }
+        .answer-box.correct { border-color: #2e7d32; background: #e8f5e9; }
+        .answer-box.incorrect { border-color: #d32f2f; background: #ffebee; }
 
         /* Status Badges */
-        .status-badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.78em;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
+        .status-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 0.78em; font-weight: bold; text-transform: uppercase; }
+        .badge-correct { background: #2e7d32; color: white; }
+        .badge-incorrect { background: #d32f2f; color: white; }
+        .badge-verified { background: #dfaa2b; color: #1e3a8a; margin-right: 8px; }
 
-        .badge-correct {
-            background: #2e7d32;
-            color: white;
-        }
-
-        .badge-incorrect {
-            background: #d32f2f;
-            color: white;
-        }
-
-        .badge-verified {
-            background: #dfaa2b;
-            color: #1e3a8a;
-            margin-right: 6px;
-        }
-
-        .screenshot-img {
-            max-width: 100%;
-            max-height: 350px;
-            border: 2px solid #1e3a8a;
-            border-radius: 6px;
-            margin-top: 8px;
-            display: block;
-        }
-
-        .btn-gold {
-            background: #dfaa2b;
-            color: #1e3a8a;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn-gold:hover {
-            background: #c99722;
-        }
-
-        .btn-outline {
-            background: white;
-            color: #1e3a8a;
-            border: 1px solid #1e3a8a;
-            padding: 7px 12px;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 0.85em;
-        }
-
-        .btn-outline:hover {
-            background: #1e3a8a;
-            color: white;
-        }
-
-        @media (max-width: 850px) {
-            .dashboard-layout {
-                grid-template-columns: 1fr;
-            }
-
-            .sidebar {
-                height: auto;
-                min-height: 250px;
-                max-height: 55vh;
-            }
-
-            .main-view {
-                height: auto;
-                min-height: 60vh;
-                padding: 18px;
-            }
-
-            .lesson-card-header {
-                align-items: flex-start;
-                flex-wrap: wrap;
-            }
-
-            .lesson-meta {
-                margin-left: 0;
-            }
-        }
+        .screenshot-img { max-width: 100%; max-height: 350px; border: 2px solid #1e3a8a; border-radius: 6px; margin-top: 8px; display: block; }
+        .btn-gold { background: #dfaa2b; color: #1e3a8a; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .btn-gold:hover { background: #c99722; }
     </style>
 </head>
-
 <body>
     <header>
         <div class="header-left">
-            <a href="index.html">
-                <img src="logo.jpg" alt="Logo">
-            </a>
+            <a href="index.html"><img src="logo.jpg" alt="Logo"></a>
         </div>
-
         <div class="header-center">
             <h1>Teacher Cloud Markbook</h1>
         </div>
-
         <div class="header-right">
-            <button class="btn-gold" onclick="fetchStudents()">
-                Refresh Roster
-            </button>
+            <button class="btn-gold" onclick="fetchStudents()">↻ Refresh Roster</button>
         </div>
     </header>
 
     <div class="dashboard-layout">
-
-        <!-- Sidebar -->
+        <!-- Sidebar: Class Filter & Student Roster -->
         <div class="sidebar">
             <h3>Class Filter</h3>
-
-            <select id="class-filter" onchange="handleClassChange()">
-                <optgroup label="Year 7">
-                    <option value="7x1">7x1</option>
-                    <option value="7x2">7x2</option>
-                    <option value="7y1">7y1</option>
-                    <option value="7y2">7y2</option>
-                </optgroup>
-
-                <optgroup label="Year 8">
-                    <option value="8x1">8x1</option>
-                    <option value="8x2">8x2</option>
-                    <option value="8y1">8y1</option>
-                    <option value="8y2">8y2</option>
-                </optgroup>
-
-                <optgroup label="Year 9">
-                    <option value="9x1">9x1</option>
-                    <option value="9x2">9x2</option>
-                    <option value="9y1">9y1</option>
-                    <option value="9y2">9y2</option>
-                </optgroup>
-
-                <optgroup label="GCSE Options">
-                    <option value="10aEnt1">10aEnt1 (Enterprise)</option>
-                    <option value="11aEnt1">11aEnt1 (Enterprise)</option>
-                    <option value="10bCim1">10bCim1 (iMedia)</option>
-                    <option value="11bCim1">11bCim1 (iMedia)</option>
-                </optgroup>
-
-                <option value="Unassigned">Unassigned</option>
+            <select id="class-filter" onchange="renderSidebar()">
                 <option value="ALL">All Classes</option>
+                <optgroup label="Year 7">
+                    <option value="7x1">7x1</option><option value="7x2">7x2</option><option value="7y1">7y1</option><option value="7y2">7y2</option>
+                </optgroup>
+                <optgroup label="Year 8">
+                    <option value="8x1">8x1</option><option value="8x2">8x2</option><option value="8y1">8y1</option><option value="8y2">8y2</option>
+                </optgroup>
+                <optgroup label="Year 9">
+                    <option value="9x1">9x1</option><option value="9x2">9x2</option><option value="9y1">9y1</option><option value="9y2">9y2</option>
+                </optgroup>
+                <optgroup label="GCSE Options">
+                    <option value="10aEnt1">10aEnt1</option><option value="11aEnt1">11aEnt1</option><option value="10bCim1">10bCim1</option><option value="11bCim1">11bCim1</option>
+                </optgroup>
+                <option value="Unassigned">Unassigned</option>
             </select>
 
-            <input
-                type="text"
-                id="student-search"
-                class="search-box"
-                placeholder="Search student name or username..."
-                oninput="renderSidebar()"
-            >
+            <input type="text" id="student-search" class="search-box" placeholder="🔍 Search student name..." oninput="renderSidebar()">
 
             <div id="student-list">
-                <p class="sidebar-message">Loading students from Firebase...</p>
+                <p style="color: #666; font-size: 0.9em;">Loading students from Firebase...</p>
             </div>
         </div>
 
-        <!-- Main Markbook View -->
+        <!-- Main View: Direct Cloud Portfolio -->
         <div class="main-view" id="work-view">
-            <h2 style="color:#666; text-align:center; margin-top:80px;">
-                Select a class from the left to begin.
-            </h2>
+            <h2 style="color: #666; text-align: center; margin-top: 80px;">&larr; Select a student from the roster to view all their cloud-saved lessons</h2>
         </div>
-
     </div>
 
     <script>
@@ -471,512 +117,239 @@
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
-
         const db = firebase.firestore();
 
         let allStudents = [];
         let activeStudent = null;
 
-        // Prevent an older lesson request from replacing a newer selection.
-        let portfolioRequestId = 0;
-
-        // 2. Fetch Students from Firestore
+        // 2. Fetch All Registered Students
         async function fetchStudents() {
             const listDiv = document.getElementById('student-list');
-
-            listDiv.innerHTML =
-                '<p class="sidebar-message">Loading roster...</p>';
+            listDiv.innerHTML = "<p style='color:#666;'>Loading roster...</p>";
 
             try {
                 const snapshot = await db.collection('users').get();
-
                 allStudents = [];
 
                 snapshot.forEach(doc => {
                     const data = doc.data();
-
                     allStudents.push({
                         uid: doc.id,
                         username: data.username || doc.id,
-                        fullName: data.fullName || data.username || 'Unnamed Student',
-                        className: data.className || 'Unassigned'
+                        fullName: data.fullName || data.username || "Unnamed Student",
+                        className: data.className || "Unassigned"
                     });
                 });
 
-                allStudents.sort((a, b) =>
-                    a.fullName.localeCompare(b.fullName)
-                );
-
-                // Update the selected student reference after refreshing.
-                if (activeStudent) {
-                    activeStudent =
-                        allStudents.find(s => s.uid === activeStudent.uid) || null;
-                }
-
+                allStudents.sort((a, b) => a.fullName.localeCompare(b.fullName));
                 renderSidebar();
-
             } catch (err) {
-                console.error('Error fetching students:', err);
-
-                listDiv.innerHTML = `
-                    <p style="color:red;">
-                        Firestore Error: ${escapeHtml(err.message)}
-                    </p>
-                `;
+                console.error("Error fetching students:", err);
+                listDiv.innerHTML = `<p style="color:red;">Firestore Error: ${err.message}</p>`;
             }
         }
 
-        // 3. Handle Changing the Selected Class
-        function handleClassChange() {
-            // Invalidate any lesson request still loading.
-            portfolioRequestId++;
-
-            // Clear the selected student and search.
-            activeStudent = null;
-            document.getElementById('student-search').value = '';
-
-            // Remove the previous student's work immediately.
-            const viewDiv = document.getElementById('work-view');
-            viewDiv.innerHTML = `
-                <h2 style="color:#666; text-align:center; margin-top:80px;">
-                    Select a student from the selected class to view their lesson list.
-                </h2>
-            `;
-
-            renderSidebar();
-        }
-
-        // 4. Render Students Only When a Specific Class Is Selected
+        // 3. Render Filtered Student List in Sidebar (WITH MULTI-CLASS FIX)
         function renderSidebar() {
             const listDiv = document.getElementById('student-list');
             const classFilter = document.getElementById('class-filter').value;
-            const searchQuery = document
-                .getElementById('student-search')
-                .value
-                .toLowerCase()
-                .trim();
+            const searchQuery = document.getElementById('student-search').value.toLowerCase().trim();
+            listDiv.innerHTML = "";
 
-            listDiv.innerHTML = '';
-
-            // Do not show any student names when All Classes is selected (Optional choice)
-            if (classFilter === 'ALL' && !searchQuery) {
-                listDiv.innerHTML = `
-                    <p class="sidebar-message">
-                        Type a name to search, or select a specific class above.
-                    </p>
-                `;
-                return;
-            }
-
-            // Filter by class first, then by the search query.
             const filtered = allStudents.filter(student => {
-                // Check if the class matches anywhere in the string (case insensitive)
+                // Check if the class matches anywhere in the string (handles multiple classes like '10bCim1 / 10aEnt1')
                 const studentClasses = String(student.className || "").toLowerCase();
                 const selectedFilter = classFilter.toLowerCase();
                 const matchesClass = classFilter === "ALL" || studentClasses.includes(selectedFilter);
                 
                 // Check if the search box matches their name
-                const matchesSearch =
-                    !searchQuery ||
-                    student.fullName.toLowerCase().includes(searchQuery) ||
-                    student.username.toLowerCase().includes(searchQuery);
+                const matchesSearch = !searchQuery || 
+                                      student.fullName.toLowerCase().includes(searchQuery) || 
+                                      student.username.toLowerCase().includes(searchQuery);
 
                 return matchesClass && matchesSearch;
             });
 
             if (filtered.length === 0) {
-                listDiv.innerHTML = `
-                    <p class="sidebar-message">
-                        No students found matching your filters.
-                    </p>
-                `;
+                listDiv.innerHTML = "<p style='color: #666; font-size: 0.9em;'>No students found matching your filters.</p>";
                 return;
             }
 
             filtered.forEach(student => {
                 const btn = document.createElement('button');
-
-                btn.className =
-                    'student-btn' +
-                    (
-                        activeStudent && activeStudent.uid === student.uid
-                            ? ' active'
-                            : ''
-                    );
-
+                btn.className = 'student-btn' + (activeStudent && activeStudent.uid === student.uid ? ' active' : '');
                 btn.innerHTML = `
-                    <span>
-                        ${escapeHtml(student.fullName)}
-                        <br>
-                        <small style="font-weight:normal; opacity:0.8;">
-                            @${escapeHtml(student.username)}
-                        </small>
-                    </span>
-                    <span class="class-pill">
-                        ${escapeHtml(student.className)}
-                    </span>
+                    <span>${escapeHtml(student.fullName)} <br><small style="font-weight:normal; opacity:0.8;">@${escapeHtml(student.username)}</small></span>
+                    <span class="class-pill">${escapeHtml(student.className)}</span>
                 `;
-
                 btn.onclick = () => {
                     activeStudent = student;
-
-                    // Re-render to keep the correct student highlighted.
-                    renderSidebar();
-
+                    document.querySelectorAll('.student-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
                     loadStudentPortfolio(student);
                 };
-
                 listDiv.appendChild(btn);
             });
         }
 
-        // 5. Load a Student's Lesson Portfolio
+        // 4. Directly Pull All Lesson Documents for Selected Student
         async function loadStudentPortfolio(student) {
             const viewDiv = document.getElementById('work-view');
-            const requestId = ++portfolioRequestId;
-
-            viewDiv.innerHTML = `
-                <h3 style="color:#1e3a8a;">
-                    Loading lesson list for ${escapeHtml(student.fullName)}...
-                </h3>
-            `;
+            viewDiv.innerHTML = `<h3 style="color:#1e3a8a;">⏳ Loading cloud work for ${escapeHtml(student.fullName)}...</h3>`;
 
             try {
-                const lessonsSnap = await db
-                    .collection('users')
-                    .doc(student.uid)
-                    .collection('lessons')
-                    .get();
-
-                // Ignore results if the teacher has selected another student
-                // or changed class while this request was loading.
-                if (
-                    requestId !== portfolioRequestId ||
-                    !activeStudent ||
-                    activeStudent.uid !== student.uid
-                ) {
-                    return;
-                }
-
+                const lessonsSnap = await db.collection('users').doc(student.uid).collection('lessons').get();
+                
                 let lessons = [];
-
                 lessonsSnap.forEach(doc => {
-                    lessons.push({
-                        id: doc.id,
-                        ...doc.data()
-                    });
+                    lessons.push({ id: doc.id, ...doc.data() });
                 });
 
-                // Most recently updated lessons appear first.
-                lessons.sort((a, b) =>
-                    (b.lastUpdated || 0) - (a.lastUpdated || 0)
-                );
-
-                const availableClasses = [
-                    'Unassigned',
-                    '7x1', '7x2', '7y1', '7y2',
-                    '8x1', '8x2', '8y1', '8y2',
-                    '9x1', '9x2', '9y1', '9y2',
-                    '10aEnt1', '11aEnt1',
-                    '10bCim1', '11bCim1'
-                ];
-
-                // Create options for dropdown (We'll leave this as a single value setter for now)
-                const classOptions = availableClasses
-                    .map(c => `
-                        <option
-                            value="${c}"
-                            ${student.className.includes(c) ? 'selected' : ''}
-                        >
-                            ${c}
-                        </option>
-                    `)
-                    .join('');
+                lessons.sort((a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0));
 
                 let html = `
                     <div class="student-header">
                         <div>
-                            <h2 style="margin:0; color:#1e3a8a;">
-                                ${escapeHtml(student.fullName)}
-                                <span style="font-weight:normal; font-size:0.75em; color:#666;">
-                                    (@${escapeHtml(student.username)})
-                                </span>
-                            </h2>
-
-                            <p style="margin:5px 0 0 0; color:#64748b; font-weight:bold;">
-                                Saved Lessons:
-                                <strong style="color:#1e3a8a;">
-                                    ${lessons.length}
-                                </strong>
-                                (Click any lesson below to open its work)
-                            </p>
+                            <h2 style="margin: 0; color: #1e3a8a;">${escapeHtml(student.fullName)} <span style="font-weight:normal; font-size:0.75em; color:#666;">(@${escapeHtml(student.username)})</span></h2>
+                            <p style="margin: 5px 0 0 0; color: #dfaa2b; font-weight: bold;">Class: ${escapeHtml(student.className)} | Cloud Lessons Saved: ${lessons.length}</p>
                         </div>
-
-                        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                            <label style="font-weight:bold; color:#1e3a8a; font-size:0.9em;">
-                                Class:
-                            </label>
-
-                            <input type="text" id="manual-class-input" value="${escapeHtml(student.className)}" style="width:150px; margin:0; padding:7px 10px; border:1px solid #ccc; border-radius:4px;">
-
-                            <button
-                                class="btn-gold"
-                                onclick="updateStudentClass('${student.uid}', document.getElementById('manual-class-input').value)"
-                            >
-                                Update Class
-                            </button>
-
-                            <button
-                                class="btn-gold"
-                                onclick="refreshActivePortfolio()"
-                            >
-                                Refresh
-                            </button>
-                        </div>
+                        <button class="btn-gold" onclick="loadStudentPortfolio(activeStudent)">↻ Refresh Student Work</button>
                     </div>
                 `;
 
                 if (lessons.length === 0) {
                     html += `
-                        <div style="text-align:center; padding:50px 20px; background:#f8f9fa; border-radius:8px; border:2px dashed #cbd5e1;">
-                            <h3 style="color:#64748b; margin-bottom:8px;">
-                                No Cloud Work Saved Yet
-                            </h3>
-                            <p style="color:#94a3b8; margin:0;">
-                                Once ${escapeHtml(student.fullName)} logs in and types on a cloud-enabled lesson page, their lessons will appear here.
-                            </p>
+                        <div style="text-align:center; padding: 50px 20px; background:#f8f9fa; border-radius:8px; border: 2px dashed #cbd5e1;">
+                            <h3 style="color:#64748b; margin-bottom:8px;">No Cloud Work Saved Yet</h3>
+                            <p style="color:#94a3b8; margin:0;">Once ${escapeHtml(student.fullName)} logs in and types on a cloud-enabled lesson page, their answers will appear here automatically.</p>
                         </div>
                     `;
-
                     viewDiv.innerHTML = html;
                     return;
                 }
 
-                // Lesson search and accordion controls.
-                html += `
-                    <div class="toolbar-row">
-                        <input
-                            type="text"
-                            id="lesson-filter-input"
-                            class="search-box"
-                            style="margin:0; max-width:380px; background:white;"
-                            placeholder="Filter lessons by name, e.g. Binary, HT1..."
-                            oninput="filterLessonBars()"
-                        >
-
-                        <div>
-                            <button
-                                class="btn-outline"
-                                onclick="toggleAllLessons(false)"
-                            >
-                                Collapse All
-                            </button>
-
-                            <button
-                                class="btn-outline"
-                                onclick="toggleAllLessons(true)"
-                            >
-                                Expand All
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="lessons-accordion-container">
-                `;
-
-                lessons.forEach((lesson, index) => {
-                    html += renderLessonCard(lesson, index);
+                lessons.forEach(lesson => {
+                    html += renderLessonCard(lesson);
                 });
-
-                html += '</div>';
 
                 viewDiv.innerHTML = html;
 
             } catch (err) {
-                console.error('Error loading portfolio:', err);
-
-                if (requestId !== portfolioRequestId) {
-                    return;
-                }
-
-                viewDiv.innerHTML = `
-                    <p style="color:red;">
-                        Error loading student portfolio: ${escapeHtml(err.message)}
-                    </p>
-                `;
+                console.error("Error loading portfolio:", err);
+                viewDiv.innerHTML = `<p style="color:red;">Error loading student portfolio: ${err.message}</p>`;
             }
         }
 
-        // Refresh the currently selected student's portfolio.
-        function refreshActivePortfolio() {
-            if (activeStudent) {
-                loadStudentPortfolio(activeStudent);
-            }
-        }
-
-        // 6. Render a Collapsible Lesson Card
-        function renderLessonCard(lesson, index) {
+        // 5. Universal Card Renderer
+        function renderLessonCard(lesson) {
             const title = lesson.pageTitle || lesson.id.replace(/-/g, ' ');
-
-            const updatedDate = lesson.lastUpdated
-                ? new Date(lesson.lastUpdated).toLocaleDateString('en-GB', {
-                    day: '2-digit',
-                    month: 'short',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                })
-                : 'Saved';
-
+            const updatedDate = lesson.lastUpdated ? new Date(lesson.lastUpdated).toLocaleString('en-GB') : 'Unknown Date';
+            
             let badgesHtml = '';
-
-            if (lesson.scoreText) {
-                badgesHtml += `
-                    <span class="status-badge badge-verified">
-                        ${escapeHtml(lesson.scoreText)}
-                    </span>
-                `;
-            }
-
-            if (lesson.maroon_verified) {
-                badgesHtml += `
-                    <span class="status-badge badge-verified">
-                        Maroon Verified
-                    </span>
-                `;
-            }
-
-            if (lesson.navy_verified) {
-                badgesHtml += `
-                    <span class="status-badge badge-verified">
-                        Navy Verified
-                    </span>
-                `;
-            }
+            if (lesson.scoreText) badgesHtml += `<span class="status-badge badge-verified">${escapeHtml(lesson.scoreText)}</span>`;
+            if (lesson.maroon_verified) badgesHtml += `<span class="status-badge badge-verified">✓ Maroon Verified</span>`;
+            if (lesson.navy_verified) badgesHtml += `<span class="status-badge badge-verified">✓ Navy Verified</span>`;
 
             let bodyHtml = '';
 
-            // Format A: Structured items array.
             if (Array.isArray(lesson.items) && lesson.items.length > 0) {
                 lesson.items.forEach((item, idx) => {
                     const val = (item.value || '').trim();
                     const isEmpty = val === '';
-
                     let boxClass = 'answer-box' + (isEmpty ? ' empty' : '');
                     let statusPill = '';
 
                     if (item.status === 'correct') {
                         boxClass += ' correct';
-                        statusPill = `
-                            <span class="status-badge badge-correct">
-                                Correct
-                            </span>
-                        `;
+                        statusPill = '<span class="status-badge badge-correct">✓ Correct</span>';
                     } else if (item.status === 'incorrect') {
                         boxClass += ' incorrect';
-                        statusPill = `
-                            <span class="status-badge badge-incorrect">
-                                Incorrect
-                            </span>
-                        `;
+                        statusPill = '<span class="status-badge badge-incorrect">✗ Incorrect</span>';
                     }
 
                     bodyHtml += `
                         <div class="qa-row">
                             <div class="qa-label">
-                                <span>
-                                    ${escapeHtml(item.label \vert{}\vert{} 'Question ' + (idx + 1))} </span>${statusPill}
+                                <span>${escapeHtml(item.label || 'Question ' + (idx + 1))}</span>
+                                ${statusPill}
                             </div>
-
-                            <div class="${boxClass}">
-                                ${isEmpty ? '(Left blank)' : escapeHtml(val)}
-                            </div>
+                            <div class="${boxClass}">${isEmpty ? '(Left blank)' : escapeHtml(val)}</div>
                         </div>
                     `;
                 });
             } else {
-                // Format B: Older input_0, input_1 lesson format.
                 const inputKeys = Object.keys(lesson)
                     .filter(k => k.startsWith('input_'))
-                    .sort((a, b) =>
-                        parseInt(a.split('_')[1]) - parseInt(b.split('_')[1])
-                    );
+                    .sort((a, b) => parseInt(a.split('_')[1]) - parseInt(b.split('_')[1]));
 
                 inputKeys.forEach(key => {
                     const idx = key.split('_')[1];
                     const val = (lesson[key] || '').trim();
                     const cls = lesson['class_' + idx] || '';
-
-                    const label =
-                        lesson['label_' + idx] ||
-                        lesson['id_' + idx] ||
-                        `Input Box ${parseInt(idx) + 1}`;
-
+                    const label = lesson['label_' + idx] || lesson['id_' + idx] || `Input Box ${parseInt(idx) + 1}`;
                     const isEmpty = val === '';
 
                     let boxClass = 'answer-box' + (isEmpty ? ' empty' : '');
                     let statusPill = '';
 
-                    if (
-                        cls.includes('input-correct') ||
-                        (cls.includes('correct') && !cls.includes('incorrect'))
-                    ) {
+                    if (cls.includes('input-correct') || (cls.includes('correct') && !cls.includes('incorrect'))) {
                         boxClass += ' correct';
-                        statusPill = `
-                            <span class="status-badge badge-correct">
-                                Correct
-                            </span>
-                        `;
+                        statusPill = '<span class="status-badge badge-correct">✓ Correct</span>';
                     } else if (cls.includes('incorrect')) {
                         boxClass += ' incorrect';
-                        statusPill = `
-                            <span class="status-badge badge-incorrect">
-                                Incorrect
-                            </span>
-                        `;
+                        statusPill = '<span class="status-badge badge-incorrect">✗ Incorrect</span>';
                     }
 
                     bodyHtml += `
                         <div class="qa-row">
                             <div class="qa-label">
-                                <span>${escapeHtml(label)}</span>${statusPill}
+                                <span>${escapeHtml(label)}</span>
+                                ${statusPill}
                             </div>
-
-                            <div class="${boxClass}">
-                                ${isEmpty ? '(Left blank)' : escapeHtml(val)}
-                            </div>
+                            <div class="${boxClass}">${isEmpty ? '(Left blank)' : escapeHtml(val)}</div>
                         </div>
                     `;
                 });
             }
 
-            // Pasted screenshots.
-            if (lesson.img_maroon) {
-                bodyHtml += `
-                    <div class="qa-row">
-                        <div class="qa-label">Maroon Task Screenshot</div>
-                        <img
-                            class="screenshot-img"
-                            src="${escapeHtml(lesson.img_maroon)}"
-                            alt="Maroon task screenshot"
-                        >
-                    </div>
-                `;
-            }
-
-            if (lesson.img_navy) {
-                bodyHtml += `
-                    <div class="qa-row">
-                        <div class="qa-label">Navy Task Screenshot</div>
-                        <img
-                            class="screenshot-img"
-                            src="${escapeHtml(lesson.img_navy)}"
-                            alt="Navy task screenshot"
-                        >
-                    </div>
-                `;
-            }
-
+            if (lesson.img_maroon) bodyHtml += `<div class="qa-row"><div class="qa-label">📸 Maroon Task Screenshot</div><img class="screenshot-img" src="${lesson.img_maroon}"></div>`;
+            if (lesson.img_navy) bodyHtml += `<div class="qa-row"><div class="qa-label">📸 Navy Task Screenshot</div><img class="screenshot-img" src="${lesson.img_navy}"></div>`;
+            
             if (Array.isArray(lesson.screenshots)) {
                 lesson.screenshots.forEach((src, i) => {
-                    bodyHtml += `
-                        <div class="qa-row
+                    bodyHtml += `<div class="qa-row"><div class="qa-label">📸 Pasted Screenshot ${i + 1}</div><img class="screenshot-img" src="${src}"></div>`;
+                });
+            }
+
+            if (!bodyHtml) {
+                bodyHtml = `<p style="color:#94a3b8; font-style:italic;">Student opened this lesson, but no inputs were recorded.</p>`;
+            }
+
+            return `
+                <div class="lesson-card">
+                    <div class="lesson-card-header">
+                        <h3>📄 ${escapeHtml(title)}</h3>
+                        <div>
+                            ${badgesHtml}
+                            <span class="lesson-meta">Last Saved: ${updatedDate}</span>
+                        </div>
+                    </div>
+                    <div class="lesson-card-body">
+                        ${bodyHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function escapeHtml(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        window.onload = fetchStudents;
+    </script>
+</body>
+</html>
