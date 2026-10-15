@@ -10,38 +10,119 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* Full-Screen Login Gate Overlay */
+        #login-gate {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #1e3a8a 0%, #0d1b42 100%);
+            z-index: 9999; display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.4s ease;
+        }
+        .gate-card {
+            background: white; padding: 40px; border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center;
+            width: 90%; max-width: 400px; border-top: 8px solid #dfaa2b; 
+        }
+        .gate-card img { max-width: 150px; margin-bottom: 20px; }
+        .gate-card h2 { color: #1e3a8a; margin-top: 0; margin-bottom: 25px; }
+        
+        .role-btn {
+            display: block; width: 100%; padding: 15px; margin-bottom: 15px;
+            font-size: 1.15em; font-weight: bold; border: none; border-radius: 6px;
+            cursor: pointer; transition: transform 0.1s, background-color 0.2s;
+        }
+        .btn-student { background-color: #dfaa2b; color: #1e3a8a; }
+        .btn-student:hover { background-color: #c99722; }
+        .btn-teacher { background-color: #f8f9fa; color: #555; border: 2px solid #ccc; }
+        .btn-teacher:hover { background-color: #e2e6ea; }
+        
+        .gate-input {
+            width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #ccc;
+            border-radius: 6px; font-size: 16px; box-sizing: border-box; text-align: center; background: white;
+        }
+        .gate-input:focus { outline: none; border-color: #1e3a8a; }
+
+        #login-error, #teacher-login-error {
+            color: #d32f2f; font-size: 0.95em; font-weight: bold; margin-bottom: 15px; display: none;
+        }
+
+        /* Hide main content completely until authenticated */
+        body.locked { overflow: hidden; }
+        body.locked header, body.locked nav, body.locked main, body.locked footer {
+            visibility: hidden;
+        }
+
+        /* Top Header User Name & Log Out Bar */
+        .header-right {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 12px;
+        }
+        .user-status-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logout-btn {
+            background-color: #b91c1c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.2s;
+        }
+        .logout-btn:hover { background-color: #991b1b; }
+    </style>
 </head>
-<body>
-    <!-- Login Modal -->
-    <div id="login-modal" class="modal" style="display: flex;">
-        <div class="modal-content">
-            <img src="logo.jpg" alt="Delta Logo" style="max-width: 150px; margin-bottom: 20px;">
-            <h2 style="color: #1e3a8a; margin-top: 0;">Student Portal Login</h2>
-            <p style="color: #666; font-size: 0.9em; margin-bottom: 20px;">Enter your school username and PIN to access your saved work.</p>
+<body class="locked">
+
+    <!-- LOGIN GATE -->
+    <div id="login-gate">
+        <div class="gate-card">
+            <img src="logo.jpg" alt="Delta Serlby Park Logo">
+            <h2>Welcome to Computing</h2>
             
-            <input type="text" id="login-username" class="search-box" placeholder="School Username (e.g., jsmith)">
-            
-            <input type="password" id="login-pin" class="search-box" placeholder="PIN (default: 1234)">
-            
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button class="btn-gold" style="flex: 1;" onclick="studentLogin()">Log In</button>
-                <button class="btn-outline" style="flex: 1;" onclick="window.location.href='teacher-dashboard.html'">Teacher Access</button>
+            <!-- Step 1: Choose Student or Teacher -->
+            <div id="role-selection">
+                <button class="role-btn btn-student" onclick="showStudentForm()">🎓 I am a Student</button>
+                <button class="role-btn btn-teacher" onclick="showTeacherForm()">👨‍🏫 I am a Teacher</button>
             </div>
-            <p id="login-error" style="color: red; font-weight: bold; display: none; margin-top: 15px;"></p>
+
+            <!-- Step 2A: Student Login Form -->
+            <div id="student-login-form" style="display: none;">
+                <div id="login-error">Incorrect username or PIN.</div>
+                <input type="text" id="student-username" class="gate-input" placeholder="Username (e.g. jsmith)" autocomplete="off">
+                <input type="password" id="student-pin" class="gate-input" placeholder="PIN / Password" autocomplete="off">
+                <button class="role-btn btn-student" id="btn-student-submit" onclick="processStudentLogin()">Log In</button>
+                <button class="role-btn btn-teacher" onclick="hideForms()">Back</button>
+            </div>
+
+            <!-- Step 2B: Teacher Login Form -->
+            <div id="teacher-login-form" style="display: none;">
+                <div id="teacher-login-error">Incorrect Teacher Passcode.</div>
+                <input type="password" id="teacher-passcode" class="gate-input" placeholder="Enter Teacher Passcode" autocomplete="off">
+                <button class="role-btn btn-student" onclick="processTeacherLogin()">Unlock Content &rarr;</button>
+                <button class="role-btn btn-teacher" onclick="hideForms()">Back</button>
+            </div>
         </div>
     </div>
 
+    <!-- HEADER WITH FULL NAME & LOG OUT -->
     <header>
         <div class="header-left">
-            <a href="index.html">
-                <img src="logo.jpg" alt="Delta Serlby Park Logo">
-            </a>
+            <a href="index.html"><img src="logo.jpg" alt="Logo"></a>
         </div>
         <div class="header-center">
             <h1>Computing Curriculum</h1>
         </div>
         <div class="header-right">
             <span id="welcome-msg" style="color: white; font-weight: bold; margin-right: 15px;"></span>
+            <button class="logout-btn" id="logout-btn" style="display: none;" onclick="logoutUser()">Log Out</button>
         </div>
     </header>
 
@@ -61,7 +142,9 @@
     </main>
 
     <script>
-        // Firebase Config
+        /* ==========================================================================
+           1. FIREBASE SETUP
+           ========================================================================== */
         const firebaseConfig = {
             apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
             authDomain: "serlby-park-computing.firebaseapp.com",
@@ -71,114 +154,9 @@
             appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
             measurementId: "G-HDNYEE11WV"
         };
-        
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Login Logic
-       async function processStudentLogin() {
-            const user = document.getElementById('student-username').value.trim();
-            const pin = document.getElementById('student-pin').value.trim();
-            const errorBox = document.getElementById('login-error');
-            const submitBtn = document.getElementById('btn-student-submit');
-
-            if (user === "" || pin === "") {
-                errorBox.innerText = "Please enter both your Username and PIN.";
-                errorBox.style.display = 'block';
-                return;
-            }
-
-            errorBox.style.display = 'none';
-            submitBtn.innerText = "Logging in...";
-
-            try {
-                const userCredential = await auth.signInWithEmailAndPassword(formatEmail(user), pin);
-                const uid = userCredential.user.uid;
-                
-                let displayName = user; // Fallback to username
-
-                const userDoc = await db.collection("users").doc(uid).get();
-                if (!userDoc.exists) {
-                    await db.collection("users").doc(uid).set({
-                        username: user,
-                        fullName: user,
-                        className: "Unassigned",
-                        lastLogin: Date.now()
-                    });
-                } else {
-                    // Grab their actual full name from Firebase instantly
-                    const data = userDoc.data();
-                    if (data.fullName) {
-                        displayName = data.fullName;
-                    }
-                }
-
-                // Instantly update the header with their Full Name
-                const welcomeMsg = document.getElementById('welcome-msg');
-                if (welcomeMsg) {
-                    welcomeMsg.innerText = "Logged in: " + displayName;
-                }
-
-                document.getElementById('login-gate').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('login-gate').style.display = 'none';
-                    document.body.classList.remove('locked');
-                }, 500);
-            } catch (err) {
-                submitBtn.innerText = "Log In";
-                errorBox.innerText = "Incorrect username or PIN.";
-                errorBox.style.display = 'block';
-            }
-        }
-
-        // Curriculum Data
-        const curriculumData = {
-            year7: [
-                { title: "Delta Welcome", description: "<ul><li>Introduction to Computational Thinking</li><li>Keyboard & Mouse Skills</li><li>File Management</li><li>Researching</li><li>E-Safety</li></ul>" },
-                { title: "Microsoft Tools", description: "<ul><li>Word</li><li>PowerPoint</li><li>Email</li></ul>" },
-                { title: "Binary", description: "<ul><li>Binary to Denary</li><li>Denary to Binary</li></ul>" }
-            ],
-            year8: [
-                { title: "E-Safety & Spreadsheets", description: "<ul><li>E-Safety rules</li><li>Data Entry</li><li>Formulas</li><li>Functions</li></ul>" },
-                { title: "Pixel Art", description: "<ul><li>Basic Designs</li><li>Character Creation</li></ul>" }
-            ],
-            year9: [
-                { title: "E-Safety & Python Programming", description: "<ul><li>E-Safety rules</li><li>Sequence</li><li>Selection</li><li>Iteration</li></ul>" },
-                { title: "Binary & Cyber Security", description: "<ul><li>Binary Conversions</li><li>Addition & Shifts</li><li>Hexadecimal</li><li>Security Basics</li></ul>" }
-            ],
-            year10: [
-                { title: "Creative iMedia", description: "<ul><li>R093 - Exam</li><li>R094 - Coursework</li><li>R097 - Coursework</li></ul>" },
-                { title: "Enterprise", description: "<ul><li>Component 1 - Coursework</li><li>Component 2 - Coursework</li><li>Component 3 - Exam</li></ul>" }
-            ],
-            year11: [
-                { title: "Enterprise Coursework", description: "<ul><li>Component 1 Completion</li><li>Component 2 Final Polish</li></ul>" },
-                { title: "iMedia Exam & Revision", description: "<ul><li>R093 Exam Prep</li><li>Coursework Finalisation</li></ul>" }
-            ]
-        };
-
-        function loadYear(year) {
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-            document.getElementById('btn-' + year).classList.add('active');
-            
-            const titles = { year7: 'Year 7 Curriculum', year8: 'Year 8 Curriculum', year9: 'Year 9 Curriculum', year10: 'Year 10 Curriculum', year11: 'Year 11 Curriculum' };
-            document.getElementById('year-title').innerText = titles[year];
-            
-            const grid = document.getElementById('content-grid');
-            grid.innerHTML = "";
-            
-            curriculumData[year].forEach((unit, index) => {
-                grid.innerHTML += `
-                    <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #800000; display: flex; flex-direction: column;">
-                        <div style="color: #800000; font-weight: bold; font-size: 0.85em; margin-bottom: 10px;">UNIT ${index + 1}</div>
-                        <h3 style="color: #1e3a8a; margin-top: 0;">${unit.title}</h3>
-                        <div style="color: #555; flex-grow: 1;">${unit.description}</div>
-                        <button onclick="window.location.href='${unit.title.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}.html'" style="background: #dfaa2b; color: #1e3a8a; font-weight: bold; border: none; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 20px;">View Unit Modules</button>
-                    </div>
-                `;
-            });
-        }
-    </script>
-</body>
-</html>
+        /* =================================================
