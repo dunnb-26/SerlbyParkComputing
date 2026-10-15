@@ -221,27 +221,6 @@
             return clean.includes('@') ? clean : clean + "@deltaschool.local";
         }
 
-        function continueToPendingLesson() {
-            const pending = sessionStorage.getItem('spcAutosaveReturnTo');
-            if (!pending) return false;
-
-            try {
-                const target = new URL(pending, window.location.origin);
-                const loginPage = new URL('index-test.html', window.location.href);
-                if (target.origin !== window.location.origin || target.pathname === loginPage.pathname) {
-                    sessionStorage.removeItem('spcAutosaveReturnTo');
-                    return false;
-                }
-
-                sessionStorage.removeItem('spcAutosaveReturnTo');
-                window.location.replace(target.href);
-                return true;
-            } catch (error) {
-                sessionStorage.removeItem('spcAutosaveReturnTo');
-                return false;
-            }
-        }
-
         // --- AUTHENTICATION LOGIC ---
         async function processStudentLogin() {
             const user = document.getElementById('student-username').value.trim();
@@ -373,7 +352,6 @@
 
                 document.getElementById('login-gate').style.display = 'none';
                 document.body.classList.remove('locked');
-                if (continueToPendingLesson()) return;
             } else {
                 document.getElementById('header-user-bar').style.display = 'none';
                 document.getElementById('login-gate').style.display = 'flex';
