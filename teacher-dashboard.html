@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -432,6 +431,7 @@
                 </optgroup>
 
                 <option value="Unassigned">Unassigned</option>
+                <option value="ALL">All Classes</option>
             </select>
 
             <input
@@ -558,19 +558,24 @@
 
             listDiv.innerHTML = '';
 
-            // Do not show any student names when All Classes is selected.
-            if (classFilter === 'ALL') {
+            // Do not show any student names when All Classes is selected (Optional choice)
+            if (classFilter === 'ALL' && !searchQuery) {
                 listDiv.innerHTML = `
                     <p class="sidebar-message">
-                        Select a class above to view its students.
+                        Type a name to search, or select a specific class above.
                     </p>
                 `;
                 return;
             }
 
             // Filter by class first, then by the search query.
-const filtered = allStudents.filter(s => classFilter === "ALL" || s.className.includes(classFilter));
-
+            const filtered = allStudents.filter(student => {
+                // Check if the class matches anywhere in the string (case insensitive)
+                const studentClasses = String(student.className || "").toLowerCase();
+                const selectedFilter = classFilter.toLowerCase();
+                const matchesClass = classFilter === "ALL" || studentClasses.includes(selectedFilter);
+                
+                // Check if the search box matches their name
                 const matchesSearch =
                     !searchQuery ||
                     student.fullName.toLowerCase().includes(searchQuery) ||
@@ -582,7 +587,7 @@ const filtered = allStudents.filter(s => classFilter === "ALL" || s.className.in
             if (filtered.length === 0) {
                 listDiv.innerHTML = `
                     <p class="sidebar-message">
-                        No students found in ${escapeHtml(classFilter)}.
+                        No students found matching your filters.
                     </p>
                 `;
                 return;
@@ -676,11 +681,12 @@ const filtered = allStudents.filter(s => classFilter === "ALL" || s.className.in
                     '10bCim1', '11bCim1'
                 ];
 
+                // Create options for dropdown (We'll leave this as a single value setter for now)
                 const classOptions = availableClasses
                     .map(c => `
                         <option
                             value="${c}"
-                            ${student.className === c ? 'selected' : ''}
+                            ${student.className.includes(c) ? 'selected' : ''}
                         >
                             ${c}
                         </option>
@@ -711,12 +717,14 @@ const filtered = allStudents.filter(s => classFilter === "ALL" || s.className.in
                                 Class:
                             </label>
 
-                            <select
-                                onchange="updateStudentClass('${student.uid}', this.value)"
-                                style="width:auto; margin:0; padding:7px 10px;"
+                            <input type="text" id="manual-class-input" value="${escapeHtml(student.className)}" style="width:150px; margin:0; padding:7px 10px; border:1px solid #ccc; border-radius:4px;">
+
+                            <button
+                                class="btn-gold"
+                                onclick="updateStudentClass('${student.uid}', document.getElementById('manual-class-input').value)"
                             >
-                                ${classOptions}
-                            </select>
+                                Update Class
+                            </button>
 
                             <button
                                 class="btn-gold"
@@ -876,9 +884,7 @@ const filtered = allStudents.filter(s => classFilter === "ALL" || s.className.in
                         <div class="qa-row">
                             <div class="qa-label">
                                 <span>
-                                    ${escapeHtml(item.label || 'Question ' + (idx + 1))}
-                                </span>
-                                ${statusPill}
+                                    ${escapeHtml(item.label \vert{}\vert{} 'Question ' + (idx + 1))} </span>${statusPill}
                             </div>
 
                             <div class="${boxClass}">
@@ -932,8 +938,7 @@ const filtered = allStudents.filter(s => classFilter === "ALL" || s.className.in
                     bodyHtml += `
                         <div class="qa-row">
                             <div class="qa-label">
-                                <span>${escapeHtml(label)}</span>
-                                ${statusPill}
+                                <span>${escapeHtml(label)}</span>${statusPill}
                             </div>
 
                             <div class="${boxClass}">
@@ -974,146 +979,4 @@ const filtered = allStudents.filter(s => classFilter === "ALL" || s.className.in
             if (Array.isArray(lesson.screenshots)) {
                 lesson.screenshots.forEach((src, i) => {
                     bodyHtml += `
-                        <div class="qa-row">
-                            <div class="qa-label">
-                                Pasted Screenshot ${i + 1}
-                            </div>
-                            <img
-                                class="screenshot-img"
-                                src="${escapeHtml(src)}"
-                                alt="Pasted screenshot ${i + 1}"
-                            >
-                        </div>
-                    `;
-                });
-            }
-
-            if (!bodyHtml) {
-                bodyHtml = `
-                    <p style="color:#94a3b8; font-style:italic; margin:0;">
-                        Student opened this lesson, but no inputs were recorded.
-                    </p>
-                `;
-            }
-
-            return `
-                <div
-                    class="lesson-card"
-                    id="lesson-card-${index}"
-                    data-title="${escapeHtml(title.toLowerCase())}"
-                >
-                    <div
-                        class="lesson-card-header"
-                        onclick="toggleLessonCard(${index})"
-                    >
-                        <div class="lesson-title-wrap">
-                            <span class="chevron">&#9654;</span>
-                            <span>${escapeHtml(title)}</span>
-                        </div>
-
-                        <div style="display:flex; align-items:center; flex-wrap:wrap;">
-                            ${badgesHtml}
-                            <span class="lesson-meta">${updatedDate}</span>
-                        </div>
-                    </div>
-
-                    <div class="lesson-card-body">
-                        ${bodyHtml}
-                    </div>
-                </div>
-            `;
-        }
-
-        // 7. Open One Lesson and Close the Others
-        function toggleLessonCard(index) {
-            const clickedCard =
-                document.getElementById(`lesson-card-${index}`);
-
-            if (!clickedCard) return;
-
-            const isAlreadyOpen = clickedCard.classList.contains('open');
-
-            document.querySelectorAll('.lesson-card').forEach(card => {
-                card.classList.remove('open');
-            });
-
-            if (!isAlreadyOpen) {
-                clickedCard.classList.add('open');
-            }
-        }
-
-        // Expand or Collapse All Lessons
-        function toggleAllLessons(expand) {
-            document.querySelectorAll('.lesson-card').forEach(card => {
-                if (expand) {
-                    card.classList.add('open');
-                } else {
-                    card.classList.remove('open');
-                }
-            });
-        }
-
-        // Filter Lesson Cards by Title
-        function filterLessonBars() {
-            const q = (
-                document.getElementById('lesson-filter-input')?.value || ''
-            ).toLowerCase().trim();
-
-            document.querySelectorAll('.lesson-card').forEach(card => {
-                const title = card.getAttribute('data-title') || '';
-
-                card.style.display =
-                    (!q || title.includes(q)) ? 'block' : 'none';
-            });
-        }
-
-        // 8. Update a Student's Class in Firebase
-        async function updateStudentClass(uid, newClass) {
-            try {
-                await db.collection('users')
-                    .doc(uid)
-                    .set({ className: newClass }, { merge: true });
-
-                const student = allStudents.find(s => s.uid === uid);
-
-                if (student) {
-                    student.className = newClass;
-                }
-
-                // Keep the selected student in the roster and show their
-                // new class immediately.
-                if (activeStudent && activeStudent.uid === uid) {
-                    activeStudent = student || activeStudent;
-
-                    document.getElementById('class-filter').value = newClass;
-                    document.getElementById('student-search').value = '';
-
-                    renderSidebar();
-
-                    // Refresh the portfolio so the class dropdown is current.
-                    await loadStudentPortfolio(activeStudent);
-                } else {
-                    renderSidebar();
-                }
-
-            } catch (err) {
-                console.error('Error updating class:', err);
-                alert('Error updating class: ' + err.message);
-            }
-        }
-
-        // 9. Safely Escape Displayed Text
-        function escapeHtml(str) {
-            return String(str ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
-
-        // Start the dashboard.
-        window.onload = fetchStudents;
-    </script>
-</body>
-</html>
+                        <div class="qa-row
