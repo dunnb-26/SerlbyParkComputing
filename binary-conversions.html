@@ -6,8 +6,10 @@
     <title>Lesson 1 - Binary Conversions</title>
     <link rel="stylesheet" href="style.css">
 
-    <!-- HTML to PDF Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
         /* Task Container Styling */
@@ -19,7 +21,7 @@
             padding: 25px; 
             margin-bottom: 30px; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-            page-break-inside: avoid; /* Stops the PDF from cutting cards in half! */
+            page-break-inside: avoid;
         }
         
         /* Section Header Colors */
@@ -88,8 +90,8 @@
     <div id="pdf-content">
         <header>
             <div class="header-left">
-    <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
-</div>
+                <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
+            </div>
             <div class="header-center"><h1>Binary Conversions</h1></div>
             <div class="header-right"><a href="binary-hex.html" class="back-btn">&larr; Back to Unit</a></div>
         </header>
@@ -251,12 +253,14 @@
 
                 <button class="btn-submit no-print" onclick="checkAnswers('navy-input')">Check Answers</button>
             </div>
-<!-- CHALLENGE GAME LINK -->
-        <div class="task-card no-print" style="border: 2px solid #dfaa2b; text-align: center; background-color: #fdfbf7;">
-            <h2 style="color: #1e3a8a; margin-top: 0; font-size: 24px;">🎮 Finished Early? Play Binary Time Attack!</h2>
-            <p style="font-size: 16px; color: #555; margin-bottom: 20px;">Test your conversion speed against the clock in the Delta Binary Time Attack game. Race to convert as many denary and binary numbers as you can in 60 seconds!</p>
-            <a href="binary-game.html" class="btn-submit" style="margin: 0 auto; background-color: #dfaa2b; color: #1e3a8a; text-decoration: none; display: inline-block; width: 250px;">Start Game &rarr;</a>
-        </div>
+
+            <!-- CHALLENGE GAME LINK -->
+            <div class="task-card no-print" style="border: 2px solid #dfaa2b; text-align: center; background-color: #fdfbf7;">
+                <h2 style="color: #1e3a8a; margin-top: 0; font-size: 24px;">🎮 Finished Early? Play Binary Time Attack!</h2>
+                <p style="font-size: 16px; color: #555; margin-bottom: 20px;">Test your conversion speed against the clock in the Delta Binary Time Attack game. Race to convert as many denary and binary numbers as you can in 60 seconds!</p>
+                <a href="binary-game.html" class="btn-submit" style="margin: 0 auto; background-color: #dfaa2b; color: #1e3a8a; text-decoration: none; display: inline-block; width: 250px;">Start Game &rarr;</a>
+            </div>
+
             <!-- PLENARY: 3 Key Takeaways -->
             <div class="task-card task-plenary">
                 <h2>Lesson Plenary</h2>
@@ -277,11 +281,10 @@
             </div>
 
         </main>
-    </div> <!-- END PDF CONTENT WRAPPER -->
+    </div>
 
-    <!-- UNIVERSAL PDF DOWNLOAD BUTTON -->
+    <!-- ACTION BUTTONS (Download Work Removed) -->
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf no-print" onclick="downloadPDF()">📄 Download Work</button>
         <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
     </div>
     
@@ -290,44 +293,148 @@
     </footer>
 
     <script>
-        /* --- AUTO-SAVE MEMORY LOGIC --- */
-        function saveProgress() {
-            var inputs = document.querySelectorAll('.auto-input');
-            var dataToSave = {};
-            
-            for (var i = 0; i < inputs.length; i++) {
-                dataToSave['input_' + i] = inputs[i].value;
+        /* --- 1. FIREBASE CONFIGURATION & INITIALIZATION --- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "binary-conversions";
+
+        /* --- 2. HELPER FOR TEACHER MARKBOOK LABELS --- */
+        function findLabelForInput(el, index) {
+            const row = el.closest('.question-row');
+            if (row) {
+                const lbl = row.querySelector('.question-label');
+                if (lbl && lbl.innerText.trim()) {
+                    return lbl.innerText.replace(/\s+/g, ' ').trim();
+                }
             }
-            localStorage.setItem('binaryConversionsMemory', JSON.stringify(dataToSave));
+            if (el.placeholder) return el.placeholder;
+            return 'Question ' + (index + 1);
         }
 
-        function loadProgress() {
-            var savedDataStr = localStorage.getItem('binaryConversionsMemory');
-            if (savedDataStr) {
-                var data = JSON.parse(savedDataStr);
-                var inputs = document.querySelectorAll('.auto-input');
-                
-                for (var i = 0; i < inputs.length; i++) {
-                    if (data['input_' + i]) {
-                        inputs[i].value = data['input_' + i];
-                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                            inputs[i].style.height = 'auto';
-                            inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                        }
+        /* --- 3. FIREBASE AUTO-SAVE LOGIC --- */
+        let saveTimer;
+        function saveProgress(immediate = false) {
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            var inputs = document.querySelectorAll('.auto-input');
+            var dataToSave = {
+                pageTitle: document.title || LESSON_ID,
+                lastUpdated: Date.now(),
+                items: []
+            };
+
+            var correctCount = 0;
+            var totalGradable = 0;
+
+            for (var i = 0; i < inputs.length; i++) {
+                var el = inputs[i];
+                var cls = el.className || '';
+                var status = 'neutral';
+
+                if (el.hasAttribute('data-answers')) {
+                    totalGradable++;
+                    if (cls.includes('input-correct')) {
+                        status = 'correct';
+                        correctCount++;
+                    } else if (cls.includes('input-incorrect')) {
+                        status = 'incorrect';
                     }
                 }
-                
-                // Auto-mark previously saved answers
-                checkAnswers('red-input');
-                checkAnswers('amber-input');
-                checkAnswers('green-input');
-                checkAnswers('navy-input');
+
+                dataToSave['input_' + i] = el.value;
+                dataToSave['class_' + i] = cls;
+
+                dataToSave.items.push({
+                    index: i,
+                    label: findLabelForInput(el, i),
+                    value: el.value,
+                    status: status
+                });
             }
+
+            if (totalGradable > 0) {
+                dataToSave.scoreText = "Score: " + correctCount + " / " + totalGradable;
+            }
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(function() {
+                db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
+                  .set(dataToSave, { merge: true })
+                  .catch(function(err) { console.error("Cloud save error:", err); });
+            }, immediate ? 50 : 800);
         }
+
+        /* --- 4. FIREBASE AUTO-LOAD LOGIC --- */
+        function applySavedData(data) {
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                var savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined) {
+                    inputs[i].value = savedVal;
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto';
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
+                    }
+                }
+            }
+
+            // Re-mark previously saved answers without triggering a redundant save
+            checkAnswers('red-input', false);
+            checkAnswers('amber-input', false);
+            checkAnswers('green-input', false);
+            checkAnswers('navy-input', false);
+        }
+
+        auth.onAuthStateChanged(async function(user) {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    // Clean up any legacy local storage on shared school PCs
+                    try { localStorage.removeItem('binaryConversionsMemory'); } catch (e) {}
+
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud work:", err);
+                }
+            }
+        });
 
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('auto-input')) {
-                saveProgress();
+                saveProgress(false);
                 if (e.target.tagName.toLowerCase() === 'textarea') {
                     e.target.style.height = 'auto';
                     e.target.style.height = e.target.scrollHeight + 'px';
@@ -335,17 +442,23 @@
             }
         });
 
-        function clearData() {
+        async function clearData() {
             if (confirm("Are you sure you want to clear all your work on this page?")) {
-                localStorage.removeItem('binaryConversionsMemory');
+                try { localStorage.removeItem('binaryConversionsMemory'); } catch (e) {}
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
+                    } catch (err) {
+                        console.error("Error clearing cloud data:", err);
+                    }
+                }
                 window.location.reload();
             }
         }
 
-        window.onload = loadProgress;
-
-        /* --- BATCH-MARKING TEXT INPUT LOGIC --- */
-        function checkAnswers(groupClass) {
+        /* --- 5. BATCH-MARKING TEXT INPUT LOGIC --- */
+        function checkAnswers(groupClass, triggerSync = true) {
             var inputs = document.getElementsByClassName(groupClass);
             
             for (var i = 0; i < inputs.length; i++) {
@@ -372,47 +485,10 @@
                     }
                 }
             }
-        }
 
-        /* --- BULLETPROOF PDF GENERATION LOGIC --- */
-        function downloadPDF() {
-            // Hide buttons
-            var buttonsToHide = document.querySelectorAll('.no-print');
-            for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'none';
-            document.getElementById('action-buttons').style.display = 'none';
-
-            // Lock text inputs
-            var textInputs = document.querySelectorAll('input[type="text"]');
-            for (var i = 0; i < textInputs.length; i++) {
-                textInputs[i].setAttribute('value', textInputs[i].value);
+            if (triggerSync) {
+                saveProgress(true);
             }
-
-            // Expand textareas
-            var textAreas = document.querySelectorAll('textarea');
-            for (var j = 0; j < textAreas.length; j++) {
-                textAreas[j].innerHTML = textAreas[j].value;
-                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
-            }
-
-            var element = document.getElementById('pdf-content');
-
-            var opt = {
-                margin:       0.3,
-                filename:     'Binary_Conversions_Workbook.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] } 
-            };
-
-            html2pdf().set(opt).from(element).save().then(function() {
-                for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'block';
-                document.getElementById('action-buttons').style.display = 'flex';
-                
-                for (var k = 0; k < textAreas.length; k++) {
-                    textAreas[k].style.height = "";
-                }
-            });
         }
     </script>
 </body>
