@@ -299,11 +299,37 @@
 
         .screenshot-img {
             max-width: 100%;
-            max-height: 350px;
+            max-height: 380px;
             border: 2px solid #1e3a8a;
             border-radius: 6px;
-            margin-top: 8px;
+            margin-top: 10px;
             display: block;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Pixel Art Grid Preview */
+        .pixel-preview-wrap {
+            margin-top: 10px;
+            display: inline-block;
+            background: #ffffff;
+            padding: 8px;
+            border-radius: 6px;
+            border: 2px solid #cbd5e1;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+        }
+
+        .pixel-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 22px);
+            grid-template-rows: repeat(10, 22px);
+            border: 1px solid #94a3b8;
+        }
+
+        .pixel-preview-cell {
+            width: 22px;
+            height: 22px;
+            border: 1px solid #e2e8f0;
+            box-sizing: border-box;
         }
 
         .btn-gold {
@@ -362,7 +388,6 @@
         <div class="sidebar">
             <h3>Class Filter</h3>
 
-            <!-- REMOVED 'ALL CLASSES' SO IT STARTS BLANK -->
             <select id="class-filter" onchange="handleClassChange()">
                 <option value="" disabled selected>Select a class...</option>
                 <optgroup label="Year 7">
@@ -440,6 +465,50 @@
         let activeStudent = null;
         let portfolioRequestId = 0;
 
+        // Universal Binary & Denary Pixel Art Colour Map
+        const pixelColorMap = {
+            '0000': '#ffffff', '0': '#ffffff',
+            '0001': '#000000', '1': '#000000',
+            '0010': '#d32f2f', '2': '#d32f2f',
+            '0011': '#388e3c', '3': '#388e3c',
+            '0100': '#1976d2', '4': '#1976d2',
+            '0101': '#fbc02d', '5': '#fbc02d',
+            '0110': '#f57c00', '6': '#f57c00',
+            '0111': '#8e24aa', '7': '#8e24aa',
+            '1000': '#e91e63', '8': '#e91e63',
+            '1001': '#00bcd4', '9': '#00bcd4',
+            '1010': '#cddc39', '10': '#cddc39',
+            '1011': '#795548', '11': '#795548',
+            '1100': '#9e9e9e', '12': '#9e9e9e',
+            '1101': '#607d8b', '13': '#607d8b',
+            '1110': '#8d6e63', '14': '#8d6e63',
+            '1111': '#009688', '15': '#009688'
+        };
+
+        // Helper: Render a 10x10 Pixel Art Grid from an array of codes
+        function buildPixelArtHtml(gridArray) {
+            if (!Array.isArray(gridArray) || gridArray.length === 0) return '';
+            const hasPainted = gridArray.some(code => {
+                const c = String(code || '').trim();
+                return pixelColorMap[c] && pixelColorMap[c] !== '#ffffff';
+            });
+            if (!hasPainted) return '';
+
+            let cellsHtml = '';
+            for (let i = 0; i < 100; i++) {
+                const code = String(gridArray[i] || '').trim();
+                const bg = pixelColorMap[code] || '#ffffff';
+                const titleAttr = code ? `title="Code: ${escapeHtml(code)}"` : '';
+                cellsHtml += `<div class="pixel-preview-cell" style="background-color: ${bg};" ${titleAttr}></div>`;
+            }
+
+            return `
+                <div class="pixel-preview-wrap">
+                    <div class="pixel-preview-grid">${cellsHtml}</div>
+                </div>
+            `;
+        }
+
         // 2. Fetch Students from Firestore
         async function fetchStudents() {
             try {
@@ -493,7 +562,6 @@
 
             listDiv.innerHTML = '';
 
-            // Do not show any student names if no class is selected and no search query is typed
             if (!classFilter && !searchQuery) {
                 listDiv.innerHTML = `
                     <p class="sidebar-message">
@@ -507,7 +575,6 @@
                 const studentClasses = String(student.className || "").toLowerCase();
                 const selectedFilter = classFilter ? classFilter.toLowerCase() : "";
                 
-                // Matches if they are in the selected class (ignores if no class selected but search is typed)
                 const matchesClass = !classFilter || studentClasses.includes(selectedFilter);
                 
                 const matchesSearch = !searchQuery || 
@@ -627,7 +694,7 @@
             }
         }
 
-        // 6. Render the List Bar for Each Lesson (Closed by Default)
+        // 6. Render the List Bar for Each Lesson (With Full Image & Pixel Art Rendering)
         function renderLessonCard(lesson, index) {
             const title = lesson.pageTitle || lesson.id.replace(/-/g, ' ');
 
@@ -640,20 +707,61 @@
             if (lesson.scoreText) badgesHtml += `<span class="status-badge badge-verified">${escapeHtml(lesson.scoreText)}</span>`;
 
             let bodyHtml = '';
+            const designs = lesson.userBinaryDesigns || {};
+            let renderedDesignKeys = new Set();
+            let renderedScreenshotKeys = new Set();
 
-            // Format A: Structured items array.
+            // Format A: Structured items array
             if (Array.isArray(lesson.items) && lesson.items.length > 0) {
                 lesson.items.forEach((item, idx) => {
+                    const labelText = item.label || 'Question ' + (idx + 1);
                     const val = (item.value || '').trim();
                     const isEmpty = val === '';
                     let boxClass = 'answer-box' + (isEmpty ? ' empty' : '');
+                    let statusPill = '';
+
+                    if (item.status === 'correct') {
+                        boxClass += ' correct';
+                        statusPill = '<span class="status-badge badge-correct">✓ Correct</span>';
+                    } else if (item.status === 'incorrect') {
+                        boxClass += ' incorrect';
+                        statusPill = '<span class="status-badge badge-incorrect">✗ Incorrect</span>';
+                    }
+
+                    // Check if this row corresponds to a Pixel Art design (Tasks 1-4)
+                    let extraVisualHtml = '';
+                    const lowerLabel = labelText.toLowerCase();
+                    let matchedDesignKey = null;
+                    if (lowerLabel.includes('red task')) matchedDesignKey = '1';
+                    else if (lowerLabel.includes('amber task')) matchedDesignKey = '2';
+                    else if (lowerLabel.includes('green task')) matchedDesignKey = '3';
+                    else if (lowerLabel.includes('blue task')) matchedDesignKey = '4';
+
+                    if (matchedDesignKey && designs[matchedDesignKey]) {
+                        extraVisualHtml += buildPixelArtHtml(designs[matchedDesignKey]);
+                        renderedDesignKeys.add(matchedDesignKey);
+                    }
+
+                    // Check if this row corresponds to a Pasted Screenshot
+                    let matchedImgKey = null;
+                    if (lowerLabel.includes('red task')) matchedImgKey = 'img_maroon';
+                    else if (lowerLabel.includes('amber task')) matchedImgKey = 'img_amber';
+                    else if (lowerLabel.includes('green task')) matchedImgKey = 'img_green';
+                    else if (lowerLabel.includes('blue task')) matchedImgKey = 'img_navy';
+
+                    if (matchedImgKey && lesson[matchedImgKey] && String(lesson[matchedImgKey]).startsWith('data:image')) {
+                        extraVisualHtml += `<img class="screenshot-img" src="${lesson[matchedImgKey]}" alt="${escapeHtml(labelText)} Screenshot">`;
+                        renderedScreenshotKeys.add(matchedImgKey);
+                    }
 
                     bodyHtml += `
                         <div class="qa-row">
                             <div class="qa-label">
-                                <span>${escapeHtml(item.label || 'Question ' + (idx + 1))}</span>
+                                <span>${escapeHtml(labelText)}</span>
+                                ${statusPill}
                             </div>
                             <div class="${boxClass}">${isEmpty ? '(Left blank)' : escapeHtml(val)}</div>
+                            ${extraVisualHtml}
                         </div>
                     `;
                 });
@@ -666,16 +774,81 @@
                 inputKeys.forEach(key => {
                     const idx = key.split('_')[1];
                     const val = (lesson[key] || '').trim();
+                    const cls = lesson['class_' + idx] || '';
                     const label = lesson['label_' + idx] || lesson['id_' + idx] || `Question ${parseInt(idx) + 1}`;
                     const isEmpty = val === '';
                     let boxClass = 'answer-box' + (isEmpty ? ' empty' : '');
+                    let statusPill = '';
+
+                    if (cls.includes('input-correct') || (cls.includes('correct') && !cls.includes('incorrect'))) {
+                        boxClass += ' correct';
+                        statusPill = '<span class="status-badge badge-correct">✓ Correct</span>';
+                    } else if (cls.includes('incorrect')) {
+                        boxClass += ' incorrect';
+                        statusPill = '<span class="status-badge badge-incorrect">✗ Incorrect</span>';
+                    }
 
                     bodyHtml += `
                         <div class="qa-row">
-                            <div class="qa-label"><span>${escapeHtml(label)}</span></div>
+                            <div class="qa-label">
+                                <span>${escapeHtml(label)}</span>
+                                ${statusPill}
+                            </div>
                             <div class="${boxClass}">${isEmpty ? '(Left blank)' : escapeHtml(val)}</div>
                         </div>
                     `;
+                });
+            }
+
+            // Render any remaining Pixel Art designs not already attached to a row above
+            const designTaskLabels = {
+                '1': 'Red Task - Pixel Design',
+                '2': 'Amber Task - Pixel Design',
+                '3': 'Green Task - Pixel Design',
+                '4': 'Blue Task - Pixel Design'
+            };
+            ['1', '2', '3', '4'].forEach(k => {
+                if (!renderedDesignKeys.has(k) && designs[k]) {
+                    const gridHtml = buildPixelArtHtml(designs[k]);
+                    if (gridHtml) {
+                        bodyHtml += `
+                            <div class="qa-row">
+                                <div class="qa-label"><span>🎨 ${designTaskLabels[k]}</span></div>
+                                ${gridHtml}
+                            </div>
+                        `;
+                    }
+                }
+            });
+
+            // Render any remaining Screenshots not already attached to a row above
+            const screenshotLabels = {
+                'img_maroon': '📸 Red Task Screenshot',
+                'img_amber': '📸 Amber Task Screenshot',
+                'img_green': '📸 Green Task Screenshot',
+                'img_navy': '📸 Blue Task Screenshot'
+            };
+            Object.keys(screenshotLabels).forEach(imgKey => {
+                if (!renderedScreenshotKeys.has(imgKey) && lesson[imgKey] && String(lesson[imgKey]).startsWith('data:image')) {
+                    bodyHtml += `
+                        <div class="qa-row">
+                            <div class="qa-label"><span>${screenshotLabels[imgKey]}</span></div>
+                            <img class="screenshot-img" src="${lesson[imgKey]}" alt="Student Screenshot">
+                        </div>
+                    `;
+                }
+            });
+
+            if (Array.isArray(lesson.screenshots)) {
+                lesson.screenshots.forEach((src, i) => {
+                    if (src && String(src).startsWith('data:image')) {
+                        bodyHtml += `
+                            <div class="qa-row">
+                                <div class="qa-label"><span>📸 Pasted Screenshot ${i + 1}</span></div>
+                                <img class="screenshot-img" src="${src}" alt="Pasted Screenshot ${i + 1}">
+                            </div>
+                        `;
+                    }
                 });
             }
 
