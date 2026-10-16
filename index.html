@@ -190,6 +190,9 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        // Lock Firebase Auth to SESSION only (closing the browser tab automatically logs out)
+        auth.setPersistence(firebase.auth.Auth.Persistence.SESSION).catch(err => console.error(err));
+
         // UI Controls (Declared top-level so buttons never fail)
         function showStudentForm() {
             document.getElementById('role-selection').style.display = 'none';
@@ -239,6 +242,11 @@
 
             try {
                 sessionStorage.removeItem('teacherMode');
+                
+                // Force session-only persistence and mark this tab as an active login session
+                await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+                sessionStorage.setItem('activeStudentSession', 'true');
+
                 const cred = await auth.signInWithEmailAndPassword(formatEmail(user), pin);
                 const uid = cred.user.uid;
 
@@ -275,6 +283,7 @@
 
                 submitBtn.innerText = "Log In";
             } catch (err) {
+                sessionStorage.removeItem('activeStudentSession');
                 submitBtn.innerText = "Log In";
                 errorBox.innerText = "Incorrect username or PIN.";
                 errorBox.style.display = 'block';
@@ -286,6 +295,7 @@
             const errorBox = document.getElementById('teacher-login-error');
 
             if (pass === "2525" || pass === "delta") {
+                sessionStorage.removeItem('activeStudentSession');
                 if (auth.currentUser) await auth.signOut();
                 sessionStorage.setItem('teacherMode', 'true');
 
@@ -321,14 +331,27 @@
             if (e.key === 'Enter') processTeacherLogin(false);
         });
 
-        // --- AUTH STATE PERSISTENCE ---
+        // --- AUTH STATE PERSISTENCE (Enforces Tab Session Only) ---
         auth.onAuthStateChanged(async (user) => {
             if (sessionStorage.getItem('teacherMode') === 'true') {
                 unlockPageAsTeacher();
                 return;
             }
 
-            if (user) {
+            const hasActiveTabSession = sessionStorage.getItem('activeStudentSession') === 'true';
+
+            // If a previous student was left cached in the browser from a closed tab, sign them out immediately
+            if (user && !hasActiveTabSession) {
+                await auth.signOut();
+                document.getElementById('header-user-bar').style.display = 'none';
+                document.getElementById('login-gate').style.display = 'flex';
+                document.getElementById('login-gate').style.opacity = '1';
+                document.body.classList.add('locked');
+                hideForms();
+                return;
+            }
+
+            if (user && hasActiveTabSession) {
                 const cleanUsername = user.email ? user.email.replace('@deltaschool.local', '') : 'Student';
                 let displayFullName = cleanUsername;
                 let displayClass = "";
