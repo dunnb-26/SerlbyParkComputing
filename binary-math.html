@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Binary Addition & Shifts - Lesson</title>
     
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         :root {
             /* Official Delta Serlby Park Color Scheme */
@@ -644,9 +649,8 @@
         </main>
     </div> <!-- END PDF CONTENT WRAPPER -->
 
-    <!-- UNIVERSAL PDF DOWNLOAD BUTTON -->
+    <!-- ACTION BUTTONS (Download Work Removed) -->
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf no-print" onclick="downloadPDF()">📄 Download Work as PDF</button>
         <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
     </div>
     
@@ -654,11 +658,27 @@
         &copy; 2026 Delta Serlby Park - Computing Department
     </footer>
 
-    <!-- EXTERNAL PDF SCRIPT MOVED TO BOTTOM TO PREVENT FIREWALL BLOCKING -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
     <script>
-        /* --- KEYBOARD NAVIGATION (Left/Right Arrows for Math Grids) --- */
+        /* --- 1. FIREBASE CONFIGURATION & INITIALIZATION --- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "binary-addition-shifts";
+
+        /* --- 2. KEYBOARD NAVIGATION (Left/Right Arrows for Math Grids) --- */
         document.addEventListener('keydown', function(e) {
             if(e.target.classList.contains('bit-box') || e.target.classList.contains('carry-box')) {
                 var td = e.target.parentElement;
@@ -678,49 +698,195 @@
             }
         });
 
-        /* --- FIREWALL-PROOF AUTO-SAVE MEMORY LOGIC --- */
-        function saveProgress() {
-            try {
-                var inputs = document.querySelectorAll('.auto-input');
-                var dataToSave = {};
-                for (var i = 0; i < inputs.length; i++) {
-                    dataToSave['input_' + i] = inputs[i].value;
-                }
-                localStorage.setItem('binaryPerBitMemory', JSON.stringify(dataToSave));
-            } catch (error) {
-                console.log("Memory saving blocked by browser - ignoring safely.");
-            }
-        }
+        /* --- 3. MARKBOOK SUMMARY BUILDER --- */
+        function buildMarkbookItems() {
+            const items = [];
+            let correctCount = 0;
+            let totalGradable = 0;
 
-        function loadProgress() {
-            try {
-                var savedDataStr = localStorage.getItem('binaryPerBitMemory');
-                if (savedDataStr) {
-                    var data = JSON.parse(savedDataStr);
-                    var inputs = document.querySelectorAll('.auto-input');
-                    for (var i = 0; i < inputs.length; i++) {
-                        if (data['input_' + i]) {
-                            inputs[i].value = data['input_' + i];
-                            if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                                inputs[i].style.height = 'auto';
-                                inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                            }
+            // 1. Preparation Key Words & Notes
+            const prepInputs = document.querySelectorAll('.task-prep .auto-input');
+            prepInputs.forEach((el, idx) => {
+                const row = el.closest('.question-row');
+                const lbl = row && row.querySelector('.question-label') ? row.querySelector('.question-label').innerText.trim() : 'Lesson Notes';
+                items.push({
+                    label: `Prep: ${lbl}`,
+                    value: el.value.trim(),
+                    status: 'neutral'
+                });
+            });
+
+            // 2. Red, Amber, and Green Bit-Box Groups
+            const groupSections = [
+                { selector: '.red-input', prefix: 'Red Task Q' },
+                { selector: '.amber-input', prefix: 'Amber Task Q' },
+                { selector: '.green-input', prefix: 'Green Task Q' }
+            ];
+
+            groupSections.forEach(sec => {
+                const groups = document.querySelectorAll(sec.selector);
+                groups.forEach((group, idx) => {
+                    totalGradable++;
+                    const bitInputs = Array.from(group.querySelectorAll('.bit-box'));
+                    const carryInputs = Array.from(group.querySelectorAll('.carry-box'));
+                    const hasTypedBit = bitInputs.some(inp => inp.value.trim() !== '');
+
+                    let valStr = '';
+                    let status = 'neutral';
+
+                    if (hasTypedBit) {
+                        const bitStr = bitInputs.map(inp => inp.value.trim() === '' ? '0' : inp.value.trim()).join('');
+                        valStr = bitStr;
+                        if (carryInputs.length > 0) {
+                            const carryStr = carryInputs.map(inp => inp.value.trim() === '' ? '0' : inp.value.trim()).join('');
+                            valStr += ` (Carries: ${carryStr})`;
+                        }
+
+                        if (bitInputs[0].classList.contains('input-correct')) {
+                            status = 'correct';
+                            correctCount++;
+                        } else if (bitInputs[0].classList.contains('input-incorrect')) {
+                            status = 'incorrect';
                         }
                     }
-                    // Auto-mark previously saved answers
-                    checkAnswers('red-input');
-                    checkAnswers('amber-input');
-                    checkAnswers('green-input');
-                    checkTextAnswers('blue-input'); // Added new text checker for the blue task
+
+                    items.push({
+                        label: `${sec.prefix}${idx + 1}`,
+                        value: valStr,
+                        status: status
+                    });
+                });
+            });
+
+            // 3. Blue Task (Identify the Shift)
+            const blueRows = document.querySelectorAll('.task-navy .question-row');
+            blueRows.forEach((row, idx) => {
+                totalGradable++;
+                const inputs = row.querySelectorAll('.blue-input');
+                const dirInput = inputs[0];
+                const placesInput = inputs[1];
+                const dirVal = dirInput ? dirInput.value.trim() : '';
+                const placesVal = placesInput ? placesInput.value.trim() : '';
+
+                let valStr = '';
+                if (dirVal || placesVal) {
+                    valStr = `Direction: ${dirVal || '?'} | Places: ${placesVal || '?'}`;
                 }
-            } catch (error) {
-                console.log("Memory loading blocked by browser - ignoring safely.");
-            }
+
+                let status = 'neutral';
+                if (dirInput && placesInput && (dirVal !== '' || placesVal !== '')) {
+                    const dirCorrect = dirInput.classList.contains('input-correct');
+                    const placesCorrect = placesInput.classList.contains('input-correct');
+                    const anyIncorrect = dirInput.classList.contains('input-incorrect') || placesInput.classList.contains('input-incorrect');
+                    if (dirCorrect && placesCorrect) {
+                        status = 'correct';
+                        correctCount++;
+                    } else if (anyIncorrect) {
+                        status = 'incorrect';
+                    }
+                }
+
+                items.push({
+                    label: `Blue Task Q${idx + 1}`,
+                    value: valStr,
+                    status: status
+                });
+            });
+
+            // 4. Plenary Takeaways
+            const plenaryInputs = document.querySelectorAll('.task-plenary .auto-input');
+            plenaryInputs.forEach((el, idx) => {
+                items.push({
+                    label: `Plenary Takeaway ${idx + 1}`,
+                    value: el.value.trim(),
+                    status: 'neutral'
+                });
+            });
+
+            return {
+                items: items,
+                scoreText: `Score: ${correctCount} / ${totalGradable}`
+            };
         }
+
+        /* --- 4. FIREBASE AUTO-SAVE & AUTO-LOAD LOGIC --- */
+        let saveTimer;
+        function saveProgress(immediate = false) {
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            var inputs = document.querySelectorAll('.auto-input');
+            var dataToSave = {
+                pageTitle: document.title || "Binary Addition & Shifts - Lesson",
+                lastUpdated: Date.now()
+            };
+
+            for (var i = 0; i < inputs.length; i++) {
+                dataToSave['input_' + i] = inputs[i].value;
+            }
+
+            const summary = buildMarkbookItems();
+            dataToSave.items = summary.items;
+            dataToSave.scoreText = summary.scoreText;
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(function() {
+                db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
+                  .set(dataToSave, { merge: true })
+                  .catch(function(err) { console.error("Cloud save error:", err); });
+            }, immediate ? 50 : 800);
+        }
+
+        function applySavedData(data) {
+            if (!data) return;
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                if (data['input_' + i] !== undefined) {
+                    inputs[i].value = data['input_' + i];
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto';
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
+                    }
+                }
+            }
+            // Auto-mark previously saved answers without triggering a redundant save
+            checkAnswers('red-input', false);
+            checkAnswers('amber-input', false);
+            checkAnswers('green-input', false);
+            checkTextAnswers('blue-input', false);
+        }
+
+        auth.onAuthStateChanged(async function(user) {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    try { localStorage.removeItem('binaryPerBitMemory'); } catch (e) {}
+
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud work:", err);
+                }
+            }
+        });
 
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('auto-input')) {
-                saveProgress();
+                saveProgress(false);
                 if (e.target.tagName.toLowerCase() === 'textarea') {
                     e.target.style.height = 'auto';
                     e.target.style.height = e.target.scrollHeight + 'px';
@@ -728,17 +894,23 @@
             }
         });
 
-        function clearData() {
+        async function clearData() {
             if (confirm("Are you sure you want to clear all your work on this page?")) {
                 try { localStorage.removeItem('binaryPerBitMemory'); } catch(e) {}
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
+                    } catch (err) {
+                        console.error("Error clearing cloud data:", err);
+                    }
+                }
                 window.location.reload();
             }
         }
 
-        window.onload = loadProgress;
-
-        /* --- UPGRADED BATCH-MARKING PER-BIT AND CARRY LOGIC (Red, Amber, Green) --- */
-        function checkAnswers(taskClass) {
+        /* --- 5. BATCH-MARKING PER-BIT AND CARRY LOGIC (Red, Amber, Green) --- */
+        function checkAnswers(taskClass, triggerSync = true) {
             var groups = document.querySelectorAll('.' + taskClass);
             groups.forEach(function(group) {
                 
@@ -747,7 +919,6 @@
                 var hasTypedBit = Array.from(bitInputs).some(inp => inp.value.trim() !== '');
                 
                 if (hasTypedBit) {
-                    // Blank inputs safely default to 0 for binary decimal comparison
                     var studentBinaryString = Array.from(bitInputs).map(inp => inp.value.trim() === '' ? '0' : inp.value.trim()).join('');
                     var studentDecimal = parseInt(studentBinaryString, 2);
                     
@@ -780,14 +951,18 @@
                     }
                 }
             });
+
+            if (triggerSync) {
+                saveProgress(true);
+            }
         }
 
-        /* --- NEW TEXT-MARKING LOGIC (For the Blue Reverse Engineering Task) --- */
-        function checkTextAnswers(className) {
+        /* --- 6. TEXT-MARKING LOGIC (For the Blue Reverse Engineering Task) --- */
+        function checkTextAnswers(className, triggerSync = true) {
             var inputs = document.querySelectorAll('.' + className);
             inputs.forEach(function(inp) {
                 var studentAnswer = inp.value.replace(/\s+/g, '').toLowerCase(); 
-                if(studentAnswer === '') return; // Skip if they haven't typed anything
+                if(studentAnswer === '') return;
                 
                 var acceptedAnswers = JSON.parse(inp.getAttribute('data-answers'));
                 var isCorrect = acceptedAnswers.some(ans => studentAnswer === ans.toLowerCase());
@@ -795,47 +970,10 @@
                 inp.classList.remove('input-correct', 'input-incorrect');
                 inp.classList.add(isCorrect ? 'input-correct' : 'input-incorrect');
             });
-        }
 
-        /* --- BULLETPROOF PDF GENERATION LOGIC --- */
-        function downloadPDF() {
-            if (typeof html2pdf === 'undefined') {
-                alert("The PDF creator is currently blocked by your school's network filter. Please take a screenshot of your work to save it instead.");
-                return;
+            if (triggerSync) {
+                saveProgress(true);
             }
-
-            var buttonsToHide = document.querySelectorAll('.no-print');
-            for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'none';
-            document.getElementById('action-buttons').style.display = 'none';
-
-            var textInputs = document.querySelectorAll('input[type="text"]');
-            for (var i = 0; i < textInputs.length; i++) {
-                textInputs[i].setAttribute('value', textInputs[i].value);
-            }
-
-            var textAreas = document.querySelectorAll('textarea');
-            for (var j = 0; j < textAreas.length; j++) {
-                textAreas[j].innerHTML = textAreas[j].value;
-                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
-            }
-
-            var element = document.getElementById('pdf-content');
-            var opt = {
-                margin:       0.3,
-                filename:     'Binary_Addition_Shifts_Workbook.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] } 
-            };
-
-            html2pdf().set(opt).from(element).save().then(function() {
-                for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'block';
-                document.getElementById('action-buttons').style.display = 'flex';
-                for (var k = 0; k < textAreas.length; k++) {
-                    textAreas[k].style.height = "";
-                }
-            });
         }
     </script>
 </body>
