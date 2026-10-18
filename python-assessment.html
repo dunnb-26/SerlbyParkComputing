@@ -6,6 +6,11 @@
     <title>Lesson 4 - Assessment</title>
     <link rel="stylesheet" href="style.css">
     
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <!-- CodeMirror for Interactive Syntax Highlighting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
@@ -262,7 +267,6 @@
         <div class="score-item">Task 4: <span id="score-t4">0</span>/5</div>
         <div class="score-item" style="color: var(--maroon);">TOTAL SCORE: <span id="total-score" style="color: var(--maroon);">0</span>/20</div>
         <div class="scoreboard-actions">
-            <!-- This is the updated Javascript Button -->
             <button class="btn-ms-form" onclick="submitPythonScore()" style="border: none; cursor: pointer; font-family: inherit;">📋 Submit Scores</button>
             <button class="btn-clear-scores" onclick="clearScores()">Reset Progress</button>
         </div>
@@ -324,14 +328,34 @@
             return false;
         };
 
+        /* --- 1. FIREBASE CONFIGURATION & INITIALIZATION --- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "y9-python-assessment";
+
         var editor = null;
-        let taskCodes = {
+        const defaultTaskCodes = {
             "t1": "# Task 1: Use the block bank on the left.\n\n",
             "t2": "# Task 2: Cinema Snack Bar Calculator\n\n",
             "t3": "# Task 3: Arcade Game Score Checker\n\n",
             "t4": "# Task 4: Canteen Queue Processor\n\n"
         };
 
+        let taskCodes = JSON.parse(JSON.stringify(defaultTaskCodes));
         let currentTask = "t1";
 
         const originalBlocks = [
@@ -348,6 +372,133 @@
 
         let currentBlocks = JSON.parse(JSON.stringify(originalBlocks));
 
+        /* --- 2. FIREBASE AUTO-SAVE & AUTO-LOAD --- */
+        let saveTimer;
+        let isApplyingCloudData = false;
+
+        function syncWorkToCloud(immediate = false) {
+            if (isApplyingCloudData) return;
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            if (editor) {
+                taskCodes[currentTask] = editor.getValue();
+            }
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                const s1 = parseInt(document.getElementById("score-t1").innerText) || 0;
+                const s2 = parseInt(document.getElementById("score-t2").innerText) || 0;
+                const s3 = parseInt(document.getElementById("score-t3").innerText) || 0;
+                const s4 = parseInt(document.getElementById("score-t4").innerText) || 0;
+                const total = s1 + s2 + s3 + s4;
+
+                const taskTitles = {
+                    t1: "Task 1 (Sequence Blocks)",
+                    t2: "Task 2 (Cinema Snack Bar)",
+                    t3: "Task 3 (Arcade Score Checker)",
+                    t4: "Task 4 (Canteen Queue Processor)"
+                };
+                const scoresMap = { t1: s1, t2: s2, t3: s3, t4: s4 };
+
+                const items = ['t1', 't2', 't3', 't4'].map((key, idx) => {
+                    const sc = scoresMap[key];
+                    const codeVal = (taskCodes[key] || "").trim();
+                    let status = 'neutral';
+                    if (sc === 5) status = 'correct';
+                    else if (sc > 0) status = 'neutral';
+                    else if (codeVal !== defaultTaskCodes[key].trim()) status = 'incorrect';
+
+                    return {
+                        index: idx,
+                        label: `${taskTitles[key]} — Score: ${sc}/5`,
+                        value: codeVal,
+                        status: status
+                    };
+                });
+
+                const payload = {
+                    pageTitle: document.title || "Lesson 4 - Assessment",
+                    lastUpdated: Date.now(),
+                    scoreText: `Total Score: ${total} / 20`,
+                    score_t1: s1,
+                    score_t2: s2,
+                    score_t3: s3,
+                    score_t4: s4,
+                    total_score: total,
+                    taskCodes: taskCodes,
+                    currentBlocks: currentBlocks,
+                    items: items
+                };
+
+                db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
+                  .set(payload, { merge: true })
+                  .catch(err => console.error("Cloud save error:", err));
+            }, immediate ? 50 : 800);
+        }
+
+        function applySavedData(data) {
+            if (!data) return;
+            isApplyingCloudData = true;
+
+            if (data.score_t1 !== undefined) document.getElementById("score-t1").innerText = data.score_t1;
+            if (data.score_t2 !== undefined) document.getElementById("score-t2").innerText = data.score_t2;
+            if (data.score_t3 !== undefined) document.getElementById("score-t3").innerText = data.score_t3;
+            if (data.score_t4 !== undefined) document.getElementById("score-t4").innerText = data.score_t4;
+            if (data.total_score !== undefined) document.getElementById("total-score").innerText = data.total_score;
+
+            if (data.taskCodes) {
+                taskCodes = Object.assign({}, defaultTaskCodes, data.taskCodes);
+            }
+            if (Array.isArray(data.currentBlocks)) {
+                currentBlocks = data.currentBlocks;
+            }
+
+            if (currentTask === "t1") {
+                renderBlockBank();
+            }
+            if (editor) {
+                editor.setValue(taskCodes[currentTask] || defaultTaskCodes[currentTask]);
+            }
+
+            isApplyingCloudData = false;
+        }
+
+        auth.onAuthStateChanged(async function(user) {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    // Clean up shared-PC local storage so scores never leak between students
+                    try {
+                        ['t1', 't2', 't3', 't4'].forEach(taskKey => {
+                            localStorage.removeItem('delta_python_score_' + taskKey);
+                        });
+                        localStorage.removeItem('delta_python_total');
+                    } catch (e) {}
+
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud work:", err);
+                }
+            }
+        });
+
+        /* --- 3. IDE & ASSESSMENT LOGIC --- */
         function switchTask() {
             if (editor) taskCodes[currentTask] = editor.getValue();
             currentTask = document.getElementById("task-selector").value;
@@ -384,11 +535,16 @@
                 document.getElementById("instruction-panel").innerHTML = textInstr;
             }
 
+            isApplyingCloudData = true;
             if (editor) editor.setValue(taskCodes[currentTask]);
+            isApplyingCloudData = false;
+
             document.getElementById("output").innerHTML = "";
             document.getElementById("feedback").innerHTML = "Awaiting code execution...";
             document.getElementById("feedback").style.backgroundColor = "#f5f5f5";
             document.getElementById("feedback").style.color = "var(--navy)";
+
+            syncWorkToCloud(false);
         }
 
         function renderBlockBank() {
@@ -419,6 +575,7 @@
                 let fallbackTxt = document.getElementById("python-code");
                 fallbackTxt.value += codeText + "\n";
             }
+            syncWorkToCloud(false);
         }
 
         function resetBlocks() {
@@ -426,24 +583,10 @@
             if (currentTask === "t1") renderBlockBank();
             if (editor) editor.setValue("# Type your code here:\n\n");
             taskCodes["t1"] = editor ? editor.getValue() : "";
+            syncWorkToCloud(false);
         }
 
         window.onload = function() {
-            try {
-                ['t1', 't2', 't3', 't4'].forEach(taskKey => {
-                    let savedScore = localStorage.getItem('delta_python_score_' + taskKey);
-                    if (savedScore !== null) {
-                        document.getElementById(`score-${taskKey}`).innerText = savedScore;
-                    }
-                });
-                let savedTotal = localStorage.getItem('delta_python_total');
-                if (savedTotal !== null) {
-                    document.getElementById("total-score").innerText = savedTotal;
-                }
-            } catch (error) {
-                console.log("Browser storage blocked, continuing without saving.");
-            }
-
             try {
                 editor = CodeMirror.fromTextArea(document.getElementById("python-code"), {
                     mode: "python",
@@ -455,6 +598,13 @@
                 
                 editor.addKeyMap({
                     "Insert": function(cm) { return false; } 
+                });
+
+                editor.on("change", function() {
+                    if (!isApplyingCloudData) {
+                        taskCodes[currentTask] = editor.getValue();
+                        syncWorkToCloud(false);
+                    }
                 });
                 
                 document.addEventListener('keydown', function(e) {
@@ -475,6 +625,13 @@
                 fallbackTxt.style.border = "none";
                 fallbackTxt.style.boxSizing = "border-box";
                 fallbackTxt.style.borderRadius = "5px";
+
+                fallbackTxt.addEventListener("input", function() {
+                    if (!isApplyingCloudData) {
+                        taskCodes[currentTask] = fallbackTxt.value;
+                        syncWorkToCloud(false);
+                    }
+                });
                 
                 editor = {
                     getValue: function() { return fallbackTxt.value; },
@@ -487,8 +644,8 @@
             switchTask();
         };
 
-        function clearScores() {
-            if (confirm("Are you sure you want to clear all scores for this student?")) {
+        async function clearScores() {
+            if (confirm("Are you sure you want to clear all scores and code for this student?")) {
                 ['t1', 't2', 't3', 't4'].forEach(taskKey => {
                     document.getElementById(`score-${taskKey}`).innerText = "0";
                 });
@@ -499,11 +656,20 @@
                     });
                     localStorage.removeItem('delta_python_total');
                 } catch (error) {}
-                alert("Scores have been reset.");
+
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
+                    } catch (err) {
+                        console.error("Error clearing cloud data:", err);
+                    }
+                }
+                window.location.reload();
             }
         }
         
-        // --- NEW SCRIPT: Routes ALL 5 scores directly to MS Forms ---
+        // --- Routes ALL 5 scores directly to MS Forms ---
         function submitPythonScore() {
             // 1. Grab all individual scores and the total score
             let t1 = document.getElementById("score-t1").innerText;
@@ -602,6 +768,7 @@
                 feedbackBox.innerHTML = "⚠️ Syntax Error! Check your spelling or indentation.";
                 feedbackBox.style.backgroundColor = "#ffebee";
                 feedbackBox.style.color = "#d32f2f";
+                syncWorkToCloud(true);
             });
         }
 
@@ -616,10 +783,7 @@
             let total = p1 + p2 + p3 + p4;
             document.getElementById("total-score").innerText = total;
 
-            try {
-                localStorage.setItem('delta_python_score_' + taskKey, points);
-                localStorage.setItem('delta_python_total', total);
-            } catch (error) { }
+            syncWorkToCloud(true);
         }
 
         // STRICT INTERNAL 5-POINT MARKING RUBRIC
