@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Binary Time Attack</title>
     <link rel="stylesheet" href="style.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         .game-container {
             max-width: 800px;
@@ -17,7 +23,7 @@
             text-align: center;
         }
 
-        /* NEW: Top Score Box Styling */
+        /* Top Score Box Styling */
         .top-score-container {
             background-color: rgba(223, 170, 43, 0.1);
             border: 2px solid #dfaa2b;
@@ -205,7 +211,7 @@
     <main>
         <div class="game-container">
             
-            <!-- NEW: Top Score Container -->
+            <!-- Top Score Container -->
             <div class="top-score-container">
                 <span class="top-score-icon">🏆</span> Top Score: <span id="top-score">0</span>
             </div>
@@ -256,19 +262,105 @@
     <footer>&copy; 2026 Delta Serlby Park - Computing Department</footer>
 
     <script>
+        /* --- 1. FIREBASE CONFIGURATION & INITIALIZATION --- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "binary-time-attack";
+
         let score = 0;
+        let topScore = 0;
+        let latestScore = 0;
         let timeLeft = 60;
         let targetNumber = 0;
         let currentTotal = 0;
         let timerInterval;
         let bits = [0, 0, 0, 0, 0, 0, 0, 0];
         const bitValues = [128, 64, 32, 16, 8, 4, 2, 1];
-        let currentMode = 0; 
-        
-        // NEW: Load Top Score from Local Storage
-        let topScore = localStorage.getItem('binaryTimeAttackTopScore') || 0;
-        document.getElementById('top-score').innerText = topScore;
+        let currentMode = 0;
 
+        /* --- 2. FIREBASE AUTO-SAVE & AUTO-LOAD --- */
+        function syncScoreToCloud() {
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            const payload = {
+                pageTitle: document.title || "Binary Time Attack",
+                lastUpdated: Date.now(),
+                topScore: topScore,
+                latestScore: latestScore,
+                scoreText: `Top Score: ${topScore}`,
+                items: [
+                    {
+                        index: 0,
+                        label: "🏆 All-Time Top Score",
+                        value: `${topScore} correct conversions`,
+                        status: topScore > 0 ? 'correct' : 'neutral'
+                    },
+                    {
+                        index: 1,
+                        label: "⏱️ Latest Game Score",
+                        value: `${latestScore} correct conversions`,
+                        status: 'neutral'
+                    }
+                ]
+            };
+
+            db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
+              .set(payload, { merge: true })
+              .catch(err => console.error("Cloud save error:", err));
+        }
+
+        function applySavedData(data) {
+            if (!data) return;
+            topScore = parseInt(data.topScore) || 0;
+            latestScore = parseInt(data.latestScore) || 0;
+            document.getElementById('top-score').innerText = topScore;
+        }
+
+        auth.onAuthStateChanged(async function(user) {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    // Remove shared-PC localStorage so another student's high score doesn't carry over
+                    try { localStorage.removeItem('binaryTimeAttackTopScore'); } catch (e) {}
+
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud top score:", err);
+                }
+            }
+        });
+
+        /* --- 3. GAME LOGIC --- */
         function startGame() {
             score = 0;
             timeLeft = 60;
@@ -405,14 +497,15 @@
         function triggerCorrectAnswer() {
             score++;
             timeLeft += 5; 
+            latestScore = score;
             document.getElementById('score').innerText = score;
             document.getElementById('time').innerText = timeLeft;
             
-            // NEW: Instantly update Top Score if beaten
+            // Instantly update Top Score in UI and Firebase if beaten
             if (score > topScore) {
                 topScore = score;
-                localStorage.setItem('binaryTimeAttackTopScore', topScore);
                 document.getElementById('top-score').innerText = topScore;
+                syncScoreToCloud();
             }
             
             document.body.style.backgroundColor = '#e8f5e9'; 
@@ -423,6 +516,13 @@
 
         function endGame() {
             clearInterval(timerInterval);
+            latestScore = score;
+            if (score > topScore) {
+                topScore = score;
+                document.getElementById('top-score').innerText = topScore;
+            }
+            syncScoreToCloud();
+
             document.getElementById('final-score').innerText = score;
             document.getElementById('game-over').style.display = 'flex';
         }
