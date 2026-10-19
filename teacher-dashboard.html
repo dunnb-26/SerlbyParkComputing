@@ -698,7 +698,7 @@
             }
         }
 
-        // 6. Render the List Bar for Each Lesson with Full Spelling Practice & Teacher Feedback Support
+        // 6. Render the List Bar for Each Lesson with Full Spelling Practice Support & "None" Message
         function renderLessonCard(studentUid, lesson, index) {
             const title = lesson.pageTitle || lesson.id.replace(/-/g, ' ');
 
@@ -767,10 +767,10 @@
                 });
             }
 
-            // Render Spelling Practice Table Rows if present in lesson data
+            // Render Spelling Practice Table Rows or say "None" if empty
+            let spagRowsHtml = '';
             if (Array.isArray(lesson.spagRows) && lesson.spagRows.length > 0) {
-                let spagRowsHtml = '';
-                lesson.spagRows.forEach((row, sIdx) => {
+                lesson.spagRows.forEach((row) => {
                     if (row.w0 || row.w1 || row.w2 || row.w3) {
                         spagRowsHtml += `
                             <tr>
@@ -782,23 +782,30 @@
                         `;
                     }
                 });
+            }
 
-                if (spagRowsHtml) {
-                    bodyHtml += `
-                        <div class="qa-row">
-                            <div class="qa-label"><span>📝 Spelling Practice & Corrections</span></div>
-                            <table style="width:100%; border-collapse:collapse; background:#fff3e0; margin-top:6px; font-size:0.9em; text-align:center;">
-                                <tr style="background:#f57c00; color:white;">
-                                    <th style="padding:6px; border:1px solid #cbd5e1;">Misspelled Word</th>
-                                    <th style="padding:6px; border:1px solid #cbd5e1;">Attempt 1</th>
-                                    <th style="padding:6px; border:1px solid #cbd5e1;">Attempt 2</th>
-                                    <th style="padding:6px; border:1px solid #cbd5e1;">Attempt 3</th>
-                                </tr>
-                                ${spagRowsHtml}
-                            </table>
-                        </div>
-                    `;
-                }
+            if (spagRowsHtml) {
+                bodyHtml += `
+                    <div class="qa-row">
+                        <div class="qa-label"><span>📝 Spelling Practice & Corrections</span></div>
+                        <table style="width:100%; border-collapse:collapse; background:#fff3e0; margin-top:6px; font-size:0.9em; text-align:center;">
+                            <tr style="background:#f57c00; color:white;">
+                                <th style="padding:6px; border:1px solid #cbd5e1;">Misspelled Word</th>
+                                <th style="padding:6px; border:1px solid #cbd5e1;">Attempt 1</th>
+                                <th style="padding:6px; border:1px solid #cbd5e1;">Attempt 2</th>
+                                <th style="padding:6px; border:1px solid #cbd5e1;">Attempt 3</th>
+                            </tr>
+                            ${spagRowsHtml}
+                        </table>
+                    </div>
+                `;
+            } else if (lesson.spagRows !== undefined) {
+                bodyHtml += `
+                    <div class="qa-row">
+                        <div class="qa-label"><span>📝 Spelling Practice & Corrections</span></div>
+                        <div class="answer-box" style="background:#f8f9fa; color:#64748b; font-style:italic;">None (No spelling corrections needed)</div>
+                    </div>
+                `;
             }
 
             // Render Teacher Feedback if present on Connect tasks
