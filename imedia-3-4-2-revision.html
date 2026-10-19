@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3.4.2: Intellectual Property Rights - Revision</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
         .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
@@ -36,8 +41,8 @@
         .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
         .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
         .btn-submit:hover { background-color: #152960; }
-        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
-        .btn-pdf:hover { background-color: #124d2d; }
+        .btn-pdf { background-color: #d32f2f; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
+        .btn-pdf:hover { background-color: #b71c1c; }
     </style>
 </head>
 <body>
@@ -65,70 +70,70 @@
                 
                 <div class="question-wrapper">
                     <label class="question-label">1. What is intellectual property (IP)?</label>
-                    <textarea id="ent342_q1" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["person or business creates using their ideas or creativity", "photograph, logo, song or invention"]], "feedback": "Acceptable: Something created using ideas or creativity, such as a photograph, logo, song or invention."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q1" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["person or business creates using their ideas or creativity", "photograph, logo, song or invention"]], "feedback": "Hint: Think about things people create using their ideas, like songs, logos, or inventions."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q1')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">2. Why is intellectual property important?</label>
-                    <textarea id="ent342_q2" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["protects people s creations", "stop others using them without permission"]], "feedback": "Acceptable: It protects peoples creations and helps stop others using them without permission."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q2" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["protects people s creations", "stop others using them without permission"]], "feedback": "Hint: How does it stop others from stealing or using creations without permission?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q2')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">3. Give four examples of intellectual property.</label>
-                    <textarea id="ent342_q3" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["photographs"], ["music"], ["films"], ["logos"], ["artwork"], ["written stories"], ["inventions"]], "feedback": "Acceptable: Photographs, music, films, logos, artwork, written stories, inventions or designs."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q3" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["photographs"], ["music"], ["films"], ["logos"], ["artwork"], ["written stories"], ["inventions"]], "feedback": "Hint: Name four types of creative works, like songs, pictures, or stories."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q3')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">4. Why might a creator want to protect their intellectual property?</label>
-                    <textarea id="ent342_q4" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["keep control over their work", "get credit", "earn money"]], "feedback": "Acceptable: To keep control over their work, get credit for it and potentially earn money from it."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q4" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["keep control over their work", "get credit", "earn money"]], "feedback": "Hint: Think about controlling the work, getting credit, and earning money."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">5. What could happen if intellectual property was not protected?</label>
-                    <textarea id="ent342_q5" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["copy others work without permission", "lose money or recognition"]], "feedback": "Acceptable: People could copy others work without permission, and creators might lose money or recognition."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q5" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["copy others work without permission", "lose money or recognition"]], "feedback": "Hint: What would happen to their money and recognition if anyone could copy them?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q5')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">6. What is meant by intellectual property rights?</label>
-                    <textarea id="ent342_q6" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["rights a creator or owner has over their creation", "how it can be used"]], "feedback": "Acceptable: The rights a creator or owner has over their creation, including how it can be used."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q6" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["rights a creator or owner has over their creation", "how it can be used"]], "feedback": "Hint: Think about the legal control a creator has over how their work is used."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q6')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">7. Why should media producers respect other people's intellectual property?</label>
-                    <textarea id="ent342_q7" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["avoid using work unfairly or unlawfully", "respect the creator s rights"]], "feedback": "Acceptable: To avoid using work unfairly or unlawfully and to respect the creators rights."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q7" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["avoid using work unfairly or unlawfully", "respect the creator s rights"]], "feedback": "Hint: Think about respecting the creator and avoiding breaking the law."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q7')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">8. How can intellectual property help a business?</label>
-                    <textarea id="ent342_q8" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["protect its brand, products and creative work from unauthorised copying"]], "feedback": "Acceptable: It can protect its brand, products and creative work from unauthorised copying."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q8" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["protect its brand, products and creative work from unauthorised copying"]], "feedback": "Hint: How does it stop others from copying a brand's products or logos?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q8')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">9. What is intellectual property infringement?</label>
-                    <textarea id="ent342_q9" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["using or copying protected work in a way that breaks owner rights"]], "feedback": "Acceptable: Using or copying protected work in a way that breaks the owners rights (e.g. without permission)."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q9" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["using or copying protected work in a way that breaks the owners rights"]], "feedback": "Hint: Think about what it is called when you use someone's protected work without permission."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q9')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">10. Why might a business take action against someone who copies its logo?</label>
-                    <textarea id="ent342_q10" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["confuse customers", "damage its brand", "misuse its protected identity"]], "feedback": "Acceptable: The copying could confuse customers, damage its brand or misuse its protected identity."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q10" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["confuse customers", "damage its brand", "misuse its protected identity"]], "feedback": "Hint: What happens to a brand's reputation and customers if another company uses a fake logo?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q10')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -136,210 +141,210 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 2: Protecting intellectual property</h3>
                 <div class="question-wrapper">
                     <label class="question-label">11. What is copyright?</label>
-                    <textarea id="ent342_q11" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["protection for original creative work", "music, photographs, films, writing"]], "feedback": "Acceptable: Protection for original creative work, such as music, photographs, films, writing and artwork."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q11" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["protection for original creative work", "music, photographs, films, writing"]], "feedback": "Hint: Think about the protection that automatically covers creative works like music and writing."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q11')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">12. What is the purpose of copyright?</label>
-                    <textarea id="ent342_q12" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["give creators control over certain uses", "prevent unauthorised copying"]], "feedback": "Acceptable: To give creators control over certain uses of their work and help prevent unauthorised copying."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q12" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["give creators control over certain uses", "prevent unauthorised copying"]], "feedback": "Hint: Think about how it helps creators stop unauthorised copying of their work."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q12')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">13. What types of work can copyright protect?</label>
-                    <textarea id="ent342_q13" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["original photographs", "music", "videos", "illustrations", "written content", "software"]], "feedback": "Acceptable: Original photographs, music, videos, illustrations, written content, software and other creative work."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q13" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["original photographs", "music", "videos", "illustrations", "written content", "software"]], "feedback": "Hint: Name some original creative works, like music, video, or software."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q13')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">14. Does a photograph have to be famous to be protected by copyright?</label>
-                    <textarea id="ent342_q14" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "original photograph can be protected even if taken by ordinary person"]], "feedback": "Acceptable: No. An original photograph can be protected even if it was taken by an ordinary person."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q14" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "original photograph can be protected even if taken by ordinary person"]], "feedback": "Hint: Does copyright only apply to professionals, or to any ordinary person's original photo?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q14')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">15. Does a creator usually need to register their work for copyright to exist in the UK?</label>
-                    <textarea id="ent342_q15" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "arises automatically when qualifying original work is created"]], "feedback": "Acceptable: No. Copyright protection generally arises automatically when qualifying original work is created."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q15" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "arises automatically when qualifying original work is created"]], "feedback": "Hint: Do you have to fill out forms, or does copyright happen automatically?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q15')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">16. Who usually owns copyright in a photograph?</label>
-                    <textarea id="ent342_q16" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["usually the photographer", "employment", "contracts"]], "feedback": "Acceptable: Usually the photographer, although ownership can depend on employment or contracts."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q16" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["usually the photographer", "employment", "contracts"]], "feedback": "Hint: Who usually owns it, unless they took it as part of their job?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q16')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">17. Does finding an image on Google mean you can use it freely?</label>
-                    <textarea id="ent342_q17" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "may still be copyrighted", "permission or licence needed"]], "feedback": "Acceptable: No. It may still be copyrighted, and permission or a suitable licence may be needed."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q17" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "may still be copyrighted", "permission or licence needed"]], "feedback": "Hint: Just because an image is on Google, does it mean it's free of copyright?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q17')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">18. Can a media producer copy a song into a video just because they have bought the song?</label>
-                    <textarea id="ent342_q18" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["not automatically", "buying a copy does not give permission to reproduce or publish"]], "feedback": "Acceptable: Not automatically. Buying a copy does not usually give permission to reproduce or publish it in a video."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q18" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["not automatically", "buying a copy does not give permission to reproduce or publish"]], "feedback": "Hint: Buying a song gives you the right to listen to it, but does it give you the right to publish it?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q18')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">19. What should a producer do before using a copyrighted image?</label>
-                    <textarea id="ent342_q19" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["check the licence", "contact the owner to find out if intended use is allowed"]], "feedback": "Acceptable: Check the licence or contact the owner to find out whether the intended use is allowed."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q19" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["check the licence", "contact the owner to find out if intended use is allowed"]], "feedback": "Hint: What should you check or who should you contact before using it?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q19')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">20. What could happen if a producer uses copyrighted music without permission?</label>
-                    <textarea id="ent342_q20" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["copyright complaint", "removal of video", "payment demand", "legal action"]], "feedback": "Acceptable: They could face a copyright complaint, video removal, a payment demand or legal action."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q20" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["copyright complaint", "removal of video", "payment demand", "legal action"]], "feedback": "Hint: Think about legal action, video takedowns, or having to pay fines."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q20')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">21. Are ideas alone usually protected by copyright?</label>
-                    <textarea id="ent342_q21" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "protects the way an idea is expressed, not the idea itself"]], "feedback": "Acceptable: No. Copyright generally protects the way an idea is expressed, not the idea itself."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q21" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "protects the way an idea is expressed, not the idea itself"]], "feedback": "Hint: Can you protect a basic idea, or only the final created expression of that idea?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q21')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">22. How could a media producer protect a developed creative concept before sharing it?</label>
-                    <textarea id="ent342_q22" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["keep it confidential", "use suitable agreements", "record development work"]], "feedback": "Acceptable: Keep it confidential where appropriate, use suitable agreements and record development work."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q22" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["keep it confidential", "use suitable agreements", "record development work"]], "feedback": "Hint: Think about keeping it a secret, recording dates, and using confidentiality agreements."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q22')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">23. What is a patent?</label>
-                    <textarea id="ent342_q23" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["protection for a qualifying invention", "exclusive rights for a limited period"]], "feedback": "Acceptable: Protection for a qualifying invention, giving the owner exclusive rights for a limited period."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q23" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["protection for a qualifying invention", "exclusive rights for a limited period"]], "feedback": "Hint: What type of protection gives exclusive rights to a new invention?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-ent342_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent341_q23')">👨‍🏫 Override Score</button></div>
+                    <div style="text-align: right;"><button id="override-ent342_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q23')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">24. What type of thing might be protected by a patent?</label>
-                    <textarea id="ent342_q24" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["qualifying new invention", "new technical device", "new way of making something work"]], "feedback": "Acceptable: A qualifying new invention, such as a new technical device or a new way of making something work."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q24" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["qualifying new invention", "new technical device", "new way of making something work"]], "feedback": "Hint: Think about new technical devices or inventions."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q24')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">25. Would a basic idea for a new superhero usually be protected by a patent?</label>
-                    <textarea id="ent342_q25" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "character idea is not a technical invention", "artwork or story may qualify for copyright"]], "feedback": "Acceptable: No. A character idea alone is not normally a technical invention; artwork or story may qualify for copyright."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q25" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "character idea is not a technical invention", "artwork or story may qualify for copyright"]], "feedback": "Hint: Is a character an 'invention', or is it an artwork protected by copyright?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q25')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">26. Why might a business want to patent an invention?</label>
-                    <textarea id="ent342_q26" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["prevent others from making, using or selling without permission"]], "feedback": "Acceptable: To help prevent others from making, using or selling the patented invention without permission."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q26" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["prevent others from making, using or selling without permission"]], "feedback": "Hint: How does a patent stop others from making or selling the invention?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q26" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q26')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">27. What is a trademark?</label>
-                    <textarea id="ent342_q27" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["sign that identifies a business s goods or services", "brand name, logo or slogan"]], "feedback": "Acceptable: A sign that identifies a business's goods or services, such as a brand name, logo or slogan."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q27" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["sign that identifies a business s goods or services", "brand name, logo or slogan"]], "feedback": "Hint: What protects a brand name, logo, or slogan?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q27" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q27')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">28. Why are trademarks useful to businesses?</label>
-                    <textarea id="ent342_q28" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["help customers recognise a brand", "distinguish it from competitors"]], "feedback": "Acceptable: They help customers recognise a brand and distinguish it from competitors."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q28" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["help customers recognise a brand", "distinguish it from competitors"]], "feedback": "Hint: How does it help customers tell one brand apart from its competitors?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q28" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q28')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">29. What could happen if a company copies another company's trademark?</label>
-                    <textarea id="ent342_q29" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["customers could be confused", "brand owner take action", "legal consequences"]], "feedback": "Acceptable: Customers could be confused, the brand owner could take action and the copier could face legal consequences."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q29" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["customers could be confused", "brand owner take action", "legal consequences"]], "feedback": "Hint: Think about customer confusion and the legal consequences for copying."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q29" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q29')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">30. What is the difference between copyright and a trademark?</label>
-                    <textarea id="ent342_q30" class="auto-input ent342-input" rows="3" data-rubric='{"keywords": [["copyright protects creative work"], ["trademark identifies and distinguishes brand goods or services"]], "feedback": "Copyright protects creative work; a trademark identifies and distinguishes a brand's goods or services."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q30" class="auto-input ent342-input" rows="3" data-rubric='{"keywords": [["copyright protects creative work"], ["trademark identifies and distinguishes brand goods or services"]], "feedback": "Hint: Contrast protecting creative work (music/art) versus protecting a brand identity (logos)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q30" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q30')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">31. What is the difference between copyright and a patent?</label>
-                    <textarea id="ent342_q31" class="auto-input ent342-input" rows="3" data-rubric='{"keywords": [["copyright protects original creative expression"], ["patent protects a qualifying invention"]], "feedback": "Copyright protects original creative expression; a patent protects a qualifying invention."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q31" class="auto-input ent342-input" rows="3" data-rubric='{"keywords": [["copyright protects original creative expression"], ["patent protects a qualifying invention"]], "feedback": "Hint: Contrast protecting creative expression (books/music) versus protecting a physical invention."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q31" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q31')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">32. Why might a media company protect its logo as a trademark?</label>
-                    <textarea id="ent342_q32" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["prevent other businesses using a confusingly similar brand identity", "protect reputation"]], "feedback": "Acceptable: To help prevent other businesses using a confusingly similar brand identity and to protect its reputation."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q32" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["prevent other businesses using a confusingly similar brand identity", "protect reputation"]], "feedback": "Hint: Why do businesses want to stop competitors from using similar logos?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q32" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q32')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">33. How can a photographer help show that they created an image?</label>
-                    <textarea id="ent342_q33" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["keep the original file", "retain editing records", "record the date", "evidence of creation"]], "feedback": "Acceptable: Keep the original file, retain editing records, record the date and keep evidence of the work's creation."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q33" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["keep the original file", "retain editing records", "record the date", "evidence of creation"]], "feedback": "Hint: How do digital files, editing records, and dates help prove who made an image?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q33" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q33')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">34. Why might a creator put their name or copyright notice on their work?</label>
-                    <textarea id="ent342_q34" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["identify the creator or owner", "warn others work may be protected"]], "feedback": "Acceptable: To identify the creator or owner and warn others that the work may be protected."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q34" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["identify the creator or owner", "warn others work may be protected"]], "feedback": "Hint: Why put a warning sign on your work?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q34" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q34')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">35. Does adding a copyright symbol automatically create copyright protection?</label>
-                    <textarea id="ent342_q35" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "arises automatically", "symbol communicates claim"]], "feedback": "Acceptable: No. Copyright arises automatically for qualifying work; the symbol helps communicate that a claim is made."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q35" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "arises automatically", "symbol communicates claim"]], "feedback": "Hint: Is the symbol required for copyright to exist, or does it just warn people?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q35" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q35')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">36. When might a business apply to register a trademark?</label>
-                    <textarea id="ent342_q36" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["wants formal protection for a brand name, logo or sign"]], "feedback": "Acceptable: When it wants formal protection for a brand name, logo or other eligible sign used for goods/services."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q36" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["wants formal protection for a brand name, logo or sign"]], "feedback": "Hint: When would a company want to legally register its brand name or logo?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q36" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q36')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">37. When might someone apply for a patent?</label>
-                    <textarea id="ent342_q37" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["developed a potentially patentable invention", "seek legal protection"]], "feedback": "Acceptable: When they have developed a potentially patentable invention and want to seek legal protection for it."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q37" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["developed a potentially patentable invention", "seek legal protection"]], "feedback": "Hint: When someone has created a brand new technical invention, what do they apply for?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q37" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q37')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">38. Why should a creator keep records of licences and permissions?</label>
-                    <textarea id="ent342_q38" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["show what use was agreed", "evidence if dispute arises"]], "feedback": "Acceptable: To show what use was agreed and provide evidence if a dispute arises."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q38" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["show what use was agreed", "evidence if dispute arises"]], "feedback": "Hint: Why is it important to have written proof of an agreement if a disagreement happens later?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q38" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q38')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">39. Why might a business use a confidentiality agreement when sharing an idea?</label>
-                    <textarea id="ent342_q39" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["restrict how information can be shared or used"]], "feedback": "Acceptable: To help restrict how the information can be shared or used by the people who agree to the terms."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q39" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["restrict how information can be shared or used"]], "feedback": "Hint: How does a contract stop people from sharing a secret idea?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q39" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q39')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">40. Why should a producer check whether an image is still covered by copyright?</label>
-                    <textarea id="ent342_q40" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["protection periods and ownership can vary", "avoid using without rights"]], "feedback": "Acceptable: Protection periods and ownership can vary, so checking helps avoid using work without necessary rights."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q40" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["protection periods and ownership can vary", "avoid using without rights"]], "feedback": "Hint: Because copyright eventually runs out, why is it important to check the dates?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q40" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q40')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -347,210 +352,210 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 3: Using copyrighted materials</h3>
                 <div class="question-wrapper">
                     <label class="question-label">41. What is permission to use copyrighted material?</label>
-                    <textarea id="ent342_q41" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["agreement from copyright owner allowing someone to use work"]], "feedback": "Acceptable: Agreement from the copyright owner allowing someone to use their work in a particular way."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q41" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["agreement from copyright owner allowing someone to use work"]], "feedback": "Hint: What do you call the agreement from the owner to use their work?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-ent342_q41" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent341_q41')">👨‍🏫 Override Score</button></div>
+                    <div style="text-align: right;"><button id="override-ent342_q41" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q41')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">42. What is a licence?</label>
-                    <textarea id="ent342_q42" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["agreement that sets out how someone is allowed to use copyrighted material"]], "feedback": "Acceptable: An agreement that sets out how someone is allowed to use copyrighted material."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q42" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["agreement that sets out how someone is allowed to use copyrighted material"]], "feedback": "Hint: Think of the legal document that sets the terms and limits for using a work."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q42" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q42')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">43. What is the difference between permission and a licence?</label>
-                    <textarea id="ent342_q43" class="auto-input ent342-input" rows="3" data-rubric='{"keywords": [["permission is approval to use"], ["licence sets out terms and limits"]], "feedback": "Permission is approval to use; a licence sets out terms and limits of that use."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q43" class="auto-input ent342-input" rows="3" data-rubric='{"keywords": [["permission is approval to use"], ["licence sets out terms and limits"]], "feedback": "Hint: One is a general 'yes', the other is a strict set of terms and limits."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q43" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q43')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">44. What is a licensing fee?</label>
-                    <textarea id="ent342_q44" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["money paid for the right to use someone else s work"]], "feedback": "Acceptable: Money paid for the right to use someone else's work."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q44" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["money paid for the right to use someone else s work"]], "feedback": "Hint: What do you call the money paid to get a licence?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q44" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q44')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">45. Does every copyrighted image require a payment to use it?</label>
-                    <textarea id="ent342_q45" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "some are free under terms"]], "feedback": "Acceptable: No. Some images are free under particular terms, but users must still follow licence conditions."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q45" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "some are free under terms"]], "feedback": "Hint: Do all images cost money, or are some free under certain conditions?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q45" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q45')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">46. Why should a producer check a licence before using an image?</label>
-                    <textarea id="ent342_q46" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["check whether planned use is allowed", "commercial use, editing, sharing"]], "feedback": "Acceptable: To check whether planned use is allowed, including commercial use, editing and sharing."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q46" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["check whether planned use is allowed", "commercial use, editing, sharing"]], "feedback": "Hint: Why is it important to check if the licence actually allows you to edit or sell it?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q46" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q46')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">47. What might a licence restrict?</label>
-                    <textarea id="ent342_q47" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["where work can be used", "how long", "whether it can be edited or used commercially"]], "feedback": "Acceptable: Where work can be used, duration, whether it can be edited or used commercially."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q47" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["where work can be used", "how long", "whether it can be edited or used commercially"]], "feedback": "Hint: Think about limits on time, location, editing, or making money."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q47" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q47')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">48. What is commercial use?</label>
-                    <textarea id="ent342_q48" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["using something to make money or promote a business, product or service"]], "feedback": "Acceptable: Using something to make money or promote a business, product or service."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q48" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["using something to make money or promote a business, product or service"]], "feedback": "Hint: What do you call it when you use an image to make money or advertise?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q48" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q48')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">49. Why might a licence for a personal project not allow commercial use?</label>
-                    <textarea id="ent342_q49" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["owner may allow private or non commercial use", "require different licence for business"]], "feedback": "Acceptable: Owner may allow private use but require a different licence or payment for business use."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q49" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["owner may allow private or non commercial use", "require different licence for business"]], "feedback": "Hint: Why might the owner charge businesses money but let regular people use it for free?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q49" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q49')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">50. A producer pays to use a photograph in a printed leaflet. Can they automatically use it in a national advertising campaign too?</label>
-                    <textarea id="ent342_q50" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "check whether licence covers additional use"]], "feedback": "Acceptable: No. They must check whether the licence covers that additional use."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q50" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "check whether licence covers additional use"]], "feedback": "Hint: Does paying for one leaflet automatically mean you have the rights for a national TV advert?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q50" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q50')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">51. What should a producer do if a licence does not clearly explain whether editing is allowed?</label>
-                    <textarea id="ent342_q51" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["check the terms or contact the owner before making changes"]], "feedback": "Acceptable: Check the terms or contact the owner before making changes."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q51" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["check the terms or contact the owner before making changes"]], "feedback": "Hint: What should you do with the owner before making any changes if the rules aren't clear?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-ent342_q51" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent341_q51')">👨‍🏫 Override Score</button></div>
+                    <div style="text-align: right;"><button id="override-ent342_q51" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q51')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">52. Why should a producer keep proof of a licence or permission?</label>
-                    <textarea id="ent342_q52" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["show they were allowed to use material", "what conditions applied"]], "feedback": "Acceptable: To show they were allowed to use the material and what conditions applied."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q52" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["show they were allowed to use material", "what conditions applied"]], "feedback": "Hint: How does keeping proof save you if someone claims you stole their work?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q52" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q52')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">53. What is a Creative Commons licence?</label>
-                    <textarea id="ent342_q53" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["licence that allows creators to let others use their work under stated conditions"]], "feedback": "Acceptable: A licence allowing creators to let others use their work under stated conditions."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q53" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["licence that allows creators to let others use their work under stated conditions"]], "feedback": "Hint: What is the famous licence system (CC) that lets creators share work easily?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q53" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q53')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">54. Does a Creative Commons licence mean that an image has no copyright?</label>
-                    <textarea id="ent342_q54" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "creator retains copyright while allowing certain uses"]], "feedback": "Acceptable: No. The creator can retain copyright while allowing certain uses through the licence."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q54" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "creator retains copyright while allowing certain uses"]], "feedback": "Hint: Does sharing work under CC mean giving up your copyright entirely?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q54" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q54')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">55. What does attribution mean in a Creative Commons licence?</label>
-                    <textarea id="ent342_q55" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["giving credit to the creator", "naming them and providing source"]], "feedback": "Acceptable: Giving credit to the creator, usually by naming them and providing required source details."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q55" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["giving credit to the creator", "naming them and providing source"]], "feedback": "Hint: What does it mean when you have to give credit or name the original creator?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q55" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q55')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">56. What does a NonCommercial condition mean?</label>
-                    <textarea id="ent342_q56" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["work cannot be used for commercial purposes"]], "feedback": "Acceptable: The work cannot be used for commercial purposes under that licence."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q56" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["work cannot be used for commercial purposes"]], "feedback": "Hint: What does 'NonCommercial' mean about making money?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q56" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q56')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">57. What does a NoDerivatives condition mean?</label>
-                    <textarea id="ent342_q57" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["work can be shared only without distributing modified versions"]], "feedback": "Acceptable: The work can be shared only under licence terms without distributing modified versions."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q57" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["work can be shared only without distributing modified versions"]], "feedback": "Hint: What does 'NoDerivatives' mean about editing or changing the original work?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q57" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q57')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">58. What does a ShareAlike condition mean?</label>
-                    <textarea id="ent342_q58" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["adaptation must be shared under same or compatible licence"]], "feedback": "Acceptable: If an adaptation is shared, it must be under the same or a compatible licence."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q58" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["adaptation must be shared under same or compatible licence"]], "feedback": "Hint: What does 'ShareAlike' mean if you decide to share your new version?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q58" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q58')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">59. Why must a producer check the exact Creative Commons licence?</label>
-                    <textarea id="ent342_q59" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["different licences allow different uses", "some restrict commercial use or adaptations"]], "feedback": "Acceptable: Different licences allow different uses, and some restrict commercial use or adaptations."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q59" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["different licences allow different uses", "some restrict commercial use or adaptations"]], "feedback": "Hint: Are all Creative Commons licences exactly the same, or do they have different restrictions?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q59" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q59')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">60. A photograph is available under a Creative Commons licence requiring attribution. What must the producer do?</label>
-                    <textarea id="ent342_q60" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["give required credit to creator", "follow licence conditions"]], "feedback": "Acceptable: Give the required credit to the creator and follow the licence conditions."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q60" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["give required credit to creator", "follow licence conditions"]], "feedback": "Hint: What must you do if a licence asks for 'Attribution'?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q60" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q60')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">61. A student finds an image under a NonCommercial licence and wants to use it in a paid advert. What should they do?</label>
-                    <textarea id="ent342_q61" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["find a licence that allows commercial use", "get permission from owner"]], "feedback": "Acceptable: Find a licence allowing commercial use or get permission from the owner."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q61" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["find a licence that allows commercial use", "get permission from owner"]], "feedback": "Hint: If the current licence says 'NonCommercial', what else do they need to get?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q61" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q61')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">62. A producer edits an image but the licence does not allow derivatives. What is the problem?</label>
-                    <textarea id="ent342_q62" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["edit breaches licence conditions", "use appropriately licensed image or get permission"]], "feedback": "Acceptable: Edit breaches licence conditions. They should use an appropriately licensed image or obtain permission."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q62" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["edit breaches licence conditions", "use appropriately licensed image or get permission"]], "feedback": "Hint: What happens if they edit a 'NoDerivatives' image?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q62" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q62')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">63. What is fair dealing?</label>
-                    <textarea id="ent342_q63" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["limited legal exception", "allow certain uses of copyrighted work without permission"]], "feedback": "Acceptable: A limited legal exception allowing certain uses of copyrighted work without permission in specific circumstances."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q63" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["limited legal exception", "allow certain uses of copyrighted work without permission"]], "feedback": "Hint: Think of the legal exception that lets you use small bits of a work without asking."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q63" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q63')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">64. Does fair dealing mean you can use any copyrighted material as long as you only use a small amount?</label>
-                    <textarea id="ent342_q64" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "depends on purpose and circumstances"]], "feedback": "Acceptable: No. Whether it applies depends on purpose and circumstances, and other conditions apply."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q64" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "depends on purpose and circumstances"]], "feedback": "Hint: Is 'fair dealing' just a free pass to use a small amount, or are there strict rules?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q64" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q64')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">65. Give examples of purposes where fair dealing may apply in the UK.</label>
-                    <textarea id="ent342_q65" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["criticism or review", "quotation", "reporting current events", "research or private study"]], "feedback": "Acceptable: Criticism or review, quotation, reporting current events, research or private study."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q65" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["criticism or review", "quotation", "reporting current events", "research or private study"]], "feedback": "Hint: Think of things like news reporting, reviews, or school research."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q65" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q65')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">66. Why should a producer not assume that fair dealing applies to every school or educational project?</label>
-                    <textarea id="ent342_q66" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["purpose alone does not automatically make every use lawful", "particular exception conditions apply"]], "feedback": "Acceptable: Purpose alone doesn't make every use lawful; particular exception conditions must be considered."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q66" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["purpose alone does not automatically make every use lawful", "particular exception conditions apply"]], "feedback": "Hint: Does being an educational project automatically cancel all copyright laws?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q66" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q66')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">67. A student uses a short extract from a film to review it and credits the source. Could fair dealing be relevant?</label>
-                    <textarea id="ent342_q67" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["potentially", "criticism or review may qualify"]], "feedback": "Acceptable: Potentially, because criticism or review may qualify, provided conditions are met."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q67" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["potentially", "criticism or review may qualify"]], "feedback": "Hint: Can you use a short film clip if you are doing a review of the film?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q67" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q67')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">68. A company copies an entire commercially available film and uploads it for free. Is this automatically fair dealing?</label>
-                    <textarea id="ent342_q68" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "copying whole film would not be justified"]], "feedback": "Acceptable: No. Copying and sharing the whole film would not normally be justified as fair dealing."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q68" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "copying whole film would not be justified"]], "feedback": "Hint: Does fair dealing let you upload a whole movie for free?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q68" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q68')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">69. Why should a producer use only what is reasonably necessary when relying on a fair dealing exception?</label>
-                    <textarea id="ent342_q69" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["using more than necessary may weaken argument that use is fair"]], "feedback": "Acceptable: Using more than necessary may weaken the argument that the use is fair."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q69" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["using more than necessary may weaken argument that use is fair"]], "feedback": "Hint: If you use more of the video than you actually need, does it still look 'fair'?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q69" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q69')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">70. What should a producer do if they are unsure whether fair dealing applies?</label>
-                    <textarea id="ent342_q70" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["check reliable guidance", "seek permission from copyright owner"]], "feedback": "Acceptable: Check reliable guidance or seek permission from the copyright owner."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q70" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["check reliable guidance", "seek permission from copyright owner"]], "feedback": "Hint: What should they do if they aren't sure it's fair dealing?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q70" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q70')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -558,70 +563,70 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 4: Watermarks, symbols and consequences</h3>
                 <div class="question-wrapper">
                     <label class="question-label">71. What is a watermark?</label>
-                    <textarea id="ent342_q71" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["text, logo or pattern placed over or into an image", "identify owner or discourage copying"]], "feedback": "Acceptable: Text, logo or pattern placed over an image or document to identify its owner or discourage copying."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q71" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["text, logo or pattern placed over or into an image", "identify owner or discourage copying"]], "feedback": "Hint: What do you call a semi-transparent logo placed over a preview image?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q71" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q71')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">72. Why might a photographer put a watermark on an image?</label>
-                    <textarea id="ent342_q72" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["show who created it", "advertise business", "make unauthorised reuse less attractive"]], "feedback": "Acceptable: To show who created it, advertise their business or make unauthorised reuse less attractive."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q72" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["show who created it", "advertise business", "make unauthorised reuse less attractive"]], "feedback": "Hint: Why put a big logo over a photo you want to sell?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q72" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q72')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">73. Does a watermark guarantee that nobody can copy an image?</label>
-                    <textarea id="ent342_q73" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "someone may still copy or remove it"]], "feedback": "Acceptable: No. Someone may still copy or remove it, so it is not complete protection."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q73" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "someone may still copy or remove it"]], "feedback": "Hint: Is a watermark impossible to remove, or can people still crop or edit it out?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q73" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q73')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">74. What does the © symbol mean?</label>
-                    <textarea id="ent342_q74" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["indicates a copyright claim", "identifies copyright ownership"]], "feedback": "Acceptable: It indicates a copyright claim or identifies copyright ownership."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q74" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["indicates a copyright claim", "identifies copyright ownership"]], "feedback": "Hint: What does the © symbol stand for?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q74" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q74')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">75. What does the ™ symbol usually indicate?</label>
-                    <textarea id="ent342_q75" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["business is claiming a name or logo as a trademark"]], "feedback": "Acceptable: A business is claiming a name or logo as a trademark."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q75" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["business is claiming a name or logo as a trademark"]], "feedback": "Hint: What does the ™ symbol stand for?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q75" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q75')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">76. What does the ® symbol usually indicate?</label>
-                    <textarea id="ent342_q76" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["trademark is registered"]], "feedback": "Acceptable: The trademark is registered. It should not be used to suggest registration where there is none."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q76" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["trademark is registered"]], "feedback": "Hint: What does the ® symbol stand for?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q76" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q76')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">77. Does putting a © symbol on someone else's photograph give you ownership of it?</label>
-                    <textarea id="ent342_q77" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "does not transfer copyright or give permission"]], "feedback": "Acceptable: No. Adding the symbol does not transfer copyright or give permission to use the image."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q77" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "does not transfer copyright or give permission"]], "feedback": "Hint: Can you steal a photo and just slap your own © on it to make it yours?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q77" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q77')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">78. Why might a watermark make a preview image less attractive?</label>
-                    <textarea id="ent342_q78" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["cover important parts of the image", "harder to view clearly"]], "feedback": "Acceptable: It can cover important parts of the image and make it harder to view clearly."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q78" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["cover important parts of the image", "harder to view clearly"]], "feedback": "Hint: How does a big semi-transparent logo ruin the look of an image?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q78" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q78')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">79. A producer finds a watermarked photograph online. Can they remove the watermark and use the image freely?</label>
-                    <textarea id="ent342_q79" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "removing watermark does not give permission"]], "feedback": "Acceptable: No. Removing the watermark does not give permission. Check rights and obtain a licence."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q79" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["no", "removing watermark does not give permission"]], "feedback": "Hint: Does editing out the watermark suddenly make the image free to use?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q79" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q79')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">80. Why should a media producer understand the difference between ©, ™ and ®?</label>
-                    <textarea id="ent342_q80" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["refer to different types of rights or claims", "avoid misleading people"]], "feedback": "Acceptable: They refer to different types of rights or claims, so using them correctly avoids misleading people."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q80" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["refer to different types of rights or claims", "avoid misleading people"]], "feedback": "Hint: Why is it bad to confuse copyright with a registered trademark?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q80" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q80')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -629,70 +634,70 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 5: Applying knowledge to scenarios</h3>
                 <div class="question-wrapper">
                     <label class="question-label">81. A student copies a photographer's image from a website into a public advert without permission. What is the problem?</label>
-                    <textarea id="ent342_q81" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["infringing copyright", "used without appropriate licence"]], "feedback": "Acceptable: They may be infringing copyright because the image is used without an appropriate licence or permission."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q81" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["infringing copyright", "used without appropriate licence"]], "feedback": "Hint: What is it called when you use someone's copyrighted photo in an advert without asking?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q81" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent341_q81')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">82. A business creates a new logo and discovers another company is using a confusingly similar logo. Which type of IP protection may be relevant?</label>
-                    <textarea id="ent342_q82" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["trademark protection"]], "feedback": "Acceptable: Trademark protection, depending on circumstances and rights held."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q82" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["trademark protection"]], "feedback": "Hint: What kind of protection stops someone from using a confusingly similar logo?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q82" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q82')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">83. A student invents a new type of camera mechanism. Which type of IP protection might be relevant?</label>
-                    <textarea id="ent342_q83" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["patent"]], "feedback": "Acceptable: A patent may be relevant if the mechanism meets requirements for patent protection."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q83" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["patent"]], "feedback": "Hint: What protection covers physical, mechanical inventions?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q83" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q83')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">84. A designer creates an original poster and wants to stop others copying the artwork. Which protection is likely to apply?</label>
-                    <textarea id="ent342_q84" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["copyright", "protects original creative expression"]], "feedback": "Acceptable: Copyright, because it protects original creative expression."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q84" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["copyright", "protects original creative expression"]], "feedback": "Hint: What protection automatically applies to an original poster drawing?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q84" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q84')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">85. A media producer uses a song under a licence that allows personal use only in a paid advertisement. What should they have done?</label>
-                    <textarea id="ent342_q85" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["checked licence", "obtained permission or licence allowing commercial use"]], "feedback": "Acceptable: Checked the licence and obtained permission or a licence allowing commercial use."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q85" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["checked licence", "obtained permission or licence allowing commercial use"]], "feedback": "Hint: What should they have checked before putting the song in a paid advert?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q85" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q85')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">86. A student uses a Creative Commons image but forgets to credit the creator, even though attribution is required. What is the issue?</label>
-                    <textarea id="ent342_q86" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["not followed licence conditions", "use may not be permitted"]], "feedback": "Acceptable: They have not followed the licence conditions, so their use may not be permitted."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q86" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["not followed licence conditions", "use may not be permitted"]], "feedback": "Hint: What happens to the CC licence if they fail to attribute the creator?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q86" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q86')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">87. A video creator uses a short film extract to provide criticism and review. What should they consider before relying on fair dealing?</label>
-                    <textarea id="ent342_q87" class="auto-input ent342-input" rows="3" data-rubric='{"keywords": [["whether use falls within relevant exception", "meets conditions", "amount used", "acknowledgement"]], "feedback": "Acceptable: Whether the use falls within the relevant exception, meets conditions, amount used, and acknowledgement."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q87" class="auto-input ent342-input" rows="3" data-rubric='{"keywords": [["whether use falls within relevant exception", "meets conditions", "amount used", "acknowledgement"]], "feedback": "Hint: Think about whether their review uses an appropriate amount and gives credit."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q87" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q87')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">88. A company copies a competitor's logo and uses it on similar products. What could happen?</label>
-                    <textarea id="ent342_q88" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["customers could be confused", "face a complaint or legal action for infringing trademark"]], "feedback": "Acceptable: Customers could be confused, and the company may face legal action for infringing trademark rights."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q88" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["customers could be confused", "face a complaint or legal action for infringing trademark"]], "feedback": "Hint: Think about what happens to the customers and what legal action the other company might take."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q88" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q88')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">89. A photographer uploads low resolution previews with a watermark, then provides licensed high resolution files to paying clients. Why might they do this?</label>
-                    <textarea id="ent342_q89" class="auto-input ent342-input" rows="3" data-rubric='{"keywords": [["watermark identifies photographer and discourages unauthorised use", "clients receive files under agreed terms"]], "feedback": "Acceptable: Watermark identifies the creator and discourages unauthorised reuse, while paying clients receive licensed files."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q89" class="auto-input ent342-input" rows="3" data-rubric='{"keywords": [["watermark identifies photographer and discourages unauthorised use", "clients receive files under agreed terms"]], "feedback": "Hint: Why show a protected version for free but charge for the clean version?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q89" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q89')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">90. A producer cannot work out who owns an image they found online. What is the safest approach?</label>
-                    <textarea id="ent342_q90" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["find the owner and check licence", "obtain permission", "use a different image"]], "feedback": "Acceptable: Find the owner and check the licence, obtain permission or use a different image with clear usage rights."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="ent342_q90" class="auto-input ent342-input" rows="2" data-rubric='{"keywords": [["find the owner and check licence", "obtain permission", "use a different image"]], "feedback": "Hint: Should they use it anyway, or find a different image?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent342_q90" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent342_q90')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -701,8 +706,8 @@
             </div>
         </main>
     </div>
+    
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
         <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
     </div>
 
@@ -722,45 +727,178 @@
     <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
 
     <script>
-        function saveProgress() {
-            var inputs = document.querySelectorAll('.auto-input');
-            var dataToSave = {};
-            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
-            try { localStorage.setItem('enterprise3_4_2Memory_Smart_v1', JSON.stringify(dataToSave)); } catch (e) {}
+        /* --- FIREBASE CONFIGURATION & INITIALIZATION --- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
-        function loadProgress() {
-            var saved = localStorage.getItem('enterprise3_4_2Memory_Smart_v1');
-            if (saved) {
-                var data = JSON.parse(saved);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "imedia-3-4-2-intellectual-property";
+
+        /* --- MARKBOOK BUILDER FOR TEACHER DASHBOARD --- */
+        function buildMarkbookData() {
+            const items = [];
+            const inputs = document.querySelectorAll('.auto-input');
+            
+            inputs.forEach((input, i) => {
+                const wrapper = input.closest('.question-wrapper');
+                const labelEl = wrapper ? wrapper.querySelector('.question-label') : null;
+                const labelText = labelEl ? labelEl.innerText.trim() : `Question ${i + 1}`;
+                
+                let status = 'neutral';
+                if (input.classList.contains('correct') || input.classList.contains('teacher-locked')) {
+                    status = 'correct';
+                } else if (input.classList.contains('incorrect')) {
+                    status = 'incorrect';
+                }
+
+                items.push({
+                    index: i,
+                    label: labelText,
+                    value: input.value.trim(),
+                    status: status
+                });
+            });
+
+            // Calculate total correct answers
+            const correctCount = document.querySelectorAll('.auto-input.correct, .auto-input.teacher-locked').length;
+            const gradableInputs = document.querySelectorAll('.ent342-input');
+            const totalGradable = gradableInputs.length;
+
+            return {
+                items: items,
+                scoreText: `Score: ${correctCount} / ${totalGradable}`
+            };
+        }
+
+        /* --- CLOUD AUTO-SAVE & AUTO-LOAD --- */
+        let saveTimer;
+        function saveProgressToCloud(immediate = false) {
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                const structured = buildMarkbookData();
+                const payload = {
+                    pageTitle: document.title || "3.4.2 Intellectual Property Rights",
+                    lastUpdated: Date.now(),
+                    scoreText: structured.scoreText,
+                    items: structured.items
+                };
+
+                // Also store inputs explicitly for local legacy support fallback
                 var inputs = document.querySelectorAll('.auto-input');
                 for (var i = 0; i < inputs.length; i++) {
-                    if (data['input_' + i]) {
-                        inputs[i].value = data['input_' + i];
-                        if (data['class_' + i]) {
-                            inputs[i].className = data['class_' + i];
-                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
-                                var btnId = "override-" + inputs[i].id;
-                                var btn = document.getElementById(btnId);
-                                if (btn) btn.classList.remove('hidden');
+                    payload['input_' + i] = inputs[i].value;
+                    payload['class_' + i] = inputs[i].className;
+                }
+
+                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
+                  .set(payload, { merge: true })
+                  .catch(err => console.error("Cloud sync error:", err));
+            }, immediate ? 50 : 800);
+        }
+
+        function applySavedData(data) {
+            if (!data) return;
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                var savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined) {
+                    inputs[i].value = savedVal;
+                    if (data['class_' + i]) {
+                        inputs[i].className = data['class_' + i];
+                        if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect') || inputs[i].classList.contains('teacher-locked')) {
+                            var btnId = "override-" + inputs[i].id;
+                            var btn = document.getElementById(btnId);
+                            if (btn) btn.classList.remove('hidden');
+                            
+                            // Restore feedback visually if teacher-locked
+                            var feedbackDiv = inputs[i].nextElementSibling;
+                            if (inputs[i].classList.contains('teacher-locked') && feedbackDiv) {
+                                if (inputs[i].classList.contains('correct')) {
+                                    feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; 
+                                    feedbackDiv.style.color = "#006100"; 
+                                    feedbackDiv.style.display = "block";
+                                } else {
+                                    feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; 
+                                    feedbackDiv.style.color = "#b71c1c"; 
+                                    feedbackDiv.style.display = "block";
+                                }
                             }
                         }
-                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                            inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                        }
+                    }
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto';
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
                     }
                 }
             }
         }
-        document.addEventListener('input', function(e) {
-            if (e.target.classList.contains('auto-input')) {
-                saveProgress();
-                if (e.target.tagName.toLowerCase() === 'textarea') {
-                    e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';
+
+        auth.onAuthStateChanged(async function(user) {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection('users').doc(inspectedUid).collection('lessons').doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    try { localStorage.removeItem('enterprise3_4_2Memory_Smart_v1'); } catch (e) {}
+
+                    const doc = await db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud work:", err);
                 }
             }
         });
-        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterprise3_4_2Memory_Smart_v1'); window.location.reload(); } }
-        window.onload = loadProgress;
+
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                saveProgressToCloud(false);
+                if (e.target.tagName.toLowerCase() === 'textarea') {
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                }
+            }
+        });
+
+        function clearData() { 
+            if (confirm("Clear all work?")) { 
+                try { localStorage.removeItem('enterprise3_4_2Memory_Smart_v1'); } catch(e) {}
+                const user = auth.currentUser;
+                if (user) {
+                    db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).delete().catch(err => {});
+                }
+                window.location.reload(); 
+            } 
+        }
 
         let activeQuestionId = null;
         function openVerifyModal(qId) {
@@ -790,7 +928,7 @@
                     if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
                 }
                 closeVerifyModal();
-                saveProgress();
+                saveProgressToCloud(true);
             } else {
                 document.getElementById('modal-error-msg').style.display = 'block';
             }
@@ -864,34 +1002,7 @@
                     }
                 }
             }
-            saveProgress();
-        }
-
-        function downloadPDF() {
-            var hide = document.querySelectorAll('.no-print');
-            for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
-            document.getElementById('action-buttons').style.display = 'none';
-
-            var textAreas = document.querySelectorAll('textarea');
-            for (var j = 0; j < textAreas.length; j++) {
-                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
-            }
-
-            var element = document.getElementById('pdf-content');
-            var opt = { 
-                margin: 0.3, 
-                filename: '3.4.2_Intellectual_Property.pdf', 
-                image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, 
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
-
-            html2pdf().set(opt).from(element).save().then(function() {
-                for(var b=0; b<hide.length; b++) hide[b].style.display = 'block';
-                document.getElementById('action-buttons').style.display = 'flex';
-                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
-            });
+            saveProgressToCloud(true);
         }
     </script>
 </body>
