@@ -699,7 +699,7 @@
             }
         }
 
-        // 6. Render the List Bar for Each Lesson with Delete Button & Image Inspection
+        // 6. Render the List Bar for Each Lesson with Clean Mapped Screenshots & Delete Button
         function renderLessonCard(studentUid, lesson, index) {
             const title = lesson.pageTitle || lesson.id.replace(/-/g, ' ');
 
@@ -717,6 +717,19 @@
             let bodyHtml = '';
             const userProgress = lesson.userProgress || {};
             const designs = lesson.userBinaryDesigns || {};
+            let renderedScreenshotKeys = new Set();
+
+            // Strictly map specific task titles/labels to exact image properties to avoid image overlapping across tasks
+            const zoneImageMap = {
+                'red task': 'img_maroon',
+                'amber task': 'img_amber',
+                'green task': 'img_green',
+                'blue task': 'img_navy',
+                'red': 'img_maroon',
+                'amber': 'img_amber',
+                'green': 'img_green',
+                'blue': 'img_navy'
+            };
 
             // Format A: Structured items array
             if (Array.isArray(lesson.items) && lesson.items.length > 0) {
@@ -735,19 +748,22 @@
                         statusPill = '<span class="status-badge badge-incorrect">✗ Incorrect</span>';
                     }
 
-                    // Check if this item has an attached screenshot image in the lesson root (e.g. img_maroon, img_navy, etc.)
                     let extraVisualHtml = '';
                     const lowerLabel = labelText.toLowerCase();
 
-                    // Check for standard pasted screenshots across Word, PowerPoint, Email, and File Management
-                    ['maroon', 'amber', 'green', 'navy'].forEach(zone => {
-                        if (lowerLabel.includes(zone) || lowerLabel.includes('task') || lowerLabel.includes('screenshot')) {
-                            const imgKey = 'img_' + zone;
-                            if (lesson[imgKey] && String(lesson[imgKey]).startsWith('data:image')) {
-                                extraVisualHtml += `<img class="screenshot-img" src="${lesson[imgKey]}" alt="Student Screenshot">`;
-                            }
+                    // Match exact screenshot for this row
+                    let matchedImgKey = null;
+                    for (let key in zoneImageMap) {
+                        if (lowerLabel.includes(key)) {
+                            matchedImgKey = zoneImageMap[key];
+                            break;
                         }
-                    });
+                    }
+
+                    if (matchedImgKey && lesson[matchedImgKey] && String(lesson[matchedImgKey]).startsWith('data:image')) {
+                        extraVisualHtml += `<img class="screenshot-img" src="${lesson[matchedImgKey]}" alt="${escapeHtml(labelText)} Screenshot">`;
+                        renderedScreenshotKeys.add(matchedImgKey);
+                    }
 
                     // Check for Character Creation / Binary Studio designs
                     let matchedDesignKey = null;
@@ -757,7 +773,6 @@
                     else if (lowerLabel.includes('blue task')) matchedDesignKey = '4';
 
                     if (matchedDesignKey && designs[matchedDesignKey]) {
-                        // Quick 10x10 grid preview for character creation
                         const gridArr = designs[matchedDesignKey];
                         let cellsHtml = '';
                         const pixelColorMap = {
@@ -794,7 +809,6 @@
                     `;
                 });
             } else {
-                // Format B: Older input formats
                 const inputKeys = Object.keys(lesson)
                     .filter(k => k.startsWith('input_'))
                     .sort((a, b) => parseInt(a.split('_')[1]) - parseInt(b.split('_')[1]));
@@ -815,14 +829,18 @@
                 });
             }
 
-            // Render any standalone screenshots stored in lesson root (img_maroon, img_navy, etc.)
-            ['maroon', 'amber', 'green', 'navy'].forEach(zone => {
-                const imgKey = 'img_' + zone;
-                if (lesson[imgKey] && String(lesson[imgKey]).startsWith('data:image')) {
-                    // Only add if not already rendered in items loop
+            // Fallback: Render any root screenshots (img_maroon, img_amber, img_green, img_navy) not yet rendered above
+            const screenshotLabels = {
+                'img_maroon': '📸 Red Task Screenshot',
+                'img_amber': '📸 Amber Task Screenshot',
+                'img_green': '📸 Green Task Screenshot',
+                'img_navy': '📸 Blue Task Screenshot'
+            };
+            Object.keys(screenshotLabels).forEach(imgKey => {
+                if (!renderedScreenshotKeys.has(imgKey) && lesson[imgKey] && String(lesson[imgKey]).startsWith('data:image')) {
                     bodyHtml += `
                         <div class="qa-row">
-                            <div class="qa-label"><span>📸 Task Screenshot (${zone.toUpperCase()})</span></div>
+                            <div class="qa-label"><span>${screenshotLabels[imgKey]}</span></div>
                             <img class="screenshot-img" src="${lesson[imgKey]}" alt="Student Screenshot">
                         </div>
                     `;
