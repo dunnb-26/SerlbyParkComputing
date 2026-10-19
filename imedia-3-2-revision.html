@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3.2: Mind Maps and Mood Boards - Revision</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
         .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
@@ -36,8 +41,8 @@
         .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
         .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
         .btn-submit:hover { background-color: #152960; }
-        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
-        .btn-pdf:hover { background-color: #124d2d; }
+        .btn-pdf { background-color: #d32f2f; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
+        .btn-pdf:hover { background-color: #b71c1c; }
     </style>
 </head>
 <body>
@@ -64,885 +69,885 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 1: Mind maps</h3>
                 
                 <div class="question-wrapper">
-                    <label class="question-label">1. What is a mind map?</label>
-                    <textarea id="ent32_q1" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["visual way of organising ideas", "around a central topic"]], "feedback": "Acceptable: A visual way of organising ideas around a central topic."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q1. What is a mind map?</label>
+                    <textarea id="ent32_q1" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["visual way of organising ideas", "around a central topic"]], "feedback": "Hint: Think about a visual method used to arrange ideas that branch out from a central subject."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q1')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">2. What is the main purpose of a mind map?</label>
-                    <textarea id="ent32_q2" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["generate, collect and organise ideas"]], "feedback": "Acceptable: To generate, collect, and organise ideas."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q2. What is the main purpose of a mind map?</label>
+                    <textarea id="ent32_q2" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["generate, collect and organise ideas"]], "feedback": "Hint: Think about creating, gathering, and structuring your thoughts."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q2')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">3. What is normally placed in the centre of a mind map?</label>
-                    <textarea id="ent32_q3" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["main topic", "subject", "central idea"]], "feedback": "Acceptable: The main topic, subject, or central idea."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q3. What is normally placed in the centre of a mind map?</label>
+                    <textarea id="ent32_q3" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["main topic", "subject", "central idea"]], "feedback": "Hint: Think about the core subject or the main idea everything connects to."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q3')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">4. What are branches used for?</label>
-                    <textarea id="ent32_q4" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["connect the main topic to related ideas or categories"]], "feedback": "Acceptable: To connect the main topic to related ideas or categories."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q4. What are branches used for?</label>
+                    <textarea id="ent32_q4" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["connect the main topic to related ideas or categories"]], "feedback": "Hint: Think about how you link the central idea to its related sub-topics."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">5. When might a mind map be used during pre-production?</label>
-                    <textarea id="ent32_q5" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["brainstorming", "planning content", "exploring a brief"]], "feedback": "Acceptable: When brainstorming ideas, planning content, or exploring a brief."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q5. When might a mind map be used during pre-production?</label>
+                    <textarea id="ent32_q5" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["brainstorming", "planning content", "exploring a brief"]], "feedback": "Hint: Think about the early stages when you are coming up with ideas and planning what to include."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q5')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">6. How can a mind map help someone who is struggling for ideas?</label>
-                    <textarea id="ent32_q6" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["explore different possibilities", "make connections"]], "feedback": "Acceptable: It helps them explore different possibilities and make connections."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q6. How can a mind map help someone who is struggling for ideas?</label>
+                    <textarea id="ent32_q6" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["explore different possibilities", "make connections"]], "feedback": "Hint: Think about how linking thoughts visually can help explore options and find connections."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q6')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">7. Who might use a mind map?</label>
-                    <textarea id="ent32_q7" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["designers", "media students", "writers", "clients", "teachers", "production teams"]], "feedback": "Acceptable: Designers, media students, writers, clients, teachers, or production teams."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q7. Who might use a mind map?</label>
+                    <textarea id="ent32_q7" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["designers", "media students", "writers", "clients", "teachers", "production teams"]], "feedback": "Hint: Think of creative professionals, learners, and planners who need to structure their ideas."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q7')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">8. Why might a media production team use a mind map?</label>
-                    <textarea id="ent32_q8" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["share ideas", "agree on possible directions"]], "feedback": "Acceptable: To share ideas and agree on possible directions for a project."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q8. Why might a media production team use a mind map?</label>
+                    <textarea id="ent32_q8" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["share ideas", "agree on possible directions"]], "feedback": "Hint: Think about how it helps a group show their thoughts to each other and agree on a direction."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q8')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">9. Why might a mind map be useful when interpreting a client brief?</label>
-                    <textarea id="ent32_q9" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["break the brief into smaller topics", "requirements and ideas"]], "feedback": "Acceptable: It helps break the brief into smaller topics, requirements and ideas."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q9. Why might a mind map be useful when interpreting a client brief?</label>
+                    <textarea id="ent32_q9" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["break the brief into smaller topics", "requirements and ideas"]], "feedback": "Hint: Think about how it can split a large brief into smaller, manageable topics and ideas."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q9')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">10. How can a mind map help organise a large amount of information?</label>
-                    <textarea id="ent32_q10" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["groups related information into clear categories and subcategories"]], "feedback": "Acceptable: It groups related information into clear categories and subcategories."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q10. How can a mind map help organise a large amount of information?</label>
+                    <textarea id="ent32_q10" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["groups related information into clear categories and subcategories"]], "feedback": "Hint: Think about grouping similar pieces of information into categories."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q10')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">11. Give one situation where a mind map would be more appropriate than a mood board.</label>
-                    <textarea id="ent32_q11" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["generating and organising lots of written ideas", "before choosing a visual style"]], "feedback": "Acceptable: When generating and organising lots of written ideas before choosing a visual style."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q11. Give one situation where a mind map would be more appropriate than a mood board.</label>
+                    <textarea id="ent32_q11" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["generating and organising lots of written ideas", "before choosing a visual style"]], "feedback": "Hint: Think about the stage when you are sorting out written thoughts before worrying about how things look."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q11')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">12. Give one limitation of a mind map.</label>
-                    <textarea id="ent32_q12" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["may not communicate visual styles", "colours or textures"]], "feedback": "Acceptable: It may not communicate visual styles, colours or textures very effectively."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q12. Give one limitation of a mind map.</label>
+                    <textarea id="ent32_q12" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["may not communicate visual styles", "colours or textures"]], "feedback": "Hint: Think about what it lacks in showing exact visual styles, colours, or textures."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q12')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">13. Name four common components of a mind map.</label>
-                    <textarea id="ent32_q13" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["central topic"], ["branches"], ["sub branches"], ["keywords"], ["images"], ["colours"]], "feedback": "Acceptable: Central topic, branches, sub-branches, keywords, images, colours, or connecting lines."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q13. Name four common components of a mind map.</label>
+                    <textarea id="ent32_q13" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["central topic"], ["branches"], ["sub branches"], ["keywords"], ["images"], ["colours"]], "feedback": "Hint: Think of the main subject, the lines that connect, the short text used, and visual additions like pictures."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q13')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">14. Why should a mind map have a clear central topic?</label>
-                    <textarea id="ent32_q14" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["so users understand what the ideas relate to"]], "feedback": "Acceptable: So users understand what the ideas relate to."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q14. Why should a mind map have a clear central topic?</label>
+                    <textarea id="ent32_q14" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["so users understand what the ideas relate to"]], "feedback": "Hint: Think about making it obvious what all the surrounding ideas connect back to."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q14')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">15. What is the purpose of sub-branches?</label>
-                    <textarea id="ent32_q15" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["divide larger categories into more detailed ideas"]], "feedback": "Acceptable: To divide larger categories into more detailed ideas."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q15. What is the purpose of sub-branches?</label>
+                    <textarea id="ent32_q15" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["divide larger categories into more detailed ideas"]], "feedback": "Hint: Think about breaking down the main branches into smaller, more detailed points."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q15')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">16. Why are keywords often used instead of long sentences?</label>
-                    <textarea id="ent32_q16" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["keep the map concise and easy to scan"]], "feedback": "Acceptable: They keep the map concise and easy to scan."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q16. Why are keywords often used instead of long sentences?</label>
+                    <textarea id="ent32_q16" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["keep the map concise and easy to scan"]], "feedback": "Hint: Think about keeping the map short, snappy, and easy to read quickly."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q16')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">17. How can colour be used effectively in a mind map?</label>
-                    <textarea id="ent32_q17" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["different colours can identify separate categories or related ideas"]], "feedback": "Acceptable: Different colours can identify separate categories or related ideas."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q17. How can colour be used effectively in a mind map?</label>
+                    <textarea id="ent32_q17" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["different colours can identify separate categories or related ideas"]], "feedback": "Hint: Think about how grouping specific branches with their own colour helps separate ideas."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q17')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">18. How can images or symbols improve a mind map?</label>
-                    <textarea id="ent32_q18" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["communicate ideas quickly", "make content easier to remember"]], "feedback": "Acceptable: They help communicate ideas quickly and make the content easier to remember."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q18. How can images or symbols improve a mind map?</label>
+                    <textarea id="ent32_q18" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["communicate ideas quickly", "make content easier to remember"]], "feedback": "Hint: Think about how pictures communicate faster than words and stick in your memory."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q18')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">19. Why should branches be connected to the correct category?</label>
-                    <textarea id="ent32_q19" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["relationships between ideas are clear", "information is organised logically"]], "feedback": "Acceptable: So relationships between ideas are clear and the information is organised logically."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q19. Why should branches be connected to the correct category?</label>
+                    <textarea id="ent32_q19" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["relationships between ideas are clear", "information is organised logically"]], "feedback": "Hint: Think about making sure ideas are logically linked so relationships are obvious."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q19')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">20. Why should a mind map avoid too much text?</label>
-                    <textarea id="ent32_q20" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["excessive text makes it cluttered and harder to read quickly"]], "feedback": "Acceptable: Excessive text makes it cluttered and harder to read quickly."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q20. Why should a mind map avoid too much text?</label>
+                    <textarea id="ent32_q20" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["excessive text makes it cluttered and harder to read quickly"]], "feedback": "Hint: Think about how too many words make it look cluttered and hard to read."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q20')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">21. Why is a clear layout important?</label>
-                    <textarea id="ent32_q21" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["allows users to follow branches and understand how ideas relate"]], "feedback": "Acceptable: It allows users to follow branches and understand how ideas relate."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q21. Why is a clear layout important?</label>
+                    <textarea id="ent32_q21" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["allows users to follow branches and understand how ideas relate"]], "feedback": "Hint: Think about making it easy for the user's eyes to track how ideas are linked."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q21')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">22. What could happen if branches overlap or cross unnecessarily?</label>
-                    <textarea id="ent32_q22" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["map becomes confusing", "users may struggle to follow connections"]], "feedback": "Acceptable: The map becomes confusing and users may struggle to follow the connections."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q22. What could happen if branches overlap or cross unnecessarily?</label>
+                    <textarea id="ent32_q22" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["map becomes confusing", "users may struggle to follow connections"]], "feedback": "Hint: Think about what happens if lines get tangled and connections become unclear."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q22')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">23. Why should text be large enough to read?</label>
-                    <textarea id="ent32_q23" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["users need to understand ideas without straining or zooming"]], "feedback": "Acceptable: Users need to understand the ideas without straining or zooming excessively."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q23. Why should text be large enough to read?</label>
+                    <textarea id="ent32_q23" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["users need to understand ideas without straining or zooming"]], "feedback": "Hint: Think about ensuring people don't have to squint or zoom in to read it."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q23')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">24. How could consistent formatting improve a mind map?</label>
-                    <textarea id="ent32_q24" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["similar ideas look related", "document becomes easier to navigate"]], "feedback": "Acceptable: Similar ideas look related and the document becomes easier to navigate."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q24. How could consistent formatting improve a mind map?</label>
+                    <textarea id="ent32_q24" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["similar ideas look related", "document becomes easier to navigate"]], "feedback": "Hint: Think about how keeping fonts and styles the same helps the map feel organised."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q24')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">25. Is there only one correct layout for a mind map?</label>
-                    <textarea id="ent32_q25" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["no", "layout can vary", "provided ideas and relationships remain clear"]], "feedback": "Acceptable: No. Layout can vary, provided ideas and relationships remain clear."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q25. Is there only one correct layout for a mind map?</label>
+                    <textarea id="ent32_q25" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["no", "layout can vary", "provided ideas and relationships remain clear"]], "feedback": "Hint: Does it have to look exactly the same every time, or can it change as long as it's clear?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q25')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">26. What is a digital mind map?</label>
-                    <textarea id="ent32_q26" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["created using a computer, tablet or other digital device"]], "feedback": "Acceptable: A mind map created using a computer, tablet, or other digital device."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q26. What is a digital mind map?</label>
+                    <textarea id="ent32_q26" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["created using a computer, tablet or other digital device"]], "feedback": "Hint: Think about how it is made using electronic devices and software."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q26" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q26')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">27. What is a hand drawn mind map?</label>
-                    <textarea id="ent32_q27" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["created by hand using paper and drawing or writing materials"]], "feedback": "Acceptable: A mind map created by hand using paper and drawing or writing materials."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q27. What is a hand drawn mind map?</label>
+                    <textarea id="ent32_q27" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["created by hand using paper and drawing or writing materials"]], "feedback": "Hint: Think about creating it physically using paper and pens."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q27" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q27')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">28. Name two pieces of hardware that could be used to create a digital mind map.</label>
-                    <textarea id="ent32_q28" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["computer", "laptop", "tablet", "touchscreen", "graphics tablet"]], "feedback": "Acceptable: Computer, laptop, tablet, touchscreen device, or graphics tablet."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q28. Name two pieces of hardware that could be used to create a digital mind map.</label>
+                    <textarea id="ent32_q28" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["computer", "laptop", "tablet", "touchscreen", "graphics tablet"]], "feedback": "Hint: Name physical electronic devices you could use to make one."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q28" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q28')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">29. Name two software options that could be used to create a digital mind map.</label>
-                    <textarea id="ent32_q29" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["microsoft powerpoint", "word", "canva", "mindmeister", "xmind"]], "feedback": "Acceptable: Microsoft PowerPoint, Word, Canva, MindMeister, XMind, or similar."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q29. Name two software options that could be used to create a digital mind map.</label>
+                    <textarea id="ent32_q29" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["microsoft powerpoint", "word", "canva", "mindmeister", "xmind"]], "feedback": "Hint: Name specific programs or apps you could use to make one."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q29" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q29')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">30. What equipment could be used to create a hand drawn mind map?</label>
-                    <textarea id="ent32_q30" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["paper", "pens", "pencils", "coloured pencils", "markers"]], "feedback": "Acceptable: Paper, pens, pencils, coloured pencils, or markers."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q30. What equipment could be used to create a hand drawn mind map?</label>
+                    <textarea id="ent32_q30" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["paper", "pens", "pencils", "coloured pencils", "markers"]], "feedback": "Hint: Name physical stationery items used to draw."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q30" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q30')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">31. Give one advantage of a digital mind map.</label>
-                    <textarea id="ent32_q31" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["ideas can be edited, moved, resized or reorganised easily"]], "feedback": "Acceptable: Ideas can be edited, moved, resized, or reorganised easily."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q31. Give one advantage of a digital mind map.</label>
+                    <textarea id="ent32_q31" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["ideas can be edited, moved, resized or reorganised easily"]], "feedback": "Hint: Think about how easy it is to change or move things around without having to start over."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q31" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q31')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">32. Give another advantage of a digital mind map.</label>
-                    <textarea id="ent32_q32" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["shared electronically", "stored for later editing"]], "feedback": "Acceptable: It can be shared electronically or stored for later editing."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q32. Give another advantage of a digital mind map.</label>
+                    <textarea id="ent32_q32" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["shared electronically", "stored for later editing"]], "feedback": "Hint: Think about how easy it is to send to someone over the internet or save for later."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q32" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q32')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">33. Give one disadvantage of a digital mind map.</label>
-                    <textarea id="ent32_q33" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["requires a suitable device", "software or an application"]], "feedback": "Acceptable: It requires a suitable device and usually software or an application."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q33. Give one disadvantage of a digital mind map.</label>
+                    <textarea id="ent32_q33" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["requires a suitable device", "software or an application"]], "feedback": "Hint: Think about what equipment and programs you must have access to."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q33" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q33')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">34. Give one advantage of a hand drawn mind map.</label>
-                    <textarea id="ent32_q34" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["started immediately without needing a computer or software"]], "feedback": "Acceptable: It can be started immediately without needing a computer or software."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q34. Give one advantage of a hand drawn mind map.</label>
+                    <textarea id="ent32_q34" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["started immediately without needing a computer or software"]], "feedback": "Hint: Think about how quickly you can start without waiting for a device to boot up."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q34" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q34')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">35. Give another advantage of a hand drawn mind map.</label>
-                    <textarea id="ent32_q35" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["quick, free flowing sketches and annotations"]], "feedback": "Acceptable: It allows quick, free-flowing sketches and annotations."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q35. Give another advantage of a hand drawn mind map.</label>
+                    <textarea id="ent32_q35" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["quick, free flowing sketches and annotations"]], "feedback": "Hint: Think about the freedom to draw and scribble notes instantly."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q35" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q35')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">36. Give one disadvantage of a hand drawn mind map.</label>
-                    <textarea id="ent32_q36" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["changes can be messy", "difficult to make or require redrawing"]], "feedback": "Acceptable: Changes can be messy, difficult to make, or require redrawing."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q36. Give one disadvantage of a hand drawn mind map.</label>
+                    <textarea id="ent32_q36" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["changes can be messy", "difficult to make or require redrawing"]], "feedback": "Hint: Think about what happens when you make a mistake with a pen."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q36" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q36')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">37. Why might a hand drawn mind map be useful during a quick team brainstorming session?</label>
-                    <textarea id="ent32_q37" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["people can add ideas immediately without needing to learn or open software"]], "feedback": "Acceptable: People can add ideas immediately without needing to learn or open software."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q37. Why might a hand drawn mind map be useful during a quick team brainstorming session?</label>
+                    <textarea id="ent32_q37" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["people can add ideas immediately without needing to learn or open software"]], "feedback": "Hint: Think about how everyone can grab a pen and contribute right away."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q37" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q37')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">38. Why might a digital mind map be more suitable for a large project?</label>
-                    <textarea id="ent32_q38" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["easier to reorganise, expand, save and share as project develops"]], "feedback": "Acceptable: It is easier to reorganise, expand, save and share as the project develops."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q38. Why might a digital mind map be more suitable for a large project?</label>
+                    <textarea id="ent32_q38" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["easier to reorganise, expand, save and share as project develops"]], "feedback": "Hint: Think about how easily you can scale it up, change it, and send it to others."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q38" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q38')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">39. How could a digital mind map be shared with a team in different locations?</label>
-                    <textarea id="ent32_q39" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["send a file", "share a link", "collaborate through an online application"]], "feedback": "Acceptable: Send a file, share a link, or collaborate through an online application."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q39. How could a digital mind map be shared with a team in different locations?</label>
+                    <textarea id="ent32_q39" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["send a file", "share a link", "collaborate through an online application"]], "feedback": "Hint: Think about emails, links, and online collaboration tools."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q39" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q39')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">40. Why might a digital mind map be easier to update after client feedback?</label>
-                    <textarea id="ent32_q40" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["ideas and branches can be moved or edited without starting again"]], "feedback": "Acceptable: Ideas and branches can be moved or edited without starting again."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q40. Why might a digital mind map be easier to update after client feedback?</label>
+                    <textarea id="ent32_q40" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["ideas and branches can be moved or edited without starting again"]], "feedback": "Hint: Think about how you don't have to rub things out or start a new page."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q40" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q40')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">41. What makes a mind map effective?</label>
-                    <textarea id="ent32_q41" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["clear central topic", "logical branches", "readable keywords", "well organised layout"]], "feedback": "Acceptable: Clear central topic, logical branches, readable keywords, and a well-organised layout."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q41. What makes a mind map effective?</label>
+                    <textarea id="ent32_q41" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["clear central topic", "logical branches", "readable keywords", "well organised layout"]], "feedback": "Hint: Think about the centre, the lines, the text length, and the overall neatness."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q41" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q41')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">42. A mind map contains lots of tiny text. Suggest one improvement.</label>
-                    <textarea id="ent32_q42" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["increase the font size", "reduce the amount of text"]], "feedback": "Acceptable: Increase the font size or reduce the amount of text."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q42. A mind map contains lots of tiny text. Suggest one improvement.</label>
+                    <textarea id="ent32_q42" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["increase the font size", "reduce the amount of text"]], "feedback": "Hint: If text is tiny, what should you do to the size and the amount of words?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q42" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q42')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">43. A mind map uses the same colour for every branch. How could it be improved?</label>
-                    <textarea id="ent32_q43" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["use different colours to separate categories", "make branches easier to follow"]], "feedback": "Acceptable: Use different colours to separate categories and make branches easier to follow."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q43. A mind map uses the same colour for every branch. How could it be improved?</label>
+                    <textarea id="ent32_q43" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["use different colours to separate categories", "make branches easier to follow"]], "feedback": "Hint: How could you use colour coding to show different sections?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q43" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q43')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">44. A mind map has several unrelated ideas mixed together. What should the creator do?</label>
-                    <textarea id="ent32_q44" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["group related ideas under appropriate branches or categories"]], "feedback": "Acceptable: Group related ideas under appropriate branches or categories."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q44. A mind map has several unrelated ideas mixed together. What should the creator do?</label>
+                    <textarea id="ent32_q44" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["group related ideas under appropriate branches or categories"]], "feedback": "Hint: What should you do with similar ideas to keep them organised?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q44" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q44')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">45. A mind map is too crowded to follow. Suggest two improvements.</label>
-                    <textarea id="ent32_q45" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["remove unnecessary details", "use more space", "rearrange branches", "split content"]], "feedback": "Acceptable: Remove unnecessary details, use more space, rearrange branches, or split content into separate maps."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q45. A mind map is too crowded to follow. Suggest two improvements.</label>
+                    <textarea id="ent32_q45" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["remove unnecessary details", "use more space", "rearrange branches", "split content"]], "feedback": "Hint: How can you create more space or reduce the clutter?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q45" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q45')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">46. Why should a mind map be appropriate for its intended audience?</label>
-                    <textarea id="ent32_q46" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["audience needs to understand ideas", "navigate information easily"]], "feedback": "Acceptable: The audience needs to understand the ideas and navigate the information easily."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q46. Why should a mind map be appropriate for its intended audience?</label>
+                    <textarea id="ent32_q46" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["audience needs to understand ideas", "navigate information easily"]], "feedback": "Hint: Think about ensuring the reader can easily read and follow the map."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q46" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q46')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">47. How could a mind map be improved for a younger audience?</label>
-                    <textarea id="ent32_q47" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["simpler keywords", "clear pictures", "larger text", "distinct colours"]], "feedback": "Acceptable: Use simpler keywords, clear pictures, larger text, and distinct colours."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q47. How could a mind map be improved for a younger audience?</label>
+                    <textarea id="ent32_q47" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["simpler keywords", "clear pictures", "larger text", "distinct colours"]], "feedback": "Hint: Think about what makes a book easier for a child (words, pictures, size)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q47" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q47')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">48. How could a mind map be improved for a professional production team?</label>
-                    <textarea id="ent32_q48" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["clear categories", "consistent formatting", "concise wording", "relevant detail"]], "feedback": "Acceptable: Use clear categories, consistent formatting, concise wording, and relevant detail."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q48. How could a mind map be improved for a professional production team?</label>
+                    <textarea id="ent32_q48" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["clear categories", "consistent formatting", "concise wording", "relevant detail"]], "feedback": "Hint: Think about making it look neat, structured, and focused for adults at work."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q48" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q48')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">49. A mind map will be presented on a large screen. What should be considered?</label>
-                    <textarea id="ent32_q49" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["text must be large enough to read from a distance", "clear layout", "contrast"]], "feedback": "Acceptable: Text must be large enough to read from a distance, with a clear layout and strong contrast."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q49. A mind map will be presented on a large screen. What should be considered?</label>
+                    <textarea id="ent32_q49" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["text must be large enough to read from a distance", "clear layout", "contrast"]], "feedback": "Hint: Think about what is needed if people are sitting far away."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q49" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q49')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">50. A mind map will be printed in black and white. What should be changed?</label>
-                    <textarea id="ent32_q50" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["do not rely on colour alone", "labels", "shapes", "line styles", "clear headings"]], "feedback": "Acceptable: Do not rely on colour alone. Use labels, shapes, line styles, or clear headings."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q50. A mind map will be printed in black and white. What should be changed?</label>
+                    <textarea id="ent32_q50" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["do not rely on colour alone", "labels", "shapes", "line styles", "clear headings"]], "feedback": "Hint: If colour is gone, what else can you use to show differences? (e.g. shapes, text)"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q50" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q50')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">51. Why should irrelevant ideas be removed from a final mind map?</label>
-                    <textarea id="ent32_q51" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["distract users from important information", "harder to follow"]], "feedback": "Acceptable: They distract users from important information and make it harder to follow."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q51. Why should irrelevant ideas be removed from a final mind map?</label>
+                    <textarea id="ent32_q51" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["distract users from important information", "harder to follow"]], "feedback": "Hint: Think about how clutter makes the main points harder to spot."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q51" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q51')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">52. How could feedback from users improve a mind map?</label>
-                    <textarea id="ent32_q52" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["identify confusing categories", "missing information", "layout problems"]], "feedback": "Acceptable: It can identify confusing categories, missing information, or layout problems that need fixing."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q52. How could feedback from users improve a mind map?</label>
+                    <textarea id="ent32_q52" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["identify confusing categories", "missing information", "layout problems"]], "feedback": "Hint: What can users tell you about things that are missing or hard to read?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q52" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q52')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 2: Mood boards</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">53. What is a mood board?</label>
-                    <textarea id="ent32_q53" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["collection of visual material", "style, atmosphere or design direction"]], "feedback": "Acceptable: A collection of visual material used to communicate a particular style, atmosphere or design direction."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q53. What is a mood board?</label>
+                    <textarea id="ent32_q53" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["collection of visual material", "style, atmosphere or design direction"]], "feedback": "Hint: Think of a collage of images used to show the visual vibe or style."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q53" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q53')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">54. What is the main purpose of a mood board?</label>
-                    <textarea id="ent32_q54" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["communicate the intended visual style", "look and feel"]], "feedback": "Acceptable: To communicate the intended visual style, look and feel of a project."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q54. What is the main purpose of a mood board?</label>
+                    <textarea id="ent32_q54" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["communicate the intended visual style", "look and feel"]], "feedback": "Hint: Think about showing someone what the final product will look and feel like."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q54" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q54')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">55. What might a mood board contain?</label>
-                    <textarea id="ent32_q55" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["images", "colour palettes", "textures", "patterns", "typography"]], "feedback": "Acceptable: Images, colour palettes, textures, patterns, typography examples, and other visual references."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q55. What might a mood board contain?</label>
+                    <textarea id="ent32_q55" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["images", "colour palettes", "textures", "patterns", "typography"]], "feedback": "Hint: Think of visual elements like pictures, colours, and fonts."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q55" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q55')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">56. When might a mood board be used during pre-production?</label>
-                    <textarea id="ent32_q56" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["developing and communicating visual direction before creating final product"]], "feedback": "Acceptable: When developing and communicating the visual direction before creating the final media product."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q56. When might a mood board be used during pre-production?</label>
+                    <textarea id="ent32_q56" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["developing and communicating visual direction before creating final product"]], "feedback": "Hint: Think about agreeing on the visual style before you actually start making the product."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q56" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q56')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">57. Who might use a mood board?</label>
-                    <textarea id="ent32_q57" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["graphic designers", "web designers", "photographers", "students", "clients", "teams"]], "feedback": "Acceptable: Graphic designers, web designers, photographers, media students, clients, or production teams."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q57. Who might use a mood board?</label>
+                    <textarea id="ent32_q57" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["graphic designers", "web designers", "photographers", "students", "clients", "teams"]], "feedback": "Hint: Think of creative professionals or clients who need to see a design vision."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q57" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q57')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">58. Why might a designer show a mood board to a client?</label>
-                    <textarea id="ent32_q58" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["check that proposed style matches client expectations before work begins"]], "feedback": "Acceptable: To check that the proposed style matches client expectations before work begins."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q58. Why might a designer show a mood board to a client?</label>
+                    <textarea id="ent32_q58" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["check that proposed style matches client expectations before work begins"]], "feedback": "Hint: Think about making sure the client likes the style before you spend time making it."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q58" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q58')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">59. How can a mood board help a team agree on a visual style?</label>
-                    <textarea id="ent32_q59" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["gives everyone a shared visual reference to discuss and approve"]], "feedback": "Acceptable: It gives everyone a shared visual reference to discuss and approve."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q59. How can a mood board help a team agree on a visual style?</label>
+                    <textarea id="ent32_q59" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["gives everyone a shared visual reference to discuss and approve"]], "feedback": "Hint: Think about giving everyone the same picture to look at and talk about."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q59" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q59')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">60. Give one example of a project where a mood board would be useful.</label>
-                    <textarea id="ent32_q60" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["magazine cover", "website", "poster", "game", "film sequence", "advertising campaign"]], "feedback": "Acceptable: Designing a magazine cover, website, poster, game, film sequence, or advertising campaign."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q60. Give one example of a project where a mood board would be useful.</label>
+                    <textarea id="ent32_q60" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["magazine cover", "website", "poster", "game", "film sequence", "advertising campaign"]], "feedback": "Hint: Think of any visual media product that needs a specific style (e.g. a poster or website)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q60" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q60')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">61. When would a mood board be more appropriate than a mind map?</label>
-                    <textarea id="ent32_q61" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["communicating colours", "imagery", "textures", "typography", "overall visual atmosphere"]], "feedback": "Acceptable: When communicating colours, imagery, textures, typography, and overall visual atmosphere."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q61. When would a mood board be more appropriate than a mind map?</label>
+                    <textarea id="ent32_q61" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["communicating colours", "imagery", "textures", "typography", "overall visual atmosphere"]], "feedback": "Hint: Which tool is better for showing visual style, textures, and colours?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q61" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q61')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">62. Why might a mood board be created before designing a website?</label>
-                    <textarea id="ent32_q62" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["establish colours, fonts, imagery and overall style before building"]], "feedback": "Acceptable: To establish colours, fonts, imagery and overall style before building pages."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q62. Why might a mood board be created before designing a website?</label>
+                    <textarea id="ent32_q62" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["establish colours, fonts, imagery and overall style before building"]], "feedback": "Hint: Think about agreeing on the fonts and colours before you write any code."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q62" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q62')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">63. How could a mood board help maintain consistency across a media product?</label>
-                    <textarea id="ent32_q63" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["provides a reference for colours, fonts and imagery used throughout project"]], "feedback": "Acceptable: Provides a reference for colours, fonts and imagery used throughout the project."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q63. How could a mood board help maintain consistency across a media product?</label>
+                    <textarea id="ent32_q63" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["provides a reference for colours, fonts and imagery used throughout project"]], "feedback": "Hint: Think about having a visual guide that everyone can check to keep things matching."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q63" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q63')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">64. Give one limitation of a mood board.</label>
-                    <textarea id="ent32_q64" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["communicate visual style without explaining detailed tasks", "timings"]], "feedback": "Acceptable: It may communicate visual style without explaining detailed tasks, timings, or how the project works."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q64. Give one limitation of a mood board.</label>
+                    <textarea id="ent32_q64" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["communicate visual style without explaining detailed tasks", "timings"]], "feedback": "Hint: It shows what it looks like, but what does it NOT tell you about how to build it or when?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q64" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q64')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">65. Name four common components of a mood board.</label>
-                    <textarea id="ent32_q65" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["images"], ["colour palettes"], ["textures"], ["patterns"], ["typography"], ["annotations"]], "feedback": "Acceptable: Images, colour palettes, textures, patterns, typography, sample graphics, or annotations."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q65. Name four common components of a mood board.</label>
+                    <textarea id="ent32_q65" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["images"], ["colour palettes"], ["textures"], ["patterns"], ["typography"], ["annotations"]], "feedback": "Hint: Name visual components like pictures, colours, fonts, and textures."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q65" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q65')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">66. Why are images important on a mood board?</label>
-                    <textarea id="ent32_q66" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["communicate visual ideas", "subjects and styles"]], "feedback": "Acceptable: They communicate visual ideas, subjects and styles."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q66. Why are images important on a mood board?</label>
+                    <textarea id="ent32_q66" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["communicate visual ideas", "subjects and styles"]], "feedback": "Hint: Think about how pictures show ideas and themes better than words."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q66" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q66')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">67. Why might a mood board include a colour palette?</label>
-                    <textarea id="ent32_q67" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["show colours used consistently in final product"]], "feedback": "Acceptable: To show the colours that could be used consistently in the final product."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q67. Why might a mood board include a colour palette?</label>
+                    <textarea id="ent32_q67" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["show colours used consistently in final product"]], "feedback": "Hint: Think about establishing the exact colours that will be used in the final design."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q67" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q67')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">68. Why might a mood board include typography examples?</label>
-                    <textarea id="ent32_q68" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["communicate intended font style", "tone and readability"]], "feedback": "Acceptable: To communicate the intended font style, tone and readability."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q68. Why might a mood board include typography examples?</label>
+                    <textarea id="ent32_q68" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["communicate intended font style", "tone and readability"]], "feedback": "Hint: Think about showing what the text will look like and how easy it is to read."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q68" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q68')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">69. Why might textures and patterns be included?</label>
-                    <textarea id="ent32_q69" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["help communicate visual feel or surface style"]], "feedback": "Acceptable: They help communicate the visual feel or surface style of the product."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q69. Why might textures and patterns be included?</label>
+                    <textarea id="ent32_q69" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["help communicate visual feel or surface style"]], "feedback": "Hint: Think about showing how a surface might feel or look close up."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q69" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q69')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">70. What is the purpose of annotations on a mood board?</label>
-                    <textarea id="ent32_q70" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["explain why an image, colour or design choice has been included"]], "feedback": "Acceptable: To explain why an image, colour or design choice has been included."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q70. What is the purpose of annotations on a mood board?</label>
+                    <textarea id="ent32_q70" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["explain why an image, colour or design choice has been included"]], "feedback": "Hint: Think about using small notes to explain WHY a picture was chosen."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q70" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q70')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">71. Why should the images on a mood board be relevant to the project?</label>
-                    <textarea id="ent32_q71" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["unrelated images can confuse users about intended style"]], "feedback": "Acceptable: Unrelated images can confuse users about the intended style."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q71. Why should the images on a mood board be relevant to the project?</label>
+                    <textarea id="ent32_q71" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["unrelated images can confuse users about intended style"]], "feedback": "Hint: What happens if you include pictures that don't match the brief?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q71" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q71')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">72. Why is the arrangement of images important?</label>
-                    <textarea id="ent32_q72" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["helps users see relationships between visual elements and understand design direction"]], "feedback": "Acceptable: Helps users see relationships between visual elements and understand overall design direction."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q72. Why is the arrangement of images important?</label>
+                    <textarea id="ent32_q72" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["helps users see relationships between visual elements and understand design direction"]], "feedback": "Hint: Think about how grouping images helps show the overall style clearly."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q72" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q72')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">73. Why should a mood board have a consistent visual style?</label>
-                    <textarea id="ent32_q73" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["communicate clear and coherent direction rather than conflicting styles"]], "feedback": "Acceptable: Communicates a clear and coherent direction rather than several conflicting styles."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q73. Why should a mood board have a consistent visual style?</label>
+                    <textarea id="ent32_q73" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["communicate clear and coherent direction rather than conflicting styles"]], "feedback": "Hint: Think about avoiding confusion by not mixing up completely different looks."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q73" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q73')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">74. Why should images be clear and good quality?</label>
-                    <textarea id="ent32_q74" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["blurry or poor quality images make intended design difficult to judge"]], "feedback": "Acceptable: Blurry or poor quality images make the intended design difficult to judge."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q74. Why should images be clear and good quality?</label>
+                    <textarea id="ent32_q74" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["blurry or poor quality images make intended design difficult to judge"]], "feedback": "Hint: If an image is blurry, how does that affect people's ability to see the style?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q74" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q74')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">75. Why should a mood board avoid being overcrowded?</label>
-                    <textarea id="ent32_q75" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["too many elements distract from key visual ideas", "difficult to interpret"]], "feedback": "Acceptable: Too many elements can distract from key visual ideas and make the board difficult to interpret."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q75. Why should a mood board avoid being overcrowded?</label>
+                    <textarea id="ent32_q75" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["too many elements distract from key visual ideas", "difficult to interpret"]], "feedback": "Hint: Think about how too many pictures makes it cluttered and hard to focus."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q75" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q75')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">76. Why might a mood board include examples of the intended target audience?</label>
-                    <textarea id="ent32_q76" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["help communicate type of person design is aimed at"]], "feedback": "Acceptable: To help communicate the type of person the design is aimed at, where relevant."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q76. Why might a mood board include examples of the intended target audience?</label>
+                    <textarea id="ent32_q76" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["help communicate type of person design is aimed at"]], "feedback": "Hint: Think about showing who the product is actually being made for."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q76" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q76')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">77. Why should a mood board avoid contradictory visual references?</label>
-                    <textarea id="ent32_q77" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["make intended style unclear"]], "feedback": "Acceptable: They can make the intended style unclear, unless contrast is deliberate."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q77. Why should a mood board avoid contradictory visual references?</label>
+                    <textarea id="ent32_q77" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["make intended style unclear"]], "feedback": "Hint: Think about how mixing opposites (like bright cartoons and dark horror) might confuse people."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q77" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q77')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">78. Why should the chosen images, colours and fonts work together?</label>
-                    <textarea id="ent32_q78" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["communicate a consistent atmosphere and support purpose"]], "feedback": "Acceptable: They should communicate a consistent atmosphere and support the purpose of the product."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q78. Why should the chosen images, colours and fonts work together?</label>
+                    <textarea id="ent32_q78" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["communicate a consistent atmosphere and support purpose"]], "feedback": "Hint: Think about making sure everything matches to create one clear mood."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q78" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q78')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">79. What is a digital mood board?</label>
-                    <textarea id="ent32_q79" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["created and displayed using digital devices and software"]], "feedback": "Acceptable: A mood board created and displayed using digital devices and software."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q79. What is a digital mood board?</label>
+                    <textarea id="ent32_q79" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["created and displayed using digital devices and software"]], "feedback": "Hint: Think of a mood board made on a computer screen."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q79" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q79')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">80. What is a physical mood board?</label>
-                    <textarea id="ent32_q80" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["made using physical materials arranged on a board, paper or surface"]], "feedback": "Acceptable: A mood board made using physical materials arranged on a board, paper or another surface."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q80. What is a physical mood board?</label>
+                    <textarea id="ent32_q80" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["made using physical materials arranged on a board, paper or surface"]], "feedback": "Hint: Think of a mood board made of real paper, card, and glue."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q80" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q80')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">81. Name two pieces of hardware that could be used to create a digital mood board.</label>
-                    <textarea id="ent32_q81" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["computer", "laptop", "tablet", "scanner", "digital camera"]], "feedback": "Acceptable: Computer, laptop, tablet, scanner, or digital camera."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q81. Name two pieces of hardware that could be used to create a digital mood board.</label>
+                    <textarea id="ent32_q81" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["computer", "laptop", "tablet", "scanner", "digital camera"]], "feedback": "Hint: Name electronic devices used to create or capture digital images."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q81" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q81')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">82. Name two software options that could be used to create a digital mood board.</label>
-                    <textarea id="ent32_q82" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["canva", "powerpoint", "photoshop", "google slides"]], "feedback": "Acceptable: Canva, PowerPoint, Photoshop, Google Slides, or similar design software."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q82. Name two software options that could be used to create a digital mood board.</label>
+                    <textarea id="ent32_q82" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["canva", "powerpoint", "photoshop", "google slides"]], "feedback": "Hint: Name specific design or presentation software."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q82" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q82')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">83. What materials could be used to create a physical mood board?</label>
-                    <textarea id="ent32_q83" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["card", "paper", "magazines", "fabric samples", "scissors", "glue"]], "feedback": "Acceptable: Card, paper, printed photographs, magazines, fabric samples, scissors, glue, markers."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q83. What materials could be used to create a physical mood board?</label>
+                    <textarea id="ent32_q83" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["card", "paper", "magazines", "fabric samples", "scissors", "glue"]], "feedback": "Hint: Name real-world materials and stationery items."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q83" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q83')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">84. How could a designer obtain images for a physical mood board?</label>
-                    <textarea id="ent32_q84" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["print images", "cut pictures from magazines", "photographs and drawings"]], "feedback": "Acceptable: Print images, cut pictures from magazines, or use photographs and drawings."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q84. How could a designer obtain images for a physical mood board?</label>
+                    <textarea id="ent32_q84" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["print images", "cut pictures from magazines", "photographs and drawings"]], "feedback": "Hint: Think about cutting things out or printing them from the internet."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q84" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q84')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">85. Give one advantage of a digital mood board.</label>
-                    <textarea id="ent32_q85" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["images and colours can be changed, resized and rearranged easily"]], "feedback": "Acceptable: Images and colours can be changed, resized, and rearranged easily."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q85. Give one advantage of a digital mood board.</label>
+                    <textarea id="ent32_q85" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["images and colours can be changed, resized and rearranged easily"]], "feedback": "Hint: Think about how easy it is to edit, move, or delete things on a screen."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q85" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q85')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">86. Give another advantage of a digital mood board.</label>
-                    <textarea id="ent32_q86" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["shared online with clients or team members in different locations"]], "feedback": "Acceptable: It can be shared online with clients or team members in different locations."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q86. Give another advantage of a digital mood board.</label>
+                    <textarea id="ent32_q86" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["shared online with clients or team members in different locations"]], "feedback": "Hint: Think about how easily you can email it to someone far away."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q86" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q86')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">87. Give one disadvantage of a digital mood board.</label>
-                    <textarea id="ent32_q87" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["needs a device and software", "colours may appear differently on different screens"]], "feedback": "Acceptable: Needs a device and software, and colours may appear differently on various screens."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q87. Give one disadvantage of a digital mood board.</label>
+                    <textarea id="ent32_q87" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["needs a device and software", "colours may appear differently on different screens"]], "feedback": "Hint: Think about needing a computer, or how screens show colours differently."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q87" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q87')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">88. Give one advantage of a physical mood board.</label>
-                    <textarea id="ent32_q88" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["people can handle and compare real materials", "fabric", "texture"]], "feedback": "Acceptable: People can handle and compare real materials like fabric, paper, or texture samples."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q88. Give one advantage of a physical mood board.</label>
+                    <textarea id="ent32_q88" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["people can handle and compare real materials", "fabric", "texture"]], "feedback": "Hint: Think about being able to actually touch and feel the textures."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q88" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q88')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">89. Give another advantage of a physical mood board.</label>
-                    <textarea id="ent32_q89" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["displayed in a shared workspace for people to discuss together"]], "feedback": "Acceptable: It can be displayed in a shared workspace for people to discuss together."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q89. Give another advantage of a physical mood board.</label>
+                    <textarea id="ent32_q89" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["displayed in a shared workspace for people to discuss together"]], "feedback": "Hint: Think about pinning it to a wall in an office for everyone to see."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q89" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q89')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">90. Give one disadvantage of a physical mood board.</label>
-                    <textarea id="ent32_q90" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["difficult to change, transport or reproduce"]], "feedback": "Acceptable: It can be difficult to change, transport, or reproduce if many materials are attached."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q90. Give one disadvantage of a physical mood board.</label>
+                    <textarea id="ent32_q90" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["difficult to change, transport or reproduce"]], "feedback": "Hint: Think about the mess of ungluing things or the difficulty of emailing it."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q90" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q90')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">91. Why might a physical mood board be suitable for an interior design project?</label>
-                    <textarea id="ent32_q91" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["real samples of paint, fabric or flooring can be handled and compared"]], "feedback": "Acceptable: Real samples of paint, fabric or flooring can be handled and compared."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q91. Why might a physical mood board be suitable for an interior design project?</label>
+                    <textarea id="ent32_q91" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["real samples of paint, fabric or flooring can be handled and compared"]], "feedback": "Hint: Think about needing to feel fabrics or see real paint colours."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q91" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q91')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">92. Why might a digital mood board be suitable for a team working remotely?</label>
-                    <textarea id="ent32_q92" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["shared online and reviewed by people in different locations"]], "feedback": "Acceptable: It can be shared online and reviewed by people in different locations."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q92. Why might a digital mood board be suitable for a team working remotely?</label>
+                    <textarea id="ent32_q92" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["shared online and reviewed by people in different locations"]], "feedback": "Hint: Think about emailing links so people far away can look at it."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q92" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q92')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">93. How could a designer update a digital mood board after client feedback?</label>
-                    <textarea id="ent32_q93" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["replace images", "adjust colours", "add references", "rearrange elements"]], "feedback": "Acceptable: Replace images, adjust colours, add references, or rearrange elements."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q93. How could a designer update a digital mood board after client feedback?</label>
+                    <textarea id="ent32_q93" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["replace images", "adjust colours", "add references", "rearrange elements"]], "feedback": "Hint: Think about quickly swapping out images or changing the colours on screen."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q93" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q93')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">94. Why might a physical mood board be less convenient when frequent changes are expected?</label>
-                    <textarea id="ent32_q94" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["materials may need to be removed, reprinted or rearranged manually"]], "feedback": "Acceptable: Materials may need to be removed, reprinted, or rearranged manually."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q94. Why might a physical mood board be less convenient when frequent changes are expected?</label>
+                    <textarea id="ent32_q94" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["materials may need to be removed, reprinted or rearranged manually"]], "feedback": "Hint: Think about the hassle of ripping off glued paper and re-printing."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q94" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q94')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">95. What is one possible benefit of combining digital and physical mood boards?</label>
-                    <textarea id="ent32_q95" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["digital images provide inspiration while physical samples allow real textures"]], "feedback": "Acceptable: Digital images provide inspiration while physical samples allow users to assess real textures and materials."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q95. What is one possible benefit of combining digital and physical mood boards?</label>
+                    <textarea id="ent32_q95" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["digital images provide inspiration while physical samples allow real textures"]], "feedback": "Hint: Think about getting ideas from the screen but feeling real textures with your hands."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q95" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q95')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">96. What makes a mood board effective?</label>
-                    <textarea id="ent32_q96" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["relevant visual references", "clear style", "suitable colours", "good quality images"]], "feedback": "Acceptable: Relevant visual references, clear style, suitable colours, good quality images, and well-organised layout."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q96. What makes a mood board effective?</label>
+                    <textarea id="ent32_q96" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["relevant visual references", "clear style", "suitable colours", "good quality images"]], "feedback": "Hint: Think about using high-quality, relevant images and a clear colour scheme."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q96" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q96')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">97. A mood board contains images that do not match the client's brief. What should be improved?</label>
-                    <textarea id="ent32_q97" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["replace them with images that reflect the brief and intended audience"]], "feedback": "Acceptable: Replace them with images that reflect the brief and intended audience."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q97. A mood board contains images that do not match the client's brief. What should be improved?</label>
+                    <textarea id="ent32_q97" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["replace them with images that reflect the brief and intended audience"]], "feedback": "Hint: What should you do with the wrong images to fix it?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q97" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q97')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">98. A mood board contains many different colour schemes. How could it be improved?</label>
-                    <textarea id="ent32_q98" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["select a smaller, consistent colour palette that supports intended style"]], "feedback": "Acceptable: Select a smaller, consistent colour palette that supports the intended style."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q98. A mood board contains many different colour schemes. How could it be improved?</label>
+                    <textarea id="ent32_q98" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["select a smaller, consistent colour palette that supports intended style"]], "feedback": "Hint: How could you limit the colours so it looks more consistent?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q98" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q98')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">99. A mood board contains only photographs. What could be added to make it more useful?</label>
-                    <textarea id="ent32_q99" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["typography", "colour swatches", "textures", "patterns", "annotations"]], "feedback": "Acceptable: Typography, colour swatches, textures, patterns, or short annotations."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q99. A mood board contains only photographs. What could be added to make it more useful?</label>
+                    <textarea id="ent32_q99" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["typography", "colour swatches", "textures", "patterns", "annotations"]], "feedback": "Hint: What else besides photos helps show a style? (e.g. fonts, colours, notes)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q99" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q99')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">100. A mood board has no explanation of its visual choices. How could it be improved?</label>
-                    <textarea id="ent32_q100" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["add brief annotations explaining important choices and relation to brief"]], "feedback": "Acceptable: Add brief annotations explaining important choices and how they relate to the brief."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q100. A mood board has no explanation of its visual choices. How could it be improved?</label>
+                    <textarea id="ent32_q100" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["add brief annotations explaining important choices and relation to brief"]], "feedback": "Hint: What could you write next to the images to explain them?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q100" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q100')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">101. A mood board looks cluttered. Suggest two improvements.</label>
-                    <textarea id="ent32_q101" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["remove unnecessary images", "create more space", "group related elements", "clearer layout"]], "feedback": "Acceptable: Remove unnecessary images, create space, group related elements, or use a clearer layout."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q101. A mood board looks cluttered. Suggest two improvements.</label>
+                    <textarea id="ent32_q101" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["remove unnecessary images", "create more space", "group related elements", "clearer layout"]], "feedback": "Hint: How can you free up space and organise the images better?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q101" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q101')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">102. How could a mood board be improved for a client who wants a luxury brand image?</label>
-                    <textarea id="ent32_q102" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["high quality references", "refined colour palette", "appropriate typography", "luxury imagery"]], "feedback": "Acceptable: Use high quality references, a refined colour palette, appropriate typography, and luxury imagery."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q102. How could a mood board be improved for a client who wants a luxury brand image?</label>
+                    <textarea id="ent32_q102" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["high quality references", "refined colour palette", "appropriate typography", "luxury imagery"]], "feedback": "Hint: Think about using elegant fonts, premium colours, and high-quality photos."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q102" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q102')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">103. How could a mood board be improved for a product aimed at young children?</label>
-                    <textarea id="ent32_q103" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["age appropriate imagery", "clear colours", "visual style suited to audience"]], "feedback": "Acceptable: Use age appropriate imagery, clear colours, and a visual style suited to children."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q103. How could a mood board be improved for a product aimed at young children?</label>
+                    <textarea id="ent32_q103" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["age appropriate imagery", "clear colours", "visual style suited to audience"]], "feedback": "Hint: Think about using bright colours, friendly fonts, and kid-friendly images."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q103" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q103')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">104. Why should a mood board reflect the target audience?</label>
-                    <textarea id="ent32_q104" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["visual style needs to appeal to people final product is intended for"]], "feedback": "Acceptable: The visual style needs to appeal to the people the final product is intended for."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q104. Why should a mood board reflect the target audience?</label>
+                    <textarea id="ent32_q104" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["visual style needs to appeal to people final product is intended for"]], "feedback": "Hint: Think about ensuring the style actually attracts the people who will buy it."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q104" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q104')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">105. A physical mood board will be displayed in a meeting room. What should be considered?</label>
-                    <textarea id="ent32_q105" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["large enough to view", "arrange items clearly", "materials securely attached"]], "feedback": "Acceptable: Make it large enough to view, arrange items clearly, and ensure materials are securely attached."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q105. A physical mood board will be displayed in a meeting room. What should be considered?</label>
+                    <textarea id="ent32_q105" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["large enough to view", "arrange items clearly", "materials securely attached"]], "feedback": "Hint: Think about making it big enough to see from across the room and gluing it well."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q105" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q105')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">106. A digital mood board will be emailed to a client. How could its effectiveness be improved?</label>
-                    <textarea id="ent32_q106" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["clear layout", "readable labels", "appropriate file format that is easy to open"]], "feedback": "Acceptable: Use a clear layout, readable labels, and an appropriate file format easy to open."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q106. A digital mood board will be emailed to a client. How could its effectiveness be improved?</label>
+                    <textarea id="ent32_q106" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["clear layout", "readable labels", "appropriate file format that is easy to open"]], "feedback": "Hint: Think about saving it as a standard file type (like PDF or JPEG) so anyone can open it."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q106" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q106')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">107. A client cannot distinguish the colours on a digital mood board. What could be the cause, and how might it be improved?</label>
-                    <textarea id="ent32_q107" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["similar colours or poor contrast", "use more distinguishable colours and clear labels"]], "feedback": "Acceptable: Similar colours or poor contrast. Improve by using more distinguishable colours and clear labels."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q107. A client cannot distinguish the colours on a digital mood board. What could be the cause, and how might it be improved?</label>
+                    <textarea id="ent32_q107" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["similar colours or poor contrast", "use more distinguishable colours and clear labels"]], "feedback": "Hint: Why might colours blend together on a screen, and how can you fix the contrast?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q107" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q107')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">108. Why might the designer need to check image permissions when making a mood board?</label>
-                    <textarea id="ent32_q108" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["ensure images can be used appropriately", "published or distributed"]], "feedback": "Acceptable: To ensure images can be used appropriately, particularly if published or distributed."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q108. Why might the designer need to check image permissions when making a mood board?</label>
+                    <textarea id="ent32_q108" class="auto-input ent32-input" rows="2" data-rubric='{"keywords": [["ensure images can be used appropriately", "published or distributed"]], "feedback": "Hint: Think about copyright laws if the mood board is going to be published publicly."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q108" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q108')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 3: Applying knowledge to scenarios</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">109. A student has ten ideas for a new computer game but has not decided which to use. Which document would be most appropriate and why?</label>
-                    <textarea id="ent32_q109" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["mind map", "record, group and explore different ideas"]], "feedback": "Acceptable: A mind map, because it allows them to record, group and explore different ideas."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q109. A student has ten ideas for a new computer game but has not decided which to use. Which document would be most appropriate and why?</label>
+                    <textarea id="ent32_q109" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["mind map", "record, group and explore different ideas"]], "feedback": "Hint: Which tool is best for brainstorming and grouping written thoughts?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q109" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q109')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">110. A client wants a poster to feel dark, mysterious and dramatic. Which document would help communicate this style?</label>
-                    <textarea id="ent32_q110" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["mood board", "show dark colours, suitable images, textures and typography"]], "feedback": "Acceptable: A mood board, because it can show dark colours, suitable images, textures and typography."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q110. A client wants a poster to feel dark, mysterious and dramatic. Which document would help communicate this style?</label>
+                    <textarea id="ent32_q110" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["mood board", "show dark colours, suitable images, textures and typography"]], "feedback": "Hint: Which tool is best for showing visual themes like dark colours and textures?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q110" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q110')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">111. A team needs to share a mind map with colleagues who work from home. Which format would be most suitable and why?</label>
-                    <textarea id="ent32_q111" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["digital mind map", "shared electronically and accessed remotely"]], "feedback": "Acceptable: A digital mind map, because it can be shared electronically and accessed remotely."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q111. A team needs to share a mind map with colleagues who work from home. Which format would be most suitable and why?</label>
+                    <textarea id="ent32_q111" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["digital mind map", "shared electronically and accessed remotely"]], "feedback": "Hint: Which format is easiest to send over the internet to remote workers?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q111" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q111')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">112. A designer needs to compare actual fabric samples for a fashion campaign. Which type of mood board would be appropriate?</label>
-                    <textarea id="ent32_q112" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["physical mood board", "team can handle and compare real materials"]], "feedback": "Acceptable: A physical mood board, because the team can handle and compare real materials."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q112. A designer needs to compare actual fabric samples for a fashion campaign. Which type of mood board would be appropriate?</label>
+                    <textarea id="ent32_q112" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["physical mood board", "team can handle and compare real materials"]], "feedback": "Hint: Which format allows people to actually touch fabric?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q112" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q112')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">113. A hand drawn mind map needs several major changes after a meeting. What would be a sensible improvement to the working process?</label>
-                    <textarea id="ent32_q113" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["transfer it to digital software", "redraw it clearly", "ideas can be reorganised and shared"]], "feedback": "Acceptable: Transfer it to digital software or redraw it clearly so ideas can be reorganised and shared."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q113. A hand drawn mind map needs several major changes after a meeting. What would be a sensible improvement to the working process?</label>
+                    <textarea id="ent32_q113" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["transfer it to digital software", "redraw it clearly", "ideas can be reorganised and shared"]], "feedback": "Hint: What could you do to make the messy drawing neat and easy to edit?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q113" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q113')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">114. A digital mood board must be updated several times during a project. Why is a digital version useful?</label>
-                    <textarea id="ent32_q114" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["elements can be replaced, resized and rearranged without rebuilding whole board"]], "feedback": "Acceptable: Elements can be replaced, resized and rearranged without rebuilding the whole board."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q114. A digital mood board must be updated several times during a project. Why is a digital version useful?</label>
+                    <textarea id="ent32_q114" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["elements can be replaced, resized and rearranged without rebuilding whole board"]], "feedback": "Hint: Think about how easy it is to drag and drop items on a computer."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q114" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q114')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">115. A mood board for a sports brand includes images of formal office clothing and luxury hotels. What is the problem?</label>
-                    <textarea id="ent32_q115" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["may not match the brand, brief or intended audience", "replace with relevant references"]], "feedback": "Acceptable: May not match the brand, brief or audience, so they should be replaced with relevant references."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q115. A mood board for a sports brand includes images of formal office clothing and luxury hotels. What is the problem?</label>
+                    <textarea id="ent32_q115" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["may not match the brand, brief or intended audience", "replace with relevant references"]], "feedback": "Hint: Why do luxury hotels conflict with a sports brand, and what should be done?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q115" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q115')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">116. A mind map contains complete paragraphs under every branch. What is the likely problem, and how could it be fixed?</label>
-                    <textarea id="ent32_q116" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["too text heavy and difficult to scan", "replace paragraphs with concise keywords"]], "feedback": "Acceptable: Too text-heavy and hard to scan. Replace paragraphs with concise keywords and short phrases."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q116. A mind map contains complete paragraphs under every branch. What is the likely problem, and how could it be fixed?</label>
+                    <textarea id="ent32_q116" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["too text heavy and difficult to scan", "replace paragraphs with concise keywords"]], "feedback": "Hint: Mind maps shouldn't be essays. What should the long sentences be changed to?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q116" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q116')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">117. A client and designer disagree about the style of a website. How could a mood board help?</label>
-                    <textarea id="ent32_q117" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["provides visual examples that both can discuss and agree on before production starts"]], "feedback": "Acceptable: Provides visual examples that both can discuss and agree on before production starts."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q117. A client and designer disagree about the style of a website. How could a mood board help?</label>
+                    <textarea id="ent32_q117" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["provides visual examples that both can discuss and agree on before production starts"]], "feedback": "Hint: How does showing a visual board help resolve arguments about style?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q117" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q117')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">118. A student creates a mood board with attractive images, but none relate to the brief. Is it effective? Explain your answer.</label>
-                    <textarea id="ent32_q118" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["no", "images need to communicate intended style and meet brief", "not just look attractive"]], "feedback": "Acceptable: No. Images need to communicate the intended style and meet the brief, not just look attractive."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q118. A student creates a mood board with attractive images, but none relate to the brief. Is it effective? Explain your answer.</label>
+                    <textarea id="ent32_q118" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["no", "images need to communicate intended style and meet brief", "not just look attractive"]], "feedback": "Hint: Does looking pretty matter if the images don't match what the client asked for?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q118" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q118')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">119. A production team needs to explore story ideas and decide the visual style for a short film. Which two documents could help, and how?</label>
-                    <textarea id="ent32_q119" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["mind map can generate and organise story ideas", "mood board can communicate visual style"]], "feedback": "Acceptable: Mind map generates/organises story ideas; mood board communicates the film's visual style."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q119. A production team needs to explore story ideas and decide the visual style for a short film. Which two documents could help, and how?</label>
+                    <textarea id="ent32_q119" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["mind map can generate and organise story ideas", "mood board can communicate visual style"]], "feedback": "Hint: Which one is for the story ideas, and which one is for the visual style?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q119" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q119')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">120. A digital mood board will be viewed on a mobile phone. Suggest two ways to improve it.</label>
-                    <textarea id="ent32_q120" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["layout that works on a small screen", "make text readable", "avoid overcrowding", "clear, high quality images"]], "feedback": "Acceptable: Use a small screen layout, make text readable, avoid overcrowding, and use clear images."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q120. A digital mood board will be viewed on a mobile phone. Suggest two ways to improve it.</label>
+                    <textarea id="ent32_q120" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["layout that works on a small screen", "make text readable", "avoid overcrowding", "clear, high quality images"]], "feedback": "Hint: Think about making the layout simple, text big, and not putting too much on it."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q120" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q120')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">121. A hand drawn mind map uses different colours but has no labels and unclear branches. Why might it still be ineffective?</label>
-                    <textarea id="ent32_q121" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["colour alone may not explain relationships", "clear branches, labels and logical grouping needed"]], "feedback": "Acceptable: Colour alone doesn't explain relationships. Clear branches, labels, and logical grouping are needed."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q121. A hand drawn mind map uses different colours but has no labels and unclear branches. Why might it still be ineffective?</label>
+                    <textarea id="ent32_q121" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["colour alone may not explain relationships", "clear branches, labels and logical grouping needed"]], "feedback": "Hint: What is missing that usually connects the ideas and tells you what they are?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q121" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q121')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">122. A physical mood board is being transported to a client meeting. What should the designer do to make it suitable?</label>
-                    <textarea id="ent32_q122" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["secure attached materials", "easy to carry", "make key elements visible"]], "feedback": "Acceptable: Secure attached materials, ensure it is easy to carry, and make key elements visible."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q122. A physical mood board is being transported to a client meeting. What should the designer do to make it suitable?</label>
+                    <textarea id="ent32_q122" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["secure attached materials", "easy to carry", "make key elements visible"]], "feedback": "Hint: Think about gluing things securely so they don't fall off during the journey."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q122" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q122')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">123. A team has limited time and needs to brainstorm ideas immediately. Which type of mind map might be appropriate? Explain your choice.</label>
-                    <textarea id="ent32_q123" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["hand drawn", "started quickly with paper and pens without setting up software"]], "feedback": "Acceptable: Hand-drawn mind map, because it starts quickly with paper and pens without setting up software."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q123. A team has limited time and needs to brainstorm ideas immediately. Which type of mind map might be appropriate? Explain your choice.</label>
+                    <textarea id="ent32_q123" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["hand drawn", "started quickly with paper and pens without setting up software"]], "feedback": "Hint: Which format can you start instantly with just a pen and paper?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q123" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q123')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">124. A designer wants the client to approve the colour scheme before designing a magazine cover. Which document would help, and why?</label>
-                    <textarea id="ent32_q124" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["mood board", "present proposed colours alongside suitable imagery and typography for approval"]], "feedback": "Acceptable: A mood board, because it presents proposed colours alongside suitable imagery and typography for approval."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q124. A designer wants the client to approve the colour scheme before designing a magazine cover. Which document would help, and why?</label>
+                    <textarea id="ent32_q124" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["mood board", "present proposed colours alongside suitable imagery and typography for approval"]], "feedback": "Hint: Which tool visually presents a colour palette and imagery?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q124" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q124')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">125. A mind map will be used by several people to develop a project over several weeks. What would make it more effective?</label>
-                    <textarea id="ent32_q125" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["digital version", "edited and shared", "clear categories", "readable text", "consistent formatting"]], "feedback": "Acceptable: Use a digital version that can be edited and shared, with clear categories, readable text and formatting."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q125. A mind map will be used by several people to develop a project over several weeks. What would make it more effective?</label>
+                    <textarea id="ent32_q125" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["digital version", "edited and shared", "clear categories", "readable text", "consistent formatting"]], "feedback": "Hint: Which format is best for long-term editing and sharing among many people?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q125" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q125')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">126. A mood board includes relevant images but the fonts and colours suggest completely different styles. How should it be improved?</label>
-                    <textarea id="ent32_q126" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["choose fonts and colours that work with images", "reinforce one clear visual direction"]], "feedback": "Acceptable: Choose fonts and colours that work with the images and reinforce one clear visual direction."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q126. A mood board includes relevant images but the fonts and colours suggest completely different styles. How should it be improved?</label>
+                    <textarea id="ent32_q126" class="auto-input ent32-input" rows="3" data-rubric='{"keywords": [["choose fonts and colours that work with images", "reinforce one clear visual direction"]], "feedback": "Hint: How could you make the fonts and colours match the images to create one solid theme?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent32_q126" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent32_q126')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -952,7 +957,6 @@
         </main>
     </div>
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
         <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
     </div>
 
@@ -972,45 +976,178 @@
     <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
 
     <script>
-        function saveProgress() {
-            var inputs = document.querySelectorAll('.auto-input');
-            var dataToSave = {};
-            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
-            try { localStorage.setItem('enterprise3_2Memory_Smart_v1', JSON.stringify(dataToSave)); } catch (e) {}
+        /* --- FIREBASE CONFIGURATION & INITIALIZATION --- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
-        function loadProgress() {
-            var saved = localStorage.getItem('enterprise3_2Memory_Smart_v1');
-            if (saved) {
-                var data = JSON.parse(saved);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "imedia-3-2-mind-maps";
+
+        /* --- MARKBOOK BUILDER FOR TEACHER DASHBOARD --- */
+        function buildMarkbookData() {
+            const items = [];
+            const inputs = document.querySelectorAll('.auto-input');
+            
+            inputs.forEach((input, i) => {
+                const wrapper = input.closest('.question-wrapper');
+                const labelEl = wrapper ? wrapper.querySelector('.question-label') : null;
+                const labelText = labelEl ? labelEl.innerText.trim() : `Question ${i + 1}`;
+                
+                let status = 'neutral';
+                if (input.classList.contains('correct') || input.classList.contains('teacher-locked')) {
+                    status = 'correct';
+                } else if (input.classList.contains('incorrect')) {
+                    status = 'incorrect';
+                }
+
+                items.push({
+                    index: i,
+                    label: labelText,
+                    value: input.value.trim(),
+                    status: status
+                });
+            });
+
+            // Calculate total correct answers
+            const correctCount = document.querySelectorAll('.auto-input.correct, .auto-input.teacher-locked').length;
+            const gradableInputs = document.querySelectorAll('.ent32-input');
+            const totalGradable = gradableInputs.length;
+
+            return {
+                items: items,
+                scoreText: `Score: ${correctCount} / ${totalGradable}`
+            };
+        }
+
+        /* --- CLOUD AUTO-SAVE & AUTO-LOAD --- */
+        let saveTimer;
+        function saveProgressToCloud(immediate = false) {
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                const structured = buildMarkbookData();
+                const payload = {
+                    pageTitle: document.title || "3.2 Mind Maps and Mood Boards",
+                    lastUpdated: Date.now(),
+                    scoreText: structured.scoreText,
+                    items: structured.items
+                };
+
+                // Also store inputs explicitly for local legacy support fallback
                 var inputs = document.querySelectorAll('.auto-input');
                 for (var i = 0; i < inputs.length; i++) {
-                    if (data['input_' + i]) {
-                        inputs[i].value = data['input_' + i];
-                        if (data['class_' + i]) {
-                            inputs[i].className = data['class_' + i];
-                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
-                                var btnId = "override-" + inputs[i].id;
-                                var btn = document.getElementById(btnId);
-                                if (btn) btn.classList.remove('hidden');
+                    payload['input_' + i] = inputs[i].value;
+                    payload['class_' + i] = inputs[i].className;
+                }
+
+                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
+                  .set(payload, { merge: true })
+                  .catch(err => console.error("Cloud sync error:", err));
+            }, immediate ? 50 : 800);
+        }
+
+        function applySavedData(data) {
+            if (!data) return;
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                var savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined) {
+                    inputs[i].value = savedVal;
+                    if (data['class_' + i]) {
+                        inputs[i].className = data['class_' + i];
+                        if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect') || inputs[i].classList.contains('teacher-locked')) {
+                            var btnId = "override-" + inputs[i].id;
+                            var btn = document.getElementById(btnId);
+                            if (btn) btn.classList.remove('hidden');
+                            
+                            // Restore feedback visually if teacher-locked
+                            var feedbackDiv = inputs[i].nextElementSibling;
+                            if (inputs[i].classList.contains('teacher-locked') && feedbackDiv) {
+                                if (inputs[i].classList.contains('correct')) {
+                                    feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; 
+                                    feedbackDiv.style.color = "#006100"; 
+                                    feedbackDiv.style.display = "block";
+                                } else {
+                                    feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; 
+                                    feedbackDiv.style.color = "#b71c1c"; 
+                                    feedbackDiv.style.display = "block";
+                                }
                             }
                         }
-                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                            inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                        }
+                    }
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto';
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
                     }
                 }
             }
         }
-        document.addEventListener('input', function(e) {
-            if (e.target.classList.contains('auto-input')) {
-                saveProgress();
-                if (e.target.tagName.toLowerCase() === 'textarea') {
-                    e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';
+
+        auth.onAuthStateChanged(async function(user) {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection('users').doc(inspectedUid).collection('lessons').doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    try { localStorage.removeItem('enterprise3_2Memory_Smart_v1'); } catch (e) {}
+
+                    const doc = await db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud work:", err);
                 }
             }
         });
-        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterprise3_2Memory_Smart_v1'); window.location.reload(); } }
-        window.onload = loadProgress;
+
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                saveProgressToCloud(false);
+                if (e.target.tagName.toLowerCase() === 'textarea') {
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                }
+            }
+        });
+
+        function clearData() { 
+            if (confirm("Clear all work?")) { 
+                try { localStorage.removeItem('enterprise3_2Memory_Smart_v1'); } catch(e) {}
+                const user = auth.currentUser;
+                if (user) {
+                    db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).delete().catch(err => {});
+                }
+                window.location.reload(); 
+            } 
+        }
 
         let activeQuestionId = null;
         function openVerifyModal(qId) {
@@ -1040,7 +1177,7 @@
                     if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
                 }
                 closeVerifyModal();
-                saveProgress();
+                saveProgressToCloud(true);
             } else {
                 document.getElementById('modal-error-msg').style.display = 'block';
             }
@@ -1114,34 +1251,7 @@
                     }
                 }
             }
-            saveProgress();
-        }
-
-        function downloadPDF() {
-            var hide = document.querySelectorAll('.no-print');
-            for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
-            document.getElementById('action-buttons').style.display = 'none';
-
-            var textAreas = document.querySelectorAll('textarea');
-            for (var j = 0; j < textAreas.length; j++) {
-                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
-            }
-
-            var element = document.getElementById('pdf-content');
-            var opt = { 
-                margin: 0.3, 
-                filename: '3.2_Mind_Maps_Mood_Boards.pdf', 
-                image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, 
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
-
-            html2pdf().set(opt).from(element).save().then(function() {
-                for(var b=0; b<hide.length; b++) hide[b].style.display = 'block';
-                document.getElementById('action-buttons').style.display = 'flex';
-                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
-            });
+            saveProgressToCloud(true);
         }
     </script>
 </body>
