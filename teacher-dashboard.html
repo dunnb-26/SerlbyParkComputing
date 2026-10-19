@@ -138,19 +138,6 @@
             margin-bottom: 20px;
         }
 
-        .toolbar-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 18px;
-            background: #f8f9fa;
-            padding: 12px 15px;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-        }
-
         /* Lesson Accordion - LIST VIEW */
         .lesson-card {
             border: 2px solid #cbd5e1;
@@ -228,7 +215,6 @@
             background: #ffffff;
         }
 
-        /* SHOWS WORK ONLY WHEN CLICKED */
         .lesson-card.open .lesson-card-body {
             display: block; 
         }
@@ -299,7 +285,7 @@
 
         .screenshot-img {
             max-width: 100%;
-            max-height: 380px;
+            max-height: 400px;
             border: 2px solid #1e3a8a;
             border-radius: 6px;
             margin-top: 10px;
@@ -463,7 +449,7 @@
         let activeStudent = null;
         let portfolioRequestId = 0;
 
-        // Universal 10-Color Palette
+        // Universal 10-Color Palette for Basic Designs
         const basicColorMaps = {
             2: { 0: '#ffffff', 1: '#000000', 2: '#d32f2f', 3: '#388e3c' },
             3: { 0: '#ffffff', 1: '#000000', 2: '#d32f2f', 3: '#388e3c', 4: '#1976d2', 5: '#fbc02d', 6: '#8e24aa', 7: '#f57c00' },
@@ -713,7 +699,7 @@
             }
         }
 
-        // 6. Render the List Bar for Each Lesson with Delete Button
+        // 6. Render the List Bar for Each Lesson with Delete Button & Image Inspection
         function renderLessonCard(studentUid, lesson, index) {
             const title = lesson.pageTitle || lesson.id.replace(/-/g, ' ');
 
@@ -730,6 +716,7 @@
 
             let bodyHtml = '';
             const userProgress = lesson.userProgress || {};
+            const designs = lesson.userBinaryDesigns || {};
 
             // Format A: Structured items array
             if (Array.isArray(lesson.items) && lesson.items.length > 0) {
@@ -748,6 +735,53 @@
                         statusPill = '<span class="status-badge badge-incorrect">✗ Incorrect</span>';
                     }
 
+                    // Check if this item has an attached screenshot image in the lesson root (e.g. img_maroon, img_navy, etc.)
+                    let extraVisualHtml = '';
+                    const lowerLabel = labelText.toLowerCase();
+
+                    // Check for standard pasted screenshots across Word, PowerPoint, Email, and File Management
+                    ['maroon', 'amber', 'green', 'navy'].forEach(zone => {
+                        if (lowerLabel.includes(zone) || lowerLabel.includes('task') || lowerLabel.includes('screenshot')) {
+                            const imgKey = 'img_' + zone;
+                            if (lesson[imgKey] && String(lesson[imgKey]).startsWith('data:image')) {
+                                extraVisualHtml += `<img class="screenshot-img" src="${lesson[imgKey]}" alt="Student Screenshot">`;
+                            }
+                        }
+                    });
+
+                    // Check for Character Creation / Binary Studio designs
+                    let matchedDesignKey = null;
+                    if (lowerLabel.includes('red task')) matchedDesignKey = '1';
+                    else if (lowerLabel.includes('amber task')) matchedDesignKey = '2';
+                    else if (lowerLabel.includes('green task')) matchedDesignKey = '3';
+                    else if (lowerLabel.includes('blue task')) matchedDesignKey = '4';
+
+                    if (matchedDesignKey && designs[matchedDesignKey]) {
+                        // Quick 10x10 grid preview for character creation
+                        const gridArr = designs[matchedDesignKey];
+                        let cellsHtml = '';
+                        const pixelColorMap = {
+                            '0000': '#ffffff', '0': '#ffffff', '0001': '#000000', '1': '#000000',
+                            '0010': '#d32f2f', '2': '#d32f2f', '0011': '#388e3c', '3': '#388e3c',
+                            '0100': '#1976d2', '4': '#1976d2', '0101': '#fbc02d', '5': '#fbc02d',
+                            '0110': '#f57c00', '6': '#f57c00', '0111': '#8e24aa', '7': '#8e24aa',
+                            '1000': '#e91e63', '8': '#e91e63', '1001': '#00bcd4', '9': '#00bcd4',
+                            '1010': '#cddc39', '10': '#cddc39', '1011': '#795548', '11': '#795548',
+                            '1100': '#9e9e9e', '12': '#9e9e9e', '1101': '#607d8b', '13': '#607d8b',
+                            '1110': '#8d6e63', '14': '#8d6e63', '1111': '#009688', '15': '#009688'
+                        };
+                        for (let i = 0; i < 100; i++) {
+                            const code = String(gridArr[i] || '').trim();
+                            const bg = pixelColorMap[code] || '#ffffff';
+                            cellsHtml += `<div class="pixel-preview-cell" style="width:18px;height:18px;background-color:${bg};"></div>`;
+                        }
+                        extraVisualHtml += `
+                            <div class="pixel-preview-wrap" style="margin-top:8px;">
+                                <div style="display:grid; grid-template-columns:repeat(10, 18px); grid-template-rows:repeat(10, 18px); border:1px solid #94a3b8;">${cellsHtml}</div>
+                            </div>
+                        `;
+                    }
+
                     bodyHtml += `
                         <div class="qa-row">
                             <div class="qa-label">
@@ -755,6 +789,7 @@
                                 ${statusPill}
                             </div>
                             <div class="${boxClass}">${isEmpty ? '(Left blank)' : escapeHtml(val)}</div>
+                            ${extraVisualHtml}
                         </div>
                     `;
                 });
@@ -779,6 +814,20 @@
                     `;
                 });
             }
+
+            // Render any standalone screenshots stored in lesson root (img_maroon, img_navy, etc.)
+            ['maroon', 'amber', 'green', 'navy'].forEach(zone => {
+                const imgKey = 'img_' + zone;
+                if (lesson[imgKey] && String(lesson[imgKey]).startsWith('data:image')) {
+                    // Only add if not already rendered in items loop
+                    bodyHtml += `
+                        <div class="qa-row">
+                            <div class="qa-label"><span>📸 Task Screenshot (${zone.toUpperCase()})</span></div>
+                            <img class="screenshot-img" src="${lesson[imgKey]}" alt="Student Screenshot">
+                        </div>
+                    `;
+                }
+            });
 
             // Render any saved Basic Designs pixel art grids found in userProgress
             const basicTaskLabels = {
