@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3.4.4: Health and Safety - Revision</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
         .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
@@ -36,8 +41,8 @@
         .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
         .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
         .btn-submit:hover { background-color: #152960; }
-        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
-        .btn-pdf:hover { background-color: #124d2d; }
+        .btn-reset { background-color: #d32f2f; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; margin: 0 auto; }
+        .btn-reset:hover { background-color: #b71c1c; }
     </style>
 </head>
 <body>
@@ -64,214 +69,214 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 1: Health and safety risks and hazards</h3>
                 
                 <div class="question-wrapper">
-                    <label class="question-label">1. What is a hazard?</label>
-                    <textarea id="ent344_q1" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["something that could cause harm or injury", "trailing cable"]], "feedback": "Acceptable: Something that could cause harm or injury, such as a trailing cable."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q1. What is a hazard?</label>
+                    <textarea id="ent344_q1" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["something that could cause harm or injury", "trailing cable"]], "feedback": "Hint: Think about an object or situation that has the potential to cause harm, like a trailing cable."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q1')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">2. What is a risk?</label>
-                    <textarea id="ent344_q2" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["chance that someone could be harmed by a hazard"]], "feedback": "Acceptable: The chance that someone could be harmed by a hazard."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q2. What is a risk?</label>
+                    <textarea id="ent344_q2" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["chance that someone could be harmed by a hazard"]], "feedback": "Hint: Think about the likelihood or chance that someone could be harmed by a hazard."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q2')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">3. What is the difference between a hazard and a risk?</label>
-                    <textarea id="ent344_q3" class="auto-input ent344-input" rows="3" data-rubric='{"keywords": [["hazard is what could cause harm"], ["risk is how likely it is to happen and how serious"]], "feedback": "A hazard is what could cause harm; a risk is how likely it is to happen and how serious it could be."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q3. What is the difference between a hazard and a risk?</label>
+                    <textarea id="ent344_q3" class="auto-input ent344-input" rows="3" data-rubric='{"keywords": [["hazard is what could cause harm"], ["risk is how likely it is to happen and how serious"]], "feedback": "Hint: One is the thing that causes harm, the other is how likely it is to happen and how bad it could be."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q3')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">4. Give two examples of health and safety hazards when filming.</label>
-                    <textarea id="ent344_q4" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["trailing cables", "wet floors", "heavy equipment", "poor lighting", "unsafe electrical equipment"]], "feedback": "Acceptable: Trailing cables, wet floors, heavy equipment, poor lighting or unsafe electrical equipment."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q4. Give two examples of health and safety hazards when filming.</label>
+                    <textarea id="ent344_q4" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["trailing cables", "wet floors", "heavy equipment", "poor lighting", "unsafe electrical equipment"]], "feedback": "Hint: Think of physical things on a set like cables, lights, or wet floors."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">5. Give one health and safety risk when using camera equipment.</label>
-                    <textarea id="ent344_q5" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["someone could trip over a tripod", "drop heavy equipment on their foot"]], "feedback": "Acceptable: Someone could trip over a tripod or drop heavy equipment on their foot."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q5. Give one health and safety risk when using camera equipment.</label>
+                    <textarea id="ent344_q5" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["someone could trip over a tripod", "drop heavy equipment on their foot"]], "feedback": "Hint: Think about what might happen if heavy equipment falls or if someone walks into a tripod."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q5')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">6. What hazards might be present when filming outdoors?</label>
-                    <textarea id="ent344_q6" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["uneven ground", "traffic", "bad weather", "water", "members of the public", "poor lighting"]], "feedback": "Acceptable: Uneven ground, traffic, bad weather, water, members of the public or poor lighting."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q6. What hazards might be present when filming outdoors?</label>
+                    <textarea id="ent344_q6" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["uneven ground", "traffic", "bad weather", "water", "members of the public", "poor lighting"]], "feedback": "Hint: Think about the environment outside—weather, terrain, traffic, or the public."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q6')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">7. What hazards might be present in a studio?</label>
-                    <textarea id="ent344_q7" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["cables", "lights that become hot", "heavy equipment", "clutter", "overloaded electrical sockets"]], "feedback": "Acceptable: Cables, lights that become hot, heavy equipment, clutter or overloaded electrical sockets."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q7. What hazards might be present in a studio?</label>
+                    <textarea id="ent344_q7" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["cables", "lights that become hot", "heavy equipment", "clutter", "overloaded electrical sockets"]], "feedback": "Hint: Think about the equipment inside a studio—hot lights, trailing wires, or overloaded sockets."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q7')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">8. Why can poor lighting be dangerous during production?</label>
-                    <textarea id="ent344_q8" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["people may not see obstacles and could trip, fall or injure themselves"]], "feedback": "Acceptable: People may not see obstacles and could trip, fall or injure themselves."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q8. Why can poor lighting be dangerous during production?</label>
+                    <textarea id="ent344_q8" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["people may not see obstacles and could trip, fall or injure themselves"]], "feedback": "Hint: Think about what happens if people can't see where they are going."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q8')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 2: Reducing risks and hazards</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">9. What does it mean to mitigate a risk?</label>
-                    <textarea id="ent344_q9" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["reduce the chance of harm happening", "reduce how serious it could be"]], "feedback": "Acceptable: To reduce the chance of harm happening or reduce how serious it could be."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q9. What does it mean to mitigate a risk?</label>
+                    <textarea id="ent344_q9" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["reduce the chance of harm happening", "reduce how serious it could be"]], "feedback": "Hint: Think about taking action to reduce the chance of harm or how serious it could be."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q9')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">10. Give two ways to reduce trip hazards when filming.</label>
-                    <textarea id="ent344_q10" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["tape down cables", "use cable covers", "keep walkways clear", "move equipment"]], "feedback": "Acceptable: Tape down cables, use cable covers, keep walkways clear or move equipment out of the way."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q10. Give two ways to reduce trip hazards when filming.</label>
+                    <textarea id="ent344_q10" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["tape down cables", "use cable covers", "keep walkways clear", "move equipment"]], "feedback": "Hint: Think about what you can do to cables on the floor to stop people falling over them."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q10')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">11. How can producers reduce risks when using electrical equipment?</label>
-                    <textarea id="ent344_q11" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["check equipment for damage", "use it correctly", "keep it away from water"]], "feedback": "Acceptable: Check equipment for damage, use it correctly and keep it away from water."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q11. How can producers reduce risks when using electrical equipment?</label>
+                    <textarea id="ent344_q11" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["check equipment for damage", "use it correctly", "keep it away from water"]], "feedback": "Hint: Think about keeping them away from liquids and making sure they aren't damaged."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q11')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">12. Why should heavy equipment be handled carefully?</label>
-                    <textarea id="ent344_q12" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["could cause injuries if dropped or lifted incorrectly"]], "feedback": "Acceptable: It could cause injuries if dropped or lifted incorrectly."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q12. Why should heavy equipment be handled carefully?</label>
+                    <textarea id="ent344_q12" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["could cause injuries if dropped or lifted incorrectly"]], "feedback": "Hint: What might happen to a person's foot or back if heavy equipment is not handled correctly?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q12')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">13. How can a production team reduce risks when filming near roads?</label>
-                    <textarea id="ent344_q13" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["choose a safe filming area", "stay away from traffic", "supervision or barriers"]], "feedback": "Acceptable: Choose a safe filming area, stay away from traffic and use suitable supervision or barriers."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q13. How can a production team reduce risks when filming near roads?</label>
+                    <textarea id="ent344_q13" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["choose a safe filming area", "stay away from traffic", "supervision or barriers"]], "feedback": "Hint: Think about staying away from moving vehicles and using barriers."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q13')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">14. Why should a production team consider the weather before filming outdoors?</label>
-                    <textarea id="ent344_q14" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["rain, wind or extreme temperatures could make filming unsafe or damage equipment"]], "feedback": "Acceptable: Rain, wind or extreme temperatures could make filming unsafe or damage equipment."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q14. Why should a production team consider the weather before filming outdoors?</label>
+                    <textarea id="ent344_q14" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["rain, wind or extreme temperatures could make filming unsafe or damage equipment"]], "feedback": "Hint: How might rain, wind, or extreme temperatures affect the crew and the electrical equipment?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q14')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">15. What should a producer do if they discover a serious hazard during filming?</label>
-                    <textarea id="ent344_q15" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["stop the activity", "keep people away", "make the area safe before continuing"]], "feedback": "Acceptable: Stop the activity if necessary, keep people away and make the area safe before continuing."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q15. What should a producer do if they discover a serious hazard during filming?</label>
+                    <textarea id="ent344_q15" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["stop the activity", "keep people away", "make the area safe before continuing"]], "feedback": "Hint: Should they ignore it, or should they stop what they are doing and make the area safe?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q15')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">16. Why is it important to brief the production team about safety procedures?</label>
-                    <textarea id="ent344_q16" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["everyone understands the hazards and knows how to work safely"]], "feedback": "Acceptable: Everyone understands the hazards and knows how to work safely."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q16. Why is it important to brief the production team about safety procedures?</label>
+                    <textarea id="ent344_q16" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["everyone understands the hazards and knows how to work safely"]], "feedback": "Hint: Why is it important that everyone knows the rules and what the dangers are?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q16')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 3: Risk assessments</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">17. What is a risk assessment?</label>
-                    <textarea id="ent344_q17" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["process of identifying hazards", "considering the risks", "deciding how to reduce them"]], "feedback": "Acceptable: A process of identifying hazards, considering the risks and deciding how to reduce them."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q17. What is a risk assessment?</label>
+                    <textarea id="ent344_q17" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["process of identifying hazards", "considering the risks", "deciding how to reduce them"]], "feedback": "Hint: Think about the process of looking for hazards, checking risks, and planning how to reduce them."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q17')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">18. What is the purpose of a risk assessment?</label>
-                    <textarea id="ent344_q18" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["prevent injuries", "protect people", "activities can be carried out safely"]], "feedback": "Acceptable: To prevent injuries, protect people and make sure activities can be carried out safely."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q18. What is the purpose of a risk assessment?</label>
+                    <textarea id="ent344_q18" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["prevent injuries", "protect people", "activities can be carried out safely"]], "feedback": "Hint: What is the main goal of finding hazards before they cause an accident?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q18')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">19. What should be identified during a risk assessment?</label>
-                    <textarea id="ent344_q19" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["hazards", "who could be harmed", "level of risk", "actions to reduce it"]], "feedback": "Acceptable: Hazards, who could be harmed, the level of risk and actions to reduce it."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q19. What should be identified during a risk assessment?</label>
+                    <textarea id="ent344_q19" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["hazards", "who could be harmed", "level of risk", "actions to reduce it"]], "feedback": "Hint: Think about the hazards, who might get hurt, the level of danger, and how to fix it."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q19')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">20. When should a media producer carry out a risk assessment?</label>
-                    <textarea id="ent344_q20" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["before an activity takes place", "new hazards or locations"]], "feedback": "Acceptable: Before an activity takes place, especially when new hazards or locations are involved."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q20. When should a media producer carry out a risk assessment?</label>
+                    <textarea id="ent344_q20" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["before an activity takes place", "new hazards or locations"]], "feedback": "Hint: Should it be done before or after the activity takes place?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q20')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">21. Why should a risk assessment consider everyone involved in production?</label>
-                    <textarea id="ent344_q21" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["crew members, actors, visitors and members of the public may all be affected"]], "feedback": "Acceptable: Crew members, actors, visitors and members of the public may all be affected by hazards."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q21. Why should a risk assessment consider everyone involved in production?</label>
+                    <textarea id="ent344_q21" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["crew members, actors, visitors and members of the public may all be affected"]], "feedback": "Hint: Are the actors and crew the only ones who might get hurt, or could the public be affected too?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q21')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">22. A filming location has cables running across a busy walkway. What should the producer do to reduce the risk?</label>
-                    <textarea id="ent344_q22" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["reroute the cables", "use cable covers", "secure them safely", "keep walkways clear"]], "feedback": "Acceptable: Reroute the cables, use cable covers or secure them safely, and keep walkways clear."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q22. A filming location has cables running across a busy walkway. What should the producer do to reduce the risk?</label>
+                    <textarea id="ent344_q22" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["reroute the cables", "use cable covers", "secure them safely", "keep walkways clear"]], "feedback": "Hint: What can be done to the cables so people don't trip over them?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q22')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">23. Why might a risk assessment need reviewing?</label>
-                    <textarea id="ent344_q23" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["conditions may change", "new hazards may appear", "existing safety measures no longer suitable"]], "feedback": "Acceptable: Conditions may change, new hazards may appear or existing safety measures may no longer be suitable."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q23. Why might a risk assessment need reviewing?</label>
+                    <textarea id="ent344_q23" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["conditions may change", "new hazards may appear", "existing safety measures no longer suitable"]], "feedback": "Hint: What happens if the weather changes or a new hazard suddenly appears?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q23')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 4: Location recces</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">24. What is a location recce?</label>
-                    <textarea id="ent344_q24" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["visit to a possible filming location before production to check suitability"]], "feedback": "Acceptable: A visit to a possible filming location before production to check whether it is suitable."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q24. What is a location recce?</label>
+                    <textarea id="ent344_q24" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["visit to a possible filming location before production to check suitability"]], "feedback": "Hint: Think about visiting a location before filming to see if it is suitable."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q24')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">25. What is the purpose of a location recce?</label>
-                    <textarea id="ent344_q25" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["check the location", "plan the shoot", "identify possible problems before filming"]], "feedback": "Acceptable: To check the location, plan the shoot and identify possible problems before filming."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q25. What is the purpose of a location recce?</label>
+                    <textarea id="ent344_q25" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["check the location", "plan the shoot", "identify possible problems before filming"]], "feedback": "Hint: Why do you need to check a location in person before turning up with all your equipment?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q25')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">26. What should a production team check during a location recce?</label>
-                    <textarea id="ent344_q26" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["space", "lighting", "sound", "access", "power supplies", "facilities", "hazards"]], "feedback": "Acceptable: Space, lighting, sound, access, power supplies, facilities and potential hazards."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q26. What should a production team check during a location recce?</label>
+                    <textarea id="ent344_q26" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["space", "lighting", "sound", "access", "power supplies", "facilities", "hazards"]], "feedback": "Hint: Think about practical things like power sockets, lighting, space, and access."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q26" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q26')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">27. Why should the team check noise levels during a location recce?</label>
-                    <textarea id="ent344_q27" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["background noise could ruin dialogue or make recording difficult"]], "feedback": "Acceptable: Background noise could ruin dialogue or make the recording difficult to hear."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q27. Why should the team check noise levels during a location recce?</label>
+                    <textarea id="ent344_q27" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["background noise could ruin dialogue or make recording difficult"]], "feedback": "Hint: What happens to your audio recording if a loud train goes past the location?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q27" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q27')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">28. Why should access and parking be considered during a location recce?</label>
-                    <textarea id="ent344_q28" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["crew needs to reach location and transport equipment safely"]], "feedback": "Acceptable: The crew needs to reach the location and transport equipment safely and conveniently."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q28. Why should access and parking be considered during a location recce?</label>
+                    <textarea id="ent344_q28" class="auto-input ent344-input" rows="2" data-rubric='{"keywords": [["crew needs to reach location and transport equipment safely"]], "feedback": "Hint: Think about how the crew is going to transport heavy equipment to the exact filming spot."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q28" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q28')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">29. How is a location recce different from a risk assessment?</label>
-                    <textarea id="ent344_q29" class="auto-input ent344-input" rows="3" data-rubric='{"keywords": [["recce checks whether location is suitable"], ["risk assessment identifies hazards and how to reduce risks"]], "feedback": "A recce checks location suitability; a risk assessment identifies hazards and how to reduce risks."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q29. How is a location recce different from a risk assessment?</label>
+                    <textarea id="ent344_q29" class="auto-input ent344-input" rows="3" data-rubric='{"keywords": [["recce checks whether location is suitable"], ["risk assessment identifies hazards and how to reduce risks"]], "feedback": "Hint: One checks if the place is suitable for filming; the other checks for dangers and safety issues."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q29" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q29')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">30. A team plans to film in a public park. Explain how a recce and risk assessment could help.</label>
-                    <textarea id="ent344_q30" class="auto-input ent344-input" rows="3" data-rubric='{"keywords": [["recce checks practical issues such as light, noise, access and space"], ["risk assessment identifies hazards such as uneven ground or roads and plans ways to reduce them"]], "feedback": "Acceptable: Recce checks practical issues (light/noise/space); risk assessment identifies physical hazards (uneven ground/roads) and plans reduction."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q30. A team plans to film in a public park. Explain how a recce and risk assessment could help.</label>
+                    <textarea id="ent344_q30" class="auto-input ent344-input" rows="3" data-rubric='{"keywords": [["recce checks practical issues such as light, noise, access and space"], ["risk assessment identifies hazards such as uneven ground or roads and plans ways to reduce them"]], "feedback": "Hint: How does one check the practical filming conditions (light/noise) while the other looks at dangers (uneven ground)?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent344_q30" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent344_q30')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -280,20 +285,21 @@
             </div>
         </main>
     </div>
+
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
-        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+        <button class="btn-reset no-print" onclick="clearData()">Reset Page</button>
     </div>
 
-    <!-- SECURE PASSWORD MODAL -->
-    <div class="modal-overlay" id="verify-modal">
+    <!-- Teacher Override Modal -->
+    <div id="verify-modal" class="modal-overlay">
         <div class="modal-content">
-            <h3>Teacher Verification</h3>
-            <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
-            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter PIN">
+            <h2>Teacher Verification</h2>
+            <p>Enter password to manually mark this question correct.</p>
+            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Password">
+            <div id="modal-error-msg" class="modal-error">Incorrect Password!</div>
             <div class="modal-btn-row">
                 <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
-                <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
+                <button class="modal-btn-confirm" onclick="submitVerify()">Confirm</button>
             </div>
         </div>
     </div>
@@ -301,45 +307,178 @@
     <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
 
     <script>
-        function saveProgress() {
-            var inputs = document.querySelectorAll('.auto-input');
-            var dataToSave = {};
-            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
-            try { localStorage.setItem('enterprise3_4_4Memory_Smart_v1', JSON.stringify(dataToSave)); } catch (e) {}
+        /* --- FIREBASE CONFIGURATION & INITIALIZATION --- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
-        function loadProgress() {
-            var saved = localStorage.getItem('enterprise3_4_4Memory_Smart_v1');
-            if (saved) {
-                var data = JSON.parse(saved);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "imedia-3-4-4-health-safety";
+
+        /* --- MARKBOOK BUILDER FOR TEACHER DASHBOARD --- */
+        function buildMarkbookData() {
+            const items = [];
+            const inputs = document.querySelectorAll('.auto-input');
+            
+            inputs.forEach((input, i) => {
+                const wrapper = input.closest('.question-wrapper');
+                const labelEl = wrapper ? wrapper.querySelector('.question-label') : null;
+                const labelText = labelEl ? labelEl.innerText.trim() : `Question ${i + 1}`;
+                
+                let status = 'neutral';
+                if (input.classList.contains('correct') || input.classList.contains('teacher-locked')) {
+                    status = 'correct';
+                } else if (input.classList.contains('incorrect')) {
+                    status = 'incorrect';
+                }
+
+                items.push({
+                    index: i,
+                    label: labelText,
+                    value: input.value.trim(),
+                    status: status
+                });
+            });
+
+            // Calculate total correct answers
+            const correctCount = document.querySelectorAll('.auto-input.correct, .auto-input.teacher-locked').length;
+            const gradableInputs = document.querySelectorAll('.ent344-input');
+            const totalGradable = gradableInputs.length;
+
+            return {
+                items: items,
+                scoreText: `Score: ${correctCount} / ${totalGradable}`
+            };
+        }
+
+        /* --- CLOUD AUTO-SAVE & AUTO-LOAD --- */
+        let saveTimer;
+        function saveProgressToCloud(immediate = false) {
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                const structured = buildMarkbookData();
+                const payload = {
+                    pageTitle: document.title || "3.4.4 Health and Safety",
+                    lastUpdated: Date.now(),
+                    scoreText: structured.scoreText,
+                    items: structured.items
+                };
+
+                // Also store inputs explicitly for local legacy support fallback
                 var inputs = document.querySelectorAll('.auto-input');
                 for (var i = 0; i < inputs.length; i++) {
-                    if (data['input_' + i]) {
-                        inputs[i].value = data['input_' + i];
-                        if (data['class_' + i]) {
-                            inputs[i].className = data['class_' + i];
-                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
-                                var btnId = "override-" + inputs[i].id;
-                                var btn = document.getElementById(btnId);
-                                if (btn) btn.classList.remove('hidden');
+                    payload['input_' + i] = inputs[i].value;
+                    payload['class_' + i] = inputs[i].className;
+                }
+
+                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
+                  .set(payload, { merge: true })
+                  .catch(err => console.error("Cloud sync error:", err));
+            }, immediate ? 50 : 800);
+        }
+
+        function applySavedData(data) {
+            if (!data) return;
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                var savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined) {
+                    inputs[i].value = savedVal;
+                    if (data['class_' + i]) {
+                        inputs[i].className = data['class_' + i];
+                        if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect') || inputs[i].classList.contains('teacher-locked')) {
+                            var btnId = "override-" + inputs[i].id;
+                            var btn = document.getElementById(btnId);
+                            if (btn) btn.classList.remove('hidden');
+                            
+                            // Restore feedback visually if teacher-locked
+                            var feedbackDiv = inputs[i].nextElementSibling;
+                            if (inputs[i].classList.contains('teacher-locked') && feedbackDiv) {
+                                if (inputs[i].classList.contains('correct')) {
+                                    feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; 
+                                    feedbackDiv.style.color = "#006100"; 
+                                    feedbackDiv.style.display = "block";
+                                } else {
+                                    feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; 
+                                    feedbackDiv.style.color = "#b71c1c"; 
+                                    feedbackDiv.style.display = "block";
+                                }
                             }
                         }
-                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                            inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                        }
+                    }
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto';
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
                     }
                 }
             }
         }
-        document.addEventListener('input', function(e) {
-            if (e.target.classList.contains('auto-input')) {
-                saveProgress();
-                if (e.target.tagName.toLowerCase() === 'textarea') {
-                    e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';
+
+        auth.onAuthStateChanged(async function(user) {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection('users').doc(inspectedUid).collection('lessons').doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    try { localStorage.removeItem('enterprise3_4_4Memory_Smart_v1'); } catch (e) {}
+
+                    const doc = await db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud work:", err);
                 }
             }
         });
-        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterprise3_4_4Memory_Smart_v1'); window.location.reload(); } }
-        window.onload = loadProgress;
+
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                saveProgressToCloud(false);
+                if (e.target.tagName.toLowerCase() === 'textarea') {
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                }
+            }
+        });
+
+        function clearData() { 
+            if (confirm("Clear all work?")) { 
+                try { localStorage.removeItem('enterprise3_4_4Memory_Smart_v1'); } catch(e) {}
+                const user = auth.currentUser;
+                if (user) {
+                    db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).delete().catch(err => {});
+                }
+                window.location.reload(); 
+            } 
+        }
 
         let activeQuestionId = null;
         function openVerifyModal(qId) {
@@ -369,7 +508,7 @@
                     if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
                 }
                 closeVerifyModal();
-                saveProgress();
+                saveProgressToCloud(true);
             } else {
                 document.getElementById('modal-error-msg').style.display = 'block';
             }
@@ -443,34 +582,7 @@
                     }
                 }
             }
-            saveProgress();
-        }
-
-        function downloadPDF() {
-            var hide = document.querySelectorAll('.no-print');
-            for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
-            document.getElementById('action-buttons').style.display = 'none';
-
-            var textAreas = document.querySelectorAll('textarea');
-            for (var j = 0; j < textAreas.length; j++) {
-                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
-            }
-
-            var element = document.getElementById('pdf-content');
-            var opt = { 
-                margin: 0.3, 
-                filename: '3.4.4_Health_and_Safety.pdf', 
-                image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, 
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
-
-            html2pdf().set(opt).from(element).save().then(function() {
-                for(var b=0; b<hide.length; b++) hide[b].style.display = 'block';
-                document.getElementById('action-buttons').style.display = 'flex';
-                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
-            });
+            saveProgressToCloud(true);
         }
     </script>
 </body>
