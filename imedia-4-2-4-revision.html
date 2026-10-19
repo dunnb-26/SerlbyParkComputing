@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>4.2.4: File Compression - Revision</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
         .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
@@ -36,8 +41,8 @@
         .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
         .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
         .btn-submit:hover { background-color: #152960; }
-        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
-        .btn-pdf:hover { background-color: #124d2d; }
+        .btn-reset { background-color: #d32f2f; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; margin: 20px auto; }
+        .btn-reset:hover { background-color: #b71c1c; }
     </style>
 </head>
 <body>
@@ -64,179 +69,179 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 1: Understanding file compression</h3>
                 
                 <div class="question-wrapper">
-                    <label class="question-label">1. What is file compression?</label>
-                    <textarea id="ent424_q1" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["reducing the amount of data needed to store a file", "making it smaller"]], "feedback": "Acceptable: Reducing the amount of data needed to store a file, making it smaller."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q1. What is file compression?</label>
+                    <textarea id="ent424_q1" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["reducing the amount of data needed to store a file", "making it smaller"]], "feedback": "Hint: Think about the process of reducing the amount of data needed to store a file to make it smaller."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q1')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">2. Why is file compression used?</label>
-                    <textarea id="ent424_q2" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["save storage space", "quicker to upload, download or share"]], "feedback": "Acceptable: To save storage space and make files quicker to upload, download or share."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q2. Why is file compression used?</label>
+                    <textarea id="ent424_q2" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["save storage space", "quicker to upload, download or share"]], "feedback": "Hint: Think about saving hard drive storage and speeding up file sharing over the internet."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q2')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">3. What is lossy compression?</label>
-                    <textarea id="ent424_q3" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["permanently removes some data from a file to reduce its size"]], "feedback": "Acceptable: Compression that permanently removes some data from a file to reduce its size."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q3. What is lossy compression?</label>
+                    <textarea id="ent424_q3" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["permanently removes some data from a file to reduce its size"]], "feedback": "Hint: Think about compression that permanently throws away unneeded data to shrink the file."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q3')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">4. What is lossless compression?</label>
-                    <textarea id="ent424_q4" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["reduces file size without permanently losing the original data"]], "feedback": "Acceptable: Compression that reduces file size without permanently losing the original data."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q4. What is lossless compression?</label>
+                    <textarea id="ent424_q4" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["reduces file size without permanently losing the original data"]], "feedback": "Hint: Think about compression that shrinks the file without throwing away any original data permanently."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">5. What is the main difference between lossy and lossless compression?</label>
-                    <textarea id="ent424_q5" class="auto-input ent424-input" rows="3" data-rubric='{"keywords": [["lossy removes some information permanently"], ["lossless allows original data to be recovered exactly"]], "feedback": "Lossy removes information permanently; lossless allows the original data to be recovered exactly."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q5. What is the main difference between lossy and lossless compression?</label>
+                    <textarea id="ent424_q5" class="auto-input ent424-input" rows="3" data-rubric='{"keywords": [["lossy removes some information permanently"], ["lossless allows original data to be recovered exactly"]], "feedback": "Hint: One deletes data forever while the other allows complete, exact recovery of the original file."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q5')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">6. Which type of compression can permanently reduce quality?</label>
-                    <input type="text" id="ent424_q6" class="auto-input ent424-input" data-rubric='{"keywords": [["lossy"]], "feedback": "Lossy compression."}' placeholder="Type answer here...">
+                    <label class="question-label">Q6. Which type of compression can permanently reduce quality?</label>
+                    <input type="text" id="ent424_q6" class="auto-input ent424-input" data-rubric='{"keywords": [["lossy"]], "feedback": "Hint: Which method throws away data permanently?"}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q6')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">7. Which type of compression preserves the original data?</label>
-                    <input type="text" id="ent424_q7" class="auto-input ent424-input" data-rubric='{"keywords": [["lossless"]], "feedback": "Lossless compression."}' placeholder="Type answer here...">
+                    <label class="question-label">Q7. Which type of compression preserves the original data?</label>
+                    <input type="text" id="ent424_q7" class="auto-input ent424-input" data-rubric='{"keywords": [["lossless"]], "feedback": "Hint: Which method keeps everything intact without losing data?"}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q7')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">8. Why can lossy compression usually produce smaller files than lossless compression?</label>
-                    <textarea id="ent424_q8" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["removes information that can be discarded", "greater reduction in file size"]], "feedback": "Acceptable: It removes information that can be discarded, allowing a greater reduction in file size."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q8. Why can lossy compression usually produce smaller files than lossless compression?</label>
+                    <textarea id="ent424_q8" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["removes information that can be discarded", "greater reduction in file size"]], "feedback": "Hint: Think about how discarding data completely allows for much heavier file reduction."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q8')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 2: Lossy compression</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">9. Give two examples of file formats that commonly use lossy compression.</label>
-                    <textarea id="ent424_q9" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["jpeg", "mp3", "h.264"]], "feedback": "Acceptable: JPEG for images, MP3 for audio, or video codecs like H.264."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q9. Give two examples of file formats that commonly use lossy compression.</label>
+                    <textarea id="ent424_q9" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["jpeg", "mp3", "h.264"]], "feedback": "Hint: Name common formats for compressed photos (JPEG) or music (MP3)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q9')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">10. Give one advantage of lossy compression.</label>
-                    <textarea id="ent424_q10" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["creates smaller files", "saving storage", "quicker to transfer"]], "feedback": "Acceptable: It creates smaller files, saving storage space and making files quicker to transfer."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q10. Give one advantage of lossy compression.</label>
+                    <textarea id="ent424_q10" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["creates smaller files", "saving storage", "quicker to transfer"]], "feedback": "Hint: Think about saving device storage space and speeding up internet transfers."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q10')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">11. Give one disadvantage of lossy compression.</label>
-                    <textarea id="ent424_q11" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["some data is permanently lost", "reduce quality"]], "feedback": "Acceptable: Some data is permanently lost, which can reduce quality."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q11. Give one disadvantage of lossy compression.</label>
+                    <textarea id="ent424_q11" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["some data is permanently lost", "reduce quality"]], "feedback": "Hint: Think about the permanent loss of data and how it can lower overall quality."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q11')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">12. Why might a website use lossy compression for images?</label>
-                    <textarea id="ent424_q12" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["smaller images load faster", "use less data for visitors"]], "feedback": "Acceptable: Smaller images load faster and use less data for visitors."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q12. Why might a website use lossy compression for images?</label>
+                    <textarea id="ent424_q12" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["smaller images load faster", "use less data for visitors"]], "feedback": "Hint: Why do web pages need smaller images to load quickly for visitors?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q12')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">13. Why might a music streaming service use lossy compression?</label>
-                    <textarea id="ent424_q13" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["reduces amount of data streamed", "less buffering", "less bandwidth"]], "feedback": "Acceptable: It reduces data streamed, helping music play with less buffering and using less bandwidth."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q13. Why might a music streaming service use lossy compression?</label>
+                    <textarea id="ent424_q13" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["reduces amount of data streamed", "less buffering", "less bandwidth"]], "feedback": "Hint: Think about reducing bandwidth and preventing songs from buffering while streaming."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q13')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">14. What might happen if a file is repeatedly saved using lossy compression?</label>
-                    <textarea id="ent424_q14" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["more information may be lost each time", "reducing quality further"]], "feedback": "Acceptable: More information may be lost each time, potentially reducing quality further."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q14. What might happen if a file is repeatedly saved using lossy compression?</label>
+                    <textarea id="ent424_q14" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["more information may be lost each time", "reducing quality further"]], "feedback": "Hint: Think about what happens if you compress and re-save a JPEG file over and over again."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q14')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">15. When might lossy compression be unsuitable?</label>
-                    <textarea id="ent424_q15" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["original data must be preserved exactly", "master recordings", "detailed editing"]], "feedback": "Acceptable: When original data must be preserved exactly, such as master recordings or detailed editing workflows."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q15. When might lossy compression be unsuitable?</label>
+                    <textarea id="ent424_q15" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["original data must be preserved exactly", "master recordings", "detailed editing"]], "feedback": "Hint: Think about master audio recordings or professional image editing where every single pixel counts."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q15')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 3: Lossless compression</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">16. Give two examples of formats that use lossless compression.</label>
-                    <input type="text" id="ent424_q16" class="auto-input ent424-input" data-rubric='{"keywords": [["png", "flac", "zip"]], "feedback": "PNG, FLAC or ZIP."}' placeholder="Type answer here...">
+                    <label class="question-label">Q16. Give two examples of formats that use lossless compression.</label>
+                    <input type="text" id="ent424_q16" class="auto-input ent424-input" data-rubric='{"keywords": [["png", "flac", "zip"]], "feedback": "Hint: Name formats like PNG, FLAC, or ZIP archives."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q16')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">17. Give one advantage of lossless compression.</label>
-                    <textarea id="ent424_q17" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["original data can be recovered exactly", "no information permanently lost"]], "feedback": "Acceptable: The original data can be recovered exactly, with no information permanently lost."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q17. Give one advantage of lossless compression.</label>
+                    <textarea id="ent424_q17" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["original data can be recovered exactly", "no information permanently lost"]], "feedback": "Hint: Think about being able to perfectly restore the original file without any data loss."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q17')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">18. Give one disadvantage of lossless compression.</label>
-                    <textarea id="ent424_q18" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["files are often larger than equivalent lossy files"]], "feedback": "Acceptable: Files are often larger than equivalent lossy files."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q18. Give one disadvantage of lossless compression.</label>
+                    <textarea id="ent424_q18" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["files are often larger than equivalent lossy files"]], "feedback": "Hint: How do the file sizes compare when you don't throw away any data?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q18')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">19. Why might a photographer use lossless compression?</label>
-                    <textarea id="ent424_q19" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["reduce file size while preserving all of the original image data"]], "feedback": "Acceptable: To reduce file size while preserving all of the original image data."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q19. Why might a photographer use lossless compression?</label>
+                    <textarea id="ent424_q19" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["reduce file size while preserving all of the original image data"]], "feedback": "Hint: Why do photographers want smaller files while still keeping every bit of original detail?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q19')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">20. Why might a company use ZIP compression for documents?</label>
-                    <textarea id="ent424_q20" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["bundle and reduce the size of files for storage or sharing", "original files recovered"]], "feedback": "Acceptable: It bundles and reduces file size for storage or sharing while allowing original files to be recovered."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q20. Why might a company use ZIP compression for documents?</label>
+                    <textarea id="ent424_q20" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["bundle and reduce the size of files for storage or sharing", "original files recovered"]], "feedback": "Hint: Think about bundling multiple documents together and making them easier to email."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q20')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">21. Does lossless compression always make a file smaller?</label>
-                    <textarea id="ent424_q21" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["no", "some files may shrink very little or become slightly larger"]], "feedback": "Acceptable: No. Some files may shrink very little, or may even become slightly larger."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q21. Does lossless compression always make a file smaller?</label>
+                    <textarea id="ent424_q21" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["no", "some files may shrink very little or become slightly larger"]], "feedback": "Hint: Does it always guarantee a smaller file size depending on what is inside the file?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q21')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">22. Does lossless compression improve the original quality of a file?</label>
-                    <textarea id="ent424_q22" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["no", "preserves original data but does not create extra detail"]], "feedback": "Acceptable: No. It preserves the original data but does not create extra detail or improve source quality."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q22. Does lossless compression improve the original quality of a file?</label>
+                    <textarea id="ent424_q22" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["no", "preserves original data but does not create extra detail"]], "feedback": "Hint: Can compression ever magically improve or enhance the original quality of a poorly shot photo?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q22')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 4: Choosing the right compression</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">23. A student needs to upload photographs to a website quickly. Which compression type might be suitable, and why?</label>
-                    <textarea id="ent424_q23" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["lossy compression", "jpeg", "smaller files that load faster"]], "feedback": "Acceptable: Lossy compression like JPEG, because it creates smaller files that load faster (lossless if quality priority)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q23. A student needs to upload photographs to a website quickly. Which compression type might be suitable, and why?</label>
+                    <textarea id="ent424_q23" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["lossy compression", "jpeg", "smaller files that load faster"]], "feedback": "Hint: Which compression type gives you small files that load quickly for web visitors?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q23')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">24. A sound engineer must preserve every piece of audio data in a recording. Which compression type should they choose, and why?</label>
-                    <textarea id="ent424_q24" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["lossless compression", "flac", "original audio data can be recovered exactly"]], "feedback": "Acceptable: Lossless compression, such as FLAC, because the original audio data can be recovered exactly."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q24. A sound engineer must preserve every piece of audio data in a recording. Which compression type should they choose, and why?</label>
+                    <textarea id="ent424_q24" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["lossless compression", "flac", "original audio data can be recovered exactly"]], "feedback": "Hint: Which compression type ensures zero data loss so audio can be recovered exactly?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q24')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">25. A school needs to email a large folder of documents without changing their contents. Which compression type is suitable, and why?</label>
-                    <textarea id="ent424_q25" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["lossless compression", "zip", "reduces file size while preserving original files"]], "feedback": "Acceptable: Lossless compression, such as ZIP, because it reduces file size while preserving original files."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q25. A school needs to email a large folder of documents without changing their contents. Which compression type is suitable, and why?</label>
+                    <textarea id="ent424_q25" class="auto-input ent424-input" rows="2" data-rubric='{"keywords": [["lossless compression", "zip", "reduces file size while preserving original files"]], "feedback": "Hint: Which compression type is used for archives like ZIP files to keep documents intact?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent424_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent424_q25')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -245,20 +250,21 @@
             </div>
         </main>
     </div>
+
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
-        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+        <button class="btn-reset no-print" onclick="clearData()">Reset Page</button>
     </div>
 
-    <!-- SECURE PASSWORD MODAL -->
-    <div class="modal-overlay" id="verify-modal">
+    <!-- Teacher Override Modal -->
+    <div id="verify-modal" class="modal-overlay">
         <div class="modal-content">
-            <h3>Teacher Verification</h3>
-            <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
-            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter PIN">
+            <h2>Teacher Verification</h2>
+            <p>Enter password to manually mark this question correct.</p>
+            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Password">
+            <div id="modal-error-msg" class="modal-error">Incorrect Password!</div>
             <div class="modal-btn-row">
                 <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
-                <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
+                <button class="modal-btn-confirm" onclick="submitVerify()">Confirm</button>
             </div>
         </div>
     </div>
@@ -266,45 +272,178 @@
     <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
 
     <script>
-        function saveProgress() {
-            var inputs = document.querySelectorAll('.auto-input');
-            var dataToSave = {};
-            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
-            try { localStorage.setItem('enterprise4_2_4Memory_Smart_v1', JSON.stringify(dataToSave)); } catch (e) {}
+        /* --- FIREBASE CONFIGURATION & INITIALIZATION --- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
-        function loadProgress() {
-            var saved = localStorage.getItem('enterprise4_2_4Memory_Smart_v1');
-            if (saved) {
-                var data = JSON.parse(saved);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "imedia-4-2-4-compression";
+
+        /* --- MARKBOOK BUILDER FOR TEACHER DASHBOARD --- */
+        function buildMarkbookData() {
+            const items = [];
+            const inputs = document.querySelectorAll('.auto-input');
+            
+            inputs.forEach((input, i) => {
+                const wrapper = input.closest('.question-wrapper');
+                const labelEl = wrapper ? wrapper.querySelector('.question-label') : null;
+                const labelText = labelEl ? labelEl.innerText.trim() : `Question ${i + 1}`;
+                
+                let status = 'neutral';
+                if (input.classList.contains('correct') || input.classList.contains('teacher-locked')) {
+                    status = 'correct';
+                } else if (input.classList.contains('incorrect')) {
+                    status = 'incorrect';
+                }
+
+                items.push({
+                    index: i,
+                    label: labelText,
+                    value: input.value.trim(),
+                    status: status
+                });
+            });
+
+            // Calculate total correct answers
+            const correctCount = document.querySelectorAll('.auto-input.correct, .auto-input.teacher-locked').length;
+            const gradableInputs = document.querySelectorAll('.ent424-input');
+            const totalGradable = gradableInputs.length;
+
+            return {
+                items: items,
+                scoreText: `Score: ${correctCount} / ${totalGradable}`
+            };
+        }
+
+        /* --- CLOUD AUTO-SAVE & AUTO-LOAD --- */
+        let saveTimer;
+        function saveProgressToCloud(immediate = false) {
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                const structured = buildMarkbookData();
+                const payload = {
+                    pageTitle: document.title || "4.2.4 File Compression",
+                    lastUpdated: Date.now(),
+                    scoreText: structured.scoreText,
+                    items: structured.items
+                };
+
+                // Also store inputs explicitly for local legacy support fallback
                 var inputs = document.querySelectorAll('.auto-input');
                 for (var i = 0; i < inputs.length; i++) {
-                    if (data['input_' + i]) {
-                        inputs[i].value = data['input_' + i];
-                        if (data['class_' + i]) {
-                            inputs[i].className = data['class_' + i];
-                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
-                                var btnId = "override-" + inputs[i].id;
-                                var btn = document.getElementById(btnId);
-                                if (btn) btn.classList.remove('hidden');
+                    payload['input_' + i] = inputs[i].value;
+                    payload['class_' + i] = inputs[i].className;
+                }
+
+                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
+                  .set(payload, { merge: true })
+                  .catch(err => console.error("Cloud sync error:", err));
+            }, immediate ? 50 : 800);
+        }
+
+        function applySavedData(data) {
+            if (!data) return;
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                var savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined) {
+                    inputs[i].value = savedVal;
+                    if (data['class_' + i]) {
+                        inputs[i].className = data['class_' + i];
+                        if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect') || inputs[i].classList.contains('teacher-locked')) {
+                            var btnId = "override-" + inputs[i].id;
+                            var btn = document.getElementById(btnId);
+                            if (btn) btn.classList.remove('hidden');
+                            
+                            // Restore feedback visually if teacher-locked
+                            var feedbackDiv = inputs[i].nextElementSibling;
+                            if (inputs[i].classList.contains('teacher-locked') && feedbackDiv) {
+                                if (inputs[i].classList.contains('correct')) {
+                                    feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; 
+                                    feedbackDiv.style.color = "#006100"; 
+                                    feedbackDiv.style.display = "block";
+                                } else {
+                                    feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; 
+                                    feedbackDiv.style.color = "#b71c1c"; 
+                                    feedbackDiv.style.display = "block";
+                                }
                             }
                         }
-                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                            inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                        }
+                    }
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto';
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
                     }
                 }
             }
         }
-        document.addEventListener('input', function(e) {
-            if (e.target.classList.contains('auto-input')) {
-                saveProgress();
-                if (e.target.tagName.toLowerCase() === 'textarea') {
-                    e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';
+
+        auth.onAuthStateChanged(async function(user) {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection('users').doc(inspectedUid).collection('lessons').doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    try { localStorage.removeItem('enterprise4_2_4Memory_Smart_v1'); } catch (e) {}
+
+                    const doc = await db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud work:", err);
                 }
             }
         });
-        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterprise4_2_4Memory_Smart_v1'); window.location.reload(); } }
-        window.onload = loadProgress;
+
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                saveProgressToCloud(false);
+                if (e.target.tagName.toLowerCase() === 'textarea') {
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                }
+            }
+        });
+
+        function clearData() { 
+            if (confirm("Clear all work?")) { 
+                try { localStorage.removeItem('enterprise4_2_4Memory_Smart_v1'); } catch(e) {}
+                const user = auth.currentUser;
+                if (user) {
+                    db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).delete().catch(err => {});
+                }
+                window.location.reload(); 
+            } 
+        }
 
         let activeQuestionId = null;
         function openVerifyModal(qId) {
@@ -334,7 +473,7 @@
                     if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
                 }
                 closeVerifyModal();
-                saveProgress();
+                saveProgressToCloud(true);
             } else {
                 document.getElementById('modal-error-msg').style.display = 'block';
             }
@@ -408,34 +547,7 @@
                     }
                 }
             }
-            saveProgress();
-        }
-
-        function downloadPDF() {
-            var hide = document.querySelectorAll('.no-print');
-            for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
-            document.getElementById('action-buttons').style.display = 'none';
-
-            var textAreas = document.querySelectorAll('textarea');
-            for (var j = 0; j < textAreas.length; j++) {
-                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
-            }
-
-            var element = document.getElementById('pdf-content');
-            var opt = { 
-                margin: 0.3, 
-                filename: '4.2.4_File_Compression.pdf', 
-                image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, 
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
-
-            html2pdf().set(opt).from(element).save().then(function() {
-                for(var b=0; b<hide.length; b++) hide[b].style.display = 'block';
-                document.getElementById('action-buttons').style.display = 'flex';
-                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
-            });
+            saveProgressToCloud(true);
         }
     </script>
 </body>
