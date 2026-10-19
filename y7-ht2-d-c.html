@@ -184,7 +184,7 @@
         }
         .btn-add-word:hover { background-color: #455a64; }
 
-        /* Teacher Verification Styles */
+        /* Teacher Verification & Override Styles */
         .teacher-verify-btn {
             background-color: #607d8b;
             color: white;
@@ -197,6 +197,19 @@
             margin-top: 10px;
         }
         .teacher-verify-btn:hover { background-color: #455a64; }
+
+        .teacher-override-btn {
+            background-color: #9e9e9e;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        .teacher-override-btn:hover { background-color: #757575; }
 
         .teacher-feedback-display {
             background-color: #f8f9fa;
@@ -325,22 +338,37 @@
                 <div class="question-group">
                     <label>1. What is the main difference between Microsoft Word and Microsoft PowerPoint in terms of their primary purpose?</label>
                     <textarea id="q1" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <div style="text-align: right;">
+                        <button id="override-q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('q1')">👨‍🏫 Override Score</button>
+                    </div>
                 </div>
                 <div class="question-group">
                     <label>2. Explain how you would properly attach a file to an email in Outlook:</label>
                     <textarea id="q2" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <div style="text-align: right;">
+                        <button id="override-q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('q2')">👨‍🏫 Override Score</button>
+                    </div>
                 </div>
                 <div class="question-group">
                     <label>3. How many bits are in a single nibble, and how many bits make up a byte?</label>
                     <textarea id="q3" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <div style="text-align: right;">
+                        <button id="override-q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('q3')">👨‍🏫 Override Score</button>
+                    </div>
                 </div>
                 <div class="question-group">
                     <label>4. Describe the steps required to convert the binary number <code>1011</code> into a denary number:</label>
                     <textarea id="q4" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <div style="text-align: right;">
+                        <button id="override-q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('q4')">👨‍🏫 Override Score</button>
+                    </div>
                 </div>
                 <div class="question-group">
                     <label>5. Explain the method used to convert the denary number <code>12</code> into a 4-bit binary number:</label>
                     <textarea id="q5" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <div style="text-align: right;">
+                        <button id="override-q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('q5')">👨‍🏫 Override Score</button>
+                    </div>
                 </div>
 
                 <div class="btn-row" id="stage1-buttons">
@@ -612,6 +640,7 @@
 
             for (let i = 1; i <= 5; i++) {
                 lockSpellcheckTextarea(document.getElementById('q' + i));
+                document.getElementById('override-q' + i).classList.remove('hidden');
             }
             document.getElementById('stage1-buttons').style.display = 'none';
 
@@ -624,7 +653,7 @@
             saveToCloud(true);
         }
 
-        // --- TEACHER VERIFICATION MODAL LOGIC ---
+        // --- TEACHER VERIFICATION & OVERRIDE MODAL LOGIC ---
         let activeLevel = null;
         function openVerifyModal(level) {
             activeLevel = level;
@@ -684,6 +713,16 @@
                         feedbackDiv.classList.add('hidden');
                         feedbackDiv.innerHTML = "";
                     }
+                } else if (activeLevel.startsWith('q')) {
+                    let el = document.getElementById(activeLevel);
+                    if (el.classList.contains('incorrect')) {
+                        el.classList.remove('incorrect');
+                        el.classList.add('correct');
+                    } else {
+                        el.classList.remove('correct');
+                        el.classList.add('incorrect');
+                    }
+                    recalculateScore();
                 }
                 closeVerifyModal();
                 saveToCloud(true);
@@ -836,6 +875,7 @@
             if (data.q1_locked) {
                 for (let i = 1; i <= 5; i++) {
                     lockSpellcheckTextarea(document.getElementById('q' + i));
+                    document.getElementById('override-q' + i).classList.remove('hidden');
                 }
             }
 
