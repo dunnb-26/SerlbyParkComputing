@@ -345,21 +345,19 @@
 
         .btn-gold:hover { background: #c99722; }
 
-        .btn-outline {
-            background: white;
-            color: #1e3a8a;
-            border: 1px solid #1e3a8a;
-            padding: 7px 12px;
+        .btn-delete-lesson {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 5px 10px;
             border-radius: 4px;
+            font-size: 0.8em;
             font-weight: bold;
             cursor: pointer;
-            font-size: 0.85em;
+            transition: background 0.2s;
+            margin-left: 10px;
         }
-
-        .btn-outline:hover {
-            background: #1e3a8a;
-            color: white;
-        }
+        .btn-delete-lesson:hover { background-color: #b71c1c; }
     </style>
 </head>
 
@@ -480,13 +478,12 @@
             "blue1": 8, "blue2": 8, "blue3": 8
         };
 
-        // Helper: Render an 8x8 Pixel Grid Preview for Basic Designs (pixel array of booleans/true)
+        // Helper: Render an 8x8 Pixel Grid Preview for Basic Designs
         function buildBasicDesignsHtml(taskKey, solvedArray) {
             if (!Array.isArray(solvedArray) || solvedArray.length === 0) return '';
             const bits = basicImageDataBits[taskKey] || 2;
             const map = basicColorMaps[bits];
             
-            // Default expected answer data mapping reference for Basic Designs colors
             const baseDataMap = {
                 "red1": [0,2,2,0,0,2,2,0, 2,2,2,2,2,2,2,2, 2,2,2,2,2,2,2,2, 0,2,2,2,2,2,2,0, 0,0,2,2,2,2,0,0, 0,0,0,2,2,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0],
                 "red2": [0,0,1,1,1,1,0,0, 0,1,0,0,0,0,1,0, 1,0,1,0,0,1,0,1, 1,0,0,0,0,0,0,1, 1,0,3,0,0,3,0,1, 1,0,0,3,3,0,0,1, 0,1,0,0,0,0,1,0, 0,0,1,1,1,1,0,0],
@@ -686,7 +683,7 @@
                 html += `<div id="lessons-accordion-container">`;
 
                 lessons.forEach((lesson, index) => {
-                    html += renderLessonCard(lesson, index);
+                    html += renderLessonCard(student.uid, lesson, index);
                 });
 
                 html += '</div>';
@@ -697,14 +694,27 @@
             }
         }
 
+        async function deleteStudentLesson(studentUid, lessonId, lessonTitle) {
+            if (confirm(`Are you sure you want to delete "${lessonTitle}" for this student? This will permanently remove their submitted work from the cloud.`)) {
+                try {
+                    await db.collection('users').doc(studentUid).collection('lessons').doc(lessonId).delete();
+                    alert("Lesson work deleted successfully.");
+                    refreshActivePortfolio();
+                } catch (err) {
+                    console.error("Error deleting lesson submission:", err);
+                    alert("Failed to delete lesson work. Please try again.");
+                }
+            }
+        }
+
         function refreshActivePortfolio() {
             if (activeStudent) {
                 loadStudentPortfolio(activeStudent);
             }
         }
 
-        // 6. Render the List Bar for Each Lesson
-        function renderLessonCard(lesson, index) {
+        // 6. Render the List Bar for Each Lesson with Delete Button
+        function renderLessonCard(studentUid, lesson, index) {
             const title = lesson.pageTitle || lesson.id.replace(/-/g, ' ');
 
             const updatedDate = lesson.lastUpdated
@@ -715,9 +725,11 @@
             let badgesHtml = '';
             if (lesson.scoreText) badgesHtml += `<span class="status-badge badge-verified">${escapeHtml(lesson.scoreText)}</span>`;
 
+            // Delete Button added to Header Actions
+            badgesHtml += `<button class="btn-delete-lesson" onclick="event.stopPropagation(); deleteStudentLesson('${studentUid}', '${lesson.id}', '${escapeHtml(title)}')">🗑️ Delete</button>`;
+
             let bodyHtml = '';
             const userProgress = lesson.userProgress || {};
-            let renderedBasicKeys = new Set();
 
             // Format A: Structured items array
             if (Array.isArray(lesson.items) && lesson.items.length > 0) {
