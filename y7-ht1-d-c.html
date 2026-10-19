@@ -6,8 +6,10 @@
     <title>Y7 HT1 - Demonstrate & Connect</title>
     <link rel="stylesheet" href="style.css">
     
-    <!-- HTML to PDF Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
         .task-container {
@@ -98,7 +100,7 @@
         }
         .btn-mark:hover { background-color: #c99722; }
 
-        /* Universal Action Buttons Area (PDF & Reset) */
+        /* Universal Action Buttons Area (Reset) */
         .action-row {
             display: flex;
             justify-content: center;
@@ -487,9 +489,8 @@
 
         </div>
 
-        <!-- UNIVERSAL ACTION BUTTONS (PDF & RESET - Hidden until marked) -->
+        <!-- ACTION BUTTONS (Download Work Removed - Hidden until marked) -->
         <div class="action-row hidden" id="action-buttons">
-            <button class="btn-pdf" onclick="downloadPDF()">📄 Download Work</button>
             <button class="btn-reset" onclick="clearData()">Reset Page</button>
         </div>
     </main>
@@ -515,6 +516,25 @@
     </footer>
 
     <script>
+        /* --- 1. FIREBASE CONFIGURATION & INITIALIZATION --- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "y7-ht1-demonstrate-connect";
+
         // Updated Keywords tailored for Y7 Computing questions
         const qKeywords = {
             1: ['type', 'typing', 'write', 'enter', 'letters', 'words', 'text', 'input', 'inputting'],
@@ -552,7 +572,7 @@
             }
         }
 
-        function addPracticeRow(word1 = '', word2 = '', word3 = '', word4 = '') {
+        function addPracticeRow(word1 = '', word2 = '', word3 = '', word4 = '', triggerSave = true) {
             const container = document.getElementById('practice-rows-container');
             const row = document.createElement('div');
             row.className = 'practice-row';
@@ -566,15 +586,15 @@
             container.appendChild(row);
 
             row.querySelectorAll('input').forEach(input => {
-                input.addEventListener('input', saveToLocalStorage);
+                input.addEventListener('input', () => saveToCloud(false));
             });
-            saveToLocalStorage();
+            if (triggerSave) saveToCloud(false);
         }
 
         function removePracticeRow(button) {
             const row = button.parentElement;
             row.remove();
-            saveToLocalStorage();
+            saveToCloud(false);
         }
 
         function lockSpellcheckTextarea(textarea) {
@@ -656,12 +676,11 @@
             // Reveal spelling section
             document.getElementById('spag-section').classList.remove('hidden');
             if (document.getElementById('practice-rows-container').children.length === 0) {
-                addPracticeRow();
+                addPracticeRow('', '', '', '', false);
             }
 
-            // Centralized calculation updates the UI, Score, and shows the PDF buttons
             recalculateScore();
-            saveToLocalStorage();
+            saveToCloud(true);
         }
 
         // --- TEACHER VERIFICATION & OVERRIDE MODAL LOGIC ---
@@ -702,7 +721,7 @@
             const pass = document.getElementById('teacher-password-input').value;
             if (pass === '2525') {
                 if (activeLevel.includes('-correct') || activeLevel.includes('-incorrect')) {
-                    // New Connect Task Logic
+                    // Connect Task Logic
                     const [level, status] = activeLevel.split('-');
                     const textarea = document.getElementById('connect-' + level);
                     const taskCard = document.getElementById('task-' + level);
@@ -743,7 +762,7 @@
                     recalculateScore(); // Instantly adjusts the score and the Connect task below
                 }
                 closeVerifyModal();
-                saveToLocalStorage();
+                saveToCloud(true);
             } else {
                 document.getElementById('modal-error-msg').style.display = 'block';
             }
@@ -754,53 +773,103 @@
             if (e.key === 'Enter') submitVerify();
         });
         
-        // Prevent accidental enters inside feedback box from submitting if they just want a new line, 
-        // but let Ctrl+Enter submit it
         document.getElementById('teacher-feedback-input').addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
                 submitVerify();
             }
         });
 
-        // --- BULLETPROOF PDF GENERATION LOGIC ---
-        function downloadPDF() {
-            var buttonsToHide = document.querySelectorAll('.no-print');
-            for(var b = 0; b < buttonsToHide.length; b++) buttonsToHide[b].style.display = 'none';
-            document.getElementById('action-buttons').style.display = 'none';
-
-            var textInputs = document.querySelectorAll('input[type="text"]');
-            for (var i = 0; i < textInputs.length; i++) {
-                textInputs[i].setAttribute('value', textInputs[i].value);
+        /* --- 2. FIREBASE CLOUD AUTO-SAVE & AUTO-LOAD --- */
+        function findLabelForInput(el, index) {
+            const group = el.closest('.question-group');
+            if (group) {
+                const lbl = group.querySelector('label');
+                if (lbl && lbl.innerText.trim()) {
+                    return lbl.innerText.replace(/\s+/g, ' ').trim();
+                }
             }
-
-            var textAreas = document.querySelectorAll('textarea');
-            for (var j = 0; j < textAreas.length; j++) {
-                textAreas[j].innerHTML = textAreas[j].value;
-                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
-            }
-
-            var element = document.getElementById('pdf-content');
-
-            var opt = {
-                margin:       0.3,
-                filename:     'Y7_HT1_Demonstrate_Connect.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
-            };
-
-            html2pdf().set(opt).from(element).save().then(function() {
-                for(var b = 0; b < buttonsToHide.length; b++) buttonsToHide[b].style.display = 'block';
-                document.getElementById('action-buttons').style.display = 'flex';
-                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
-            });
+            return 'Question ' + index;
         }
 
-        // --- LOCAL STORAGE PERSISTENCE (Updated Key) ---
-        function saveToLocalStorage() {
-            try {
+        function buildMarkbookData() {
+            const items = [];
+            let correctCount = 0;
+            let isMarked = document.getElementById('q1').dataset.spellcheckLocked === 'true';
+
+            for (let i = 1; i <= 5; i++) {
+                const el = document.getElementById('q' + i);
+                let status = 'neutral';
+                if (el.classList.contains('correct')) {
+                    status = 'correct';
+                    correctCount++;
+                } else if (el.classList.contains('incorrect')) {
+                    status = 'incorrect';
+                }
+                items.push({
+                    index: i - 1,
+                    label: findLabelForInput(el, i),
+                    value: el.value.trim(),
+                    status: status
+                });
+            }
+
+            // Include Spelling Practice words if any are typed
+            const spagWords = [];
+            document.querySelectorAll('.practice-row').forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                const w0 = inputs[0].value.trim();
+                if (w0) {
+                    spagWords.push(`${w0} -> ${inputs[1].value.trim()}, ${inputs[2].value.trim()}, ${inputs[3].value.trim()}`);
+                }
+            });
+            if (spagWords.length > 0) {
+                items.push({
+                    label: "Spelling Practice",
+                    value: spagWords.join('\n'),
+                    status: 'neutral'
+                });
+            }
+
+            // Include Connect Tasks
+            ['red', 'amber', 'green'].forEach(level => {
+                const card = document.getElementById('task-' + level);
+                const textarea = document.getElementById('connect-' + level);
+                const isCorrect = card.classList.contains('teacher-verified-correct');
+                const isIncorrect = card.classList.contains('teacher-verified-incorrect');
+
+                if (!card.classList.contains('hidden') || textarea.value.trim() !== '' || isCorrect || isIncorrect) {
+                    let status = 'neutral';
+                    if (isCorrect) status = 'correct';
+                    else if (isIncorrect) status = 'incorrect';
+
+                    items.push({
+                        label: `Part 2: Connect - ${level.toUpperCase()} Task`,
+                        value: textarea.value.trim(),
+                        status: status
+                    });
+                }
+            });
+
+            return {
+                items: items,
+                scoreText: isMarked ? `Score: ${correctCount} / 5` : "In Progress"
+            };
+        }
+
+        let saveTimer;
+        function saveToCloud(immediate = false) {
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                const structured = buildMarkbookData();
                 const data = {
+                    pageTitle: document.title || "Y7 HT1 - Demonstrate & Connect",
+                    lastUpdated: Date.now(),
+                    scoreText: structured.scoreText,
+                    items: structured.items,
+
                     q1: document.getElementById('q1').value,
                     q2: document.getElementById('q2').value,
                     q3: document.getElementById('q3').value,
@@ -816,17 +885,14 @@
                     actions_hidden: document.getElementById('action-buttons').classList.contains('hidden'),
                     spag_hidden: document.getElementById('spag-section').classList.contains('hidden'),
                     
-                    // Added backwards compatibility for old saves
                     red_verified: document.getElementById('task-red').classList.contains('teacher-verified-correct'),
                     amber_verified: document.getElementById('task-amber').classList.contains('teacher-verified-correct'),
                     green_verified: document.getElementById('task-green').classList.contains('teacher-verified-correct'),
                     
-                    // Save specific verified status (correct or incorrect)
                     task_red_status: document.getElementById('task-red').classList.contains('teacher-verified-incorrect') ? 'incorrect' : (document.getElementById('task-red').classList.contains('teacher-verified-correct') ? 'correct' : ''),
                     task_amber_status: document.getElementById('task-amber').classList.contains('teacher-verified-incorrect') ? 'incorrect' : (document.getElementById('task-amber').classList.contains('teacher-verified-correct') ? 'correct' : ''),
                     task_green_status: document.getElementById('task-green').classList.contains('teacher-verified-incorrect') ? 'incorrect' : (document.getElementById('task-green').classList.contains('teacher-verified-correct') ? 'correct' : ''),
                     
-                    // Added classes for the connect textareas to save state correctly
                     connectRed: document.getElementById('connect-red').value,
                     connectRed_class: document.getElementById('connect-red').className,
                     connectAmber: document.getElementById('connect-amber').value,
@@ -834,7 +900,6 @@
                     connectGreen: document.getElementById('connect-green').value,
                     connectGreen_class: document.getElementById('connect-green').className,
                     
-                    // Teacher feedback persistence
                     feedbackRed: document.getElementById('feedback-red').innerHTML,
                     feedbackRed_hidden: document.getElementById('feedback-red').classList.contains('hidden'),
                     feedbackAmber: document.getElementById('feedback-amber').innerHTML,
@@ -855,123 +920,150 @@
                     });
                 });
 
-                // Uses specific key for Y7
-                localStorage.setItem('y7_ht1_full_data', JSON.stringify(data));
-            } catch (e) {
-                console.log("Local storage restricted.");
+                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
+                  .set(data, { merge: true })
+                  .catch(err => console.error("Cloud save error:", err));
+            }, immediate ? 50 : 600);
+        }
+
+        function applySavedData(data) {
+            if (!data) return;
+
+            document.getElementById('q1').value = data.q1 || '';
+            document.getElementById('q2').value = data.q2 || '';
+            document.getElementById('q3').value = data.q3 || '';
+            document.getElementById('q4').value = data.q4 || '';
+            document.getElementById('q5').value = data.q5 || '';
+
+            if (data.q1_class) document.getElementById('q1').className = data.q1_class;
+            if (data.q2_class) document.getElementById('q2').className = data.q2_class;
+            if (data.q3_class) document.getElementById('q3').className = data.q3_class;
+            if (data.q4_class) document.getElementById('q4').className = data.q4_class;
+            if (data.q5_class) document.getElementById('q5').className = data.q5_class;
+
+            if (data.q1_locked) {
+                for (let i = 1; i <= 5; i++) {
+                    lockSpellcheckTextarea(document.getElementById('q' + i));
+                    document.getElementById('override-q' + i).classList.remove('hidden');
+                }
+            }
+
+            if (data.buttons_hidden) {
+                document.getElementById('stage1-buttons').style.display = 'none';
+            }
+
+            if (data.actions_hidden === false) {
+                document.getElementById('action-buttons').classList.remove('hidden');
+            }
+
+            if (!data.spag_hidden) {
+                document.getElementById('spag-section').classList.remove('hidden');
+            }
+
+            // Handle old save formats turning straight to correct
+            if (data.red_verified && !data.task_red_status) document.getElementById('task-red').classList.add('teacher-verified-correct');
+            if (data.amber_verified && !data.task_amber_status) document.getElementById('task-amber').classList.add('teacher-verified-correct');
+            if (data.green_verified && !data.task_green_status) document.getElementById('task-green').classList.add('teacher-verified-correct');
+
+            // Load accurate status formatting
+            if (data.task_red_status === 'correct') document.getElementById('task-red').classList.add('teacher-verified-correct');
+            if (data.task_red_status === 'incorrect') document.getElementById('task-red').classList.add('teacher-verified-incorrect');
+            
+            if (data.task_amber_status === 'correct') document.getElementById('task-amber').classList.add('teacher-verified-correct');
+            if (data.task_amber_status === 'incorrect') document.getElementById('task-amber').classList.add('teacher-verified-incorrect');
+            
+            if (data.task_green_status === 'correct') document.getElementById('task-green').classList.add('teacher-verified-correct');
+            if (data.task_green_status === 'incorrect') document.getElementById('task-green').classList.add('teacher-verified-incorrect');
+
+            document.getElementById('connect-red').value = data.connectRed || '';
+            if (data.connectRed_class) document.getElementById('connect-red').className = data.connectRed_class;
+            
+            document.getElementById('connect-amber').value = data.connectAmber || '';
+            if (data.connectAmber_class) document.getElementById('connect-amber').className = data.connectAmber_class;
+            
+            document.getElementById('connect-green').value = data.connectGreen || '';
+            if (data.connectGreen_class) document.getElementById('connect-green').className = data.connectGreen_class;
+
+            // Load Feedback
+            if (data.feedbackRed) document.getElementById('feedback-red').innerHTML = data.feedbackRed;
+            if (data.feedbackRed_hidden === false) document.getElementById('feedback-red').classList.remove('hidden');
+
+            if (data.feedbackAmber) document.getElementById('feedback-amber').innerHTML = data.feedbackAmber;
+            if (data.feedbackAmber_hidden === false) document.getElementById('feedback-amber').classList.remove('hidden');
+
+            if (data.feedbackGreen) document.getElementById('feedback-green').innerHTML = data.feedbackGreen;
+            if (data.feedbackGreen_hidden === false) document.getElementById('feedback-green').classList.remove('hidden');
+
+            const container = document.getElementById('practice-rows-container');
+            container.innerHTML = '';
+            if (data.spagRows && data.spagRows.length > 0) {
+                data.spagRows.forEach(row => {
+                    addPracticeRow(row.w0, row.w1, row.w2, row.w3, false);
+                });
+            } else {
+                addPracticeRow('', '', '', '', false);
+            }
+
+            // Ensures the correct RAG task is shown based on the saved classes
+            if (data.q1_locked) {
+                recalculateScore();
             }
         }
 
-        function loadFromLocalStorage() {
-            try {
-                const saved = localStorage.getItem('y7_ht1_full_data');
-                if (!saved) return;
-                const data = JSON.parse(saved);
+        auth.onAuthStateChanged(async function(user) {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
 
-                document.getElementById('q1').value = data.q1 || '';
-                document.getElementById('q2').value = data.q2 || '';
-                document.getElementById('q3').value = data.q3 || '';
-                document.getElementById('q4').value = data.q4 || '';
-                document.getElementById('q5').value = data.q5 || '';
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection('users').doc(inspectedUid).collection('lessons').doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
 
-                if (data.q1_class) document.getElementById('q1').className = data.q1_class;
-                if (data.q2_class) document.getElementById('q2').className = data.q2_class;
-                if (data.q3_class) document.getElementById('q3').className = data.q3_class;
-                if (data.q4_class) document.getElementById('q4').className = data.q4_class;
-                if (data.q5_class) document.getElementById('q5').className = data.q5_class;
+            if (user) {
+                try {
+                    try { localStorage.removeItem('y7_ht1_full_data'); } catch (e) {}
 
-                if (data.q1_locked) {
-                    for (let i = 1; i <= 5; i++) {
-                        lockSpellcheckTextarea(document.getElementById('q' + i));
-                        document.getElementById('override-q' + i).classList.remove('hidden');
+                    const doc = await db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud work:", err);
+                }
+            }
+        });
+
+        async function clearData() {
+            if (confirm("Are you sure you want to clear all your work on this page?")) {
+                try { localStorage.removeItem('y7_ht1_full_data'); } catch (e) {}
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).delete();
+                    } catch (err) {
+                        console.error("Error clearing cloud data:", err);
                     }
                 }
-
-                if (data.buttons_hidden) {
-                    document.getElementById('stage1-buttons').style.display = 'none';
-                }
-
-                if (data.actions_hidden === false) {
-                    document.getElementById('action-buttons').classList.remove('hidden');
-                }
-
-                if (!data.spag_hidden) {
-                    document.getElementById('spag-section').classList.remove('hidden');
-                }
-
-                // Handle old save formats turning straight to correct
-                if (data.red_verified && !data.task_red_status) document.getElementById('task-red').classList.add('teacher-verified-correct');
-                if (data.amber_verified && !data.task_amber_status) document.getElementById('task-amber').classList.add('teacher-verified-correct');
-                if (data.green_verified && !data.task_green_status) document.getElementById('task-green').classList.add('teacher-verified-correct');
-
-                // Load accurate status formatting
-                if (data.task_red_status === 'correct') document.getElementById('task-red').classList.add('teacher-verified-correct');
-                if (data.task_red_status === 'incorrect') document.getElementById('task-red').classList.add('teacher-verified-incorrect');
-                
-                if (data.task_amber_status === 'correct') document.getElementById('task-amber').classList.add('teacher-verified-correct');
-                if (data.task_amber_status === 'incorrect') document.getElementById('task-amber').classList.add('teacher-verified-incorrect');
-                
-                if (data.task_green_status === 'correct') document.getElementById('task-green').classList.add('teacher-verified-correct');
-                if (data.task_green_status === 'incorrect') document.getElementById('task-green').classList.add('teacher-verified-incorrect');
-
-                document.getElementById('connect-red').value = data.connectRed || '';
-                if (data.connectRed_class) document.getElementById('connect-red').className = data.connectRed_class;
-                
-                document.getElementById('connect-amber').value = data.connectAmber || '';
-                if (data.connectAmber_class) document.getElementById('connect-amber').className = data.connectAmber_class;
-                
-                document.getElementById('connect-green').value = data.connectGreen || '';
-                if (data.connectGreen_class) document.getElementById('connect-green').className = data.connectGreen_class;
-
-                // Load Feedback
-                if (data.feedbackRed) document.getElementById('feedback-red').innerHTML = data.feedbackRed;
-                if (data.feedbackRed_hidden === false) document.getElementById('feedback-red').classList.remove('hidden');
-
-                if (data.feedbackAmber) document.getElementById('feedback-amber').innerHTML = data.feedbackAmber;
-                if (data.feedbackAmber_hidden === false) document.getElementById('feedback-amber').classList.remove('hidden');
-
-                if (data.feedbackGreen) document.getElementById('feedback-green').innerHTML = data.feedbackGreen;
-                if (data.feedbackGreen_hidden === false) document.getElementById('feedback-green').classList.remove('hidden');
-
-                const container = document.getElementById('practice-rows-container');
-                container.innerHTML = '';
-                if (data.spagRows && data.spagRows.length > 0) {
-                    data.spagRows.forEach(row => {
-                        addPracticeRow(row.w0, row.w1, row.w2, row.w3);
-                    });
-                } else {
-                    addPracticeRow(); 
-                }
-
-                // Ensures the correct RAG task is shown based on the saved classes
-                if (data.q1_locked) {
-                    recalculateScore();
-                }
-            } catch (e) {
-                console.log("Local storage read blocked.");
-            }
-        }
-
-        function clearData() {
-            if (confirm("Are you sure you want to clear all your work on this page?")) {
-                localStorage.removeItem('y7_ht1_full_data');
                 window.location.reload();
             }
         }
 
         window.onload = function() {
-            loadFromLocalStorage();
-
             if (document.getElementById('practice-rows-container').children.length === 0) {
-                addPracticeRow();
+                addPracticeRow('', '', '', '', false);
             }
 
             document.querySelectorAll('.persist-input').forEach(el => {
-                el.addEventListener('input', saveToLocalStorage);
+                el.addEventListener('input', () => saveToCloud(false));
             });
 
             document.querySelectorAll('.spag-input').forEach(el => {
-                el.addEventListener('input', saveToLocalStorage);
+                el.addEventListener('input', () => saveToCloud(false));
             });
         };
     </script>
