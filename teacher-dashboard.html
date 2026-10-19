@@ -464,7 +464,6 @@
             "blue1": 8, "blue2": 8, "blue3": 8
         };
 
-        // Helper: Render an 8x8 Pixel Grid Preview for Basic Designs
         function buildBasicDesignsHtml(taskKey, solvedArray) {
             if (!Array.isArray(solvedArray) || solvedArray.length === 0) return '';
             const bits = basicImageDataBits[taskKey] || 2;
@@ -699,7 +698,7 @@
             }
         }
 
-        // 6. Render the List Bar for Each Lesson with Clean Mapped Screenshots & Delete Button
+        // 6. Render the List Bar for Each Lesson with Full Spelling Practice & Teacher Feedback Support
         function renderLessonCard(studentUid, lesson, index) {
             const title = lesson.pageTitle || lesson.id.replace(/-/g, ' ');
 
@@ -719,19 +718,7 @@
             const designs = lesson.userBinaryDesigns || {};
             let renderedScreenshotKeys = new Set();
 
-            // Strictly map specific task titles/labels to exact image properties to avoid image overlapping across tasks
-            const zoneImageMap = {
-                'red task': 'img_maroon',
-                'amber task': 'img_amber',
-                'green task': 'img_green',
-                'blue task': 'img_navy',
-                'red': 'img_maroon',
-                'amber': 'img_amber',
-                'green': 'img_green',
-                'blue': 'img_navy'
-            };
-
-            // Format A: Structured items array
+            // Format A: Structured items array (Used by Demonstrate & Connect lessons)
             if (Array.isArray(lesson.items) && lesson.items.length > 0) {
                 lesson.items.forEach((item, idx) => {
                     const labelText = item.label || 'Question ' + (idx + 1);
@@ -748,55 +735,6 @@
                         statusPill = '<span class="status-badge badge-incorrect">✗ Incorrect</span>';
                     }
 
-                    let extraVisualHtml = '';
-                    const lowerLabel = labelText.toLowerCase();
-
-                    // Match exact screenshot for this row
-                    let matchedImgKey = null;
-                    for (let key in zoneImageMap) {
-                        if (lowerLabel.includes(key)) {
-                            matchedImgKey = zoneImageMap[key];
-                            break;
-                        }
-                    }
-
-                    if (matchedImgKey && lesson[matchedImgKey] && String(lesson[matchedImgKey]).startsWith('data:image')) {
-                        extraVisualHtml += `<img class="screenshot-img" src="${lesson[matchedImgKey]}" alt="${escapeHtml(labelText)} Screenshot">`;
-                        renderedScreenshotKeys.add(matchedImgKey);
-                    }
-
-                    // Check for Character Creation / Binary Studio designs
-                    let matchedDesignKey = null;
-                    if (lowerLabel.includes('red task')) matchedDesignKey = '1';
-                    else if (lowerLabel.includes('amber task')) matchedDesignKey = '2';
-                    else if (lowerLabel.includes('green task')) matchedDesignKey = '3';
-                    else if (lowerLabel.includes('blue task')) matchedDesignKey = '4';
-
-                    if (matchedDesignKey && designs[matchedDesignKey]) {
-                        const gridArr = designs[matchedDesignKey];
-                        let cellsHtml = '';
-                        const pixelColorMap = {
-                            '0000': '#ffffff', '0': '#ffffff', '0001': '#000000', '1': '#000000',
-                            '0010': '#d32f2f', '2': '#d32f2f', '0011': '#388e3c', '3': '#388e3c',
-                            '0100': '#1976d2', '4': '#1976d2', '0101': '#fbc02d', '5': '#fbc02d',
-                            '0110': '#f57c00', '6': '#f57c00', '0111': '#8e24aa', '7': '#8e24aa',
-                            '1000': '#e91e63', '8': '#e91e63', '1001': '#00bcd4', '9': '#00bcd4',
-                            '1010': '#cddc39', '10': '#cddc39', '1011': '#795548', '11': '#795548',
-                            '1100': '#9e9e9e', '12': '#9e9e9e', '1101': '#607d8b', '13': '#607d8b',
-                            '1110': '#8d6e63', '14': '#8d6e63', '1111': '#009688', '15': '#009688'
-                        };
-                        for (let i = 0; i < 100; i++) {
-                            const code = String(gridArr[i] || '').trim();
-                            const bg = pixelColorMap[code] || '#ffffff';
-                            cellsHtml += `<div class="pixel-preview-cell" style="width:18px;height:18px;background-color:${bg};"></div>`;
-                        }
-                        extraVisualHtml += `
-                            <div class="pixel-preview-wrap" style="margin-top:8px;">
-                                <div style="display:grid; grid-template-columns:repeat(10, 18px); grid-template-rows:repeat(10, 18px); border:1px solid #94a3b8;">${cellsHtml}</div>
-                            </div>
-                        `;
-                    }
-
                     bodyHtml += `
                         <div class="qa-row">
                             <div class="qa-label">
@@ -804,11 +742,11 @@
                                 ${statusPill}
                             </div>
                             <div class="${boxClass}">${isEmpty ? '(Left blank)' : escapeHtml(val)}</div>
-                            ${extraVisualHtml}
                         </div>
                     `;
                 });
             } else {
+                // Format B: Older input formats
                 const inputKeys = Object.keys(lesson)
                     .filter(k => k.startsWith('input_'))
                     .sort((a, b) => parseInt(a.split('_')[1]) - parseInt(b.split('_')[1]));
@@ -829,43 +767,63 @@
                 });
             }
 
-            // Fallback: Render any root screenshots (img_maroon, img_amber, img_green, img_navy) not yet rendered above
-            const screenshotLabels = {
-                'img_maroon': '📸 Red Task Screenshot',
-                'img_amber': '📸 Amber Task Screenshot',
-                'img_green': '📸 Green Task Screenshot',
-                'img_navy': '📸 Blue Task Screenshot'
-            };
-            Object.keys(screenshotLabels).forEach(imgKey => {
-                if (!renderedScreenshotKeys.has(imgKey) && lesson[imgKey] && String(lesson[imgKey]).startsWith('data:image')) {
+            // Render Spelling Practice Table Rows if present in lesson data
+            if (Array.isArray(lesson.spagRows) && lesson.spagRows.length > 0) {
+                let spagRowsHtml = '';
+                lesson.spagRows.forEach((row, sIdx) => {
+                    if (row.w0 || row.w1 || row.w2 || row.w3) {
+                        spagRowsHtml += `
+                            <tr>
+                                <td style="padding:6px; border:1px solid #cbd5e1; font-weight:bold; color:#e65100;">${escapeHtml(row.w0 || '-')}</td>
+                                <td style="padding:6px; border:1px solid #cbd5e1;">${escapeHtml(row.w1 || '-')}</td>
+                                <td style="padding:6px; border:1px solid #cbd5e1;">${escapeHtml(row.w2 || '-')}</td>
+                                <td style="padding:6px; border:1px solid #cbd5e1;">${escapeHtml(row.w3 || '-')}</td>
+                            </tr>
+                        `;
+                    }
+                });
+
+                if (spagRowsHtml) {
                     bodyHtml += `
                         <div class="qa-row">
-                            <div class="qa-label"><span>${screenshotLabels[imgKey]}</span></div>
-                            <img class="screenshot-img" src="${lesson[imgKey]}" alt="Student Screenshot">
+                            <div class="qa-label"><span>📝 Spelling Practice & Corrections</span></div>
+                            <table style="width:100%; border-collapse:collapse; background:#fff3e0; margin-top:6px; font-size:0.9em; text-align:center;">
+                                <tr style="background:#f57c00; color:white;">
+                                    <th style="padding:6px; border:1px solid #cbd5e1;">Misspelled Word</th>
+                                    <th style="padding:6px; border:1px solid #cbd5e1;">Attempt 1</th>
+                                    <th style="padding:6px; border:1px solid #cbd5e1;">Attempt 2</th>
+                                    <th style="padding:6px; border:1px solid #cbd5e1;">Attempt 3</th>
+                                </tr>
+                                ${spagRowsHtml}
+                            </table>
+                        </div>
+                    `;
+                }
+            }
+
+            // Render Teacher Feedback if present on Connect tasks
+            ['Red', 'Amber', 'Green'].forEach(level => {
+                const feedbackKey = 'feedback' + level;
+                if (lesson[feedbackKey] && lesson[feedbackKey].trim() !== '') {
+                    bodyHtml += `
+                        <div class="qa-row">
+                            <div class="qa-label"><span>👨‍🏫 Teacher Feedback (${level} Task)</span></div>
+                            <div class="answer-box correct" style="background:#f8f9fa; border-left:4px solid #388e3c;">${lesson[feedbackKey]}</div>
                         </div>
                     `;
                 }
             });
 
-            // Render any saved Basic Designs pixel art grids found in userProgress
-            const basicTaskLabels = {
-                "red1": "Red Task - Image 1", "red2": "Red Task - Image 2", "red3": "Red Task - Image 3",
-                "amber1": "Amber Task - Image 1", "amber2": "Amber Task - Image 2", "amber3": "Amber Task - Image 3",
-                "green1": "Green Task - Image 1", "green2": "Green Task - Image 2", "green3": "Green Task - Image 3",
-                "blue1": "Blue Task - Image 1", "blue2": "Blue Task - Image 2", "blue3": "Blue Task - Image 3"
-            };
-
-            Object.keys(basicTaskLabels).forEach(taskKey => {
-                if (userProgress[taskKey] && Array.isArray(userProgress[taskKey])) {
-                    const gridHtml = buildBasicDesignsHtml(taskKey, userProgress[taskKey]);
-                    if (gridHtml) {
-                        bodyHtml += `
-                            <div class="qa-row">
-                                <div class="qa-label"><span>🎨 ${basicTaskLabels[taskKey]}</span></div>
-                                ${gridHtml}
-                            </div>
-                        `;
-                    }
+            // Fallback: Render screenshots if present
+            ['maroon', 'amber', 'green', 'navy'].forEach(zone => {
+                const imgKey = 'img_' + zone;
+                if (lesson[imgKey] && String(lesson[imgKey]).startsWith('data:image')) {
+                    bodyHtml += `
+                        <div class="qa-row">
+                            <div class="qa-label"><span>📸 Task Screenshot (${zone.toUpperCase()})</span></div>
+                            <img class="screenshot-img" src="${lesson[imgKey]}" alt="Student Screenshot">
+                        </div>
+                    `;
                 }
             });
 
