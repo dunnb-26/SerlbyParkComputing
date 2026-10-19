@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2.5: Media Codes and Meaning - Revision</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
         .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
@@ -36,8 +41,8 @@
         .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
         .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
         .btn-submit:hover { background-color: #152960; }
-        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
-        .btn-pdf:hover { background-color: #124d2d; }
+        .btn-pdf { background-color: #d32f2f; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
+        .btn-pdf:hover { background-color: #b71c1c; }
     </style>
 </head>
 <body>
@@ -64,165 +69,165 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 1: Types of Media Codes</h3>
                 
                 <div class="question-wrapper">
-                    <label class="question-label">1. What are media codes?</label>
-                    <textarea id="im25_q1" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["systems", "signs", "symbols", "convey meaning", "communicate messages", "audience"]], "feedback": "Acceptable: Systems of signs and symbols used to communicate messages and convey meaning to an audience."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q1. What are media codes?</label>
+                    <textarea id="im25_q1" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["systems", "signs", "symbols", "convey meaning", "communicate messages", "audience"]], "feedback": "Hint: Think about systems of signs or symbols used to communicate messages to an audience."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q1')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">2. What are the three main categories of media codes?</label>
-                    <textarea id="im25_q2" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["technical"], ["symbolic"], ["written"]], "feedback": "Technical codes, symbolic codes, and written codes."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q2. What are the three main categories of media codes?</label>
+                    <textarea id="im25_q2" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["technical"], ["symbolic"], ["written"]], "feedback": "Hint: Name the three codes (one is about equipment, one is about hidden meanings, one is about text)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q2')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">3. What are technical codes?</label>
-                    <textarea id="im25_q3" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["equipment", "how a product is made", "camera angles", "lighting", "sound", "editing"]], "feedback": "Acceptable: Techniques related to equipment and how a product is made, such as camera work, lighting, sound, or editing."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q3. What are technical codes?</label>
+                    <textarea id="im25_q3" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["equipment", "how a product is made", "camera angles", "lighting", "sound", "editing"]], "feedback": "Hint: Think about how equipment is used to make a product, like camera angles, lighting, and editing."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q3')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">4. What are symbolic codes?</label>
-                    <textarea id="im25_q4" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["meaning underneath", "objects", "setting", "body language", "clothing", "colours", "symbolise"]], "feedback": "Acceptable: Codes that show meaning below the surface through objects, settings, body language, clothing, or colours."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q4. What are symbolic codes?</label>
+                    <textarea id="im25_q4" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["meaning underneath", "objects", "setting", "body language", "clothing", "colours", "symbolise"]], "feedback": "Hint: Think about how meaning is shown below the surface through objects, body language, or colours."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">5. What are written codes?</label>
-                    <textarea id="im25_q5" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["language", "text", "headlines", "captions", "font", "words used"]], "feedback": "Acceptable: Language and text used in media products, such as headlines, captions, fonts, or slogans."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q5. What are written codes?</label>
+                    <textarea id="im25_q5" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["language", "text", "headlines", "captions", "font", "words used"]], "feedback": "Hint: Think about the use of language, text, fonts, and words in a media product."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q5')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">6. Give an example of a technical code in a film.</label>
-                    <textarea id="im25_q6" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["close up shot", "low angle", "dramatic music", "lighting", "sound effect"]], "feedback": "Acceptable: A close-up camera shot, low-angle shot, dramatic background music, or lighting setup."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q6. Give an example of a technical code in a film.</label>
+                    <textarea id="im25_q6" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["close up shot", "low angle", "dramatic music", "lighting", "sound effect"]], "feedback": "Hint: Give an example related to how the camera is used, how it is lit, or how it is edited."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q6')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">7. Give an example of a symbolic code.</label>
-                    <textarea id="im25_q7" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["dark clothing to show villain", "red rose for romance", "setting", "body language"]], "feedback": "Acceptable: Dark clothing to show a villain, a red rose for romance, or angry body language."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q7. Give an example of a symbolic code.</label>
+                    <textarea id="im25_q7" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["dark clothing to show villain", "red rose for romance", "setting", "body language"]], "feedback": "Hint: Think about how a specific colour, item of clothing, or object represents a bigger idea (e.g. red for danger)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q7')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">8. Give an example of a written code on a magazine cover.</label>
-                    <textarea id="im25_q8" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["headline", "bold font", "catchphrase", "cover line", "caption"]], "feedback": "Acceptable: A bold headline, catchy cover line, or stylized font."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q8. Give an example of a written code on a magazine cover.</label>
+                    <textarea id="im25_q8" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["headline", "bold font", "catchphrase", "cover line", "caption"]], "feedback": "Hint: Think about the text elements you see on the front cover of a magazine."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q8')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 2: Camera Techniques</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">9. What is a close-up shot used for?</label>
-                    <textarea id="im25_q9" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["emotion", "facial expression", "detail", "focus attention on a character s face"]], "feedback": "Acceptable: To show emotion, facial expressions, detail, or focus attention on a characters face."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q9. What is a close-up shot used for?</label>
+                    <textarea id="im25_q9" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["emotion", "facial expression", "detail", "focus attention on a character s face"]], "feedback": "Hint: Think about showing emotion, fine detail, or focusing closely on a character's face."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q9')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">10. What is a long shot (or wide shot) used for?</label>
-                    <textarea id="im25_q10" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["location", "setting", "show where a character is", "environment"]], "feedback": "Acceptable: To show the location, setting, or environment around a character."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q10. What is a long shot (or wide shot) used for?</label>
+                    <textarea id="im25_q10" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["location", "setting", "show where a character is", "environment"]], "feedback": "Hint: Think about showing the environment or setting around a character."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q10')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">11. What effect does a low-angle shot have on a character?</label>
-                    <textarea id="im25_q11" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["make them look powerful", "dominant", "strong", "threatening", "tall"]], "feedback": "Acceptable: Makes the character look powerful, dominant, strong, or threatening."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q11. What effect does a low-angle shot have on a character?</label>
+                    <textarea id="im25_q11" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["make them look powerful", "dominant", "strong", "threatening", "tall"]], "feedback": "Hint: Think about how looking up at someone from below makes them appear strong or dominant."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q11')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">12. What effect does a high-angle shot have on a character?</label>
-                    <textarea id="im25_q12" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["make them look weak", "vulnerable", "small", "powerless", "scared"]], "feedback": "Acceptable: Makes the character look weak, vulnerable, small, or powerless."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q12. What effect does a high-angle shot have on a character?</label>
+                    <textarea id="im25_q12" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["make them look weak", "vulnerable", "small", "powerless", "scared"]], "feedback": "Hint: Think about how looking down at someone from above makes them appear small or vulnerable."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q12')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">13. What is an eye-level shot?</label>
-                    <textarea id="im25_q13" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["neutral", "natural perspective", "standard view", "equals"]], "feedback": "Acceptable: A natural, neutral perspective where the camera is level with the characters eyes."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q13. What is an eye-level shot?</label>
+                    <textarea id="im25_q13" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["neutral", "natural perspective", "standard view", "equals"]], "feedback": "Hint: Think about a neutral or natural perspective where the camera is level with the characters."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q13')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">14. What is a panning movement?</label>
-                    <textarea id="im25_q14" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["camera moves horizontally", "left to right", "right to left", "stationary tripod"]], "feedback": "Acceptable: Camera moves horizontally from side to side while remaining on a fixed base."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q14. What is a panning movement?</label>
+                    <textarea id="im25_q14" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["camera moves horizontally", "left to right", "right to left", "stationary tripod"]], "feedback": "Hint: Think about the camera moving horizontally from left to right on a fixed base."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q14')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 3: Lighting and Mise-en-scène</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">15. What is high-key lighting?</label>
-                    <textarea id="im25_q15" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["bright", "even illumination", "few shadows", "cheerful", "positive mood"]], "feedback": "Acceptable: Bright lighting with few shadows, often used to create a cheerful, positive, or clean mood."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q15. What is high-key lighting?</label>
+                    <textarea id="im25_q15" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["bright", "even illumination", "few shadows", "cheerful", "positive mood"]], "feedback": "Hint: Think about bright, even lighting used to create a cheerful or positive mood with few shadows."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q15')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">16. What is low-key lighting?</label>
-                    <textarea id="im25_q16" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["dark", "shadows", "contrast", "mysterious", "suspenseful", "horror"]], "feedback": "Acceptable: Dark lighting with strong shadows and high contrast, used to create suspense, mystery, or horror."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q16. What is low-key lighting?</label>
+                    <textarea id="im25_q16" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["dark", "shadows", "contrast", "mysterious", "suspenseful", "horror"]], "feedback": "Hint: Think about dark lighting with deep shadows used for mystery or horror."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q16')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">17. What does mise-en-scène mean?</label>
-                    <textarea id="im25_q17" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["everything placed in front of the camera", "setting", "props", "costume", "actor performance"]], "feedback": "Acceptable: Everything placed in front of the camera to be filmed, including set design, props, costumes, and acting."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q17. What does mise-en-scène mean?</label>
+                    <textarea id="im25_q17" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["everything placed in front of the camera", "setting", "props", "costume", "actor performance"]], "feedback": "Hint: Think about everything placed in front of the camera (props, costumes, setting, acting)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q17')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">18. How can costume and makeup convey meaning about a character?</label>
-                    <textarea id="im25_q18" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["job", "status", "personality", "time period", "whether they are a hero or villain"]], "feedback": "Acceptable: Shows a characters job, social status, personality, era, or whether they are a hero/villain."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q18. How can costume and makeup convey meaning about a character?</label>
+                    <textarea id="im25_q18" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["job", "status", "personality", "time period", "whether they are a hero or villain"]], "feedback": "Hint: Think about what their clothes tell us about their job, status, or personality."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q18')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">19. How do props contribute to a scene?</label>
-                    <textarea id="im25_q19" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["objects used by characters", "tell us about a character", "help set the scene"]], "feedback": "Acceptable: Objects used by characters that give clues about their lifestyle, profession, or help set the scene."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q19. How do props contribute to a scene?</label>
+                    <textarea id="im25_q19" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["objects used by characters", "tell us about a character", "help set the scene"]], "feedback": "Hint: Think about how objects give clues about characters or help set the environment."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q19')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 4: Audio and Engagement</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">20. What is diegetic sound?</label>
-                    <textarea id="im25_q20" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["sound that characters can hear", "dialogue", "footsteps", "traffic inside the world"]], "feedback": "Acceptable: Sound that characters can hear within the story world, such as dialogue or footsteps."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q20. What is diegetic sound?</label>
+                    <textarea id="im25_q20" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["sound that characters can hear", "dialogue", "footsteps", "traffic inside the world"]], "feedback": "Hint: Think about sound that exists inside the story world that characters can actually hear."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q20')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">21. What is non-diegetic sound?</label>
-                    <textarea id="im25_q21" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["sound characters cannot hear", "background music", "voiceover narration added later"]], "feedback": "Acceptable: Sound characters cannot hear in the scene, such as background mood music or a voiceover narration."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q21. What is non-diegetic sound?</label>
+                    <textarea id="im25_q21" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["sound characters cannot hear", "background music", "voiceover narration added later"]], "feedback": "Hint: Think about sound added later that characters cannot hear, like background mood music."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q21')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">22. How does background music create impact in a media product?</label>
-                    <textarea id="im25_q22" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["builds tension", "creates mood", "evokes emotion", "excitement"]], "feedback": "Acceptable: Builds tension, creates mood, evokes emotions (like sadness or excitement), or engages the audience."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q22. How does background music create impact in a media product?</label>
+                    <textarea id="im25_q22" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["builds tension", "creates mood", "evokes emotion", "excitement"]], "feedback": "Hint: Think about how music builds tension or creates a specific emotional mood."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q22')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">23. How do media products engage audiences?</label>
-                    <textarea id="im25_q23" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["capturing attention", "emotional connection", "interactive features", "exciting visuals", "relatable characters"]], "feedback": "Acceptable: By capturing attention, creating emotional connections, using exciting visuals, or relatable characters."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q23. How do media products engage audiences?</label>
+                    <textarea id="im25_q23" class="auto-input im25-input" rows="2" data-rubric='{"keywords": [["capturing attention", "emotional connection", "interactive features", "exciting visuals", "relatable characters"]], "feedback": "Hint: Think about capturing attention, creating emotional connections, or using exciting visuals."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-im25_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('im25_q23')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -232,7 +237,6 @@
         </main>
     </div>
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
         <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
     </div>
 
@@ -252,45 +256,178 @@
     <footer>&copy; 2026 Delta Serlby Park - Creative iMedia Department</footer>
 
     <script>
-        function saveProgress() {
-            var inputs = document.querySelectorAll('.auto-input');
-            var dataToSave = {};
-            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
-            try { localStorage.setItem('imedia2_5Memory_Smart_v1', JSON.stringify(dataToSave)); } catch (e) {}
+        /* --- FIREBASE CONFIGURATION & INITIALIZATION --- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
-        function loadProgress() {
-            var saved = localStorage.getItem('imedia2_5Memory_Smart_v1');
-            if (saved) {
-                var data = JSON.parse(saved);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "imedia-2-5-media-codes";
+
+        /* --- MARKBOOK BUILDER FOR TEACHER DASHBOARD --- */
+        function buildMarkbookData() {
+            const items = [];
+            const inputs = document.querySelectorAll('.auto-input');
+            
+            inputs.forEach((input, i) => {
+                const wrapper = input.closest('.question-wrapper');
+                const labelEl = wrapper ? wrapper.querySelector('.question-label') : null;
+                const labelText = labelEl ? labelEl.innerText.trim() : `Question ${i + 1}`;
+                
+                let status = 'neutral';
+                if (input.classList.contains('correct') || input.classList.contains('teacher-locked')) {
+                    status = 'correct';
+                } else if (input.classList.contains('incorrect')) {
+                    status = 'incorrect';
+                }
+
+                items.push({
+                    index: i,
+                    label: labelText,
+                    value: input.value.trim(),
+                    status: status
+                });
+            });
+
+            // Calculate total correct answers
+            const correctCount = document.querySelectorAll('.auto-input.correct, .auto-input.teacher-locked').length;
+            const gradableInputs = document.querySelectorAll('.im25-input');
+            const totalGradable = gradableInputs.length;
+
+            return {
+                items: items,
+                scoreText: `Score: ${correctCount} / ${totalGradable}`
+            };
+        }
+
+        /* --- CLOUD AUTO-SAVE & AUTO-LOAD --- */
+        let saveTimer;
+        function saveProgressToCloud(immediate = false) {
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                const structured = buildMarkbookData();
+                const payload = {
+                    pageTitle: document.title || "2.5 Media Codes and Meaning",
+                    lastUpdated: Date.now(),
+                    scoreText: structured.scoreText,
+                    items: structured.items
+                };
+
+                // Also store inputs explicitly for local legacy support fallback
                 var inputs = document.querySelectorAll('.auto-input');
                 for (var i = 0; i < inputs.length; i++) {
-                    if (data['input_' + i]) {
-                        inputs[i].value = data['input_' + i];
-                        if (data['class_' + i]) {
-                            inputs[i].className = data['class_' + i];
-                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
-                                var btnId = "override-" + inputs[i].id;
-                                var btn = document.getElementById(btnId);
-                                if (btn) btn.classList.remove('hidden');
+                    payload['input_' + i] = inputs[i].value;
+                    payload['class_' + i] = inputs[i].className;
+                }
+
+                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
+                  .set(payload, { merge: true })
+                  .catch(err => console.error("Cloud sync error:", err));
+            }, immediate ? 50 : 800);
+        }
+
+        function applySavedData(data) {
+            if (!data) return;
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                var savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined) {
+                    inputs[i].value = savedVal;
+                    if (data['class_' + i]) {
+                        inputs[i].className = data['class_' + i];
+                        if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect') || inputs[i].classList.contains('teacher-locked')) {
+                            var btnId = "override-" + inputs[i].id;
+                            var btn = document.getElementById(btnId);
+                            if (btn) btn.classList.remove('hidden');
+                            
+                            // Restore feedback visually if teacher-locked
+                            var feedbackDiv = inputs[i].nextElementSibling;
+                            if (inputs[i].classList.contains('teacher-locked') && feedbackDiv) {
+                                if (inputs[i].classList.contains('correct')) {
+                                    feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; 
+                                    feedbackDiv.style.color = "#006100"; 
+                                    feedbackDiv.style.display = "block";
+                                } else {
+                                    feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; 
+                                    feedbackDiv.style.color = "#b71c1c"; 
+                                    feedbackDiv.style.display = "block";
+                                }
                             }
                         }
-                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                            inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                        }
+                    }
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto';
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
                     }
                 }
             }
         }
-        document.addEventListener('input', function(e) {
-            if (e.target.classList.contains('auto-input')) {
-                saveProgress();
-                if (e.target.tagName.toLowerCase() === 'textarea') {
-                    e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';
+
+        auth.onAuthStateChanged(async function(user) {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection('users').doc(inspectedUid).collection('lessons').doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    try { localStorage.removeItem('imedia2_5Memory_Smart_v1'); } catch (e) {}
+
+                    const doc = await db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud work:", err);
                 }
             }
         });
-        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('imedia2_5Memory_Smart_v1'); window.location.reload(); } }
-        window.onload = loadProgress;
+
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                saveProgressToCloud(false);
+                if (e.target.tagName.toLowerCase() === 'textarea') {
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                }
+            }
+        });
+
+        function clearData() { 
+            if (confirm("Clear all work?")) { 
+                try { localStorage.removeItem('imedia2_5Memory_Smart_v1'); } catch(e) {}
+                const user = auth.currentUser;
+                if (user) {
+                    db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).delete().catch(err => {});
+                }
+                window.location.reload(); 
+            } 
+        }
 
         let activeQuestionId = null;
         function openVerifyModal(qId) {
@@ -320,7 +457,7 @@
                     if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
                 }
                 closeVerifyModal();
-                saveProgress();
+                saveProgressToCloud(true);
             } else {
                 document.getElementById('modal-error-msg').style.display = 'block';
             }
@@ -394,34 +531,7 @@
                     }
                 }
             }
-            saveProgress();
-        }
-
-        function downloadPDF() {
-            var hide = document.querySelectorAll('.no-print');
-            for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
-            document.getElementById('action-buttons').style.display = 'none';
-
-            var textAreas = document.querySelectorAll('textarea');
-            for (var j = 0; j < textAreas.length; j++) {
-                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
-            }
-
-            var element = document.getElementById('pdf-content');
-            var opt = { 
-                margin: 0.3, 
-                filename: '2.5_Media_Codes.pdf', 
-                image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, 
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
-
-            html2pdf().set(opt).from(element).save().then(function() {
-                for(var b=0; b<hide.length; b++) hide[b].style.display = 'block';
-                document.getElementById('action-buttons').style.display = 'flex';
-                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
-            });
+            saveProgressToCloud(true);
         }
     </script>
 </body>
