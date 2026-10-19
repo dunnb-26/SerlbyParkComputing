@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>4.1: Distribution Platforms and Media - Revision</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
         .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
@@ -36,8 +41,8 @@
         .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
         .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
         .btn-submit:hover { background-color: #152960; }
-        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
-        .btn-pdf:hover { background-color: #124d2d; }
+        .btn-reset { background-color: #d32f2f; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; margin: 20px auto; }
+        .btn-reset:hover { background-color: #b71c1c; }
     </style>
 </head>
 <body>
@@ -64,355 +69,355 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 1: Understanding distribution platforms and media</h3>
                 
                 <div class="question-wrapper">
-                    <label class="question-label">1. What is a distribution platform?</label>
-                    <textarea id="ent41_q1" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["technology or system used to deliver a media product to its audience", "website, app or DVD"]], "feedback": "Acceptable: The technology or system used to deliver a media product to its audience, such as a website, app or DVD."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q1. What is a distribution platform?</label>
+                    <textarea id="ent41_q1" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["technology or system used to deliver a media product to its audience", "website, app or DVD"]], "feedback": "Hint: Think about the technology or system used to deliver a product to its audience."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q1')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">2. What is distribution in media?</label>
-                    <textarea id="ent41_q2" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["getting a finished media product to the audience so they can access or use it"]], "feedback": "Acceptable: Getting a finished media product to the audience so they can access or use it."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q2. What is distribution in media?</label>
+                    <textarea id="ent41_q2" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["getting a finished media product to the audience so they can access or use it"]], "feedback": "Hint: Think about the actual process of getting a finished product to the audience so they can use it."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q2')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">3. What is a media product?</label>
-                    <textarea id="ent41_q3" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["something created for an audience", "video, website, game, poster or animation"]], "feedback": "Acceptable: Something created for an audience, such as a video, website, game, poster or animation."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q3. What is a media product?</label>
+                    <textarea id="ent41_q3" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["something created for an audience", "video, website, game, poster or animation"]], "feedback": "Hint: Think about something created specifically for an audience to view or interact with, like a video or game."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q3')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">4. What is the difference between a platform and physical media?</label>
-                    <textarea id="ent41_q4" class="auto-input ent41-input" rows="3" data-rubric='{"keywords": [["platform is where or how a product is accessed"], ["physical media is a tangible item used to store or present it"]], "feedback": "A platform is where/how a product is accessed; physical media is a tangible item used to store or present it."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q4. What is the difference between a platform and physical media?</label>
+                    <textarea id="ent41_q4" class="auto-input ent41-input" rows="3" data-rubric='{"keywords": [["platform is where or how a product is accessed"], ["physical media is a tangible item used to store or present it"]], "feedback": "Hint: Contrast the system where something is accessed (platform) with a tangible item you can hold to store it."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">5. Why must a media creator consider the target audience when choosing a distribution platform?</label>
-                    <textarea id="ent41_q5" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["audience needs to be able to access and use the product on a device or service they have"]], "feedback": "Acceptable: The audience needs to be able to access and use the product on a device or service they have."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q5. Why must a media creator consider the target audience when choosing a distribution platform?</label>
+                    <textarea id="ent41_q5" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["audience needs to be able to access and use the product on a device or service they have"]], "feedback": "Hint: Why does it matter what devices or digital services your audience actually owns?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q5')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">6. Give two examples of online distribution platforms.</label>
-                    <textarea id="ent41_q6" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["websites", "apps", "online multimedia services"]], "feedback": "Acceptable: Websites and apps, or online multimedia services."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q6. Give two examples of online distribution platforms.</label>
+                    <textarea id="ent41_q6" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["websites", "apps", "online multimedia services"]], "feedback": "Hint: Think of two digital ways people access content over the internet on their phones or computers."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q6')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">7. Give two examples of physical media.</label>
-                    <textarea id="ent41_q7" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["cds", "dvds", "memory sticks", "printed paper"]], "feedback": "Acceptable: CDs and DVDs, memory sticks or printed paper."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q7. Give two examples of physical media.</label>
+                    <textarea id="ent41_q7" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["cds", "dvds", "memory sticks", "printed paper"]], "feedback": "Hint: Think of tangible items you can hold in your hand that store data or images."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q7')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">8. What does compatibility mean when distributing a media product?</label>
-                    <textarea id="ent41_q8" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["product works properly on the device or platform it is intended for"]], "feedback": "Acceptable: The product works properly on the device or platform it is intended for."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q8. What does compatibility mean when distributing a media product?</label>
+                    <textarea id="ent41_q8" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["product works properly on the device or platform it is intended for"]], "feedback": "Hint: Think about whether the product actually works properly on the specific device it is meant for."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q8')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 2: Online platforms</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">9. What is an online platform?</label>
-                    <textarea id="ent41_q9" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["service or system accessed through the internet", "website or app"]], "feedback": "Acceptable: A service or system accessed through the internet, such as a website or app."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q9. What is an online platform?</label>
+                    <textarea id="ent41_q9" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["service or system accessed through the internet", "website or app"]], "feedback": "Hint: Think about a service or system that you access through the internet."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q9')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">10. What is a website?</label>
-                    <textarea id="ent41_q10" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["collection of connected web pages accessed using a web browser"]], "feedback": "Acceptable: A collection of connected web pages accessed using a web browser."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q10. What is a website?</label>
+                    <textarea id="ent41_q10" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["collection of connected web pages accessed using a web browser"]], "feedback": "Hint: Think about a collection of connected pages you view using a web browser."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q10')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">11. Give two advantages of distributing a media product through a website.</label>
-                    <textarea id="ent41_q11" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["reach a wide audience", "updated easily", "accessed from different locations"]], "feedback": "Acceptable: It can reach a wide audience, be updated easily, and can be accessed from different locations."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q11. Give two advantages of distributing a media product through a website.</label>
+                    <textarea id="ent41_q11" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["reach a wide audience", "updated easily", "accessed from different locations"]], "feedback": "Hint: Think about how easily it can reach people worldwide and how quickly you can update it."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q11')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">12. Give two disadvantages of distributing through a website.</label>
-                    <textarea id="ent41_q12" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["requires internet access", "load slowly", "hosting costs"]], "feedback": "Acceptable: It usually requires internet access, may load slowly and could have hosting costs."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q12. Give two disadvantages of distributing through a website.</label>
+                    <textarea id="ent41_q12" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["requires internet access", "load slowly", "hosting costs"]], "feedback": "Hint: Think about the requirement for an internet connection and potential hosting costs."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q12')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">13. What is an app?</label>
-                    <textarea id="ent41_q13" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["software designed to perform a task on a device", "phone, tablet or computer"]], "feedback": "Acceptable: Software designed to perform a task on a device, such as a phone, tablet or computer."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q13. What is an app?</label>
+                    <textarea id="ent41_q13" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["software designed to perform a task on a device", "phone, tablet or computer"]], "feedback": "Hint: Think of a specific piece of software designed to perform a task on a mobile device or tablet."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q13')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">14. Give two advantages of distributing a product through an app.</label>
-                    <textarea id="ent41_q14" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["interactive features", "use device features", "convenient user experience"]], "feedback": "Acceptable: It can offer interactive features, use device features and provide a convenient user experience."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q14. Give two advantages of distributing a product through an app.</label>
+                    <textarea id="ent41_q14" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["interactive features", "use device features", "convenient user experience"]], "feedback": "Hint: Think about interactive features and the convenience of using it on a portable device."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q14')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">15. Give two disadvantages of distributing through an app.</label>
-                    <textarea id="ent41_q15" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["need installing", "only work on certain devices", "approval from app store"]], "feedback": "Acceptable: It may need installing, may only work on certain devices and could require approval from an app store."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q15. Give two disadvantages of distributing through an app.</label>
+                    <textarea id="ent41_q15" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["need installing", "only work on certain devices", "approval from app store"]], "feedback": "Hint: Think about device compatibility, the need to install them, and app store approvals."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q15')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">16. What is multimedia?</label>
-                    <textarea id="ent41_q16" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["content that combines different types of media", "text, images, sound, video and animation"]], "feedback": "Acceptable: Content that combines different types of media, such as text, images, sound, video and animation."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q16. What is multimedia?</label>
+                    <textarea id="ent41_q16" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["content that combines different types of media", "text, images, sound, video and animation"]], "feedback": "Hint: Think about content that combines several different types of media together."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q16')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">17. Why might multimedia be useful for reaching an audience?</label>
-                    <textarea id="ent41_q17" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["make information more engaging by combining visuals, sound and interaction"]], "feedback": "Acceptable: It can make information more engaging by using a combination of visuals, sound and interaction."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q17. Why might multimedia be useful for reaching an audience?</label>
+                    <textarea id="ent41_q17" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["make information more engaging by combining visuals, sound and interaction"]], "feedback": "Hint: Think about how combining visuals, sound, and interaction makes the experience more engaging."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q17')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">18. What is one disadvantage of distributing multimedia online?</label>
-                    <textarea id="ent41_q18" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["large files may take longer to load", "faster internet connection"]], "feedback": "Acceptable: Large files may take longer to load or require a faster internet connection."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q18. What is one disadvantage of distributing multimedia online?</label>
+                    <textarea id="ent41_q18" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["large files may take longer to load", "faster internet connection"]], "feedback": "Hint: Think about file sizes and the internet speed needed to load them."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q18')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">19. Why might a website be more suitable than a printed leaflet for information that changes regularly?</label>
-                    <textarea id="ent41_q19" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["website can be updated quickly without printing and distributing new copies"]], "feedback": "Acceptable: The website can be updated quickly without printing and distributing new copies."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q19. Why might a website be more suitable than a printed leaflet for information that changes regularly?</label>
+                    <textarea id="ent41_q19" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["website can be updated quickly without printing and distributing new copies"]], "feedback": "Hint: Think about the speed and cost of updating a digital page compared to printing new copies."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q19')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">20. A company wants to distribute an interactive product to users across the country. Why might an online platform be suitable?</label>
-                    <textarea id="ent41_q20" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["users can access it remotely through the internet without needing a physical copy"]], "feedback": "Acceptable: Users can access it remotely through the internet without needing a physical copy."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q20. A company wants to distribute an interactive product to users across the country. Why might an online platform be suitable?</label>
+                    <textarea id="ent41_q20" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["users can access it remotely through the internet without needing a physical copy"]], "feedback": "Hint: Think about how users can access it instantly from anywhere without needing a physical disc."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q20')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 3: Physical platforms</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">21. What is a physical platform?</label>
-                    <textarea id="ent41_q21" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["physical device or system used to access or display a media product", "computer or kiosk"]], "feedback": "Acceptable: A physical device or system used to access or display a media product, such as a computer or kiosk."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q21. What is a physical platform?</label>
+                    <textarea id="ent41_q21" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["physical device or system used to access or display a media product", "computer or kiosk"]], "feedback": "Hint: Think about a physical device or system, like a computer or a terminal, used to access media."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q21')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">22. Give two examples of physical platforms.</label>
-                    <textarea id="ent41_q22" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["computers", "interactive tvs", "kiosks", "mobile devices"]], "feedback": "Acceptable: Computers and interactive TVs, or kiosks and mobile devices."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q22. Give two examples of physical platforms.</label>
+                    <textarea id="ent41_q22" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["computers", "interactive tvs", "kiosks", "mobile devices"]], "feedback": "Hint: Name two physical devices people use to interact with digital media."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q22')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">23. What is a computer platform useful for?</label>
-                    <textarea id="ent41_q23" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["accessing websites", "running software", "playing media", "interactive products"]], "feedback": "Acceptable: Accessing websites, running software, playing media and using interactive products."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q23. What is a computer platform useful for?</label>
+                    <textarea id="ent41_q23" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["accessing websites", "running software", "playing media", "interactive products"]], "feedback": "Hint: Think about what these devices are used for, such as running software or accessing websites."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q23')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">24. Give one advantage of distributing a product for computers.</label>
-                    <textarea id="ent41_q24" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["support complex software", "large screens", "detailed interactions"]], "feedback": "Acceptable: Computers can support complex software, large screens and detailed interactions."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q24. Give one advantage of distributing a product for computers.</label>
+                    <textarea id="ent41_q24" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["support complex software", "large screens", "detailed interactions"]], "feedback": "Hint: Think about processing power, screen size, and complex software support."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q24')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">25. Give one disadvantage of a computer based product.</label>
-                    <textarea id="ent41_q25" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["users need access to a suitable computer", "may not work on every computer"]], "feedback": "Acceptable: Users need access to a suitable computer, and the product may not work on every computer."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q25. Give one disadvantage of a computer based product.</label>
+                    <textarea id="ent41_q25" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["users need access to a suitable computer", "may not work on every computer"]], "feedback": "Hint: Think about the fact that users must actually own the device and whether it works on all operating systems."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q25')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">26. What is an interactive TV?</label>
-                    <textarea id="ent41_q26" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["television system that allows users to interact with content, menus or services"]], "feedback": "Acceptable: A television system that allows users to interact with content, menus or services rather than only watching."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q26. What is an interactive TV?</label>
+                    <textarea id="ent41_q26" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["television system that allows users to interact with content, menus or services"]], "feedback": "Hint: Think about a television system that lets you do more than just watch passively."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q26" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q26')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">27. Give one advantage of an interactive TV platform.</label>
-                    <textarea id="ent41_q27" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["users can access content and interactive services on a large screen in their home"]], "feedback": "Acceptable: Users can access content and interactive services on a large screen in their home."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q27. Give one advantage of an interactive TV platform.</label>
+                    <textarea id="ent41_q27" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["users can access content and interactive services on a large screen in their home"]], "feedback": "Hint: Think about the benefit of accessing interactive services on a large screen from the comfort of home."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q27" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q27')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">28. What is a kiosk in media distribution?</label>
-                    <textarea id="ent41_q28" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["public, often touchscreen, terminal used to access information or services"]], "feedback": "Acceptable: A public, often touchscreen, terminal used to access information or services."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q28. What is a kiosk in media distribution?</label>
+                    <textarea id="ent41_q28" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["public, often touchscreen, terminal used to access information or services"]], "feedback": "Hint: Think of a public, standalone terminal (often touchscreen) used for information or services."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q28" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q28')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">29. Give two examples of where a kiosk might be used.</label>
-                    <textarea id="ent41_q29" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["museums", "shopping centres", "cinemas", "tourist attractions", "reception areas"]], "feedback": "Acceptable: Museums, shopping centres, cinemas, tourist attractions or reception areas."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q29. Give two examples of where a kiosk might be used.</label>
+                    <textarea id="ent41_q29" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["museums", "shopping centres", "cinemas", "tourist attractions", "reception areas"]], "feedback": "Hint: Name two public places where you might find a standalone interactive screen."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q29" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q29')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">30. Why might a kiosk be suitable for an interactive information guide?</label>
-                    <textarea id="ent41_q30" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["visitors can use it on site to find information without needing their own device"]], "feedback": "Acceptable: Visitors can use it on site to find information without needing their own device."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q30. Why might a kiosk be suitable for an interactive information guide?</label>
+                    <textarea id="ent41_q30" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["visitors can use it on site to find information without needing their own device"]], "feedback": "Hint: Think about allowing visitors to access info right there on site without needing their own phone."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q30" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q30')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">31. What is one disadvantage of using a kiosk?</label>
-                    <textarea id="ent41_q31" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["fixed in one location", "costs money to install and maintain", "may be unavailable if it breaks"]], "feedback": "Acceptable: It is fixed in one location, costs money to install/maintain, and may be unavailable if it breaks."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q31. What is one disadvantage of using a kiosk?</label>
+                    <textarea id="ent41_q31" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["fixed in one location", "costs money to install and maintain", "may be unavailable if it breaks"]], "feedback": "Hint: Think about installation costs, maintenance, and what happens if it breaks down."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q31" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q31')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">32. What is one advantage of using a mobile device as a platform?</label>
-                    <textarea id="ent41_q32" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["portable", "users can access content while away from home"]], "feedback": "Acceptable: It is portable, so users can access content while away from home."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q32. What is one advantage of using a mobile device as a platform?</label>
+                    <textarea id="ent41_q32" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["portable", "users can access content while away from home"]], "feedback": "Hint: Think about portability and accessing content anywhere."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q32" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q32')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">33. What is one disadvantage of mobile devices for media products?</label>
-                    <textarea id="ent41_q33" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["small screens", "limited storage or battery life may affect experience"]], "feedback": "Acceptable: Small screens and limited storage or battery life may affect the experience."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q33. What is one disadvantage of mobile devices for media products?</label>
+                    <textarea id="ent41_q33" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["small screens", "limited storage or battery life may affect experience"]], "feedback": "Hint: Think about the limitations of screen size, storage space, and battery life."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q33" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q33')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">34. A museum wants visitors to browse an interactive exhibit while standing in front of it. Which platform might be suitable, and why?</label>
-                    <textarea id="ent41_q34" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["touchscreen kiosk", "visitors can access info at the exhibit without their own device"]], "feedback": "Acceptable: A touchscreen kiosk, because visitors can access info at the exhibit without needing their own device."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q34. A museum wants visitors to browse an interactive exhibit while standing in front of it. Which platform might be suitable, and why?</label>
+                    <textarea id="ent41_q34" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["touchscreen kiosk", "visitors can access info at the exhibit without their own device"]], "feedback": "Hint: What public, standalone touchscreen device could they use right in front of the exhibit?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q34" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q34')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 4: Physical media</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">35. What is physical media?</label>
-                    <textarea id="ent41_q35" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["tangible item used to store, distribute or present a media product"]], "feedback": "Acceptable: A tangible item used to store, distribute or present a media product."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q35. What is physical media?</label>
+                    <textarea id="ent41_q35" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["tangible item used to store, distribute or present a media product"]], "feedback": "Hint: Think about a tangible item used to store, distribute, or present a product."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q35" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q35')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">36. What is a CD or DVD used for?</label>
-                    <textarea id="ent41_q36" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["storing and distributing digital content such as music, videos or files"]], "feedback": "Acceptable: Storing and distributing digital content such as music, videos or files."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q36. What is a CD or DVD used for?</label>
+                    <textarea id="ent41_q36" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["storing and distributing digital content such as music, videos or files"]], "feedback": "Hint: Think about what these shiny discs are primarily used to store and distribute."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q36" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q36')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">37. Give one advantage of distributing a product on a DVD.</label>
-                    <textarea id="ent41_q37" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["can be used without an internet connection once available on disc"]], "feedback": "Acceptable: It can be used without an internet connection once the content is available on the disc."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q37. Give one advantage of distributing a product on a DVD.</label>
+                    <textarea id="ent41_q37" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["can be used without an internet connection once available on disc"]], "feedback": "Hint: Think about not needing an internet connection once you have the disc."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q37" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q37')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">38. Give one disadvantage of distributing a product on a CD or DVD.</label>
-                    <textarea id="ent41_q38" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["user needs a compatible disc drive", "discs can be scratched or lost"]], "feedback": "Acceptable: The user needs a compatible disc drive, and discs can be scratched or lost."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q38. Give one disadvantage of distributing a product on a CD or DVD.</label>
+                    <textarea id="ent41_q38" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["user needs a compatible disc drive", "discs can be scratched or lost"]], "feedback": "Hint: Think about requiring a specific disc drive and the risk of physical damage."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q38" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q38')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">39. What is a memory stick?</label>
-                    <textarea id="ent41_q39" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["small portable storage device, usually connected through a usb port"]], "feedback": "Acceptable: A small portable storage device, usually connected through a USB port."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q39. What is a memory stick?</label>
+                    <textarea id="ent41_q39" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["small portable storage device, usually connected through a usb port"]], "feedback": "Hint: Think about a small portable storage device that plugs into a USB port."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q39" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q39')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">40. Give two advantages of distributing files on a memory stick.</label>
-                    <textarea id="ent41_q40" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["portable", "reusable", "store different file types", "no internet needed"]], "feedback": "Acceptable: Portable, reusable, stores different file types, and doesn't require an internet connection."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q40. Give two advantages of distributing files on a memory stick.</label>
+                    <textarea id="ent41_q40" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["portable", "reusable", "store different file types", "no internet needed"]], "feedback": "Hint: Think about portability, reusability, and not needing internet access."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q40" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q40')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">41. Give one disadvantage of using a memory stick.</label>
-                    <textarea id="ent41_q41" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["can be lost, damaged or infected with malware", "needs a compatible port"]], "feedback": "Acceptable: It can be lost, damaged or infected with malware, and the device needs a compatible port."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q41. Give one disadvantage of using a memory stick.</label>
+                    <textarea id="ent41_q41" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["can be lost, damaged or infected with malware", "needs a compatible port"]], "feedback": "Hint: Think about the risks of losing it, breaking it, or spreading malware."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q41" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q41')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">42. What is paper based media?</label>
-                    <textarea id="ent41_q42" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["printed material such as posters, leaflets, magazines or instruction booklets"]], "feedback": "Acceptable: Printed material such as posters, leaflets, magazines or instruction booklets."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q42. What is paper based media?</label>
+                    <textarea id="ent41_q42" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["printed material such as posters, leaflets, magazines or instruction booklets"]], "feedback": "Hint: Think about printed materials like magazines, leaflets, and posters."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q42" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q42')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">43. Give two advantages of paper based media.</label>
-                    <textarea id="ent41_q43" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["does not need a device or internet", "easy to read or display"]], "feedback": "Acceptable: It does not need a device or internet connection and can be easy to read or display."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q43. Give two advantages of paper based media.</label>
+                    <textarea id="ent41_q43" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["does not need a device or internet", "easy to read or display"]], "feedback": "Hint: Think about not needing a device or battery, and how easy it is to display."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q43" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q43')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">44. Give two disadvantages of paper based media.</label>
-                    <textarea id="ent41_q44" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["cost money to print and distribute", "difficult to update once printed"]], "feedback": "Acceptable: It can cost money to print and distribute, and it is difficult to update once printed."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q44. Give two disadvantages of paper based media.</label>
+                    <textarea id="ent41_q44" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["cost money to print and distribute", "difficult to update once printed"]], "feedback": "Hint: Think about the cost of printing and the difficulty of fixing mistakes once printed."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q44" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q44')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">45. Why would a printed poster be unsuitable for a video with sound and animation?</label>
-                    <textarea id="ent41_q45" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["paper cannot directly play sound or animation"]], "feedback": "Acceptable: Paper cannot directly play sound or animation, so it cannot deliver those features in the intended way."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q45. Why would a printed poster be unsuitable for a video with sound and animation?</label>
+                    <textarea id="ent41_q45" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["paper cannot directly play sound or animation"]], "feedback": "Hint: Can paper play sound or show moving images?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q45" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q45')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 5: Choosing platforms and file formats</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">46. What is a file format?</label>
-                    <textarea id="ent41_q46" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["way digital information is saved", "mp4 for video or jpeg for images"]], "feedback": "Acceptable: The way digital information is saved, such as MP4 for video or JPEG for images."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q46. What is a file format?</label>
+                    <textarea id="ent41_q46" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["way digital information is saved", "mp4 for video or jpeg for images"]], "feedback": "Hint: Think about the specific way digital information is saved (like MP4 or JPEG)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q46" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q46')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">47. Why must a creator consider the platform before choosing a file format?</label>
-                    <textarea id="ent41_q47" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["platform or device must support the format for the product to work correctly"]], "feedback": "Acceptable: The platform or device must support the format for the product to work correctly."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q47. Why must a creator consider the platform before choosing a file format?</label>
+                    <textarea id="ent41_q47" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["platform or device must support the format for the product to work correctly"]], "feedback": "Hint: Think about making sure the chosen platform actually supports and can open the file."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q47" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q47')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">48. Which file format might be suitable for a video shared on a website?</label>
-                    <input type="text" id="ent41_q48" class="auto-input ent41-input" data-rubric='{"keywords": [["mp4"]], "feedback": "MP4 (widely supported with good quality and manageable file size)."}' placeholder="Type answer here...">
+                    <label class="question-label">Q48. Which file format might be suitable for a video shared on a website?</label>
+                    <input type="text" id="ent41_q48" class="auto-input ent41-input" data-rubric='{"keywords": [["mp4"]], "feedback": "Hint: Name a highly compatible and common video file format."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q48" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q48')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">49. Which file format might be suitable for a photograph on a website?</label>
-                    <input type="text" id="ent41_q49" class="auto-input ent41-input" data-rubric='{"keywords": [["jpeg", "webp"]], "feedback": "JPEG or WebP (good image quality with relatively small file sizes)."}' placeholder="Type answer here...">
+                    <label class="question-label">Q49. Which file format might be suitable for a photograph on a website?</label>
+                    <input type="text" id="ent41_q49" class="auto-input ent41-input" data-rubric='{"keywords": [["jpeg", "webp"]], "feedback": "Hint: Name a common image file format that offers good quality with small file sizes."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q49" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q49')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">50. A company wants to give customers a digital brochure that can be opened on many devices and printed. Which file format might be suitable, and why?</label>
-                    <textarea id="ent41_q50" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["pdf", "preserves layout", "viewed or printed on many devices"]], "feedback": "Acceptable: PDF, because it helps preserve the layout and can be viewed or printed on many devices."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q50. A company wants to give customers a digital brochure that can be opened on many devices and printed. Which file format might be suitable, and why?</label>
+                    <textarea id="ent41_q50" class="auto-input ent41-input" rows="2" data-rubric='{"keywords": [["pdf", "preserves layout", "viewed or printed on many devices"]], "feedback": "Hint: What format preserves the document's layout across all devices and is easy to print?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-ent41_q50" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('ent41_q50')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -421,20 +426,21 @@
             </div>
         </main>
     </div>
+
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
-        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+        <button class="btn-reset no-print" onclick="clearData()">Reset Page</button>
     </div>
 
-    <!-- SECURE PASSWORD MODAL -->
-    <div class="modal-overlay" id="verify-modal">
+    <!-- Teacher Override Modal -->
+    <div id="verify-modal" class="modal-overlay">
         <div class="modal-content">
-            <h3>Teacher Verification</h3>
-            <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
-            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter PIN">
+            <h2>Teacher Verification</h2>
+            <p>Enter password to manually mark this question correct.</p>
+            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Password">
+            <div id="modal-error-msg" class="modal-error">Incorrect Password!</div>
             <div class="modal-btn-row">
                 <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
-                <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
+                <button class="modal-btn-confirm" onclick="submitVerify()">Confirm</button>
             </div>
         </div>
     </div>
@@ -442,45 +448,178 @@
     <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
 
     <script>
-        function saveProgress() {
-            var inputs = document.querySelectorAll('.auto-input');
-            var dataToSave = {};
-            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
-            try { localStorage.setItem('enterprise4_1Memory_Smart_v1', JSON.stringify(dataToSave)); } catch (e) {}
+        /* --- FIREBASE CONFIGURATION & INITIALIZATION --- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
-        function loadProgress() {
-            var saved = localStorage.getItem('enterprise4_1Memory_Smart_v1');
-            if (saved) {
-                var data = JSON.parse(saved);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "imedia-4-1-distribution";
+
+        /* --- MARKBOOK BUILDER FOR TEACHER DASHBOARD --- */
+        function buildMarkbookData() {
+            const items = [];
+            const inputs = document.querySelectorAll('.auto-input');
+            
+            inputs.forEach((input, i) => {
+                const wrapper = input.closest('.question-wrapper');
+                const labelEl = wrapper ? wrapper.querySelector('.question-label') : null;
+                const labelText = labelEl ? labelEl.innerText.trim() : `Question ${i + 1}`;
+                
+                let status = 'neutral';
+                if (input.classList.contains('correct') || input.classList.contains('teacher-locked')) {
+                    status = 'correct';
+                } else if (input.classList.contains('incorrect')) {
+                    status = 'incorrect';
+                }
+
+                items.push({
+                    index: i,
+                    label: labelText,
+                    value: input.value.trim(),
+                    status: status
+                });
+            });
+
+            // Calculate total correct answers
+            const correctCount = document.querySelectorAll('.auto-input.correct, .auto-input.teacher-locked').length;
+            const gradableInputs = document.querySelectorAll('.ent41-input');
+            const totalGradable = gradableInputs.length;
+
+            return {
+                items: items,
+                scoreText: `Score: ${correctCount} / ${totalGradable}`
+            };
+        }
+
+        /* --- CLOUD AUTO-SAVE & AUTO-LOAD --- */
+        let saveTimer;
+        function saveProgressToCloud(immediate = false) {
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                const structured = buildMarkbookData();
+                const payload = {
+                    pageTitle: document.title || "4.1 Distribution Platforms and Media",
+                    lastUpdated: Date.now(),
+                    scoreText: structured.scoreText,
+                    items: structured.items
+                };
+
+                // Also store inputs explicitly for local legacy support fallback
                 var inputs = document.querySelectorAll('.auto-input');
                 for (var i = 0; i < inputs.length; i++) {
-                    if (data['input_' + i]) {
-                        inputs[i].value = data['input_' + i];
-                        if (data['class_' + i]) {
-                            inputs[i].className = data['class_' + i];
-                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
-                                var btnId = "override-" + inputs[i].id;
-                                var btn = document.getElementById(btnId);
-                                if (btn) btn.classList.remove('hidden');
+                    payload['input_' + i] = inputs[i].value;
+                    payload['class_' + i] = inputs[i].className;
+                }
+
+                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
+                  .set(payload, { merge: true })
+                  .catch(err => console.error("Cloud sync error:", err));
+            }, immediate ? 50 : 800);
+        }
+
+        function applySavedData(data) {
+            if (!data) return;
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                var savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined) {
+                    inputs[i].value = savedVal;
+                    if (data['class_' + i]) {
+                        inputs[i].className = data['class_' + i];
+                        if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect') || inputs[i].classList.contains('teacher-locked')) {
+                            var btnId = "override-" + inputs[i].id;
+                            var btn = document.getElementById(btnId);
+                            if (btn) btn.classList.remove('hidden');
+                            
+                            // Restore feedback visually if teacher-locked
+                            var feedbackDiv = inputs[i].nextElementSibling;
+                            if (inputs[i].classList.contains('teacher-locked') && feedbackDiv) {
+                                if (inputs[i].classList.contains('correct')) {
+                                    feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; 
+                                    feedbackDiv.style.color = "#006100"; 
+                                    feedbackDiv.style.display = "block";
+                                } else {
+                                    feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; 
+                                    feedbackDiv.style.color = "#b71c1c"; 
+                                    feedbackDiv.style.display = "block";
+                                }
                             }
                         }
-                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                            inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                        }
+                    }
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto';
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
                     }
                 }
             }
         }
-        document.addEventListener('input', function(e) {
-            if (e.target.classList.contains('auto-input')) {
-                saveProgress();
-                if (e.target.tagName.toLowerCase() === 'textarea') {
-                    e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';
+
+        auth.onAuthStateChanged(async function(user) {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection('users').doc(inspectedUid).collection('lessons').doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    try { localStorage.removeItem('enterprise4_1Memory_Smart_v1'); } catch (e) {}
+
+                    const doc = await db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud work:", err);
                 }
             }
         });
-        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterprise4_1Memory_Smart_v1'); window.location.reload(); } }
-        window.onload = loadProgress;
+
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                saveProgressToCloud(false);
+                if (e.target.tagName.toLowerCase() === 'textarea') {
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                }
+            }
+        });
+
+        function clearData() { 
+            if (confirm("Clear all work?")) { 
+                try { localStorage.removeItem('enterprise4_1Memory_Smart_v1'); } catch(e) {}
+                const user = auth.currentUser;
+                if (user) {
+                    db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).delete().catch(err => {});
+                }
+                window.location.reload(); 
+            } 
+        }
 
         let activeQuestionId = null;
         function openVerifyModal(qId) {
@@ -510,7 +649,7 @@
                     if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
                 }
                 closeVerifyModal();
-                saveProgress();
+                saveProgressToCloud(true);
             } else {
                 document.getElementById('modal-error-msg').style.display = 'block';
             }
@@ -584,34 +723,7 @@
                     }
                 }
             }
-            saveProgress();
-        }
-
-        function downloadPDF() {
-            var hide = document.querySelectorAll('.no-print');
-            for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
-            document.getElementById('action-buttons').style.display = 'none';
-
-            var textAreas = document.querySelectorAll('textarea');
-            for (var j = 0; j < textAreas.length; j++) {
-                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
-            }
-
-            var element = document.getElementById('pdf-content');
-            var opt = { 
-                margin: 0.3, 
-                filename: '4.1_Distribution_Platforms.pdf', 
-                image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, 
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
-
-            html2pdf().set(opt).from(element).save().then(function() {
-                for(var b=0; b<hide.length; b++) hide[b].style.display = 'block';
-                document.getElementById('action-buttons').style.display = 'flex';
-                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
-            });
+            saveProgressToCloud(true);
         }
     </script>
 </body>
