@@ -6,8 +6,10 @@
     <title>File Management & Researching</title>
     <link rel="stylesheet" href="style.css">
 
-    <!-- HTML to PDF Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
         /* Task Container Styling */
@@ -19,7 +21,7 @@
             padding: 25px; 
             margin-bottom: 30px; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-            page-break-inside: avoid; /* Stops the PDF from cutting cards in half! */
+            page-break-inside: avoid;
             transition: all 0.3s ease;
         }
         
@@ -75,7 +77,7 @@
         .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
         .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit; }
         .auto-input:focus { outline: none; border-color: #666; }
-        textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; /* Fixes PDF scrollbar bug */ }
+        textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; }
         
         /* Correct & Incorrect Answer Styling */
         .input-correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
@@ -99,8 +101,8 @@
     <div id="pdf-content">
         <header>
             <div class="header-left">
-    <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
-</div>
+                <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
+            </div>
             <div class="header-center"><h1>File Management & Researching</h1></div>
             <div class="header-right"><a href="index.html" class="back-btn">&larr; Back to Curriculum</a></div>
         </header>
@@ -214,7 +216,7 @@
                     <input type="text" class="auto-input green-input" data-answers='["lo"]' placeholder="Type answer here...">
                 </div>
                 
-                <button class="btn-submit no-print" onclick="checkAnswers('amber-input')">Check Answers</button>
+                <button class="btn-submit no-print" onclick="checkAnswers('green-input')">Check Answers</button>
             </div>
 
             <!-- Task 4: Navy (Blue Task) -->
@@ -260,9 +262,8 @@
         </main>
     </div> <!-- END PDF CONTENT WRAPPER -->
 
-    <!-- UNIVERSAL PDF DOWNLOAD BUTTON -->
+    <!-- ACTION BUTTONS (Download Work Removed) -->
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Work</button>
         <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
     </div>
 
@@ -284,67 +285,181 @@
     </footer>
 
     <script>
-        /* --- AUTO-SAVE MEMORY LOGIC --- */
-        function saveProgress() {
+        /* --- 1. FIREBASE CONFIGURATION & INITIALIZATION --- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "y7-file-management-researching";
+
+        /* --- 2. HELPER FOR TEACHER MARKBOOK LABELS --- */
+        function findLabelForInput(el, index) {
+            const row = el.closest('.question-row');
+            if (row) {
+                const lbl = row.querySelector('.question-label');
+                if (lbl && lbl.innerText.trim()) {
+                    return lbl.innerText.replace(/\s+/g, ' ').trim();
+                }
+            }
+            if (el.placeholder) return el.placeholder;
+            return 'Question ' + (index + 1);
+        }
+
+        /* --- 3. FIREBASE AUTO-SAVE LOGIC --- */
+        let saveTimer;
+        function saveProgress(immediate = false) {
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
             var inputs = document.querySelectorAll('.auto-input');
-            var dataToSave = {};
+            var dataToSave = {
+                pageTitle: document.title || "File Management & Researching",
+                lastUpdated: Date.now(),
+                items: []
+            };
+
+            let correctScore = 0;
+            let totalGradable = 0;
             
             for (var i = 0; i < inputs.length; i++) {
-                dataToSave['input_' + i] = inputs[i].value;
-            }
-            
-            dataToSave['maroon_verified'] = document.getElementById('card-maroon').classList.contains('teacher-verified');
-            dataToSave['navy_verified'] = document.getElementById('card-navy').classList.contains('teacher-verified');
-            
-            try {
-                dataToSave['img_maroon'] = document.getElementById('img-maroon').src;
-                dataToSave['img_navy'] = document.getElementById('img-navy').src;
-                localStorage.setItem('fileManagementMemory', JSON.stringify(dataToSave));
-            } catch (e) {
-                delete dataToSave['img_maroon'];
-                delete dataToSave['img_navy'];
-                localStorage.setItem('fileManagementMemory', JSON.stringify(dataToSave));
-            }
-        }
+                var el = inputs[i];
+                var cls = el.className || '';
+                var status = 'neutral';
 
-        function loadProgress() {
-            var savedDataStr = localStorage.getItem('fileManagementMemory');
-            if (savedDataStr) {
-                var data = JSON.parse(savedDataStr);
-                var inputs = document.querySelectorAll('.auto-input');
-                
-                for (var i = 0; i < inputs.length; i++) {
-                    if (data['input_' + i]) {
-                        inputs[i].value = data['input_' + i];
-                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                            inputs[i].style.height = 'auto';
-                            inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                        }
+                if (el.hasAttribute('data-answers')) {
+                    totalGradable++;
+                    if (cls.includes('input-correct')) {
+                        status = 'correct';
+                        correctScore++;
+                    } else if (cls.includes('input-incorrect')) {
+                        status = 'incorrect';
                     }
                 }
-                
-                if (data['maroon_verified']) document.getElementById('card-maroon').classList.add('teacher-verified');
-                if (data['navy_verified']) document.getElementById('card-navy').classList.add('teacher-verified');
-                
-                if (data['img_maroon'] && data['img_maroon'].length > 100) {
-                    document.getElementById('img-maroon').src = data['img_maroon'];
-                    document.getElementById('img-maroon').style.display = 'block';
-                    document.getElementById('text-maroon').style.display = 'none';
-                }
-                if (data['img_navy'] && data['img_navy'].length > 100) {
-                    document.getElementById('img-navy').src = data['img_navy'];
-                    document.getElementById('img-navy').style.display = 'block';
-                    document.getElementById('text-navy').style.display = 'none';
-                }
 
-                checkAnswers('amber-input');
-                checkAnswers('green-input');
+                dataToSave['input_' + i] = el.value;
+                dataToSave['class_' + i] = cls;
+
+                dataToSave.items.push({
+                    index: i,
+                    label: findLabelForInput(el, i),
+                    value: el.value,
+                    status: status
+                });
             }
+            
+            const zones = [
+                { key: 'maroon', label: 'Red Task (Folder Screenshot)' },
+                { key: 'navy', label: 'Blue Task (Saved Images Screenshot)' }
+            ];
+
+            zones.forEach(z => {
+                totalGradable++;
+                const isVerified = document.getElementById('card-' + z.key).classList.contains('teacher-verified');
+                const imgEl = document.getElementById('img-' + z.key);
+                const hasImg = imgEl && imgEl.src && imgEl.src.startsWith('data:image');
+
+                dataToSave[z.key + '_verified'] = isVerified;
+                dataToSave['img_' + z.key] = hasImg ? imgEl.src : "";
+
+                if (isVerified) correctScore++;
+
+                dataToSave.items.push({
+                    label: z.label,
+                    value: isVerified ? "Teacher Verified ✅" : (hasImg ? "Screenshot Pasted" : "Not Completed"),
+                    status: isVerified ? 'correct' : (hasImg ? 'neutral' : 'incorrect')
+                });
+            });
+
+            dataToSave.scoreText = "Score: " + correctScore + " / " + totalGradable;
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(function() {
+                db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
+                  .set(dataToSave, { merge: true })
+                  .catch(function(err) { console.error("Cloud save error:", err); });
+            }, immediate ? 50 : 800);
         }
+
+        /* --- 4. FIREBASE AUTO-LOAD LOGIC --- */
+        function applySavedData(data) {
+            if (!data) return;
+            var inputs = document.querySelectorAll('.auto-input');
+            
+            for (var i = 0; i < inputs.length; i++) {
+                var savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined) {
+                    inputs[i].value = savedVal;
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto';
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
+                    }
+                }
+            }
+            
+            if (data['maroon_verified']) document.getElementById('card-maroon').classList.add('teacher-verified');
+            if (data['navy_verified']) document.getElementById('card-navy').classList.add('teacher-verified');
+            
+            if (data['img_maroon'] && data['img_maroon'].length > 100) {
+                document.getElementById('img-maroon').src = data['img_maroon'];
+                document.getElementById('img-maroon').style.display = 'block';
+                document.getElementById('text-maroon').style.display = 'none';
+            }
+            if (data['img_navy'] && data['img_navy'].length > 100) {
+                document.getElementById('img-navy').src = data['img_navy'];
+                document.getElementById('img-navy').style.display = 'block';
+                document.getElementById('text-navy').style.display = 'none';
+            }
+
+            checkAnswers('amber-input', false);
+            checkAnswers('green-input', false);
+        }
+
+        auth.onAuthStateChanged(async function(user) {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    try { localStorage.removeItem('fileManagementMemory'); } catch (e) {}
+
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud work:", err);
+                }
+            }
+        });
 
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('auto-input')) {
-                saveProgress();
+                saveProgress(false);
                 if (e.target.tagName.toLowerCase() === 'textarea') {
                     e.target.style.height = 'auto';
                     e.target.style.height = e.target.scrollHeight + 'px';
@@ -352,23 +467,29 @@
             }
         });
 
-        function clearData() {
+        async function clearData() {
             if (confirm("Are you sure you want to clear all your work on this page?")) {
-                localStorage.removeItem('fileManagementMemory');
+                try { localStorage.removeItem('fileManagementMemory'); } catch (e) {}
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
+                    } catch (err) {
+                        console.error("Error clearing cloud data:", err);
+                    }
+                }
                 window.location.reload();
             }
         }
 
-        window.onload = loadProgress;
-
-        /* --- SECURE TEACHER VERIFY LOGIC --- */
+        /* --- 5. SECURE TEACHER VERIFY LOGIC --- */
         var activeTaskToVerify = null;
 
         function openVerifyModal(taskPrefix) {
             activeTaskToVerify = taskPrefix;
             document.getElementById('verify-modal').style.display = 'flex';
-            document.getElementById('teacher-password-input').value = ""; // Clear old input
-            document.getElementById('modal-error-msg').style.display = 'none'; // Hide error
+            document.getElementById('teacher-password-input').value = "";
+            document.getElementById('modal-error-msg').style.display = 'none';
             document.getElementById('teacher-password-input').focus();
         }
 
@@ -381,11 +502,10 @@
             var inputElement = document.getElementById('teacher-password-input');
             var passcode = inputElement.value;
             
-            // Change "delta" to whatever secret password you want to use!
             if (passcode === "2525") {
                 var card = document.getElementById('card-' + activeTaskToVerify);
                 card.classList.toggle('teacher-verified');
-                saveProgress(); 
+                saveProgress(true); 
                 closeVerifyModal();
             } else {
                 document.getElementById('modal-error-msg').style.display = 'block';
@@ -394,13 +514,12 @@
             }
         }
 
-        // Allow pressing 'Enter' key inside the password box to submit
         document.getElementById('teacher-password-input').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') submitVerify();
         });
 
-        /* --- BATCH-MARKING TEXT INPUT LOGIC --- */
-        function checkAnswers(groupClass) {
+        /* --- 6. BATCH-MARKING TEXT INPUT LOGIC --- */
+        function checkAnswers(groupClass, triggerSync = true) {
             var inputs = document.getElementsByClassName(groupClass);
             for (var i = 0; i < inputs.length; i++) {
                 var inputElement = inputs[i];
@@ -419,9 +538,13 @@
                     else inputElement.classList.add('input-incorrect');
                 }
             }
+
+            if (triggerSync) {
+                saveProgress(true);
+            }
         }
 
-        /* --- STRICT SCREENSHOT PASTE LOGIC --- */
+        /* --- 7. STRICT SCREENSHOT PASTE LOGIC (With Cloud Compression) --- */
         document.addEventListener('paste', function(e) {
             var activeElement = document.activeElement;
             var targetImgId = null;
@@ -445,49 +568,33 @@
         function displayImage(file, imgId, textId) {
             var reader = new FileReader();
             reader.onload = function(event) {
-                var imgElement = document.getElementById(imgId);
-                var textElement = document.getElementById(textId);
-                imgElement.src = event.target.result;
-                imgElement.style.display = 'block';
-                textElement.style.display = 'none'; 
-                saveProgress(); 
+                var img = new Image();
+                img.onload = function() {
+                    var canvas = document.createElement('canvas');
+                    var MAX_WIDTH = 800;
+                    var width = img.width;
+                    var height = img.height;
+
+                    if (width > MAX_WIDTH) {
+                        height = Math.round(height * (MAX_WIDTH / width));
+                        width = MAX_WIDTH;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+
+                    var compressedDataUrl = canvas.toDataURL('image/jpeg', 0.65);
+                    var imgElement = document.getElementById(imgId);
+                    var textElement = document.getElementById(textId);
+                    imgElement.src = compressedDataUrl;
+                    imgElement.style.display = 'block';
+                    textElement.style.display = 'none'; 
+                    saveProgress(true); 
+                };
+                img.src = event.target.result;
             };
             reader.readAsDataURL(file);
-        }
-
-        /* --- BULLETPROOF PDF GENERATION LOGIC --- */
-        function downloadPDF() {
-            var buttonsToHide = document.querySelectorAll('.no-print');
-            for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'none';
-            document.getElementById('action-buttons').style.display = 'none';
-
-            var textInputs = document.querySelectorAll('input[type="text"]');
-            for (var i = 0; i < textInputs.length; i++) {
-                textInputs[i].setAttribute('value', textInputs[i].value);
-            }
-
-            var textAreas = document.querySelectorAll('textarea');
-            for (var j = 0; j < textAreas.length; j++) {
-                textAreas[j].innerHTML = textAreas[j].value;
-                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
-            }
-
-            var element = document.getElementById('pdf-content');
-
-            var opt = {
-                margin:       0.3,
-                filename:     'File_Management_Workbook.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] } 
-            };
-
-            html2pdf().set(opt).from(element).save().then(function() {
-                for(var b=0; b<buttonsToHide.length; b++) buttonsToHide[b].style.display = 'block';
-                document.getElementById('action-buttons').style.display = 'flex';
-                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
-            });
         }
     </script>
 </body>
