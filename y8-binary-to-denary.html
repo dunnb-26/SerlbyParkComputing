@@ -181,6 +181,7 @@
             margin-top: 15px; 
             display: block; 
             width: 100%; 
+            max-width: 200px;
             transition: background-color 0.2s; 
         }
         .btn-submit:hover { background-color: #152960; }
@@ -312,7 +313,7 @@
                     <div style="text-align: right;"><button id="override-red_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('red_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
-                <button class="btn-submit no-print" onclick="checkAnswers('red-input')">Check Red Answers</button>
+                <button class="btn-submit no-print" onclick="checkAnswers('red-input')">Check Answers</button>
             </div>
 
             <!-- AMBER TASK: 4-BIT CONVERSIONS -->
@@ -350,7 +351,7 @@
                     <div style="text-align: right;"><button id="override-amber_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('amber_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
-                <button class="btn-submit no-print" onclick="checkAnswers('amber-input')">Check Amber Answers</button>
+                <button class="btn-submit no-print" onclick="checkAnswers('amber-input')">Check Answers</button>
             </div>
 
             <!-- GREEN TASK: 8-BIT CONVERSIONS -->
@@ -388,7 +389,7 @@
                     <div style="text-align: right;"><button id="override-green_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('green_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
-                <button class="btn-submit no-print" onclick="checkAnswers('green-input')">Check Green Answers</button>
+                <button class="btn-submit no-print" onclick="checkAnswers('green-input')">Check Answers</button>
             </div>
 
             <!-- BLUE TASK: CHALLENGE & REASONING -->
@@ -419,7 +420,7 @@
                     <div style="text-align: right;"><button id="override-blue_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('blue_q3')">👨‍🏫 Override Score</button></div>
                 </div>
 
-                <button class="btn-submit no-print" onclick="checkAnswers('blue-input')">Check Blue Answers</button>
+                <button class="btn-submit no-print" onclick="checkAnswers('blue-input')">Check Answers</button>
             </div>
 
             <!-- PLENARY -->
@@ -518,7 +519,7 @@
             };
         }
 
-        /* --- CLOUD AUTO-SAVE & AUTO-LOAD --- */
+        /* --- CLOUD AUTO-SAVE & AUTO-LOAD (Firebase Only) --- */
         let saveTimer;
         function saveProgressToCloud(immediate = false) {
             const user = auth.currentUser;
@@ -601,8 +602,6 @@
 
             if (user) {
                 try {
-                    try { localStorage.removeItem('y8BinaryMemory'); } catch (e) {}
-
                     const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
                     if (doc.exists) {
                         applySavedData(doc.data());
