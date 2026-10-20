@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Computational Thinking - Lesson</title>
     <link rel="stylesheet" href="style.css">
-    
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -13,44 +14,64 @@
 
     <style>
         :root {
-            --navy: #1B1464; 
+            --navy: #1B1464;
             --yellow: #F7931D;
             --maroon: #822433;
             --bg-color: #f4f6f8;
             --text-color: #333;
         }
 
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            margin: 0; 
-            padding: 0; 
-            background-color: var(--bg-color); 
-            color: var(--text-color); 
+        * {
+            box-sizing: border-box;
         }
 
-        /* 3-Column Grid Header */
-        header { 
-            background-color: var(--navy); 
-            color: white; 
-            padding: 20px; 
-            display: grid; 
-            grid-template-columns: 1fr auto 1fr; 
-            align-items: center; 
-            border-bottom: 6px solid var(--maroon); 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
         }
 
-        .header-left { display: flex; justify-content: flex-start; }
-        .header-center { text-align: center; }
-        .header-right { display: flex; justify-content: flex-end; align-items: center; }
-
-        header img { 
-            height: 80px; 
-            background-color: white; 
-            border-radius: 8px; 
-            padding: 5px; 
+        header {
+            background-color: var(--navy);
+            color: white;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            border-bottom: 6px solid var(--maroon);
+            gap: 15px;
         }
 
-        header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; }
+        .header-left {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .header-center {
+            text-align: center;
+        }
+
+        .header-right {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        header img {
+            height: 80px;
+            max-width: 100%;
+            background-color: white;
+            border-radius: 8px;
+            padding: 5px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: 1px;
+        }
 
         .back-btn {
             background-color: var(--yellow);
@@ -60,865 +81,1147 @@
             border-radius: 6px;
             font-weight: bold;
             transition: transform 0.2s;
-        }
-        .back-btn:hover { transform: scale(1.05); }
-
-        .task-container { max-width: 1050px; margin: 30px auto; padding: 20px; }
-        
-        .task-card { 
-            background: white; 
-            border-radius: 8px; 
-            padding: 25px; 
-            margin-bottom: 30px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-            page-break-inside: avoid; 
+            white-space: nowrap;
         }
 
-        .task-prep { border-top: 6px solid #607d8b; } 
-        .task-prep h2 { color: #607d8b; margin-top: 0; }
-
-        .task-plenary { border-top: 6px solid #673ab7; } 
-        .task-plenary h2 { color: #673ab7; margin-top: 0; }
-
-        .task-maroon { border-top: 6px solid var(--maroon); } 
-        .task-maroon h2 { color: var(--maroon); margin-top: 0; }
-        .task-maroon .instruction-box { border-left: 4px solid var(--maroon); }
-
-        .task-amber { border-top: 6px solid var(--yellow); } 
-        .task-amber h2 { color: var(--yellow); margin-top: 0; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
-        .task-amber .instruction-box { border-left: 4px solid var(--yellow); }
-
-        .task-green { border-top: 6px solid #008f39; } 
-        .task-green h2 { color: #008f39; margin-top: 0; }
-        .task-green .instruction-box { border-left: 4px solid #008f39; }
-
-        .task-navy { border-top: 6px solid var(--navy); } 
-        .task-navy h2 { color: var(--navy); margin-top: 0; }
-        .task-navy .instruction-box { border-left: 4px solid var(--navy); }
-
-        .instruction-box { 
-            background-color: #f8f9fa; 
-            padding: 15px; 
-            border-radius: 0 4px 4px 0; 
-            font-size: 16px; 
-            line-height: 1.5; 
-            margin-bottom: 25px; 
-            text-align: center; 
+        .back-btn:hover {
+            transform: scale(1.03);
         }
 
-        .question-row { margin-bottom: 20px; }
-        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: var(--text-color); font-weight: bold; }
-        
-        .auto-input { 
-            width: 100%; 
-            padding: 12px; 
-            font-size: 16px; 
-            border: 2px solid #ccc; 
-            border-radius: 4px; 
-            transition: all 0.3s ease; 
-            box-sizing: border-box; 
-            background-color: white; 
-            font-family: inherit; 
-        }
-        .auto-input:focus { outline: none; border-color: #666; }
-        textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; }
-        
-        .inline-input {
-            width: 180px;
-            display: inline-block;
-            margin: 0 5px;
-            padding: 6px;
-            text-align: center;
+        .task-container {
+            max-width: 1050px;
+            margin: 30px auto;
+            padding: 20px;
         }
 
-        .input-correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100 !important; font-weight: bold; }
-        .input-incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c !important; font-weight: bold; }
-        
-        .keyword-marking-feedback {
-            font-size: 14px;
-            margin-top: 6px;
+        .task-card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            page-break-inside: avoid;
+        }
+
+        .task-prep {
+            border-top: 6px solid #607d8b;
+        }
+
+        .task-prep h2 {
+            color: #607d8b;
+            margin-top: 0;
+        }
+
+        .task-plenary {
+            border-top: 6px solid #673ab7;
+        }
+
+        .task-plenary h2 {
+            color: #673ab7;
+            margin-top: 0;
+        }
+
+        .task-maroon {
+            border-top: 6px solid var(--maroon);
+        }
+
+        .task-maroon h2 {
+            color: var(--maroon);
+            margin-top: 0;
+        }
+
+        .task-maroon .instruction-box {
+            border-left: 4px solid var(--maroon);
+        }
+
+        .task-amber {
+            border-top: 6px solid var(--yellow);
+        }
+
+        .task-amber h2 {
+            color: #b86600;
+            margin-top: 0;
+        }
+
+        .task-amber .instruction-box {
+            border-left: 4px solid var(--yellow);
+        }
+
+        .task-green {
+            border-top: 6px solid #008f39;
+        }
+
+        .task-green h2 {
+            color: #008f39;
+            margin-top: 0;
+        }
+
+        .task-green .instruction-box {
+            border-left: 4px solid #008f39;
+        }
+
+        .task-navy {
+            border-top: 6px solid var(--navy);
+        }
+
+        .task-navy h2 {
+            color: var(--navy);
+            margin-top: 0;
+        }
+
+        .task-navy .instruction-box {
+            border-left: 4px solid var(--navy);
+        }
+
+        .instruction-box {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 0 4px 4px 0;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .question-row {
+            margin-bottom: 22px;
+        }
+
+        .question-label {
+            display: block;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+            color: var(--text-color);
             font-weight: bold;
         }
 
-        .teacher-override-btn { 
-            background-color: #607d8b; 
-            color: white; 
-            border: none; 
-            padding: 5px 10px; 
-            border-radius: 4px; 
-            font-size: 12px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            margin-top: 5px; 
+        .auto-input {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            transition: border-color 0.2s, background-color 0.2s;
+            background-color: white;
+            font-family: inherit;
         }
-        .teacher-override-btn:hover { background-color: #455a64; }
-        .hidden { display: none !important; }
 
-        /* Modal Overlay */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; border-top: 6px solid var(--navy); }
-        .modal-input { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; text-align: center; }
-        .modal-btn-row { display: flex; gap: 10px; }
-        .modal-btn-confirm { flex: 1; background-color: var(--navy); color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        .modal-btn-cancel { flex: 1; background-color: #ccc; color: #333; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
-
-        .btn-submit { 
-            background-color: var(--navy); 
-            color: white; 
-            border: none; 
-            padding: 12px 20px; 
-            border-radius: 4px; 
-            font-size: 16px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            margin-top: 15px; 
-            display: block; 
-            width: 100%; 
-            max-width: 220px; 
-            transition: background-color 0.2s; 
+        .auto-input:focus {
+            outline: none;
+            border-color: #666;
         }
-        .btn-submit:hover { background-color: #152960; }
-        
-        .btn-reset { 
-            background-color: #d32f2f; 
-            color: white; 
-            border: none; 
-            padding: 12px 25px; 
-            border-radius: 4px; 
-            font-size: 16px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            transition: background-color 0.2s; 
-            display: block; 
-            text-align: center; 
-            width: 100%; 
-            max-width: 180px; 
-        }
-        .btn-reset:hover { background-color: #b71c1c; }
 
-        footer { text-align: center; padding: 25px; color: #666; margin-top: 50px; border-top: 1px solid #ddd; background-color: white; }
+        textarea.auto-input {
+            resize: vertical;
+            min-height: 90px;
+            overflow-y: hidden;
+        }
+
+        .inline-input {
+            display: inline-block;
+            width: 150px;
+            max-width: 100%;
+            margin: 4px 5px;
+            padding: 7px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .input-correct {
+            border-color: #008f39 !important;
+            background-color: #e8f5e9 !important;
+            color: #006100 !important;
+            font-weight: bold;
+        }
+
+        .input-incorrect {
+            border-color: #d32f2f !important;
+            background-color: #ffebee !important;
+            color: #b71c1c !important;
+            font-weight: bold;
+        }
+
+        .keyword-marking-feedback {
+            font-size: 14px;
+            line-height: 1.5;
+            margin-top: 7px;
+            font-weight: bold;
+        }
+
+        .btn-submit {
+            background-color: var(--navy);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            display: block;
+            width: 100%;
+            max-width: 230px;
+        }
+
+        .btn-submit:hover {
+            background-color: #152960;
+        }
+
+        .btn-reset {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: block;
+            text-align: center;
+            width: 100%;
+            max-width: 180px;
+        }
+
+        .btn-reset:hover {
+            background-color: #b71c1c;
+        }
+
+        .example-box {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 12px 15px;
+            margin: 12px 0 20px;
+            line-height: 1.7;
+        }
+
+        .example-box p {
+            margin: 5px 0;
+        }
+
+        .task-intro {
+            line-height: 1.6;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #666;
+            margin-top: 50px;
+            border-top: 1px solid #ddd;
+            background-color: white;
+        }
+
+        @media (max-width: 700px) {
+            header {
+                grid-template-columns: 1fr;
+                justify-items: center;
+                text-align: center;
+            }
+
+            .header-left,
+            .header-right {
+                justify-content: center;
+            }
+
+            header h1 {
+                font-size: 23px;
+            }
+
+            header img {
+                height: 65px;
+            }
+
+            .task-container {
+                padding: 12px;
+                margin: 15px auto;
+            }
+
+            .task-card {
+                padding: 18px;
+            }
+
+            .inline-input {
+                width: 125px;
+            }
+        }
     </style>
 </head>
+
 <body>
-    <div id="pdf-content">
-        <header>
-            <div class="header-left">
-                <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
-            </div>
-            <div class="header-center">
-                <h1>Computational Thinking</h1>
-            </div>
-            <div class="header-right">
-                <a href="logical-thinking.html" class="back-btn no-print">&larr; Back to Unit</a>
-            </div>
-        </header>
+<div id="pdf-content">
 
-        <main class="task-container">
-
-            <!-- PREPARATION -->
-            <div class="task-card task-prep">
-                <h2>Lesson Preparation</h2>
-                
-                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">4 Key Words</h3>
-                <div class="question-row">
-                    <label class="question-label">Decomposition</label>
-                    <input type="text" class="auto-input prep-input" data-label="Key Word: Decomposition" placeholder="Type definition here...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">Abstraction</label>
-                    <input type="text" class="auto-input prep-input" data-label="Key Word: Abstraction" placeholder="Type definition here...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">Pattern Recognition</label>
-                    <input type="text" class="auto-input prep-input" data-label="Key Word: Pattern Recognition" placeholder="Type definition here...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">Algorithm</label>
-                    <input type="text" class="auto-input prep-input" data-label="Key Word: Algorithm" placeholder="Type definition here...">
-                </div>
-
-                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Lesson Notes</h3>
-                <div class="question-row" style="margin-bottom: 0;">
-                    <textarea class="auto-input prep-input" data-label="Lesson Notes" rows="6" placeholder="Write your notes about today's lesson here..."></textarea>
-                </div>
-            </div>
-
-            <!-- RED TASK: Complete the Definitions -->
-            <div class="task-card task-maroon">
-                <h2>Red Task: Complete the Definitions</h2>
-
-                <div class="instruction-box">
-                    Complete each definition by filling in the missing key word.
-                    Read each sentence carefully to make sure the definition makes sense.
-                </div>
-
-                <p style="line-height: 2.6; font-size: 1.1em; color: #333;">
-                    1. Decomposition involves breaking a complex problem into
-                    <input type="text" id="red_q1" class="auto-input red-input inline-input graded-input" data-label="Red Task Q1 (Smaller)" data-answers='["smaller"]' placeholder="...">
-                    parts so that each part is easier to solve.
-                    <br>
-                    2. Pattern recognition involves identifying
-                    <input type="text" id="red_q2" class="auto-input red-input inline-input graded-input" data-label="Red Task Q2 (Similarities)" data-answers='["similarities","similarity","patterns"]' placeholder="...">
-                    or repeated features between different problems.
-                    <br>
-                    3. Abstraction involves removing
-                    <input type="text" id="red_q3" class="auto-input red-input inline-input graded-input" data-label="Red Task Q3 (Unnecessary)" data-answers='["unnecessary","irrelevant"]' placeholder="...">
-                    details and focusing on the information that is important.
-                    <br>
-                    4. An algorithm is a clear, ordered set of
-                    <input type="text" id="red_q4" class="auto-input red-input inline-input graded-input" data-label="Red Task Q4 (Instructions)" data-answers='["instructions","steps"]' placeholder="...">
-                    used to complete a task or solve a problem.
-                    <br>
-                    5. Sequence refers to the
-                    <input type="text" id="red_q5" class="auto-input red-input inline-input graded-input" data-label="Red Task Q5 (Order)" data-answers='["order"]' placeholder="...">
-                    in which instructions or actions are carried out.
-                    <br>
-                    6. A problem can be decomposed into smaller tasks to make it less
-                    <input type="text" id="red_q6" class="auto-input red-input inline-input graded-input" data-label="Red Task Q6 (Complex)" data-answers='["complex","complicated","difficult","hard"]' placeholder="...">
-                    and easier to manage.
-                    <br>
-                    7. When creating an algorithm, instructions should be written in a logical
-                    <input type="text" id="red_q7" class="auto-input red-input inline-input graded-input" data-label="Red Task Q7 (Order)" data-answers='["order","sequence"]' placeholder="...">
-                    so that the task works correctly.
-                    <br>
-                    8. Pattern recognition can help us reuse a solution that worked for a
-                    <input type="text" id="red_q8" class="auto-input red-input inline-input graded-input" data-label="Red Task Q8 (Similar)" data-answers='["similar","related","previous"]' placeholder="...">
-                    problem.
-                    <br>
-                    9. In abstraction, we concentrate on the relevant information and ignore
-                    <input type="text" id="red_q9" class="auto-input red-input inline-input graded-input" data-label="Red Task Q9 (Irrelevant)" data-answers='["irrelevant","unnecessary","unimportant"]' placeholder="...">
-                    details.
-                    <br>
-                    10. An algorithm must contain instructions that are 
-                    <input type="text" id="red_q10" class="auto-input red-input inline-input graded-input" data-label="Red Task Q10 (Clear)" data-answers='["clear","well explained","understandable","specific"]' placeholder="...">
-                    and concise so that the person or computer carrying them out knows what to do.
-                </p>
-
-                <button class="btn-submit no-print" onclick="checkParagraphAnswers('red-input')">
-                    Check Answers
-                </button>
-            </div>
-
-            <!-- AMBER TASK -->
-            <div class="task-card task-amber">
-                <h2>Amber Task: Apply Computational Thinking</h2>
-                <div class="instruction-box">
-                    Apply computational thinking to a school lunch system. Answer each question in a few simple sentences.
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">Question 1 (Decomposition): A school wants to build a lunch ordering app. Break this big problem down into 3 smaller tasks (for example: showing the menu, taking the order, and paying).</label>
-                    <textarea id="amber_q1" class="auto-input amber-input graded-input" data-label="Amber Task Q1" data-answers='["menu","order","pay","food"]' placeholder="Type 3 smaller tasks here..."></textarea>
-                    <div style="text-align: right;"><button id="override-amber_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('amber_q1')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">Question 2 (Abstraction): The lunch app asks for a student's Name, Chosen Meal, Favourite Colour, and Pet's Name. Which 2 pieces of information are needed, and which 1 should be removed because it is unnecessary?</label>
-                    <textarea id="amber_q2" class="auto-input amber-input graded-input" data-label="Amber Task Q2" data-answers='["name","meal","colour","pet"]' placeholder="State what to keep and what to remove..."></textarea>
-                    <div style="text-align: right;"><button id="override-amber_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('amber_q2')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">Question 3 (Pattern Recognition): The canteen staff notice that most students buy pizza and chips every Friday. How does spotting this pattern help the kitchen staff prepare on a Friday morning?</label>
-                    <textarea id="amber_q3" class="auto-input amber-input graded-input" data-label="Amber Task Q3" data-answers='["prepare","more","ready","waste","faster"]' placeholder="Explain how this helps the staff..."></textarea>
-                    <div style="text-align: right;"><button id="override-amber_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('amber_q3')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">Question 4 (Algorithm): Write 4 simple steps in the right order for buying lunch in the canteen (include choosing food, paying, and getting your meal). Why would it be a problem if you tried to pay before choosing your food?</label>
-                    <textarea id="amber_q4" class="auto-input amber-input graded-input" data-label="Amber Task Q4" data-answers='["choose","pay","cost","price"]' placeholder="Write your steps and explain why the order matters..."></textarea>
-                    <div style="text-align: right;"><button id="override-amber_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('amber_q4')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <button type="button" class="btn-submit no-print" onclick="checkParagraphAnswers('amber-input')">
-                    Check Amber Answers
-                </button>
-            </div>
-
-            <!-- GREEN TASK -->
-            <div class="task-card task-green">
-                <h2>Green Task: Analyse and Test a System</h2>
-                <div class="instruction-box">
-                    Think about how a school event and queue system works, and how we can test it.
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">Question 1 (System Parts): A digital screen manages the canteen queue. Name 3 simple things this system needs to do (Hint: think about students joining the queue, being served at the till, and leaving).</label>
-                    <textarea id="green_q1" class="auto-input green-input graded-input" data-label="Green Task Q1" data-answers='["join","wait","serve","leave"]' placeholder="Describe 3 parts of the queue system..."></textarea>
-                    <div style="text-align: right;"><button id="override-green_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('green_q1')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">Question 2 (Data & Privacy): Students sign up online for a school disco. Give 2 pieces of information the school needs to collect, 1 piece they should NOT ask for, and explain why asking for too much personal info is a bad idea.</label>
-                    <textarea id="green_q2" class="auto-input green-input graded-input" data-label="Green Task Q2" data-answers='["name","unnecessary","privacy","hack"]' placeholder="Explain what to collect, what to leave out, and why..."></textarea>
-                    <div style="text-align: right;"><button id="override-green_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('green_q2')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">Question 3 (Making Decisions): The school hall can hold a maximum of 120 students. Write a simple IF / ELSE rule to check if a student can come in, add 1 to the count if there is space, or stop them if it is full.</label>
-                    <textarea id="green_q3" class="auto-input green-input graded-input" data-label="Green Task Q3" data-answers='["120","if","allow","add","full"]' placeholder="IF count is less than 120..."></textarea>
-                    <div style="text-align: right;"><button id="override-green_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('green_q3')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">Question 4 (Testing): We need to test our 120-student limit. State whether the system should allow or stop another student when the hall count is at: a) 119 students, b) 120 students, and c) 121 students.</label>
-                    <textarea id="green_q4" class="auto-input green-input graded-input" data-label="Green Task Q4" data-answers='["119","120","121","allow","stop"]' placeholder="a) At 119... b) At 120... c) At 121..."></textarea>
-                    <div style="text-align: right;"><button id="override-green_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('green_q4')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <button type="button" class="btn-submit no-print" onclick="checkParagraphAnswers('green-input')">
-                    Check Green Answers
-                </button>
-            </div>
-
-            <!-- BLUE TASK -->
-            <div class="task-card task-navy">
-                <h2>Blue Task: Design, Trace and Debug</h2>
-                <div class="instruction-box">
-                    Complete the advanced design, tracing, and evaluation challenges below.
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">Question 1: Design a digital transport booking system for a school trip. Identify at least five components, explain the purpose of each and describe how they work together to complete a booking.</label>
-                    <textarea id="blue_q1" class="auto-input blue-input graded-input" data-label="Blue Task Q1" data-answers='["decomposition","booking","availability","payment","confirmation","update"]' placeholder="Explain your answer..."></textarea>
-                    <div style="text-align: right;"><button id="override-blue_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('blue_q1')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">Question 2: The transport booking system could collect a student's name, student ID, home address, favourite subject, emergency contact and booking status. Use abstraction to decide which information is necessary. Explain two risks of collecting information that is not needed.</label>
-                    <textarea id="blue_q2" class="auto-input blue-input graded-input" data-label="Blue Task Q2" data-answers='["abstraction","essential data","unnecessary","privacy","security"]' placeholder="Explain your answer..."></textarea>
-                    <div style="text-align: right;"><button id="override-blue_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('blue_q2')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">Question 3: Write a detailed algorithm for booking a seat on a school trip. Include ID validation, checking for duplicate bookings, checking seat availability, recording the booking, updating the remaining seats and displaying an appropriate message. Explain how the system should handle two students attempting to book the final seat at the same time.</label>
-                    <textarea id="blue_q3" class="auto-input blue-input graded-input" data-label="Blue Task Q3" data-answers='["validate","duplicate","availability","record booking","update seat","simultaneous"]' placeholder="Explain your answer..."></textarea>
-                    <div style="text-align: right;"><button id="override-blue_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('blue_q3')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">Question 4: A minibus has three seats available. Student A makes a valid booking, student B has an invalid ID, student C makes a valid booking, student A tries to book again and student D makes a valid booking. Trace the sequence. Explain the result of each attempt and how many seats remain after each step.</label>
-                    <textarea id="blue_q4" class="auto-input blue-input graded-input" data-label="Blue Task Q4" data-answers='["three seats","invalid","duplicate","remaining seats","zero seats"]' placeholder="Explain your answer..."></textarea>
-                    <div style="text-align: right;"><button id="override-blue_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('blue_q4')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">Question 5: A programmer updates the remaining seat count before checking whether a student already has a booking. Explain two weaknesses in this algorithm, rewrite the steps in a safer order and describe a test case that would reveal the original problem.</label>
-                    <textarea id="blue_q5" class="auto-input blue-input graded-input" data-label="Blue Task Q5" data-answers='["duplicate","before","correct order","test","overbooking"]' placeholder="Explain your answer..."></textarea>
-                    <div style="text-align: right;"><button id="override-blue_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('blue_q5')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">Question 6: Evaluate which two computational thinking techniques are most important when designing a reliable booking system. Explain how the techniques work together, give a specific example and justify why your chosen combination is more effective than using either technique alone.</label>
-                    <textarea id="blue_q6" class="auto-input blue-input graded-input" data-label="Blue Task Q6" data-answers='["decomposition","abstraction","algorithm","work together","efficient"]' placeholder="Explain your answer..."></textarea>
-                    <div style="text-align: right;"><button id="override-blue_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('blue_q6')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <button type="button" class="btn-submit no-print" onclick="checkParagraphAnswers('blue-input')">
-                    Check Blue Answers
-                </button>
-            </div>
-
-            <!-- PLENARY: 3 Key Takeaways -->
-            <div class="task-card task-plenary">
-                <h2>Lesson Plenary</h2>
-                <h3 style="color: #444; margin-bottom: 15px;">My 3 Key Takeaways</h3>
-                
-                <div class="question-row">
-                    <label class="question-label">1.</label>
-                    <input type="text" class="auto-input plenary-input" data-label="Plenary Takeaway 1" style="max-width: 100%;" placeholder="Type first takeaway here...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">2.</label>
-                    <input type="text" class="auto-input plenary-input" data-label="Plenary Takeaway 2" style="max-width: 100%;" placeholder="Type second takeaway here...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">3.</label>
-                    <input type="text" class="auto-input plenary-input" data-label="Plenary Takeaway 3" style="max-width: 100%;" placeholder="Type third takeaway here...">
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-    <!-- RESET ACTION BUTTON -->
-    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-reset" onclick="clearAllData()">Reset Page</button>
-    </div>
-    
-    <!-- SECURE PASSWORD MODAL FOR OVERRIDE -->
-    <div class="modal-overlay" id="verify-modal">
-        <div class="modal-content">
-            <h3>Teacher Verification</h3>
-            <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
-            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter PIN">
-            <div class="modal-btn-row">
-                <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
-                <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
-            </div>
+    <header>
+        <div class="header-left">
+            <a href="index.html">
+                <img src="logo.jpg" alt="Delta Serlby Park Logo">
+            </a>
         </div>
-    </div>
 
-    <footer>
-        &copy; 2026 Delta Serlby Park - Computing Department
-    </footer>
+        <div class="header-center">
+            <h1>Computational Thinking</h1>
+        </div>
 
-    <script>
-        /* ==========================================================================
-           1. FIREBASE CLOUD INITIALIZATION & MARKBOOK SYNC
-           ========================================================================== */
-        const LESSON_ID = "y8-computational-thinking";
+        <div class="header-right">
+            <a href="logical-thinking.html" class="back-btn no-print">&larr; Back to Unit</a>
+        </div>
+    </header>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
-            authDomain: "serlby-park-computing.firebaseapp.com",
-            projectId: "serlby-park-computing",
-            storageBucket: "serlby-park-computing.firebasestorage.app",
-            messagingSenderId: "648533806051",
-            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
-            measurementId: "G-HDNYEE11WV"
-        };
+    <main class="task-container">
 
-        let auth = null;
-        let db = null;
+        <!-- LESSON PREPARATION -->
+        <section class="task-card task-prep">
+            <h2>Lesson Preparation</h2>
 
-        if (typeof firebase !== 'undefined') {
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-            }
-            auth = firebase.auth();
-            db = firebase.firestore();
+            <p class="task-intro">
+                Write a short definition for each key word. You can add to your answers as you learn.
+            </p>
+
+            <h3 style="color:#444; border-bottom:2px solid #eee; padding-bottom:5px;">
+                4 Key Words
+            </h3>
+
+            <div class="question-row">
+                <label class="question-label" for="prep_decomposition">Decomposition</label>
+                <input id="prep_decomposition" type="text" class="auto-input prep-input"
+                    data-label="Key Word: Decomposition"
+                    placeholder="What does decomposition mean?">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="prep_abstraction">Abstraction</label>
+                <input id="prep_abstraction" type="text" class="auto-input prep-input"
+                    data-label="Key Word: Abstraction"
+                    placeholder="What does abstraction mean?">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="prep_pattern">Pattern Recognition</label>
+                <input id="prep_pattern" type="text" class="auto-input prep-input"
+                    data-label="Key Word: Pattern Recognition"
+                    placeholder="What does pattern recognition mean?">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="prep_algorithm">Algorithm</label>
+                <input id="prep_algorithm" type="text" class="auto-input prep-input"
+                    data-label="Key Word: Algorithm"
+                    placeholder="What does algorithm mean?">
+            </div>
+
+            <h3 style="color:#444; border-bottom:2px solid #eee; padding-bottom:5px; margin-top:30px;">
+                Lesson Notes
+            </h3>
+
+            <textarea id="lesson_notes" class="auto-input prep-input"
+                data-label="Lesson Notes" rows="5"
+                placeholder="Write down anything useful from today's lesson..."></textarea>
+        </section>
+
+        <!-- RED TASK -->
+        <section class="task-card task-maroon">
+            <h2>Red Task: Fill in the Missing Words</h2>
+
+            <div class="instruction-box">
+                Complete all 10 sentences. Choose the word that makes each definition correct.
+                Check your answers when you finish.
+            </div>
+
+            <p style="line-height:2.5; font-size:1.05em;">
+                1. Decomposition means breaking a big problem into
+                <input type="text" id="red_q1" class="auto-input red-input inline-input"
+                    data-label="Red Q1" data-answers='["smaller"]' placeholder="word">
+
+                problems.
+
+                <br>
+
+                2. Pattern recognition means finding
+                <input type="text" id="red_q2" class="auto-input red-input inline-input"
+                    data-label="Red Q2" data-answers='["patterns","similarities","similarity"]' placeholder="word">
+
+                between things.
+
+                <br>
+
+                3. Abstraction means removing
+                <input type="text" id="red_q3" class="auto-input red-input inline-input"
+                    data-label="Red Q3" data-answers='["unnecessary","irrelevant","unimportant"]' placeholder="word">
+
+                details.
+
+                <br>
+
+                4. An algorithm is a set of
+                <input type="text" id="red_q4" class="auto-input red-input inline-input"
+                    data-label="Red Q4" data-answers='["instructions","steps"]' placeholder="word">
+
+                to follow.
+
+                <br>
+
+                5. Instructions should be completed in the correct
+                <input type="text" id="red_q5" class="auto-input red-input inline-input"
+                    data-label="Red Q5" data-answers='["order","sequence"]' placeholder="word">.
+
+                <br>
+
+                6. Breaking a big problem into smaller tasks makes it easier to
+                <input type="text" id="red_q6" class="auto-input red-input inline-input"
+                    data-label="Red Q6" data-answers='["solve","manage","complete"]' placeholder="word">.
+
+                <br>
+
+                7. A recipe is an example of an
+                <input type="text" id="red_q7" class="auto-input red-input inline-input"
+                    data-label="Red Q7" data-answers='["algorithm"]' placeholder="word">
+
+                because it gives instructions.
+
+                <br>
+
+                8. Spotting that the same thing happens every Friday is finding a
+                <input type="text" id="red_q8" class="auto-input red-input inline-input"
+                    data-label="Red Q8" data-answers='["pattern"]' placeholder="word">.
+
+                <br>
+
+                9. When planning a journey, you can ignore details that are not
+                <input type="text" id="red_q9" class="auto-input red-input inline-input"
+                    data-label="Red Q9" data-answers='["important","relevant","necessary"]' placeholder="word">.
+
+                <br>
+
+                10. When you split a task into smaller tasks, you are using
+                <input type="text" id="red_q10" class="auto-input red-input inline-input"
+                    data-label="Red Q10" data-answers='["decomposition"]' placeholder="word">.
+            </p>
+
+            <button type="button" class="btn-submit no-print"
+                onclick="checkAnswers('red-input')">
+                Check Red Answers
+            </button>
+        </section>
+
+        <!-- AMBER TASK -->
+        <section class="task-card task-amber">
+            <h2>Amber Task: Computational Thinking in Everyday Life</h2>
+
+            <div class="instruction-box">
+                You use computational thinking outside Computing lessons too.
+                Read each situation and explain what you would do.
+                Include the key ideas in your answer.
+            </div>
+
+            <div class="example-box">
+                <strong>Example: Getting ready for school</strong>
+                <p><strong>Decomposition:</strong> Get dressed, eat breakfast and pack my bag.</p>
+                <p><strong>Pattern recognition:</strong> I need the same equipment on the same school days.</p>
+                <p><strong>Abstraction:</strong> I only need to check the things required for that day.</p>
+                <p><strong>Algorithm:</strong> Follow my morning routine in the correct order.</p>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="amber_q1">
+                    1. Decomposition: You need to clean your bedroom. Name three smaller jobs you could do to complete the task.
+                </label>
+                <textarea id="amber_q1" class="auto-input amber-input"
+                    data-label="Amber Q1"
+                    placeholder="For example, put clothes away..."></textarea>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="amber_q2">
+                    2. Abstraction: You are packing your school bag. Which things do you need to remember, and which things could you ignore because they are not needed for school?
+                </label>
+                <textarea id="amber_q2" class="auto-input amber-input"
+                    data-label="Amber Q2"
+                    placeholder="Explain which things are important and which are not needed..."></textarea>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="amber_q3">
+                    3. Pattern recognition: You notice that you often forget your PE kit on Wednesdays. How could spotting this pattern help you?
+                </label>
+                <textarea id="amber_q3" class="auto-input amber-input"
+                    data-label="Amber Q3"
+                    placeholder="Explain what you notice and what you could change..."></textarea>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="amber_q4">
+                    4. Algorithm: Write four steps for making a piece of toast. Put the steps in the correct order.
+                </label>
+                <textarea id="amber_q4" class="auto-input amber-input"
+                    data-label="Amber Q4"
+                    placeholder="1. First...&#10;2. Next...&#10;3. Then...&#10;4. Finally..."></textarea>
+            </div>
+
+            <button type="button" class="btn-submit no-print"
+                onclick="checkAnswers('amber-input')">
+                Check Amber Answers
+            </button>
+        </section>
+
+        <!-- GREEN TASK -->
+        <section class="task-card task-green">
+            <h2>Green Task: Plan a School Disco</h2>
+
+            <div class="instruction-box">
+                Your school is organising a disco. Use the four computational thinking techniques
+                to help plan it. Write in full sentences where you can.
+            </div>
+
+            <div class="example-box">
+                <strong>The problem:</strong> There are lots of things to organise for a school disco.
+                You need to decide what matters, split the work into smaller jobs, spot useful patterns
+                and put instructions in the right order.
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="green_q1">
+                    1. Decomposition: Name three smaller jobs that need to be done before the disco.
+                </label>
+                <textarea id="green_q1" class="auto-input green-input"
+                    data-label="Green Q1"
+                    placeholder="Three jobs could be..."></textarea>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="green_q2">
+                    2. Abstraction: The school needs to know how many students are attending. Does it need to know each student's favourite colour, shoe size and ticket number? Explain which information is most useful.
+                </label>
+                <textarea id="green_q2" class="auto-input green-input"
+                    data-label="Green Q2"
+                    placeholder="The important information is..."></textarea>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="green_q3">
+                    3. Pattern recognition: Last year's disco was busiest at the start and many students wanted drinks. How could the school use this information to plan this year's disco?
+                </label>
+                <textarea id="green_q3" class="auto-input green-input"
+                    data-label="Green Q3"
+                    placeholder="The school could use this pattern to..."></textarea>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="green_q4">
+                    4. Algorithm: Write five steps for a student arriving at the disco, from joining the queue to entering the hall.
+                </label>
+                <textarea id="green_q4" class="auto-input green-input"
+                    data-label="Green Q4"
+                    placeholder="1. First...&#10;2. Next...&#10;3. Then...&#10;4. After that...&#10;5. Finally..."></textarea>
+            </div>
+
+            <button type="button" class="btn-submit no-print"
+                onclick="checkAnswers('green-input')">
+                Check Green Answers
+            </button>
+        </section>
+
+        <!-- BLUE TASK -->
+        <section class="task-card task-navy">
+            <h2>Blue Task: Become a Computational Thinker</h2>
+
+            <div class="instruction-box">
+                Challenge yourself to use more than one computational thinking technique.
+                Explain your decisions clearly and give examples.
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="blue_q1">
+                    1. You have been asked to organise a school trip. Use decomposition to split the job into at least five smaller tasks.
+                </label>
+                <textarea id="blue_q1" class="auto-input blue-input"
+                    data-label="Blue Q1"
+                    placeholder="One task is... Another task is..."></textarea>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="blue_q2">
+                    2. Use abstraction: the school is making a trip list. It could record each student's name, emergency contact, favourite game, shoe size and whether they have paid. Which details are useful for organising the trip? Which details could be left out, and why?
+                </label>
+                <textarea id="blue_q2" class="auto-input blue-input"
+                    data-label="Blue Q2"
+                    placeholder="The useful details are... The school can leave out..."></textarea>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="blue_q3">
+                    3. Use pattern recognition: the school has noticed that students often forget their permission slips. Suggest a pattern the school could look for and explain how it could use that pattern to reduce the problem.
+                </label>
+                <textarea id="blue_q3" class="auto-input blue-input"
+                    data-label="Blue Q3"
+                    placeholder="The school could look for... It could then..."></textarea>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="blue_q4">
+                    4. Create an algorithm for getting ready for the trip. Include checking the permission slip, packing a lunch, arriving at school and getting on the coach. Explain why the order matters.
+                </label>
+                <textarea id="blue_q4" class="auto-input blue-input"
+                    data-label="Blue Q4"
+                    placeholder="Write your steps in order..."></textarea>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="blue_q5">
+                    5. Choose two of the four computational thinking techniques. Explain how using both could help the school organise a successful trip.
+                </label>
+                <textarea id="blue_q5" class="auto-input blue-input"
+                    data-label="Blue Q5"
+                    placeholder="I would use... and... because..."></textarea>
+            </div>
+
+            <button type="button" class="btn-submit no-print"
+                onclick="checkAnswers('blue-input')">
+                Check Blue Answers
+            </button>
+        </section>
+
+        <!-- PLENARY -->
+        <section class="task-card task-plenary">
+            <h2>Lesson Plenary</h2>
+
+            <h3 style="color:#444; margin-bottom:15px;">My 3 Key Takeaways</h3>
+
+            <p class="task-intro">
+                Before finishing, write three things you have learned or understand better.
+            </p>
+
+            <div class="question-row">
+                <label class="question-label" for="plenary_q1">1.</label>
+                <input type="text" id="plenary_q1" class="auto-input plenary-input"
+                    data-label="Plenary Takeaway 1"
+                    placeholder="One thing I learned...">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="plenary_q2">2.</label>
+                <input type="text" id="plenary_q2" class="auto-input plenary-input"
+                    data-label="Plenary Takeaway 2"
+                    placeholder="Another thing I learned...">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="plenary_q3">3.</label>
+                <input type="text" id="plenary_q3" class="auto-input plenary-input"
+                    data-label="Plenary Takeaway 3"
+                    placeholder="I can use computational thinking to...">
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<div id="action-buttons"
+    style="display:flex; justify-content:center; gap:15px; margin:20px auto 50px auto; padding:0 15px;">
+    <button type="button" class="btn-reset no-print" onclick="clearAllData()">
+        Reset Page
+    </button>
+</div>
+
+<footer>
+    &copy; 2026 Delta Serlby Park, Computing Department
+</footer>
+
+<script>
+    /* =========================================================
+       1. FIREBASE SETUP
+       ========================================================= */
+
+    const LESSON_ID = "y8-computational-thinking";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+        authDomain: "serlby-park-computing.firebaseapp.com",
+        projectId: "serlby-park-computing",
+        storageBucket: "serlby-park-computing.firebasestorage.app",
+        messagingSenderId: "648533806051",
+        appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+        measurementId: "G-HDNYEE11WV"
+    };
+
+    let auth = null;
+    let db = null;
+    let cloudSyncTimer = null;
+
+    if (typeof firebase !== "undefined") {
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
 
-        // Builds a clean, grouped summary array for the Teacher Cloud Markbook
-        function buildStructuredMarkbookItems() {
-            const items = [];
-            let correctCount = 0;
-            let totalGradable = document.querySelectorAll('.graded-input').length;
+        auth = firebase.auth();
+        db = firebase.firestore();
+    }
 
-            // A. Lesson Preparation & Notes
-            document.querySelectorAll('.prep-input').forEach(inp => {
-                items.push({
-                    label: inp.getAttribute('data-label') || 'Preparation',
-                    value: inp.value.trim(),
-                    status: 'neutral'
-                });
-            });
+    /* =========================================================
+       2. SIMPLE SELF-MARKING ANSWERS
 
-            // B. Graded Tasks (Red, Amber, Green, Blue)
-            document.querySelectorAll('.graded-input').forEach(inp => {
-                let status = 'neutral';
-                if (inp.classList.contains('input-correct')) {
-                    status = 'correct';
-                    correctCount++;
-                } else if (inp.classList.contains('input-incorrect')) {
-                    status = 'incorrect';
-                }
+       Red answers use exact accepted answers.
+       Amber, Green and Blue use keyword groups.
+       A longer answer is marked correct when it includes
+       enough of the important ideas.
+       Answers are either correct or incorrect.
+       There are no partial marks.
+       ========================================================= */
 
-                items.push({
-                    label: inp.getAttribute('data-label') || inp.id || 'Question',
-                    value: inp.value.trim(),
-                    status: status
-                });
-            });
+    const keywordRubrics = {
+        amber_q1: [
+            ["clothes", "laundry", "washing"],
+            ["tidy", "put away", "organise", "organize"],
+            ["vacuum", "hoover", "clean", "dust", "bed"]
+        ],
 
-            // C. Plenary Takeaways
-            document.querySelectorAll('.plenary-input').forEach(inp => {
-                items.push({
-                    label: inp.getAttribute('data-label') || 'Plenary',
-                    value: inp.value.trim(),
-                    status: 'neutral'
-                });
-            });
+        amber_q2: [
+            ["book", "pen", "pencil", "equipment", "timetable", "homework"],
+            ["important", "needed", "necessary", "required"],
+            ["ignore", "unnecessary", "not needed", "irrelevant", "favourite colour", "shoe size", "toy"]
+        ],
 
-            return {
-                items: items,
-                scoreText: `Score: ${correctCount} / ${totalGradable}`
-            };
+        amber_q3: [
+            ["pattern", "wednesday", "every week", "often", "regularly"],
+            ["remind", "check", "pack", "prepare", "night before"],
+            ["pe kit", "kit", "forget", "remember"]
+        ],
+
+        amber_q4: [
+            ["bread"],
+            ["toaster"],
+            ["toast", "cook", "wait"],
+            ["remove", "plate", "serve", "butter"]
+        ],
+
+        green_q1: [
+            ["ticket", "sell", "invite", "permission"],
+            ["music", "dj", "playlist", "speaker"],
+            ["decorate", "hall", "food", "drink", "staff", "supervise", "clean"]
+        ],
+
+        green_q2: [
+            ["name", "ticket", "number", "attendance", "student"],
+            ["favourite colour", "shoe size", "not needed", "unnecessary", "irrelevant"],
+            ["important", "useful", "needed", "necessary", "know who", "count"]
+        ],
+
+        green_q3: [
+            ["pattern", "last year", "previous", "noticed", "busiest"],
+            ["prepare", "plan", "organise", "organize", "staff", "drink", "queue"],
+            ["enough", "ready", "avoid", "reduce", "wait", "run out"]
+        ],
+
+        green_q4: [
+            ["queue", "line", "wait"],
+            ["ticket", "check", "name", "entry"],
+            ["permission", "check", "allowed", "valid"],
+            ["enter", "go in", "hall"],
+            ["order", "next", "finally", "then"]
+        ],
+
+        blue_q1: [
+            ["permission", "form", "consent"],
+            ["coach", "transport", "travel"],
+            ["money", "payment", "cost", "budget"],
+            ["lunch", "food", "drink"],
+            ["destination", "activity", "booking", "plan", "schedule", "safety"]
+        ],
+
+        blue_q2: [
+            ["name", "emergency contact", "paid", "payment"],
+            ["favourite game", "shoe size", "unnecessary", "irrelevant", "not needed", "leave out"],
+            ["privacy", "personal information", "security", "safe", "protect"],
+            ["necessary", "needed", "important", "relevant"]
+        ],
+
+        blue_q3: [
+            ["pattern", "often", "regularly", "many students", "every trip"],
+            ["permission slip", "form", "forget", "missing"],
+            ["remind", "message", "check", "collect", "deadline"],
+            ["reduce", "fewer", "less", "avoid"]
+        ],
+
+        blue_q4: [
+            ["permission", "form", "check"],
+            ["lunch", "pack", "bag"],
+            ["school", "arrive", "meet"],
+            ["coach", "board", "get on"],
+            ["order", "before", "first", "next", "finally", "because"]
+        ],
+
+        blue_q5: [
+            ["decomposition", "abstraction", "pattern recognition", "algorithm"],
+            ["decomposition", "abstraction", "pattern recognition", "algorithm"],
+            ["trip", "school", "permission", "coach", "lunch", "organise", "organize", "plan"],
+            ["because", "help", "easier", "efficient", "successful", "avoid", "reduce"]
+        ]
+    };
+
+    function normaliseText(text) {
+        return (text || "")
+            .toLowerCase()
+            .replace(/[^a-z0-9\s]/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+    }
+
+    function keywordFound(answer, keyword) {
+        const normalAnswer = normaliseText(answer);
+        const normalKeyword = normaliseText(keyword);
+
+        if (!normalKeyword) {
+            return false;
         }
 
-        let cloudSyncTimer;
-        function syncWorkToCloud(immediate = false) {
-            if (sessionStorage.getItem('teacherMode') === 'true' && sessionStorage.getItem('inspectStudentUid')) return;
-            if (!auth || !db || !auth.currentUser) return;
-
-            const user = auth.currentUser;
-
-            clearTimeout(cloudSyncTimer);
-            cloudSyncTimer = setTimeout(() => {
-                const inputs = document.querySelectorAll('.auto-input');
-                const structured = buildStructuredMarkbookItems();
-
-                const payload = {
-                    pageTitle: "Computational Thinking",
-                    lastUpdated: Date.now(),
-                    scoreText: structured.scoreText,
-                    items: structured.items
-                };
-
-                inputs.forEach((el, i) => {
-                    payload['input_' + i] = el.value;
-                    payload['class_' + i] = el.className;
-                });
-
-                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
-                  .set(payload, { merge: true })
-                  .catch(err => {
-                      console.error("Cloud sync error:", err);
-                  });
-            }, immediate ? 50 : 600);
+        if (normalKeyword.length <= 2) {
+            const escaped = normalKeyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            return new RegExp("\\b" + escaped + "\\b").test(normalAnswer);
         }
 
-        /* ==========================================================================
-           2. AUTO-SAVE & LOAD LOGIC (Cloud Only - No LocalStorage)
-           ========================================================================== */
-        function saveProgress(immediate = false) {
-            syncWorkToCloud(immediate);
-        }
+        return normalAnswer.includes(normalKeyword);
+    }
 
-        function applySavedInputs(data) {
-            var inputs = document.querySelectorAll('.auto-input');
-            for (var i = 0; i < inputs.length; i++) {
-                var savedVal = data['input_' + i] !== undefined
-                    ? data['input_' + i]
-                    : (data.items && data.items[i] ? data.items[i].value : undefined);
-
-                if (savedVal !== undefined && savedVal !== "") {
-                    inputs[i].value = savedVal;
-                    if (data['class_' + i]) {
-                        inputs[i].className = data['class_' + i];
-                        if (inputs[i].classList.contains('input-correct') || inputs[i].classList.contains('input-incorrect') || inputs[i].classList.contains('teacher-locked')) {
-                            var btnId = "override-" + inputs[i].id;
-                            var btn = document.getElementById(btnId);
-                            if (btn) btn.classList.remove('hidden');
-                        }
-                    }
-                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                        inputs[i].style.height = 'auto';
-                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                    }
-                }
-            }
-            checkParagraphAnswers('red-input', false);
-            checkParagraphAnswers('amber-input', false);
-            checkParagraphAnswers('green-input', false);
-            checkParagraphAnswers('blue-input', false);
-        }
-
-        function loadProgress() {
-            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
-            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
-
-            if (isTeacher && inspectedUid && db) {
-                db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get().then(doc => {
-                    if (doc.exists) applySavedInputs(doc.data());
-                }).catch(err => console.error("Error loading student work:", err));
-                return;
-            }
-
-            if (auth && db) {
-                auth.onAuthStateChanged(async (user) => {
-                    if (!user) {
-                        if (!isTeacher) {
-                            alert("Please log in on the home page first!");
-                            window.location.href = "index.html";
-                        }
-                        return;
-                    }
-
-                    try {
-                        const doc = await db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).get();
-                        if (doc.exists) {
-                            applySavedInputs(doc.data());
-                        } else {
-                            syncWorkToCloud(true);
-                        }
-                    } catch (err) {
-                        console.error("Error loading cloud work:", err);
-                    }
-                });
-            }
-        }
-
-        document.addEventListener('input', function(e) {
-            if (e.target.classList.contains('auto-input')) {
-                saveProgress(false);
-                if (e.target.tagName.toLowerCase() === 'textarea') {
-                    e.target.style.height = 'auto';
-                    e.target.style.height = e.target.scrollHeight + 'px';
-                }
-            }
+    function markAnswer(input) {
+        const answer = input.value.trim();
+        const groupClass = Array.from(input.classList).find(function(className) {
+            return ["red-input", "amber-input", "green-input", "blue-input"].includes(className);
         });
 
-        async function clearAllData() {
-            if (confirm("Are you sure you want to clear EVERYTHING on this page?")) {
-                if (auth && db && auth.currentUser) {
-                    try {
-                        await db.collection('users').doc(auth.currentUser.uid).collection('lessons').doc(LESSON_ID).delete();
-                    } catch (e) {}
-                }
-                window.location.reload();
+        input.classList.remove("input-correct", "input-incorrect");
+
+        const feedbackId = input.id + "_feedback";
+        let feedback = document.getElementById(feedbackId);
+
+        if (!feedback) {
+            feedback = document.createElement("div");
+            feedback.id = feedbackId;
+            feedback.className = "keyword-marking-feedback";
+            input.insertAdjacentElement("afterend", feedback);
+        }
+
+        if (answer === "") {
+            input.classList.add("input-incorrect");
+            feedback.textContent = "Incorrect. Enter an answer and try again.";
+            feedback.style.color = "#b71c1c";
+            return false;
+        }
+
+        let correct = false;
+
+        if (groupClass === "red-input") {
+            let acceptedAnswers = [];
+
+            try {
+                acceptedAnswers = JSON.parse(input.getAttribute("data-answers") || "[]");
+            } catch (error) {
+                acceptedAnswers = [];
             }
-        }
 
-        window.onload = loadProgress;
+            correct = acceptedAnswers.some(function(accepted) {
+                return normaliseText(answer) === normaliseText(accepted);
+            });
+        } else {
+            const rubric = keywordRubrics[input.id] || [];
 
-        /* ==========================================================================
-           3. TEACHER OVERRIDE VERIFICATION MODAL
-           ========================================================================== */
-        let activeQuestionId = null;
-        function openVerifyModal(qId) {
-            activeQuestionId = qId;
-            document.getElementById('teacher-password-input').value = '';
-            document.getElementById('modal-error-msg').style.display = 'none';
-            document.getElementById('verify-modal').style.display = 'flex';
-            document.getElementById('teacher-password-input').focus();
-        }
-        function closeVerifyModal() {
-            document.getElementById('verify-modal').style.display = 'none';
-            activeQuestionId = null;
-        }
-        function submitVerify() {
-            var pass = document.getElementById('teacher-password-input').value;
-            if (pass === '2525') {
-                var inputEl = document.getElementById(activeQuestionId);
-                let feedback = document.getElementById(activeQuestionId + "_feedback");
-                if (!feedback) {
-                    feedback = document.createElement("div");
-                    feedback.id = activeQuestionId + "_feedback";
-                    feedback.className = "keyword-marking-feedback";
-                    inputEl.insertAdjacentElement("afterend", feedback);
-                }
-
-                inputEl.classList.add('teacher-locked');
-                if (inputEl.classList.contains('input-correct')) {
-                    inputEl.classList.remove('input-correct');
-                    inputEl.classList.add('input-incorrect');
-                    feedback.textContent = "❌ Marked incorrect by teacher override.";
-                    feedback.style.color = "#d32f2f";
-                } else {
-                    inputEl.classList.remove('input-incorrect');
-                    inputEl.classList.add('input-correct');
-                    feedback.textContent = "✅ Correct! (Teacher Approved Override)";
-                    feedback.style.color = "#008f39";
-                }
-                closeVerifyModal();
-                saveProgress(true);
-            } else {
-                document.getElementById('modal-error-msg').style.display = 'block';
-            }
-        }
-        document.getElementById('teacher-password-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') submitVerify();
-        });
-
-        /* ==========================================================================
-           4. BATCH MARKING LOGIC & KEYWORD RUBRICS
-           ========================================================================== */
-        function normaliseKeywordText(text) {
-            return (text || "")
-                .toLowerCase()
-                .replace(/[^a-z0-9\s]/g, " ")
-                .replace(/\s+/g, " ")
-                .trim();
-        }
-
-        function keywordPhraseFound(answerText, keywordPhrase) {
-            const normAnswer = normaliseKeywordText(answerText);
-            const normKey = normaliseKeywordText(keywordPhrase);
-            if (!normKey) return false;
-            if (normKey.length <= 2) {
-                const regex = new RegExp("\\b" + normKey + "\\b", "i");
-                return regex.test(normAnswer);
-            }
-            return normAnswer.includes(normKey);
-        }
-
-        const keywordRubrics = {
-            amber_q1: [
-                ["menu", "food", "meal", "options", "choice", "display", "show"],
-                ["order", "ordering", "choose", "select", "pick", "basket"],
-                ["pay", "payment", "cost", "money", "price", "till", "account", "check", "confirm"]
-            ],
-            amber_q2: [
-                ["name", "meal", "food", "lunch", "keep", "need", "essential", "important"],
-                ["colour", "color", "pet", "remove", "not needed", "unnecessary", "ignore", "leave out"]
-            ],
-            amber_q3: [
-                ["pizza", "chips", "friday", "same", "pattern", "popular", "most"],
-                ["prepare", "make", "cook", "buy", "order", "ready", "enough", "more", "faster", "quick", "waste", "run out"]
-            ],
-            amber_q4: [
-                ["choose", "pick", "select", "food", "meal", "lunch", "queue"],
-                ["pay", "money", "till", "card", "account", "take", "eat", "collect"],
-                ["cost", "price", "how much", "wrong", "know", "before", "cannot", "can t"]
-            ],
-            green_q1: [
-                ["join", "arrive", "enter", "start", "back", "queue", "line"],
-                ["wait", "move", "screen", "number", "call", "check", "next"],
-                ["serve", "serving", "till", "food", "pay", "leave", "exit", "go"]
-            ],
-            green_q2: [
-                ["name", "year", "class", "ticket", "id", "allerg", "emergency", "medical", "need", "keep"],
-                ["colour", "color", "pet", "hobby", "game", "shoe", "remove", "not", "leave out", "unnecessary"],
-                ["private", "privacy", "personal", "safe", "safety", "hack", "steal", "stranger", "risk", "gdpr", "protect"]
-            ],
-            green_q3: [
-                ["if", "120", "less", "under", "space", "room"],
-                ["allow", "enter", "let", "in", "come", "add", "plus", "+1", "increase", "count"],
-                ["else", "full", "stop", "no", "wait", "cannot", "deny", "sorry"]
-            ],
-            green_q4: [
-                ["119", "allow", "yes", "let", "in", "enter", "space"],
-                ["120", "121", "stop", "no", "full", "deny", "wait", "cannot", "over"]
-            ],
-            blue_q1: [
-                ["decomposition", "component", "part", "module"],
-                ["book", "booking", "select", "trip"],
-                ["available", "availability", "seat", "space"],
-                ["pay", "payment", "cost"],
-                ["confirm", "confirmation", "update", "together"]
-            ],
-            blue_q2: [
-                ["abstraction", "necessary", "essential", "name", "id", "emergency", "status"],
-                ["unnecessary", "irrelevant", "exclude", "favourite", "subject", "address"],
-                ["privacy", "security", "risk", "breach", "gdpr", "storage", "personal"]
-            ],
-            blue_q3: [
-                ["validate", "validation", "valid", "id"],
-                ["duplicate", "already", "twice", "repeat"],
-                ["available", "availability", "seat", "check"],
-                ["record", "save", "store", "update", "decrease", "reduce", "remaining"],
-                ["simultaneous", "same time", "lock", "queue", "first", "two students"]
-            ],
-            blue_q4: [
-                ["student a", "valid", "2", "two"],
-                ["student b", "invalid", "reject"],
-                ["student c", "1", "one"],
-                ["duplicate", "already", "again"],
-                ["student d", "0", "zero", "full", "none"]
-            ],
-            blue_q5: [
-                ["duplicate", "already", "before", "wrong"],
-                ["seat", "count", "reduce", "decrease", "empty", "lost"],
-                ["order", "first", "check", "then", "update"],
-                ["test", "twice", "same student", "repeat", "overbook"]
-            ],
-            blue_q6: [
-                ["decomposition", "abstraction", "pattern", "algorithm"],
-                ["together", "combine", "both", "link"],
-                ["example", "booking", "seat", "student", "system"],
-                ["effective", "reliable", "better", "alone", "because", "justify"]
-            ]
-        };
-
-        function checkParagraphAnswers(groupClass, triggerSync = true) {
-            const inputs = document.querySelectorAll("." + groupClass);
-            let correctCount = 0;
-            let checkedCount = 0;
-
-            inputs.forEach(function(input) {
-                const answer = input.value.trim();
-                const overrideBtn = document.getElementById("override-" + input.id);
-
-                if (!triggerSync && answer === "") {
-                    return;
-                }
-
-                if (input.classList.contains("teacher-locked")) {
-                    if (overrideBtn) overrideBtn.classList.remove("hidden");
-                    if (input.classList.contains("input-correct")) correctCount++;
-                    checkedCount++;
-                    return;
-                }
-
-                if (groupClass === "red-input") {
-                    let acceptedAnswers = [];
-                    try {
-                        acceptedAnswers = JSON.parse(input.getAttribute("data-answers") || "[]");
-                    } catch (error) {
-                        acceptedAnswers = [];
-                    }
-
-                    const normalisedAnswer = normaliseKeywordText(answer);
-                    const correct = answer !== "" && acceptedAnswers.some(function(item) {
-                        return normalisedAnswer === normaliseKeywordText(item);
-                    });
-
-                    input.classList.remove("input-correct", "input-incorrect", "input-partial");
-                    if (answer !== "" || triggerSync) {
-                        input.classList.add(correct ? "input-correct" : "input-incorrect");
-                    }
-
-                    if (correct) correctCount++;
-                    checkedCount++;
-                    return;
-                }
-
-                let rubric = keywordRubrics[input.id];
-
-                if (!rubric) {
-                    try {
-                        const raw = JSON.parse(input.getAttribute("data-answers") || "[]");
-                        rubric = raw.map(item => Array.isArray(item) ? item : [item]);
-                    } catch (e) {
-                        rubric = [];
-                    }
-                }
-
-                if (!rubric || rubric.length === 0) {
-                    return;
-                }
-
-                if (overrideBtn && (answer !== "" || triggerSync)) {
-                    overrideBtn.classList.remove("hidden");
-                }
-
+            if (rubric.length > 0) {
                 const matchedGroups = rubric.filter(function(group) {
                     return group.some(function(keyword) {
-                        return keywordPhraseFound(answer, keyword);
+                        return keywordFound(answer, keyword);
                     });
                 }).length;
 
                 const requiredGroups = Math.ceil(rubric.length * 0.8);
-                const correct = answer !== "" && matchedGroups >= requiredGroups;
+                correct = matchedGroups >= requiredGroups;
+            }
+        }
 
-                input.classList.remove("input-correct", "input-incorrect", "input-partial");
-                input.classList.add(correct ? "input-correct" : "input-incorrect");
+        input.classList.add(correct ? "input-correct" : "input-incorrect");
 
-                let feedback = document.getElementById(input.id + "_feedback");
-                if (!feedback) {
-                    feedback = document.createElement("div");
-                    feedback.id = input.id + "_feedback";
-                    feedback.className = "keyword-marking-feedback";
-                    input.insertAdjacentElement("afterend", feedback);
-                }
+        if (correct) {
+            feedback.textContent = "Correct! You have included the key ideas.";
+            feedback.style.color = "#008f39";
+        } else {
+            feedback.textContent = "Not quite. Read the question again and add the important ideas.";
+            feedback.style.color = "#b71c1c";
+        }
 
-                if (answer === "") {
-                    feedback.textContent = "❌ Please enter an answer before checking.";
-                    feedback.style.color = "#d32f2f";
-                } else if (correct) {
-                    feedback.textContent = "✅ Correct! Well explained.";
-                    feedback.style.color = "#008f39";
-                } else {
-                    feedback.textContent = `❌ Not quite (${matchedGroups}/${rubric.length} key points found). Read the question again to make sure you included all parts.`;
-                    feedback.style.color = "#d32f2f";
-                }
+        return correct;
+    }
 
-                if (correct) correctCount++;
-                checkedCount++;
+    function checkAnswers(groupClass, triggerSync = true) {
+        const inputs = document.querySelectorAll("." + groupClass);
+        let correctCount = 0;
+
+        inputs.forEach(function(input) {
+            if (markAnswer(input)) {
+                correctCount++;
+            }
+        });
+
+        if (triggerSync) {
+            saveProgress(true);
+        }
+
+        return {
+            correct: correctCount,
+            total: inputs.length
+        };
+    }
+
+    /* =========================================================
+       3. TEACHER MARKBOOK DATA
+       ========================================================= */
+
+    function buildStructuredMarkbookItems() {
+        const items = [];
+        let correctCount = 0;
+        let totalGradable = 0;
+
+        document.querySelectorAll(".prep-input").forEach(function(input) {
+            items.push({
+                label: input.getAttribute("data-label") || "Preparation",
+                value: input.value.trim(),
+                status: "neutral"
             });
+        });
 
-            if (triggerSync && typeof saveProgress === "function") {
-                saveProgress(true);
+        document.querySelectorAll(".graded-input, .red-input, .amber-input, .green-input, .blue-input").forEach(function(input) {
+            if (items.some(function(item) {
+                return item.label === input.getAttribute("data-label");
+            })) {
+                return;
             }
 
-            return {
-                correct: correctCount,
-                total: checkedCount
-            };
+            let status = "neutral";
+
+            if (input.classList.contains("input-correct")) {
+                status = "correct";
+                correctCount++;
+            } else if (input.classList.contains("input-incorrect")) {
+                status = "incorrect";
+            }
+
+            items.push({
+                label: input.getAttribute("data-label") || input.id || "Question",
+                value: input.value.trim(),
+                status: status
+            });
+
+            totalGradable++;
+        });
+
+        document.querySelectorAll(".plenary-input").forEach(function(input) {
+            items.push({
+                label: input.getAttribute("data-label") || "Plenary",
+                value: input.value.trim(),
+                status: "neutral"
+            });
+        });
+
+        return {
+            items: items,
+            scoreText: "Score: " + correctCount + " / " + totalGradable
+        };
+    }
+
+    /* =========================================================
+       4. SAVE PROGRESS TO FIREBASE
+       ========================================================= */
+
+    function syncWorkToCloud(immediate = false) {
+        if (
+            sessionStorage.getItem("teacherMode") === "true" &&
+            sessionStorage.getItem("inspectStudentUid")
+        ) {
+            return;
         }
-    </script>
+
+        if (!auth || !db || !auth.currentUser) {
+            return;
+        }
+
+        clearTimeout(cloudSyncTimer);
+
+        cloudSyncTimer = setTimeout(function() {
+            const user = auth.currentUser;
+
+            if (!user) {
+                return;
+            }
+
+            const inputs = document.querySelectorAll(".auto-input");
+            const structured = buildStructuredMarkbookItems();
+
+            const payload = {
+                pageTitle: "Computational Thinking",
+                lastUpdated: Date.now(),
+                scoreText: structured.scoreText,
+                items: structured.items
+            };
+
+            inputs.forEach(function(input, index) {
+                payload["input_" + index] = input.value;
+                payload["class_" + index] = input.className;
+            });
+
+            db.collection("users")
+                .doc(user.uid)
+                .collection("lessons")
+                .doc(LESSON_ID)
+                .set(payload, { merge: true })
+                .catch(function(error) {
+                    console.error("Cloud save error:", error);
+                });
+        }, immediate ? 50 : 600);
+    }
+
+    function saveProgress(immediate = false) {
+        syncWorkToCloud(immediate);
+    }
+
+    /* =========================================================
+       5. LOAD SAVED PROGRESS
+       ========================================================= */
+
+    function applySavedInputs(data) {
+        const inputs = document.querySelectorAll(".auto-input");
+
+        inputs.forEach(function(input, index) {
+            const savedValue = data["input_" + index];
+
+            if (savedValue !== undefined) {
+                input.value = savedValue;
+            }
+
+            if (data["class_" + index]) {
+                input.className = data["class_" + index];
+            }
+
+            if (input.tagName.toLowerCase() === "textarea") {
+                input.style.height = "auto";
+                input.style.height = input.scrollHeight + "px";
+            }
+        });
+
+        checkAnswers("red-input", false);
+        checkAnswers("amber-input", false);
+        checkAnswers("green-input", false);
+        checkAnswers("blue-input", false);
+    }
+
+    function loadProgress() {
+        const isTeacher = sessionStorage.getItem("teacherMode") === "true";
+        const inspectedUid = sessionStorage.getItem("inspectStudentUid");
+
+        if (isTeacher && inspectedUid && db) {
+            db.collection("users")
+                .doc(inspectedUid)
+                .collection("lessons")
+                .doc(LESSON_ID)
+                .get()
+                .then(function(doc) {
+                    if (doc.exists) {
+                        applySavedInputs(doc.data());
+                    }
+                })
+                .catch(function(error) {
+                    console.error("Error loading student work:", error);
+                });
+
+            return;
+        }
+
+        if (!auth || !db) {
+            return;
+        }
+
+        auth.onAuthStateChanged(async function(user) {
+            if (!user) {
+                if (!isTeacher) {
+                    alert("Please log in on the home page first!");
+                    window.location.href = "index.html";
+                }
+                return;
+            }
+
+            try {
+                const doc = await db.collection("users")
+                    .doc(user.uid)
+                    .collection("lessons")
+                    .doc(LESSON_ID)
+                    .get();
+
+                if (doc.exists) {
+                    applySavedInputs(doc.data());
+                } else {
+                    syncWorkToCloud(true);
+                }
+            } catch (error) {
+                console.error("Error loading saved work:", error);
+            }
+        });
+    }
+
+    /* =========================================================
+       6. INPUT EVENTS AND TEXTAREA SIZING
+       ========================================================= */
+
+    document.addEventListener("input", function(event) {
+        const input = event.target;
+
+        if (!input.classList.contains("auto-input")) {
+            return;
+        }
+
+        if (input.tagName.toLowerCase() === "textarea") {
+            input.style.height = "auto";
+            input.style.height = input.scrollHeight + "px";
+        }
+
+        saveProgress(false);
+    });
+
+    /* =========================================================
+       7. RESET PAGE
+       ========================================================= */
+
+    async function clearAllData() {
+        const confirmed = confirm(
+            "Are you sure you want to clear all your answers for this lesson?"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        if (
+            auth &&
+            db &&
+            auth.currentUser &&
+            sessionStorage.getItem("teacherMode") !== "true"
+        ) {
+            try {
+                await db.collection("users")
+                    .doc(auth.currentUser.uid)
+                    .collection("lessons")
+                    .doc(LESSON_ID)
+                    .delete();
+            } catch (error) {
+                console.error("Could not delete saved lesson data:", error);
+            }
+        }
+
+        window.location.reload();
+    }
+
+    window.onload = loadProgress;
+</script>
+
 </body>
 </html>
