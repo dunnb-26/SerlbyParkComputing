@@ -571,28 +571,21 @@
         }
 
         /* ==========================================================================
-           2. AUTO-SAVE & LOAD LOGIC (Cloud + LocalStorage Fallback)
+           2. AUTO-SAVE & LOAD LOGIC (Cloud Only - No LocalStorage)
            ========================================================================== */
         function saveProgress(immediate = false) {
-            try {
-                var inputs = document.querySelectorAll('.auto-input');
-                var dataToSave = {};
-                for (var i = 0; i < inputs.length; i++) {
-                    dataToSave['input_' + i] = inputs[i].value;
-                    dataToSave['class_' + i] = inputs[i].className;
-                }
-                localStorage.setItem('computationalThinkingMemory', JSON.stringify(dataToSave));
-            } catch (error) {
-                console.log("Local memory saving blocked - ignoring safely.");
-            }
             syncWorkToCloud(immediate);
         }
 
         function applySavedInputs(data) {
             var inputs = document.querySelectorAll('.auto-input');
             for (var i = 0; i < inputs.length; i++) {
-                if (data['input_' + i] !== undefined && data['input_' + i] !== "") {
-                    inputs[i].value = data['input_' + i];
+                var savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined && savedVal !== "") {
+                    inputs[i].value = savedVal;
                     if (data['class_' + i]) {
                         inputs[i].className = data['class_' + i];
                         if (inputs[i].classList.contains('input-correct') || inputs[i].classList.contains('input-incorrect') || inputs[i].classList.contains('teacher-locked')) {
@@ -624,18 +617,15 @@
                 return;
             }
 
-            try {
-                var savedDataStr = localStorage.getItem('computationalThinkingMemory');
-                if (savedDataStr) {
-                    applySavedInputs(JSON.parse(savedDataStr));
-                }
-            } catch (error) {
-                console.log("Local memory loading blocked - ignoring safely.");
-            }
-
             if (auth && db) {
                 auth.onAuthStateChanged(async (user) => {
-                    if (!user) return;
+                    if (!user) {
+                        if (!isTeacher) {
+                            alert("Please log in on the home page first!");
+                            window.location.href = "index.html";
+                        }
+                        return;
+                    }
 
                     try {
                         const doc = await db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).get();
@@ -663,7 +653,6 @@
 
         async function clearAllData() {
             if (confirm("Are you sure you want to clear EVERYTHING on this page?")) {
-                try { localStorage.removeItem('computationalThinkingMemory'); } catch(e) {}
                 if (auth && db && auth.currentUser) {
                     try {
                         await db.collection('users').doc(auth.currentUser.uid).collection('lessons').doc(LESSON_ID).delete();
@@ -833,12 +822,10 @@
                 const answer = input.value.trim();
                 const overrideBtn = document.getElementById("override-" + input.id);
 
-                // Ignore blank fields on initial page load so they don't turn red immediately
                 if (!triggerSync && answer === "") {
                     return;
                 }
 
-                // Respect Teacher Override lock
                 if (input.classList.contains("teacher-locked")) {
                     if (overrideBtn) overrideBtn.classList.remove("hidden");
                     if (input.classList.contains("input-correct")) correctCount++;
@@ -846,7 +833,6 @@
                     return;
                 }
 
-                // RED TASK: exact/synonym match using data-answers
                 if (groupClass === "red-input") {
                     let acceptedAnswers = [];
                     try {
@@ -870,10 +856,8 @@
                     return;
                 }
 
-                // AMBER, GREEN AND BLUE TASKS
                 let rubric = keywordRubrics[input.id];
 
-                // Fallback to data-answers attribute if no custom rubric exists
                 if (!rubric) {
                     try {
                         const raw = JSON.parse(input.getAttribute("data-answers") || "[]");
@@ -884,7 +868,6 @@
                 }
 
                 if (!rubric || rubric.length === 0) {
-                    console.warn("No keyword rubric configured for:", input.id);
                     return;
                 }
 
@@ -898,7 +881,6 @@
                     });
                 }).length;
 
-                // Require 80% of keyword concept groups
                 const requiredGroups = Math.ceil(rubric.length * 0.8);
                 const correct = answer !== "" && matchedGroups >= requiredGroups;
 
