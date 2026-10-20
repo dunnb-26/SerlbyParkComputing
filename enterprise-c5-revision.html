@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>C5: Sources of Business Finance - Revision</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
         .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
@@ -36,8 +41,8 @@
         .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
         .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
         .btn-submit:hover { background-color: #152960; }
-        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
-        .btn-pdf:hover { background-color: #124d2d; }
+        .btn-reset { background-color: #d32f2f; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; margin: 20px auto; }
+        .btn-reset:hover { background-color: #b71c1c; }
     </style>
 </head>
 <body>
@@ -53,7 +58,7 @@
                 <h2>C5 Revision Notes</h2>
                 <div class="instruction-box center-text">Use this space to write out your complete notes on internal finance (savings, retained profit, assets), external finance (loans, overdrafts, trade credit, hire purchase, leasing, crowdfunding, investors, grants), and how to choose the right source.</div>
                 <div class="question-wrapper">
-                    <textarea class="auto-input" rows="12" placeholder="Type your revision notes here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                    <textarea class="auto-input notes-textarea" rows="12" placeholder="Type your revision notes here..."></textarea>
                 </div>
             </div>
 
@@ -64,496 +69,496 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 1: Key knowledge</h3>
                 
                 <div class="question-wrapper">
-                    <label class="question-label">1. What is business finance?</label>
-                    <textarea id="c5_q1" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["money a business needs", "start or run a business", "cash to pay for things"]], "feedback": "Acceptable: Money a business needs, money to start or run a business, or cash to pay for things the business needs."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q1. What is business finance?</label>
+                    <textarea id="c5_q1" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["money a business needs", "start or run a business", "cash to pay for things"]], "feedback": "Hint: What do you call the total money or cash a business requires to set up and operate?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q1')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">2. Why might a business need finance?</label>
-                    <textarea id="c5_q2" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["start up", "buy equipment", "buy stock", "pay wages", "advertise", "expand", "cash flow", "bills"]], "feedback": "Acceptable: To start up, buy equipment/stock, pay wages, advertise, expand, cover cash flow, or pay unexpected bills."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q2. Why might a business need finance?</label>
+                    <textarea id="c5_q2" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["start up", "buy equipment", "buy stock", "pay wages", "advertise", "expand", "cash flow", "bills"]], "feedback": "Hint: Think of reasons like launching, buying equipment, paying employees, or funding expansion."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q2')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">3. What is internal finance?</label>
-                    <textarea id="c5_q3" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["within the business", "owner", "already has"]], "feedback": "Acceptable: Money from within the business or owner, using money the business already has."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q3. What is internal finance?</label>
+                    <textarea id="c5_q3" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["within the business", "owner", "already has"]], "feedback": "Hint: Where does internal finance come from relative to the company boundaries?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q3')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">4. What is external finance?</label>
-                    <textarea id="c5_q4" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["outside the business", "borrowed", "received from an outside"]], "feedback": "Acceptable: Money from outside the business, money borrowed or received from an outside person or organisation."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q4. What is external finance?</label>
+                    <textarea id="c5_q4" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["outside the business", "borrowed", "received from an outside"]], "feedback": "Hint: Where do funds come from when using external finance?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">5. Give three examples of internal finance.</label>
-                    <textarea id="c5_q5" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["personal savings", "retained profit", "selling unused assets", "already held"]], "feedback": "Acceptable: Personal savings, retained profit, selling unused assets, or money already held by the business."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q5. Give three examples of internal finance.</label>
+                    <textarea id="c5_q5" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["personal savings", "retained profit", "selling unused assets", "already held"]], "feedback": "Hint: Name three sources that don't involve borrowing from external third parties (e.g., savings, retained profit, selling assets)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q5')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">6. Give three examples of external finance.</label>
-                    <textarea id="c5_q6" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["bank loan", "overdraft", "trade credit", "crowdfunding", "investors", "grants", "hire purchase"]], "feedback": "Acceptable: Bank loan, overdraft, trade credit, crowdfunding, investors, grants, or hire purchase."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q6. Give three examples of external finance.</label>
+                    <textarea id="c5_q6" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["bank loan", "overdraft", "trade credit", "crowdfunding", "investors", "grants", "hire purchase"]], "feedback": "Hint: Name three sources involving outside organizations or lenders (e.g., bank loan, overdraft, grants)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q6')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">7. What are personal savings?</label>
-                    <textarea id="c5_q7" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["owner s own money", "money they have saved"]], "feedback": "Acceptable: The owners own money, or money they have saved and put into the business."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q7. What are personal savings?</label>
+                    <textarea id="c5_q7" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["owner s own money", "money they have saved"]], "feedback": "Hint: Whose personal money is being invested into the enterprise?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q7')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">8. Give one advantage of using personal savings.</label>
-                    <textarea id="c5_q8" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["no loan interest", "no loan repayments", "keep full control"]], "feedback": "Acceptable: No loan interest, no repayments to make, or the owner keeps full control of the business."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q8. Give one advantage of using personal savings.</label>
+                    <textarea id="c5_q8" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["no loan interest", "no loan repayments", "keep full control"]], "feedback": "Hint: What don't you have to pay back when using your own cash? Think about interest and control."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q8')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">9. Give one disadvantage of using personal savings.</label>
-                    <textarea id="c5_q9" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["risks losing their money", "may not have enough", "less personal money available"]], "feedback": "Acceptable: Owner risks losing their money, may not have enough savings, or less personal money available."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q9. Give one disadvantage of using personal savings.</label>
+                    <textarea id="c5_q9" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["risks losing their money", "may not have enough", "less personal money available"]], "feedback": "Hint: What is the personal risk to the owner's wealth if the venture fails?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q9')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">10. What are retained profits?</label>
-                    <textarea id="c5_q10" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["profit kept in the business", "instead of being taken out", "money saved from previous"]], "feedback": "Acceptable: Profit kept in the business instead of being taken out, or money saved from previous profits."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q10. What are retained profits?</label>
+                    <textarea id="c5_q10" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["profit kept in the business", "instead of being taken out", "money saved from previous"]], "feedback": "Hint: What do you call past profits that are reinvested rather than withdrawn by the owner?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q10')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">11. Give one advantage of retained profits.</label>
-                    <textarea id="c5_q11" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["no interest", "no need to borrow", "already earned"]], "feedback": "Acceptable: No interest to pay, no need to borrow, or business can use money it has already earned."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q11. Give one advantage of retained profits.</label>
+                    <textarea id="c5_q11" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["no interest", "no need to borrow", "already earned"]], "feedback": "Hint: Since it's money the business already earned, what costs do you avoid?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q11')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">12. Give one disadvantage of retained profits.</label>
-                    <textarea id="c5_q12" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["made profit already", "may not be enough money", "leave less cash for emergencies"]], "feedback": "Acceptable: Business must have made profit already, might not be enough available, or leaves less cash for emergencies."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q12. Give one disadvantage of retained profits.</label>
+                    <textarea id="c5_q12" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["made profit already", "may not be enough money", "leave less cash for emergencies"]], "feedback": "Hint: Can a brand-new business use retained profits? What if past profits weren't very high?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q12')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">13. What does selling assets mean?</label>
-                    <textarea id="c5_q13" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["selling things the business owns", "unused equipment", "vehicles", "raise money"]], "feedback": "Acceptable: Selling things the business owns, such as unused equipment, vehicles or machinery, to raise money."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q13. What does selling assets mean?</label>
+                    <textarea id="c5_q13" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["selling things the business owns", "unused equipment", "vehicles", "raise money"]], "feedback": "Hint: Converting idle machinery or property the company owns into cash."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q13')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">14. Give one advantage of selling unused assets.</label>
-                    <textarea id="c5_q14" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["raises cash without taking out a loan", "turn unwanted equipment", "avoids interest"]], "feedback": "Acceptable: Raises cash without taking a loan, turns unwanted equipment into money, or avoids interest payments."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q14. Give one advantage of selling unused assets.</label>
+                    <textarea id="c5_q14" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["raises cash without taking out a loan", "turn unwanted equipment", "avoids interest"]], "feedback": "Hint: How does this help raise funds without adding debt or interest charges?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q14')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">15. Give one disadvantage of selling assets.</label>
-                    <textarea id="c5_q15" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["loses the item", "replace it later", "not receive much money"]], "feedback": "Acceptable: Business loses the item, may need to replace it later, or might not receive much money for it."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q15. Give one disadvantage of selling assets.</label>
+                    <textarea id="c5_q15" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["loses the item", "replace it later", "not receive much money"]], "feedback": "Hint: What are you giving up permanently, and what if you get a poor resale price?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q15')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 2: Borrowing money</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">16. What is a bank loan?</label>
-                    <textarea id="c5_q16" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["money borrowed from a bank", "paid back", "interest"]], "feedback": "Acceptable: Money borrowed from a bank that must be paid back, usually with interest."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q16. What is a bank loan?</label>
+                    <textarea id="c5_q16" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["money borrowed from a bank", "paid back", "interest"]], "feedback": "Hint: A lump sum borrowed from a bank that requires scheduled repayments plus interest."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q16')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">17. Give one advantage of a bank loan.</label>
-                    <textarea id="c5_q17" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["large amount of money", "equipment or expansion", "repayments can be spread"]], "feedback": "Acceptable: Provides a large amount of money, useful for equipment/expansion, or repayments spread over time."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q17. Give one advantage of a bank loan.</label>
+                    <textarea id="c5_q17" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["large amount of money", "equipment or expansion", "repayments can be spread"]], "feedback": "Hint: Why is a bank loan good for funding massive expenses like building expansion?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q17')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">18. Give one disadvantage of a bank loan.</label>
-                    <textarea id="c5_q18" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["interest makes it more expensive", "repayments must be made", "refuse the application", "debt"]], "feedback": "Acceptable: Interest makes it expensive, mandatory repayments, bank might refuse, or business takes on debt."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q18. Give one disadvantage of a bank loan.</label>
+                    <textarea id="c5_q18" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["interest makes it more expensive", "repayments must be made", "refuse the application", "debt"]], "feedback": "Hint: Think about mandatory monthly debt commitments and the cost of interest."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q18')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">19. What is an overdraft?</label>
-                    <textarea id="c5_q19" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["agreement with a bank", "spend more than is in the business", "borrowing through the account"]], "feedback": "Acceptable: Bank agreement to spend more than in the account, or borrowing through the account."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q19. What is an overdraft?</label>
+                    <textarea id="c5_q19" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["agreement with a bank", "spend more money than is in the business", "borrowing through the account"]], "feedback": "Hint: A facility allowing you to draw more money than your current bank balance contains."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q19')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">20. Give one advantage of an overdraft.</label>
-                    <textarea id="c5_q20" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["short term cash shortages", "flexible access", "help pay bills while waiting"]], "feedback": "Acceptable: Useful for short-term cash shortages, flexible access, or helping pay bills while waiting for customers."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q20. Give one advantage of an overdraft.</label>
+                    <textarea id="c5_q20" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["short term cash shortages", "flexible access", "help pay bills while waiting"]], "feedback": "Hint: How does it help smooth out brief cash flow dips while waiting for client payments?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q20')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">21. Give one disadvantage of an overdraft.</label>
-                    <textarea id="c5_q21" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["interest or fees", "bank can reduce or withdraw", "expensive if used for a long time"]], "feedback": "Acceptable: Interest/fees apply, bank can withdraw it, or expensive if used long-term."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q21. Give one disadvantage of an overdraft.</label>
+                    <textarea id="c5_q21" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["interest or fees", "bank can reduce or withdraw", "expensive if used for a long time"]], "feedback": "Hint: High interest rates and the risk of the bank pulling the facility suddenly."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q21')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">22. What is trade credit?</label>
-                    <textarea id="c5_q22" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["goods or stock now and paying the supplier later", "buying on agreed payment terms"]], "feedback": "Acceptable: Getting goods/stock now and paying later, or buying on agreed payment terms."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q22. What is trade credit?</label>
+                    <textarea id="c5_q22" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["goods or stock now and paying the supplier later", "buying on agreed payment terms"]], "feedback": "Hint: Taking delivery of inventory now and settling the invoice 30 to 60 days later."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q22')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">23. Give one advantage of trade credit.</label>
-                    <textarea id="c5_q23" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["sell stock before paying", "keeping cash available"]], "feedback": "Acceptable: Can sell stock before paying for it, keeping cash available for other costs temporarily."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q23. Give one advantage of trade credit.</label>
+                    <textarea id="c5_q23" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["sell stock before paying", "keeping cash available"]], "feedback": "Hint: You can sell the stock to customers and pocket the cash before the supplier's bill is due."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q23')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">24. Give one disadvantage of trade credit.</label>
-                    <textarea id="c5_q24" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["supplier still needs paying", "damage the relationship", "refuse future credit"]], "feedback": "Acceptable: Supplier must still be paid, missing deadlines damages relationships, or suppliers may stop offering credit."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q24. Give one disadvantage of trade credit.</label>
+                    <textarea id="c5_q24" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["supplier still needs paying", "damage the relationship", "refuse future credit"]], "feedback": "Hint: What happens if you miss the payment window? Suppliers might cut off future credit."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q24')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">25. What is hire purchase?</label>
-                    <textarea id="c5_q25" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["paying for it in instalments", "ownership transferring after all payments"]], "feedback": "Acceptable: Getting an item and paying in instalments, with ownership transferring after all payments are made."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q25. What is hire purchase?</label>
+                    <textarea id="c5_q25" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["paying for it in instalments", "ownership transferring after all payments"]], "feedback": "Hint: Acquiring equipment via regular payments where ownership passes to you once the final payment is cleared."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q25')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">26. Give one advantage of hire purchase.</label>
-                    <textarea id="c5_q26" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["use equipment without paying the full cost upfront", "spread out"]], "feedback": "Acceptable: Can use equipment without paying full cost upfront, and payments are spread out."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q26. Give one advantage of hire purchase.</label>
+                    <textarea id="c5_q26" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["use equipment without paying the full cost upfront", "spread out"]], "feedback": "Hint: How does breaking down payments help you get machinery immediately without breaking the bank?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q26" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q26')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">27. Give one disadvantage of hire purchase.</label>
-                    <textarea id="c5_q27" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["total cost may be higher", "interest and fees", "taken back if payments are missed"]], "feedback": "Acceptable: Total cost higher due to interest/fees, payments must continue, or item taken back if payments missed."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q27. Give one disadvantage of hire purchase.</label>
+                    <textarea id="c5_q27" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["total cost may be higher", "interest and fees", "taken back if payments are missed"]], "feedback": "Hint: Think about extra interest charges and the risk of repossession if payments stop."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q27" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q27')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">28. What is leasing?</label>
-                    <textarea id="c5_q28" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["paying to use an asset", "instead of buying it outright", "renting equipment"]], "feedback": "Acceptable: Paying to use an asset for a period instead of buying outright, or renting equipment/vehicles."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q28. What is leasing?</label>
+                    <textarea id="c5_q28" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["paying to use an asset", "instead of buying it outright", "renting equipment"]], "feedback": "Hint: Renting an asset or vehicle for a fixed period rather than buying it."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q28" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q28')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">29. Give one advantage of leasing.</label>
-                    <textarea id="c5_q29" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["lower upfront cost", "predictable payments", "use equipment without buying it"]], "feedback": "Acceptable: Lower upfront cost, predictable payments, or using equipment without buying it outright."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q29. Give one advantage of leasing.</label>
+                    <textarea id="c5_q29" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["lower upfront cost", "predictable payments", "use equipment without buying it"]], "feedback": "Hint: Lower initial cost and freedom from maintenance or long-term ownership concerns."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q29" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q29')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">30. Give one disadvantage of leasing.</label>
-                    <textarea id="c5_q30" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["payments continue over time", "may never own the item", "restrictions or extra charges"]], "feedback": "Acceptable: Payments continue over time, may never own the item, or restrictions/extra charges apply."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q30. Give one disadvantage of leasing.</label>
+                    <textarea id="c5_q30" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["payments continue over time", "may never own the item", "restrictions or extra charges"]], "feedback": "Hint: You never own the asset, meaning payments continue indefinitely if you keep renting."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q30" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q30')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 3: Investors and other sources</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">31. What is an investor?</label>
-                    <textarea id="c5_q31" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["puts money into a business", "receive a return"]], "feedback": "Acceptable: Someone who puts money into a business hoping to receive a financial return."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q31. What is an investor?</label>
+                    <textarea id="c5_q31" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["puts money into a business", "receive a return"]], "feedback": "Hint: An individual or entity injecting capital in exchange for a share of profits or ownership."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q31" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q31')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">32. Give one advantage of getting an investor.</label>
-                    <textarea id="c5_q32" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["provides money for growth", "bring experience or contacts", "not a standard loan"]], "feedback": "Acceptable: Provides money for growth, brings experience/contacts, or doesn't require standard loan repayments."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q32. Give one advantage of getting an investor.</label>
+                    <textarea id="c5_q32" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["provides money for growth", "bring experience or contacts", "not a standard loan"]], "feedback": "Hint: Besides cash, what else can a smart investor provide (like mentoring or connections)?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q32" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q32')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">33. Give one disadvantage of getting an investor.</label>
-                    <textarea id="c5_q33" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["give up some control", "share profits or ownership", "listen to investor"]], "feedback": "Acceptable: Owner may have to give up control, share profits/ownership, or listen to the investor's decisions."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q33. Give one disadvantage of getting an investor.</label>
+                    <textarea id="c5_q33" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["give up some control", "share profits or ownership", "listen to investor"]], "feedback": "Hint: What do you have to hand over to someone who puts capital into your company?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q33" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q33')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">34. What is crowdfunding?</label>
-                    <textarea id="c5_q34" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["raising small amounts of money from lots of people", "online platform"]], "feedback": "Acceptable: Raising small amounts of money from lots of people, often through an online platform."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q34. What is crowdfunding?</label>
+                    <textarea id="c5_q34" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["raising small amounts of money from lots of people", "online platform"]], "feedback": "Hint: Using websites like Kickstarter to gather tiny donations or investments from the general public."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q34" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q34')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">35. Give one advantage of crowdfunding.</label>
-                    <textarea id="c5_q35" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["reach lots of potential supporters", "raises money without bank loan", "promote the idea"]], "feedback": "Acceptable: Reaches potential supporters, raises money without a bank loan, or helps promote the idea."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q35. Give one advantage of crowdfunding.</label>
+                    <textarea id="c5_q35" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["reach lots of potential supporters", "raises money without bank loan", "promote the idea"]], "feedback": "Hint: It acts as both a funding mechanism and a marketing tool to build early interest."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q35" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q35')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">36. Give one disadvantage of crowdfunding.</label>
-                    <textarea id="c5_q36" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["target may not be reached", "becomes public", "takes time to promote"]], "feedback": "Acceptable: Target may not be reached, idea becomes public, or takes time to promote the campaign."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q36. Give one disadvantage of crowdfunding.</label>
+                    <textarea id="c5_q36" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["target may not be reached", "becomes public", "takes time to promote"]], "feedback": "Hint: What happens if you fail to hit your public funding goal on the platform?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q36" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q36')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">37. What is a business grant?</label>
-                    <textarea id="c5_q37" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["money awarded", "government body", "organisation", "particular purpose", "conditions"]], "feedback": "Acceptable: Money awarded by a government body or organisation for a specific purpose under conditions."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q37. What is a business grant?</label>
+                    <textarea id="c5_q37" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["money awarded", "government body", "organisation", "particular purpose", "conditions"]], "feedback": "Hint: Financial awards given by governments or trusts that usually don't need to be paid back if rules are met."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q37" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q37')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">38. Give one advantage of a grant.</label>
-                    <textarea id="c5_q38" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["may not need to be repaid", "reduces the need to borrow", "support a specific project"]], "feedback": "Acceptable: May not need to be repaid, reduces need to borrow, or supports a specific project."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q38. Give one advantage of a grant.</label>
+                    <textarea id="c5_q38" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["may not need to be repaid", "reduces the need to borrow", "support a specific project"]], "feedback": "Hint: Free money! You don't have to repay it as long as you fulfill the project terms."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q38" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q38')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">39. Give one disadvantage of a grant.</label>
-                    <textarea id="c5_q39" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["may not qualify", "applications take time", "restrictions on how money is used"]], "feedback": "Acceptable: Business might not qualify, applications take time, or restrictions on how money is used."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q39. Give one disadvantage of a grant.</label>
+                    <textarea id="c5_q39" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["may not qualify", "applications take time", "restrictions on how money is used"]], "feedback": "Hint: They are extremely competitive to win and come with strict application paperwork and rules."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q39" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q39')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">40. What is an angel investor?</label>
-                    <textarea id="c5_q40" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["person who invests their own money", "newer business", "offering advice"]], "feedback": "Acceptable: A person who invests their own money in a business (often newer), sometimes offering advice too."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q40. What is an angel investor?</label>
+                    <textarea id="c5_q40" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["person who invests their own money", "newer business", "offering advice"]], "feedback": "Hint: A wealthy individual backing startups with personal cash and mentoring."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q40" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q40')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">41. Give one advantage of an angel investor.</label>
-                    <textarea id="c5_q41" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["provides finance", "experience", "advice", "contacts"]], "feedback": "Acceptable: Provides finance and may offer experience, advice, or useful business contacts."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q41. Give one advantage of an angel investor.</label>
+                    <textarea id="c5_q41" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["provides finance", "experience", "advice", "contacts"]], "feedback": "Hint: They offer high-level expertise alongside their financial investment."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q41" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q41')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">42. Give one disadvantage of an angel investor.</label>
-                    <textarea id="c5_q42" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["give up part ownership", "control", "expect a return", "influence over decisions"]], "feedback": "Acceptable: Owner gives up part ownership/control, or investor expects a return/influence over decisions."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q42. Give one disadvantage of an angel investor.</label>
+                    <textarea id="c5_q42" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["give up part ownership", "control", "expect a return", "influence over decisions"]], "feedback": "Hint: They take a share in your company and expect a say in how it's run."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q42" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q42')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 4: Choosing the right source of finance</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">43. What factors should a business consider when choosing finance?</label>
-                    <textarea id="c5_q43" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["how much money", "how quickly", "interest and fees", "repayment terms", "risk", "keep control"]], "feedback": "Acceptable: Amount needed, speed required, interest/fees, repayment terms, risk, duration, and keeping control."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q43. What factors should a business consider when choosing finance?</label>
+                    <textarea id="c5_q43" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["how much money", "how quickly", "interest and fees", "repayment terms", "risk", "keep control"]], "feedback": "Hint: Think about cost, speed, the amount needed, and how ownership is affected."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q43" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q43')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">44. Which source might suit a business needing a small amount of money urgently?</label>
-                    <textarea id="c5_q44" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["personal savings", "overdraft", "short term"]], "feedback": "Acceptable: Personal savings, an overdraft if agreed, or another suitable short-term source."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q44. Which source might suit a business needing a small amount of money urgently?</label>
+                    <textarea id="c5_q44" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["personal savings", "overdraft", "short term"]], "feedback": "Hint: Quick internal or short-term options like savings or an overdraft."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q44" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q44')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">45. Which source might suit a business buying expensive machinery?</label>
-                    <textarea id="c5_q45" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["bank loan", "hire purchase", "leasing", "retained profits"]], "feedback": "Acceptable: Bank loan, hire purchase, leasing, or retained profits depending on affordability."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q45. Which source might suit a business buying expensive machinery?</label>
+                    <textarea id="c5_q45" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["bank loan", "hire purchase", "leasing", "retained profits"]], "feedback": "Hint: Long-term asset funding methods like a bank loan or hire purchase."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q45" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q45')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">46. Why might a business use retained profits rather than a loan?</label>
-                    <textarea id="c5_q46" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["avoids interest", "repayments", "only use if enough profit"]], "feedback": "Acceptable: Avoids interest and repayments, though it can only be used if enough profit has been saved."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q46. Why might a business use retained profits rather than a loan?</label>
+                    <textarea id="c5_q46" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["avoids interest", "repayments", "only use if enough profit"]], "feedback": "Hint: It bypasses bank charges and loan interest entirely."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q46" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q46')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">47. Why might a business choose a loan rather than personal savings?</label>
-                    <textarea id="c5_q47" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["need more money than owner has saved", "keep some personal savings for emergencies"]], "feedback": "Acceptable: Needs more than saved, allowing the owner to keep personal savings for emergencies."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q47. Why might a business choose a loan rather than personal savings?</label>
+                    <textarea id="c5_q47" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["need more money than owner has saved", "keep some personal savings for emergencies"]], "feedback": "Hint: When the project price tag exceeds the owner's personal bank account balance."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q47" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q47')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">48. Why might an overdraft be better for a temporary cash flow problem than a long-term loan?</label>
-                    <textarea id="c5_q48" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["flexible short term support", "waiting for money", "charges apply"]], "feedback": "Acceptable: Provides flexible short-term support while waiting for money, whereas long-term loans aren't needed."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q48. Why might an overdraft be better for a temporary cash flow problem than a long-term loan?</label>
+                    <textarea id="c5_q48" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["flexible short term support", "waiting for money", "charges apply"]], "feedback": "Hint: It can be dipped into and cleared flexibly without a fixed rigid repayment schedule."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q48" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q48')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">49. Why might leasing be better than buying equipment outright?</label>
-                    <textarea id="c5_q49" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["avoids a large upfront payment", "spreads the cost", "more cash available"]], "feedback": "Acceptable: Avoids a large upfront payment and spreads the cost, leaving more cash available for other expenses."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q49. Why might leasing be better than buying equipment outright?</label>
+                    <textarea id="c5_q49" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["avoids a large upfront payment", "spreads the cost", "more cash available"]], "feedback": "Hint: It keeps large amounts of cash free in the bank instead of locking it in physical hardware."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q49" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q49')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">50. Why might a bank refuse to lend to a business?</label>
-                    <textarea id="c5_q50" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["poor credit history", "cannot afford repayments", "lacks a suitable business plan", "risky"]], "feedback": "Acceptable: Poor credit history, can't afford repayments, lacks a business plan, or considered too risky."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q50. Why might a bank refuse to lend to a business?</label>
+                    <textarea id="c5_q50" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["poor credit history", "cannot afford repayments", "lacks a suitable business plan", "risky"]], "feedback": "Hint: Think about high risk, bad credit scores, or unconvincing business plans."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q50" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q50')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 5: Scenario questions</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">51. A new business needs £500 to buy its first batch of stock. Suggest a suitable source of finance.</label>
-                    <textarea id="c5_q51" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["personal savings", "small loan", "overdraft", "crowdfunding"]], "feedback": "Acceptable: Personal savings, a small loan, an appropriate overdraft, or crowdfunding."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q51. A new business needs £500 to buy its first batch of stock. Suggest a suitable source of finance.</label>
+                    <textarea id="c5_q51" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["personal savings", "small loan", "overdraft", "crowdfunding"]], "feedback": "Hint: Suggest a quick, accessible source for a minor startup expense."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q51" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q51')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">52. An established business wants to expand and needs £30,000. Suggest a suitable source.</label>
-                    <textarea id="c5_q52" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["bank loan", "retained profits", "investor", "grant"]], "feedback": "Acceptable: A bank loan, retained profits if available, an investor, or a suitable grant."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q52. An established business wants to expand and needs £30,000. Suggest a suitable source.</label>
+                    <textarea id="c5_q52" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["bank loan", "retained profits", "investor", "grant"]], "feedback": "Hint: Think of heavy-duty funding sources like commercial bank loans or investors."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q52" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q52')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">53. A business needs a van but cannot afford to buy it outright. Suggest a source of finance.</label>
-                    <textarea id="c5_q53" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["hire purchase", "leasing", "bank loan"]], "feedback": "Acceptable: Hire purchase, leasing, or a bank loan depending on costs and ownership preferences."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q53. A business needs a van but cannot afford to buy it outright. Suggest a source of finance.</label>
+                    <textarea id="c5_q53" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["hire purchase", "leasing", "bank loan"]], "feedback": "Hint: Think of vehicle-specific arrangements where ownership is deferred or rented."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q53" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q53')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">54. A shop has a temporary cash shortage because customers are paying late. Suggest a source of finance.</label>
-                    <textarea id="c5_q54" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["overdraft", "chase overdue", "negotiate later payment"]], "feedback": "Acceptable: An overdraft, chasing overdue payments, or negotiating later payment dates with suppliers."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q54. A shop has a temporary cash shortage because customers are paying late. Suggest a source of finance.</label>
+                    <textarea id="c5_q54" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["overdraft", "chase overdue", "negotiate later payment"]], "feedback": "Hint: Short-term liquidity fixes like an overdraft."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q54" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q54')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">55. A business owner does not want to share control with anyone else. Which sources might suit them?</label>
-                    <textarea id="c5_q55" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["personal savings", "retained profits", "loan", "overdraft"]], "feedback": "Acceptable: Personal savings, retained profits, a loan, or an overdraft (internal/debt sources don't require giving away ownership)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q55. A business owner does not want to share control with anyone else. Which sources might suit them?</label>
+                    <textarea id="c5_q55" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["personal savings", "retained profits", "loan", "overdraft"]], "feedback": "Hint: Internal funds or debt finance keep ownership fully in the hands of the founder."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q55" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q55')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">56. A business has made strong profits for several years and wants to buy new equipment. Suggest a source and explain why.</label>
-                    <textarea id="c5_q56" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["retained profits", "money it has already earned", "avoid borrowing costs"]], "feedback": "Acceptable: Retained profits, because they can use money already earned, avoid borrowing costs, and keep cash for emergencies."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q56. A business has made strong profits for several years and wants to buy new equipment. Suggest a source and explain why.</label>
+                    <textarea id="c5_q56" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["retained profits", "money it has already earned", "avoid borrowing costs"]], "feedback": "Hint: Look at accumulated past earnings that can be deployed instantly without interest."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q56" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q56')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">57. A business has a new idea but cannot get a bank loan. Suggest another possible source.</label>
-                    <textarea id="c5_q57" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["crowdfunding", "angel investor", "grant", "personal savings"]], "feedback": "Acceptable: Crowdfunding, an angel investor, a grant if eligible, or personal savings."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q57. A business has a new idea but cannot get a bank loan. Suggest another possible source.</label>
+                    <textarea id="c5_q57" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["crowdfunding", "angel investor", "grant", "personal savings"]], "feedback": "Hint: Alternative startup methods like public web funding or angel backers."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q57" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q57')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">58. A business needs equipment immediately but expects its income to increase over the next year. Suggest a possible source.</label>
-                    <textarea id="c5_q58" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["loan", "hire purchase", "spread the cost"]], "feedback": "Acceptable: A loan or hire purchase to spread the cost, provided repayments are checked for affordability before income rises."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q58. A business needs equipment immediately but expects its income to increase over the next year. Suggest a possible source.</label>
+                    <textarea id="c5_q58" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["loan", "hire purchase", "spread the cost"]], "feedback": "Hint: Borrowing or installment plans where future revenue covers the repayment installments."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q58" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q58')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">59. An owner wants finance and business advice. Which source might be suitable?</label>
-                    <textarea id="c5_q59" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["angel investor", "money and guidance"]], "feedback": "Acceptable: An angel investor provides both money and guidance, though owner gives up some ownership/control."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q59. An owner wants finance and business advice. Which source might be suitable?</label>
+                    <textarea id="c5_q59" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["angel investor", "money and guidance"]], "feedback": "Hint: Think of an individual investor who mentors founders alongside putting money in."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q59" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q59')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">60. A business receives a grant. Does this mean it can spend the money on anything?</label>
-                    <textarea id="c5_q60" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["not necessarily", "conditions", "agreed purpose"]], "feedback": "Acceptable: Not necessarily. Grants often have strict conditions and may only be used for an agreed purpose."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q60. A business receives a grant. Does this mean it can spend the money on anything?</label>
+                    <textarea id="c5_q60" class="auto-input c5-input" rows="2" data-rubric='{"keywords": [["not necessarily", "conditions", "agreed purpose"]], "feedback": "Hint: Check if grants come with strings attached regarding how the cash is spent."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q60" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q60')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 6: Challenge questions</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">61. Explain why a bank loan may be suitable for business expansion.</label>
-                    <textarea id="c5_q61" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["large amount of money", "buy equipment or premises", "grow", "afford repayments"]], "feedback": "Acceptable: Provides a large amount to buy equipment or premises for growth, provided they can afford repayments/interest."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q61. Explain why a bank loan may be suitable for business expansion.</label>
+                    <textarea id="c5_q61" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["large amount of money", "buy equipment or premises", "grow", "afford repayments"]], "feedback": "Hint: It unlocks major capital for scaling up, provided earnings can support repayments."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q61" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q61')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">62. Explain why using personal savings could be risky.</label>
-                    <textarea id="c5_q62" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["business fails", "owner could lose their savings", "less money for personal expenses"]], "feedback": "Acceptable: If the business fails, the owner loses their savings, leaving less money for personal expenses or emergencies."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q62. Explain why using personal savings could be risky.</label>
+                    <textarea id="c5_q62" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["business fails", "owner could lose their savings", "less money for personal expenses"]], "feedback": "Hint: Personal financial ruin can happen if the company goes under and personal buffers are wiped out."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q62" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q62')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">63. A business needs £20,000 but wants to avoid interest. Suggest a possible source and explain a limitation.</label>
-                    <textarea id="c5_q63" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["retained profits", "grant"], ["may not be sufficient", "difficult to obtain", "restricted"]], "feedback": "Acceptable: Retained profits or a grant avoids interest. Limitation: profits may not be enough, and grants are hard to get."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q63. A business needs £20,000 but wants to avoid interest. Suggest a possible source and explain a limitation.</label>
+                    <textarea id="c5_q63" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["retained profits", "grant"], ["may not be sufficient", "difficult to obtain", "restricted"]], "feedback": "Hint: Consider retained earnings or grants. Think about why they might not be fully sufficient or easy to secure."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q63" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q63')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">64. Explain why an investor might be better than a loan for a new business.</label>
-                    <textarea id="c5_q64" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["without a normal loan repayment schedule", "reduce pressure on cash flow", "share ownership"]], "feedback": "Acceptable: Provides money without standard loan repayments (easing cash flow), but owner shares ownership/decision-making."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q64. Explain why an investor might be better than a loan for a new business.</label>
+                    <textarea id="c5_q64" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["without a normal loan repayment schedule", "reduce pressure on cash flow", "share ownership"]], "feedback": "Hint: There are no rigid monthly loan installments stressing early cash flow, but you trade equity instead."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q64" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q64')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">65. Explain why a business should compare finance options before choosing one.</label>
-                    <textarea id="c5_q65" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["costs", "repayment terms", "risks", "conditions differ", "find finance it can afford"]], "feedback": "Acceptable: Costs, repayment terms, risks and conditions differ, helping find affordable finance that suits needs."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q65. Explain why a business should compare finance options before choosing one.</label>
+                    <textarea id="c5_q65" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["costs", "repayment terms", "risks", "conditions differ", "find finance it can afford"]], "feedback": "Hint: Different methods carry drastically different interest rates, terms, and risk levels."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q65" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q65')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">66. A business has unstable sales. Explain why a large loan could be risky.</label>
-                    <textarea id="c5_q66" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["repayments are still due when sales are low", "cash flow problems", "harder to pay other bills"]], "feedback": "Acceptable: Repayments are due when sales are low, creating cash flow problems and making other bills harder to pay."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q66. A business has unstable sales. Explain why a large loan could be risky.</label>
+                    <textarea id="c5_q66" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["repayments are still due when sales are low", "cash flow problems", "harder to pay other bills"]], "feedback": "Hint: Fixed loan repayments don't shrink during slow months, putting immense pressure on cash flow."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q66" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q66')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">67. Explain one benefit and one drawback of crowdfunding.</label>
-                    <textarea id="c5_q67" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["raise money from many supporters", "promote the idea"], ["fail to reach target", "spend a lot of time marketing"]], "feedback": "Acceptable: Benefit (raises money from supporters/promotes idea). Drawback (might fail target or take lots of marketing time)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q67. Explain one benefit and one drawback of crowdfunding.</label>
+                    <textarea id="c5_q67" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["raise money from many supporters", "promote the idea"], ["fail to reach target", "spend a lot of time marketing"]], "feedback": "Hint: Benefit (public exposure and funds). Drawback (campaign failure risk or high marketing effort required)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q67" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q67')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">68. A business wants to buy a machine that will last ten years. Why should it consider how long it needs the finance for?</label>
-                    <textarea id="c5_q68" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["match the finance to its needs", "ability to pay", "long term payments increase total cost"]], "feedback": "Acceptable: Match finance to needs/ability to pay. Long-term payments increase total cost and create ongoing commitments."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q68. A business wants to buy a machine that will last ten years. Why should it consider how long it needs the finance for?</label>
+                    <textarea id="c5_q68" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["match the finance to its needs", "ability to pay", "long term payments increase total cost"]], "feedback": "Hint: Matching the lifespan of the asset to the length of the loan helps ensure affordability without overpaying on interest."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q68" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q68')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">69. Explain why a grant may not be a reliable source of finance.</label>
-                    <textarea id="c5_q69" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["may not qualify", "application unsuccessful", "decision take too long"]], "feedback": "Acceptable: Business may not qualify, application may fail, or the decision may take too long for immediate needs."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q69. Explain why a grant may not be a reliable source of finance.</label>
+                    <textarea id="c5_q69" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["may not qualify", "application unsuccessful", "decision take too long"]], "feedback": "Hint: Think about competition, strict qualifying criteria, and long approval times."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q69" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q69')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">70. Recommend a source of finance for a small business that needs new equipment but has limited cash. Explain your choice.</label>
-                    <textarea id="c5_q70" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["hire purchase", "leasing", "loan"], ["avoids paying full cost upfront", "spread"]], "feedback": "Acceptable: Hire purchase or leasing because it avoids paying full cost upfront and spreads payments. (Or affordable loan)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q70. Recommend a source of finance for a small business that needs new equipment but has limited cash. Explain your choice.</label>
+                    <textarea id="c5_q70" class="auto-input c5-input" rows="3" data-rubric='{"keywords": [["hire purchase", "leasing", "loan"], ["avoids paying full cost upfront", "spread"]], "feedback": "Hint: Suggest leasing or hire purchase and explain how it prevents a massive initial cash drain."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c5_q70" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c5_q70')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -563,8 +568,7 @@
         </main>
     </div>
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
-        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+        <button class="btn-reset no-print" onclick="clearData()">Reset Page</button>
     </div>
 
     <!-- SECURE PASSWORD MODAL -->
@@ -583,45 +587,184 @@
     <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
 
     <script>
-        function saveProgress() {
-            var inputs = document.querySelectorAll('.auto-input');
-            var dataToSave = {};
-            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
-            try { localStorage.setItem('enterpriseC5Memory_Smart_v1', JSON.stringify(dataToSave)); } catch (e) {}
+        // --- FIREBASE INITIALIZATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
-        function loadProgress() {
-            var saved = localStorage.getItem('enterpriseC5Memory_Smart_v1');
-            if (saved) {
-                var data = JSON.parse(saved);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "enterprise-c5-finance";
+
+        /* --- MARKBOOK BUILDER FOR TEACHER DASHBOARD --- */
+        function buildMarkbookData() {
+            const items = [];
+            const inputs = document.querySelectorAll('.auto-input');
+            
+            inputs.forEach((input, i) => {
+                const wrapper = input.closest('.question-wrapper');
+                const labelEl = wrapper ? wrapper.querySelector('.question-label') : null;
+                const labelText = labelEl ? labelEl.innerText.trim() : `Question ${i + 1}`;
+                
+                let status = 'neutral';
+                if (input.classList.contains('correct') || input.classList.contains('teacher-locked')) {
+                    status = 'correct';
+                } else if (input.classList.contains('incorrect')) {
+                    status = 'incorrect';
+                }
+
+                items.push({
+                    index: i,
+                    label: labelText,
+                    value: input.value.trim(),
+                    status: status
+                });
+            });
+
+            // Calculate total correct answers
+            const correctCount = document.querySelectorAll('.auto-input.correct, .auto-input.teacher-locked').length;
+            const gradableInputs = document.querySelectorAll('.c5-input');
+            const totalGradable = gradableInputs.length;
+
+            return {
+                items: items,
+                scoreText: `Score: ${correctCount} / ${totalGradable}`
+            };
+        }
+
+        /* --- CLOUD AUTO-SAVE & AUTO-LOAD --- */
+        let saveTimer;
+        function saveProgressToCloud(immediate = false) {
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                const structured = buildMarkbookData();
+                const payload = {
+                    pageTitle: document.title || "C5: Sources of Business Finance",
+                    lastUpdated: Date.now(),
+                    scoreText: structured.scoreText,
+                    items: structured.items
+                };
+
+                // Also store inputs explicitly for local legacy support fallback
                 var inputs = document.querySelectorAll('.auto-input');
                 for (var i = 0; i < inputs.length; i++) {
-                    if (data['input_' + i]) {
-                        inputs[i].value = data['input_' + i];
-                        if (data['class_' + i]) {
-                            inputs[i].className = data['class_' + i];
-                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
-                                var btnId = "override-" + inputs[i].id;
-                                var btn = document.getElementById(btnId);
-                                if (btn) btn.classList.remove('hidden');
+                    payload['input_' + i] = inputs[i].value;
+                    payload['class_' + i] = inputs[i].className;
+                }
+
+                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
+                  .set(payload, { merge: true })
+                  .catch(err => console.error("Cloud sync error:", err));
+            }, immediate ? 50 : 800);
+        }
+
+        function applySavedData(data) {
+            if (!data) return;
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                var savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined) {
+                    inputs[i].value = savedVal;
+                    if (data['class_' + i]) {
+                        inputs[i].className = data['class_' + i];
+                        if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect') || inputs[i].classList.contains('teacher-locked')) {
+                            var btnId = "override-" + inputs[i].id;
+                            var btn = document.getElementById(btnId);
+                            if (btn) btn.classList.remove('hidden');
+                            
+                            // Restore feedback visually if teacher-locked
+                            var feedbackDiv = inputs[i].nextElementSibling;
+                            if (inputs[i].classList.contains('teacher-locked') && feedbackDiv) {
+                                if (inputs[i].classList.contains('correct')) {
+                                    feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; 
+                                    feedbackDiv.style.color = "#006100"; 
+                                    feedbackDiv.style.display = "block";
+                                } else {
+                                    feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; 
+                                    feedbackDiv.style.color = "#b71c1c"; 
+                                    feedbackDiv.style.display = "block";
+                                }
                             }
                         }
-                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                            inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                        }
+                    }
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto'; 
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
                     }
                 }
             }
         }
+
+        // --- LOAD DATA FROM FIREBASE ON START ---
+        auth.onAuthStateChanged(async (user) => {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    // Try to clean up local storage from legacy version
+                    try { localStorage.removeItem('enterpriseC5Memory_Smart_v1'); } catch (e) {}
+
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud data:", err);
+                }
+            } else if (!isTeacher) {
+                alert("Please log in on the home page first!");
+                window.location.href = "index.html";
+            }
+        });
+
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('auto-input')) {
-                saveProgress();
+                saveProgressToCloud(false);
                 if (e.target.tagName.toLowerCase() === 'textarea') {
-                    e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';
+                    e.target.style.height = 'auto'; 
+                    e.target.style.height = e.target.scrollHeight + 'px';
                 }
             }
         });
-        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterpriseC5Memory_Smart_v1'); window.location.reload(); } }
-        window.onload = loadProgress;
+
+        // --- RESET / CLEAR DATA FROM FIREBASE CLOUD ---
+        async function clearData() { 
+            if (confirm("Clear all work on this page?")) { 
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
+                    } catch (e) {}
+                }
+                window.location.reload(); 
+            } 
+        }
 
         let activeQuestionId = null;
         function openVerifyModal(qId) {
@@ -651,7 +794,7 @@
                     if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
                 }
                 closeVerifyModal();
-                saveProgress();
+                saveProgressToCloud(true);
             } else {
                 document.getElementById('modal-error-msg').style.display = 'block';
             }
@@ -725,7 +868,7 @@
                     }
                 }
             }
-            saveProgress();
+            saveProgressToCloud(true);
         }
 
         function downloadPDF() {
