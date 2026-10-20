@@ -43,12 +43,9 @@
         .btn-submit:hover { background-color: #152960; }
         .btn-reset { background-color: #d32f2f; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; margin: 20px auto; }
         .btn-reset:hover { background-color: #b71c1c; }
-        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; justify-content: center; align-items: center; font-size: 1.5em; color: #1e3a8a; font-weight: bold; transition: opacity 0.5s; }
     </style>
 </head>
 <body>
-    <div id="loading-overlay">Loading your workspace from cloud...</div>
-
     <div id="pdf-content">
         <header>
             <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
@@ -582,14 +579,6 @@
             }
         }
 
-        function hideLoading() {
-            const overlay = document.getElementById('loading-overlay');
-            if (overlay) {
-                overlay.style.opacity = '0';
-                setTimeout(() => { overlay.style.display = 'none'; }, 500);
-            }
-        }
-
         // --- LOAD DATA FROM FIREBASE ON START ---
         auth.onAuthStateChanged(async (user) => {
             const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
@@ -602,7 +591,6 @@
                 } catch (err) {
                     console.error("Error loading inspected student data:", err);
                 }
-                hideLoading();
                 return;
             }
 
@@ -622,7 +610,6 @@
                 alert("Please log in on the home page first!");
                 window.location.href = "index.html";
             }
-            hideLoading();
         });
 
         document.addEventListener('input', function(e) {
