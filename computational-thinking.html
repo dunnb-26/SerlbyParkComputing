@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computational Thinking</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        .task-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-top: 5px solid;
+        }
+        .task-prep { border-top-color: #607d8b; }
+        .task-red { border-top-color: #d32f2f; }
+        .task-amber { border-top-color: #f57c00; }
+        .task-green { border-top-color: #388e3c; }
+        .task-blue { border-top-color: #1976d2; }
+
+        .question-row {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        .question-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .auto-input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+        textarea.auto-input {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .inline-input {
+            width: 150px;
+            display: inline-block;
+            margin: 0 5px;
+            padding: 5px;
+            text-align: center;
+        }
+
+        .correct { border: 2px solid #388e3c !important; background-color: #e8f5e9 !important; }
+        .incorrect { border: 2px solid #d32f2f !important; background-color: #ffebee !important; }
+
+        .btn-submit {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: var(--navy, #001f3f);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-submit:hover { background-color: #003366; }
+        
+        .instruction-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #ccc;
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <img src="logo.jpg" alt="Delta Serlby Park Logo" onerror="this.style.display='none'">
+        </div>
+        <div class="header-center">
+            <h1>Computational Thinking</h1>
+        </div>
+        <div class="header-right">
+            <a href="index.html" class="back-btn">&larr; Back to Curriculum</a>
+            <span id="save-status-pill" style="margin-left:15px; font-size:0.9em; color:#666;"></span>
+        </div>
+    </header>
+
+    <main style="max-width: 1000px; margin: 30px auto; padding: 0 20px;">
+        
+        <!-- PREPARATION -->
+        <div class="task-card task-prep">
+            <h2>Lesson Preparation: Key Words</h2>
+            <div class="instruction-box">Define the four pillars of computational thinking before you begin.</div>
+            
+            <div class="question-row">
+                <label class="question-label">Decomposition</label>
+                <input type="text" class="auto-input prep-input" data-label="Key Word: Decomposition" placeholder="Type definition here...">
+            </div>
+            <div class="question-row">
+                <label class="question-label">Abstraction</label>
+                <input type="text" class="auto-input prep-input" data-label="Key Word: Abstraction" placeholder="Type definition here...">
+            </div>
+            <div class="question-row">
+                <label class="question-label">Pattern Recognition</label>
+                <input type="text" class="auto-input prep-input" data-label="Key Word: Pattern Recognition" placeholder="Type definition here...">
+            </div>
+            <div class="question-row">
+                <label class="question-label">Algorithm</label>
+                <input type="text" class="auto-input prep-input" data-label="Key Word: Algorithm" placeholder="Type definition here...">
+            </div>
+        </div>
+
+        <!-- RED TASK -->
+        <div class="task-card task-red">
+            <h2 style="color: #d32f2f;">Red Task: The Four Pillars</h2>
+            <div class="instruction-box">Fill in the missing words using the key terms from your preparation.</div>
+            
+            <p style="line-height: 2.2; font-size: 1.1em; color: #333;">
+                When solving a complex problem, we use computational thinking. First, we break the problem down into smaller, manageable parts, which is called 
+                <input type="text" class="auto-input red-input inline-input" data-answers='["decomposition"]' placeholder="...">. 
+                Next, we look for similarities or past trends, known as 
+                <input type="text" class="auto-input red-input inline-input" data-answers='["pattern recognition", "pattern"]' placeholder="...">. 
+                Then, we filter out the unnecessary details to focus only on what is strictly important; this is called 
+                <input type="text" class="auto-input red-input inline-input" data-answers='["abstraction"]' placeholder="...">. 
+                Finally, we create a step-by-step set of instructions to solve the problem, which is an 
+                <input type="text" class="auto-input red-input inline-input" data-answers='["algorithm"]' placeholder="...">. 
+                The exact order in which these instructions are carried out is called a 
+                <input type="text" class="auto-input red-input inline-input" data-answers='["sequence"]' placeholder="...">.
+            </p>
+            <button class="btn-submit" style="background-color: #d32f2f;" onclick="checkAnswers('red-input')">Check Red Task</button>
+        </div>
+
+        <!-- AMBER TASK -->
+        <div class="task-card task-amber">
+            <h2 style="color: #f57c00;">Amber Task: Identify the Pillar</h2>
+            <div class="instruction-box">Read the real-world examples below and type which of the four pillars of computational thinking it represents (Decomposition, Abstraction, Pattern Recognition, or Algorithm).</div>
+
+            <div class="question-row">
+                <label class="question-label">1. Focusing only on the wheels, chassis, and engine of a car model, while ignoring the paint color and stereo system.</label>
+                <input type="text" class="auto-input amber-input" data-answers='["abstraction"]' placeholder="Type pillar here...">
+            </div>
+            <div class="question-row">
+                <label class="question-label">2. Taking the massive task of "Making a Video Game" and splitting it into "Graphics", "Sound", "Story", and "Code".</label>
+                <input type="text" class="auto-input amber-input" data-answers='["decomposition"]' placeholder="Type pillar here...">
+            </div>
+            <div class="question-row">
+                <label class="question-label">3. Writing out a recipe for baking a cake step-by-step.</label>
+                <input type="text" class="auto-input amber-input" data-answers='["algorithm"]' placeholder="Type pillar here...">
+            </div>
+            <div class="question-row">
+                <label class="question-label">4. Realizing that because your character died touching lava on Level 1, they will probably die touching lava on Level 2.</label>
+                <input type="text" class="auto-input amber-input" data-answers='["pattern recognition", "pattern"]' placeholder="Type pillar here...">
+            </div>
+            <button class="btn-submit" style="background-color: #f57c00;" onclick="checkAnswers('amber-input')">Check Amber Task</button>
+        </div>
+
+        <!-- GREEN TASK -->
+        <div class="task-card task-green">
+            <h2 style="color: #388e3c;">Green Task: Applied Logic</h2>
+            <div class="instruction-box">Apply your knowledge to the process of building a complex Lego set.</div>
+
+            <div class="question-row">
+                <label class="question-label">1. Sorting your massive pile of Lego bricks into different color and size piles before you even start building is an example of what?</label>
+                <input type="text" class="auto-input green-input" data-answers='["decomposition"]' placeholder="Enter answer here...">
+            </div>
+            <div class="question-row">
+                <label class="question-label">2. The numbered instruction booklet contains a step-by-step ________ to successfully build the set.</label>
+                <input type="text" class="auto-input green-input" data-answers='["algorithm"]' placeholder="Enter answer here...">
+            </div>
+            <div class="question-row">
+                <label class="question-label">3. Ignoring the tiny plastic copyright logo printed inside a Lego brick because it doesn't change how it fits together is an example of what?</label>
+                <input type="text" class="auto-input green-input" data-answers='["abstraction"]' placeholder="Enter answer here...">
+            </div>
+            <div class="question-row">
+                <label class="question-label">4. Looking at the picture on the box to see what the final model looks like and identifying repeated shapes (like four identical car wheels) is an example of what?</label>
+                <input type="text" class="auto-input green-input" data-answers='["pattern recognition", "pattern"]' placeholder="Enter answer here...">
+            </div>
+            <button class="btn-submit" style="background-color: #388e3c;" onclick="checkAnswers('green-input')">Check Green Task</button>
+        </div>
+
+        <!-- BLUE TASK -->
+        <div class="task-card task-blue">
+            <h2 style="color: #1976d2;">Blue Task: Scenario Challenge</h2>
+            <div class="instruction-box">
+                <strong>Scenario:</strong> You have been hired to design a new mobile app that helps students organize their homework and revision schedules. Answer the questions below in full sentences.
+            </div>
+
+            <div class="question-row">
+                <label class="question-label">1. How would you use <strong>Decomposition</strong> to plan the creation of this app?</label>
+                <textarea class="auto-input blue-input" placeholder="Explain how you would break the project down..."></textarea>
+            </div>
+            <div class="question-row">
+                <label class="question-label">2. How would you use <strong>Abstraction</strong> when deciding what user data to collect to make the timetable function work?</label>
+                <textarea class="auto-input blue-input" placeholder="Explain what details are important and what should be ignored..."></textarea>
+            </div>
+            <div class="question-row">
+                <label class="question-label">3. Write a 3-step <strong>Algorithm</strong> for how the app should logically alert a student about an overdue assignment.</label>
+                <textarea class="auto-input blue-input" placeholder="Step 1: ...&#10;Step 2: ...&#10;Step 3: ..."></textarea>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        &copy; 2026 Delta Serlby Park - Computing Department
+    </footer>
+
+    <!-- Auto-Marking Script -->
+    <script>
+        function checkAnswers(inputClass) {
+            const inputs = document.querySelectorAll('.' + inputClass);
+            
+            inputs.forEach(input => {
+                const studentAnswer = input.value.toLowerCase().trim();
+                
+                if (studentAnswer === "") {
+                    input.classList.remove('correct', 'incorrect');
+                    return;
+                }
+
+                try {
+                    const correctAnswers = JSON.parse(input.getAttribute('data-answers'));
+                    // Check if the student's answer matches any of the accepted answers
+                    const isCorrect = correctAnswers.some(ans => studentAnswer === ans.toLowerCase());
+
+                    if (isCorrect) {
+                        input.classList.add('correct');
+                        input.classList.remove('incorrect');
+                    } else {
+                        input.classList.add('incorrect');
+                        input.classList.remove('correct');
+                    }
+                } catch(e) {
+                    console.error("Error parsing answers for input", input, e);
+                }
+            });
+
+            // Trigger Firebase sync immediately after marking
+            if (typeof window.syncWorkToCloud === 'function') {
+                window.syncWorkToCloud(true);
+            }
+        }
+    </script>
+
+    <!-- Cloud Sync Script Link (Loads the universal Teacher Dashboard logic) -->
+    <script>
+        // Set the unique database ID for this page
+        window.LESSON_ID = "computational-thinking";
+    </script>
+    <script src="cloud-sync.js"></script>
+
+</body>
+</html>
