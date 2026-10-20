@@ -3,17 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lesson 1 - Computational Thinking</title>
+    <title>Computational Thinking - Lesson</title>
     <link rel="stylesheet" href="style.css">
-
+    
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
-        /* Task Container Styling */
-        .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
+        :root {
+            --navy: #1B1464; 
+            --yellow: #F7931D;
+            --maroon: #822433;
+            --bg-color: #f4f6f8;
+            --text-color: #333;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+        }
+
+        /* 3-Column Grid Header */
+        header { 
+            background-color: var(--navy); 
+            color: white; 
+            padding: 20px; 
+            display: grid; 
+            grid-template-columns: 1fr auto 1fr; 
+            align-items: center; 
+            border-bottom: 6px solid var(--maroon); 
+        }
+
+        .header-left { display: flex; justify-content: flex-start; }
+        .header-center { text-align: center; }
+        .header-right { display: flex; justify-content: flex-end; align-items: center; }
+
+        header img { 
+            height: 80px; 
+            background-color: white; 
+            border-radius: 8px; 
+            padding: 5px; 
+        }
+
+        header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; }
+
+        .back-btn {
+            background-color: var(--yellow);
+            color: var(--navy);
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .back-btn:hover { transform: scale(1.05); }
+
+        .task-container { max-width: 1050px; margin: 30px auto; padding: 20px; }
         
         .task-card { 
             background: white; 
@@ -23,41 +73,44 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
             page-break-inside: avoid; 
         }
-        
-        /* Section Header Colors */
+
         .task-prep { border-top: 6px solid #607d8b; } 
         .task-prep h2 { color: #607d8b; margin-top: 0; }
-        
+
         .task-plenary { border-top: 6px solid #673ab7; } 
         .task-plenary h2 { color: #673ab7; margin-top: 0; }
 
-        /* RAGB Colors */
-        .task-maroon { border-top: 6px solid #800000; }
-        .task-maroon h2 { color: #800000; margin-top: 0; }
-        .task-maroon .instruction-box { border-left: 4px solid #800000; }
+        .task-maroon { border-top: 6px solid var(--maroon); } 
+        .task-maroon h2 { color: var(--maroon); margin-top: 0; }
+        .task-maroon .instruction-box { border-left: 4px solid var(--maroon); }
 
-        .task-amber { border-top: 6px solid #ffb300; }
-        .task-amber h2 { color: #ffb300; margin-top: 0; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
-        .task-amber .instruction-box { border-left: 4px solid #ffb300; }
+        .task-amber { border-top: 6px solid var(--yellow); } 
+        .task-amber h2 { color: var(--yellow); margin-top: 0; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
+        .task-amber .instruction-box { border-left: 4px solid var(--yellow); }
 
-        .task-green { border-top: 6px solid #008f39; }
+        .task-green { border-top: 6px solid #008f39; } 
         .task-green h2 { color: #008f39; margin-top: 0; }
         .task-green .instruction-box { border-left: 4px solid #008f39; }
 
-        .task-navy { border-top: 6px solid #1e3a8a; }
-        .task-navy h2 { color: #1e3a8a; margin-top: 0; }
-        .task-navy .instruction-box { border-left: 4px solid #1e3a8a; }
+        .task-navy { border-top: 6px solid var(--navy); } 
+        .task-navy h2 { color: var(--navy); margin-top: 0; }
+        .task-navy .instruction-box { border-left: 4px solid var(--navy); }
 
-        /* Common Elements */
-        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; text-align: center; }
-        
-        /* Inputs & Textareas */
+        .instruction-box { 
+            background-color: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 0 4px 4px 0; 
+            font-size: 16px; 
+            line-height: 1.5; 
+            margin-bottom: 25px; 
+            text-align: center; 
+        }
+
         .question-row { margin-bottom: 20px; }
-        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
+        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: var(--text-color); font-weight: bold; }
         
         .auto-input { 
             width: 100%; 
-            max-width: 350px; 
             padding: 12px; 
             font-size: 16px; 
             border: 2px solid #ccc; 
@@ -68,23 +121,57 @@
             font-family: inherit; 
         }
         .auto-input:focus { outline: none; border-color: #666; }
-        textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; max-width: 100%; }
+        textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; }
         
         .inline-input {
-            width: 170px;
+            width: 180px;
             display: inline-block;
             margin: 0 5px;
             padding: 6px;
             text-align: center;
-            max-width: 100%;
         }
 
-        /* Correct & Incorrect Answer Styling */
-        .input-correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
-        .input-incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
+        .input-correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100 !important; font-weight: bold; }
+        .input-incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c !important; font-weight: bold; }
         
-        /* Buttons */
-        .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; max-width: 200px; transition: background-color 0.2s; }
+        .teacher-override-btn { 
+            background-color: #607d8b; 
+            color: white; 
+            border: none; 
+            padding: 5px 10px; 
+            border-radius: 4px; 
+            font-size: 12px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 5px; 
+        }
+        .teacher-override-btn:hover { background-color: #455a64; }
+        .hidden { display: none !important; }
+
+        /* Modal Overlay */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; border-top: 6px solid var(--navy); }
+        .modal-input { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; text-align: center; }
+        .modal-btn-row { display: flex; gap: 10px; }
+        .modal-btn-confirm { flex: 1; background-color: var(--navy); color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-btn-cancel { flex: 1; background-color: #ccc; color: #333; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
+
+        .btn-submit { 
+            background-color: var(--navy); 
+            color: white; 
+            border: none; 
+            padding: 12px 20px; 
+            border-radius: 4px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 15px; 
+            display: block; 
+            width: 100%; 
+            max-width: 200px; 
+            transition: background-color 0.2s; 
+        }
         .btn-submit:hover { background-color: #152960; }
         
         .btn-reset { 
@@ -104,75 +191,74 @@
         }
         .btn-reset:hover { background-color: #b71c1c; }
 
-        #save-status-pill {
-            position: fixed; bottom: 20px; right: 20px; background: #1e3a8a; color: white; padding: 8px 16px; border-radius: 20px;
-            font-size: 13px; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.2); z-index: 1000;
-        }
+        footer { text-align: center; padding: 25px; color: #666; margin-top: 50px; border-top: 1px solid #ddd; background-color: white; }
     </style>
 </head>
 <body>
-    <div id="save-status-pill">☁️ Loading your work...</div>
-
     <div id="pdf-content">
         <header>
             <div class="header-left">
                 <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
             </div>
-            <div class="header-center"><h1>Lesson 1 - Computational Thinking</h1></div>
-            <div class="header-right"><a href="logical-thinking.html" class="back-btn">&larr; Back to Unit</a></div>
+            <div class="header-center">
+                <h1>Computational Thinking</h1>
+            </div>
+            <div class="header-right">
+                <a href="logical-thinking.html" class="back-btn no-print">&larr; Back to Unit</a>
+            </div>
         </header>
 
         <main class="task-container">
 
-            <!-- PREPARATION: Keywords & Notes -->
+            <!-- PREPARATION -->
             <div class="task-card task-prep">
                 <h2>Lesson Preparation</h2>
                 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">4 Key Words</h3>
                 <div class="question-row">
                     <label class="question-label">Decomposition</label>
-                    <input type="text" class="auto-input prep-input" data-label="Key Word: Decomposition" style="max-width: 100%;" placeholder="Type definition here...">
+                    <input type="text" class="auto-input prep-input" data-label="Key Word: Decomposition" placeholder="Type definition here...">
                 </div>
                 <div class="question-row">
                     <label class="question-label">Abstraction</label>
-                    <input type="text" class="auto-input prep-input" data-label="Key Word: Abstraction" style="max-width: 100%;" placeholder="Type definition here...">
+                    <input type="text" class="auto-input prep-input" data-label="Key Word: Abstraction" placeholder="Type definition here...">
                 </div>
                 <div class="question-row">
                     <label class="question-label">Pattern Recognition</label>
-                    <input type="text" class="auto-input prep-input" data-label="Key Word: Pattern Recognition" style="max-width: 100%;" placeholder="Type definition here...">
+                    <input type="text" class="auto-input prep-input" data-label="Key Word: Pattern Recognition" placeholder="Type definition here...">
                 </div>
                 <div class="question-row">
                     <label class="question-label">Algorithm</label>
-                    <input type="text" class="auto-input prep-input" data-label="Key Word: Algorithm" style="max-width: 100%;" placeholder="Type definition here...">
+                    <input type="text" class="auto-input prep-input" data-label="Key Word: Algorithm" placeholder="Type definition here...">
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Lesson Notes</h3>
-                <div class="question-row">
+                <div class="question-row" style="margin-bottom: 0;">
                     <textarea class="auto-input prep-input" data-label="Lesson Notes" rows="6" placeholder="Write your notes about today's lesson here..."></textarea>
                 </div>
             </div>
 
-            <!-- RED TASK: Self-Marking Paragraph (5 Blanks) -->
+            <!-- RED TASK: Paragraph Fill-in-the-Blanks -->
             <div class="task-card task-maroon">
                 <h2>Red Task: The Four Pillars Paragraph</h2>
                 <div class="instruction-box">
-                    Fill in the 5 missing words using the key terms from your preparation.
+                    Fill in the 5 missing blanks using the key terms from your preparation.
                 </div>
 
-                <p style="line-height: 2.5; font-size: 1.1em; color: #333;">
+                <p style="line-height: 2.6; font-size: 1.1em; color: #333;">
                     When solving a complex problem, we use computational thinking. First, we break the problem down into smaller, manageable parts, which is called 
-                    <input type="text" class="auto-input red-input inline-input graded-input" data-label="Red Task Blank 1 (Decomposition)" data-answers='["decomposition"]' placeholder="...">. 
+                    <input type="text" id="red_q1" class="auto-input red-input inline-input graded-input" data-label="Red Task Blank 1 (Decomposition)" data-answers='["decomposition"]' placeholder="...">. 
                     Next, we look for similarities or past trends to help us solve it, known as 
-                    <input type="text" class="auto-input red-input inline-input graded-input" data-label="Red Task Blank 2 (Pattern Recognition)" data-answers='["pattern recognition", "pattern", "patterns"]' placeholder="...">. 
+                    <input type="text" id="red_q2" class="auto-input red-input inline-input graded-input" data-label="Red Task Blank 2 (Pattern Recognition)" data-answers='["pattern recognition", "pattern", "patterns"]' placeholder="...">. 
                     Then, we filter out unnecessary details to focus only on what is strictly important; this is called 
-                    <input type="text" class="auto-input red-input inline-input graded-input" data-label="Red Task Blank 3 (Abstraction)" data-answers='["abstraction"]' placeholder="...">. 
+                    <input type="text" id="red_q3" class="auto-input red-input inline-input graded-input" data-label="Red Task Blank 3 (Abstraction)" data-answers='["abstraction"]' placeholder="...">. 
                     Finally, we create a step-by-step set of instructions to solve the problem, which is an 
-                    <input type="text" class="auto-input red-input inline-input graded-input" data-label="Red Task Blank 4 (Algorithm)" data-answers='["algorithm"]' placeholder="...">. 
+                    <input type="text" id="red_q4" class="auto-input red-input inline-input graded-input" data-label="Red Task Blank 4 (Algorithm)" data-answers='["algorithm"]' placeholder="...">. 
                     The exact order in which instructions are carried out is called a 
-                    <input type="text" class="auto-input red-input inline-input graded-input" data-label="Red Task Blank 5 (Sequence)" data-answers='["sequence"]' placeholder="...">.
+                    <input type="text" id="red_q5" class="auto-input red-input inline-input graded-input" data-label="Red Task Blank 5 (Sequence)" data-answers='["sequence"]' placeholder="...">.
                 </p>
 
-                <button class="btn-submit no-print" onclick="checkAnswers('red-input'); syncWorkToCloud(true);">Check Answers</button>
+                <button class="btn-submit no-print" style="background-color: var(--maroon);" onclick="checkParagraphAnswers('red-input')">Check Red Task</button>
             </div>
 
             <!-- AMBER TASK: Identify the Pillar -->
@@ -184,25 +270,26 @@
 
                 <div class="question-row">
                     <label class="question-label">1. Focusing only on the wheels, chassis, and engine of a car model while ignoring the paint color and stereo system.</label>
-                    <input type="text" class="auto-input amber-input graded-input" data-label="Amber Task Q1" data-answers='["abstraction"]' placeholder="Enter answer here...">
+                    <input type="text" id="amber_q1" class="auto-input amber-input graded-input" data-label="Amber Task Q1" data-answers='["abstraction"]' placeholder="Enter answer here...">
+                    <div style="text-align: right;"><button id="override-amber_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('amber_q1')">👨‍🏫 Override Score</button></div>
                 </div>
-
                 <div class="question-row">
                     <label class="question-label">2. Taking the massive task of making a video game and splitting it into Graphics, Sound, Story, and Code.</label>
-                    <input type="text" class="auto-input amber-input graded-input" data-label="Amber Task Q2" data-answers='["decomposition"]' placeholder="Enter answer here...">
+                    <input type="text" id="amber_q2" class="auto-input amber-input graded-input" data-label="Amber Task Q2" data-answers='["decomposition"]' placeholder="Enter answer here...">
+                    <div style="text-align: right;"><button id="override-amber_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('amber_q2')">👨‍🏫 Override Score</button></div>
                 </div>
-
                 <div class="question-row">
                     <label class="question-label">3. Writing out a recipe for baking a cake step-by-step.</label>
-                    <input type="text" class="auto-input amber-input graded-input" data-label="Amber Task Q3" data-answers='["algorithm"]' placeholder="Enter answer here...">
+                    <input type="text" id="amber_q3" class="auto-input amber-input graded-input" data-label="Amber Task Q3" data-answers='["algorithm"]' placeholder="Enter answer here...">
+                    <div style="text-align: right;"><button id="override-amber_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('amber_q3')">👨‍🏫 Override Score</button></div>
                 </div>
-
                 <div class="question-row">
                     <label class="question-label">4. Realizing that because your character died touching lava on Level 1, they will probably die touching lava on Level 2.</label>
-                    <input type="text" class="auto-input amber-input graded-input" data-label="Amber Task Q4" data-answers='["pattern recognition", "pattern", "patterns"]' placeholder="Enter answer here...">
+                    <input type="text" id="amber_q4" class="auto-input amber-input graded-input" data-label="Amber Task Q4" data-answers='["pattern recognition", "pattern", "patterns"]' placeholder="Enter answer here...">
+                    <div style="text-align: right;"><button id="override-amber_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('amber_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
-                <button class="btn-submit no-print" onclick="checkAnswers('amber-input'); syncWorkToCloud(true);">Check Answers</button>
+                <button class="btn-submit no-print" style="background-color: var(--yellow); color: var(--navy);" onclick="checkParagraphAnswers('amber-input')">Check Amber Task</button>
             </div>
 
             <!-- GREEN TASK: Applied Logic -->
@@ -214,25 +301,26 @@
 
                 <div class="question-row">
                     <label class="question-label">1. Sorting your massive pile of Lego bricks into different color and size piles before building is an example of what?</label>
-                    <input type="text" class="auto-input green-input graded-input" data-label="Green Task Q1" data-answers='["decomposition"]' placeholder="Enter answer here...">
+                    <input type="text" id="green_q1" class="auto-input green-input graded-input" data-label="Green Task Q1" data-answers='["decomposition"]' placeholder="Enter answer here...">
+                    <div style="text-align: right;"><button id="override-green_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('green_q1')">👨‍🏫 Override Score</button></div>
                 </div>
-
                 <div class="question-row">
                     <label class="question-label">2. The numbered instruction booklet contains a step-by-step ________ to successfully build the set.</label>
-                    <input type="text" class="auto-input green-input graded-input" data-label="Green Task Q2" data-answers='["algorithm"]' placeholder="Enter answer here...">
+                    <input type="text" id="green_q2" class="auto-input green-input graded-input" data-label="Green Task Q2" data-answers='["algorithm"]' placeholder="Enter answer here...">
+                    <div style="text-align: right;"><button id="override-green_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('green_q2')">👨‍🏫 Override Score</button></div>
                 </div>
-
                 <div class="question-row">
                     <label class="question-label">3. Ignoring the tiny plastic copyright logo printed inside a Lego brick because it doesn't change how it fits together is what?</label>
-                    <input type="text" class="auto-input green-input graded-input" data-label="Green Task Q3" data-answers='["abstraction"]' placeholder="Enter answer here...">
+                    <input type="text" id="green_q3" class="auto-input green-input graded-input" data-label="Green Task Q3" data-answers='["abstraction"]' placeholder="Enter answer here...">
+                    <div style="text-align: right;"><button id="override-green_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('green_q3')">👨‍🏫 Override Score</button></div>
                 </div>
-
                 <div class="question-row">
                     <label class="question-label">4. Looking at the picture on the box to see what the final model looks like and identifying repeated shapes is what?</label>
-                    <input type="text" class="auto-input green-input graded-input" data-label="Green Task Q4" data-answers='["pattern recognition", "pattern", "patterns"]' placeholder="Enter answer here...">
+                    <input type="text" id="green_q4" class="auto-input green-input graded-input" data-label="Green Task Q4" data-answers='["pattern recognition", "pattern", "patterns"]' placeholder="Enter answer here...">
+                    <div style="text-align: right;"><button id="override-green_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('green_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
-                <button class="btn-submit no-print" onclick="checkAnswers('green-input'); syncWorkToCloud(true);">Check Answers</button>
+                <button class="btn-submit no-print" style="background-color: #008f39;" onclick="checkParagraphAnswers('green-input')">Check Answers</button>
             </div>
 
             <!-- BLUE TASK: Scenario Challenge -->
@@ -244,18 +332,20 @@
 
                 <div class="question-row">
                     <label class="question-label">1. How would you use <strong>Decomposition</strong> to plan the creation of this app?</label>
-                    <textarea class="auto-input navy-input prep-input" data-label="Blue Task Q1 (Decomposition)" rows="3" placeholder="Explain how you would break the project down..."></textarea>
+                    <textarea id="blue_q1" class="auto-input blue-input graded-input" data-label="Blue Task Q1 (Decomposition)" rows="3" placeholder="Explain how you would break the project down..."></textarea>
+                    <div style="text-align: right;"><button id="override-blue_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('blue_q1')">👨‍🏫 Override Score</button></div>
                 </div>
-
                 <div class="question-row">
                     <label class="question-label">2. How would you use <strong>Abstraction</strong> when deciding what user data to collect?</label>
-                    <textarea class="auto-input navy-input prep-input" data-label="Blue Task Q2 (Abstraction)" rows="3" placeholder="Explain what details are important and what should be ignored..."></textarea>
+                    <textarea id="blue_q2" class="auto-input blue-input graded-input" data-label="Blue Task Q2 (Abstraction)" rows="3" placeholder="Explain what details are important and what should be ignored..."></textarea>
+                    <div style="text-align: right;"><button id="override-blue_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('blue_q2')">👨‍🏫 Override Score</button></div>
                 </div>
-
                 <div class="question-row">
                     <label class="question-label">3. Write a 3-step <strong>Algorithm</strong> for how the app should logically alert a student about an overdue assignment.</label>
-                    <textarea class="auto-input navy-input prep-input" data-label="Blue Task Q3 (Algorithm)" rows="3" placeholder="Step 1: ...&#10;Step 2: ...&#10;Step 3: ..."></textarea>
+                    <textarea id="blue_q3" class="auto-input blue-input graded-input" data-label="Blue Task Q3 (Algorithm)" rows="3" placeholder="Step 1: ...&#10;Step 2: ...&#10;Step 3: ..."></textarea>
+                    <div style="text-align: right;"><button id="override-blue_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('blue_q3')">👨‍🏫 Override Score</button></div>
                 </div>
+                <button class="btn-submit no-print" onclick="checkParagraphAnswers('blue-input')">Check Answers</button>
             </div>
 
             <!-- PLENARY: 3 Key Takeaways -->
@@ -265,15 +355,15 @@
                 
                 <div class="question-row">
                     <label class="question-label">1.</label>
-                    <input type="text" class="auto-input prep-input" data-label="Plenary Takeaway 1" style="max-width: 100%;" placeholder="Type first takeaway here...">
+                    <input type="text" class="auto-input plenary-input" data-label="Plenary Takeaway 1" style="max-width: 100%;" placeholder="Type first takeaway here...">
                 </div>
                 <div class="question-row">
                     <label class="question-label">2.</label>
-                    <input type="text" class="auto-input prep-input" data-label="Plenary Takeaway 2" style="max-width: 100%;" placeholder="Type second takeaway here...">
+                    <input type="text" class="auto-input plenary-input" data-label="Plenary Takeaway 2" style="max-width: 100%;" placeholder="Type second takeaway here...">
                 </div>
                 <div class="question-row">
                     <label class="question-label">3.</label>
-                    <input type="text" class="auto-input prep-input" data-label="Plenary Takeaway 3" style="max-width: 100%;" placeholder="Type third takeaway here...">
+                    <input type="text" class="auto-input plenary-input" data-label="Plenary Takeaway 3" style="max-width: 100%;" placeholder="Type third takeaway here...">
                 </div>
             </div>
 
@@ -282,9 +372,22 @@
 
     <!-- RESET ACTION BUTTON -->
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-reset" onclick="clearData()">Reset Page</button>
+        <button class="btn-reset" onclick="clearAllData()">Reset Page</button>
     </div>
     
+    <!-- SECURE PASSWORD MODAL FOR OVERRIDE -->
+    <div class="modal-overlay" id="verify-modal">
+        <div class="modal-content">
+            <h3>Teacher Verification</h3>
+            <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
+            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter PIN">
+            <div class="modal-btn-row">
+                <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
+                <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
+            </div>
+        </div>
+    </div>
+
     <footer>
         &copy; 2026 Delta Serlby Park - Computing Department
     </footer>
@@ -293,6 +396,8 @@
         /* ==========================================================================
            1. FIREBASE CLOUD INITIALIZATION & MARKBOOK SYNC
            ========================================================================== */
+        const LESSON_ID = "y8-computational-thinking";
+
         const firebaseConfig = {
             apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
             authDomain: "serlby-park-computing.firebaseapp.com",
@@ -303,34 +408,36 @@
             measurementId: "G-HDNYEE11WV"
         };
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+        let auth = null;
+        let db = null;
 
-        const LESSON_ID = "y8-computational-thinking";
+        if (typeof firebase !== 'undefined') {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            auth = firebase.auth();
+            db = firebase.firestore();
+        }
 
         // Builds a clean, grouped summary array for the Teacher Cloud Markbook
         function buildStructuredMarkbookItems() {
             const items = [];
             let correctCount = 0;
-            let totalGradable = 13; // 5 Red blanks + 4 Amber + 4 Green
+            let totalGradable = document.querySelectorAll('.graded-input').length;
 
-            // A. Lesson Preparation & Notes (Non-Graded)
+            // A. Lesson Preparation & Notes
             document.querySelectorAll('.prep-input').forEach(inp => {
                 items.push({
-                    label: inp.getAttribute('data-label') || 'Note',
+                    label: inp.getAttribute('data-label') || 'Preparation',
                     value: inp.value.trim(),
                     status: 'neutral'
                 });
             });
 
-            // B. RAGB Tasks (Graded Inputs)
+            // B. Graded Tasks (Red, Amber, Green, Blue)
             document.querySelectorAll('.graded-input').forEach(inp => {
                 let status = 'neutral';
-                
-                if (inp.classList.contains('input-correct')) {
+                if (inp.classList.contains('input-correct') || inp.classList.contains('teacher-locked')) {
                     status = 'correct';
                     correctCount++;
                 } else if (inp.classList.contains('input-incorrect')) {
@@ -344,6 +451,15 @@
                 });
             });
 
+            // C. Plenary Takeaways
+            document.querySelectorAll('.plenary-input').forEach(inp => {
+                items.push({
+                    label: inp.getAttribute('data-label') || 'Plenary',
+                    value: inp.value.trim(),
+                    status: 'neutral'
+                });
+            });
+
             return {
                 items: items,
                 scoreText: `Score: ${correctCount} / ${totalGradable}`
@@ -353,17 +469,13 @@
         let cloudSyncTimer;
         function syncWorkToCloud(immediate = false) {
             if (sessionStorage.getItem('teacherMode') === 'true' && sessionStorage.getItem('inspectStudentUid')) return;
+            if (!auth || !db || !auth.currentUser) return;
 
             const user = auth.currentUser;
-            if (!user) return;
-
-            const statusPill = document.getElementById('save-status-pill');
-            if (statusPill) statusPill.innerText = "⏳ Saving...";
-
-            const inputs = document.querySelectorAll('.auto-input');
 
             clearTimeout(cloudSyncTimer);
             cloudSyncTimer = setTimeout(() => {
+                const inputs = document.querySelectorAll('.auto-input');
                 const structured = buildStructuredMarkbookItems();
 
                 const payload = {
@@ -373,30 +485,48 @@
                     items: structured.items
                 };
 
-                for (let i = 0; i < inputs.length; i++) {
-                    payload['input_' + i] = inputs[i].value;
-                    payload['class_' + i] = inputs[i].className;
-                }
+                inputs.forEach((el, i) => {
+                    payload['input_' + i] = el.value;
+                    payload['class_' + i] = el.className;
+                });
 
-                db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
+                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
                   .set(payload, { merge: true })
-                  .then(() => {
-                      if (statusPill) statusPill.innerText = "☁️ Saved to Cloud";
-                  })
                   .catch(err => {
-                      console.error("Cloud save error:", err);
-                      if (statusPill) statusPill.innerText = "⚠️ Sync Error";
+                      console.error("Cloud sync error:", err);
                   });
             }, immediate ? 50 : 600);
         }
 
-        function populateInputs(data) {
-            const inputs = document.querySelectorAll('.auto-input');
-            for (let i = 0; i < inputs.length; i++) {
-                if (data['input_' + i] !== undefined) {
+        /* ==========================================================================
+           2. AUTO-SAVE & LOAD LOGIC (Cloud + LocalStorage Fallback)
+           ========================================================================== */
+        function saveProgress(immediate = false) {
+            try {
+                var inputs = document.querySelectorAll('.auto-input');
+                var dataToSave = {};
+                for (var i = 0; i < inputs.length; i++) {
+                    dataToSave['input_' + i] = inputs[i].value;
+                }
+                localStorage.setItem('computationalThinkingMemory', JSON.stringify(dataToSave));
+            } catch (error) {
+                console.log("Local memory saving blocked - ignoring safely.");
+            }
+            syncWorkToCloud(immediate);
+        }
+
+        function applySavedInputs(data) {
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                if (data['input_' + i] !== undefined && data['input_' + i] !== "") {
                     inputs[i].value = data['input_' + i];
                     if (data['class_' + i]) {
                         inputs[i].className = data['class_' + i];
+                        if (inputs[i].classList.contains('input-correct') || inputs[i].classList.contains('input-incorrect') || inputs[i].classList.contains('teacher-locked')) {
+                            var btnId = "override-" + inputs[i].id;
+                            var btn = document.getElementById(btnId);
+                            if (btn) btn.classList.remove('hidden');
+                        }
                     }
                     if (inputs[i].tagName.toLowerCase() === 'textarea') {
                         inputs[i].style.height = 'auto';
@@ -404,51 +534,53 @@
                     }
                 }
             }
-            checkAnswers('red-input', false);
-            checkAnswers('amber-input', false);
-            checkAnswers('green-input', false);
+            checkParagraphAnswers('red-input', false);
+            checkParagraphAnswers('amber-input', false);
+            checkParagraphAnswers('green-input', false);
+            checkParagraphAnswers('blue-input', false);
         }
 
-        auth.onAuthStateChanged(async (user) => {
-            const statusPill = document.getElementById('save-status-pill');
-            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+        function loadProgress() {
             const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
 
-            // 1. Teacher Inspection Mode
-            if (isTeacher && inspectedUid) {
-                try {
-                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
-                    if (doc.exists) populateInputs(doc.data());
-                    if (statusPill) statusPill.innerText = "👨‍🏫 Viewing: " + sessionStorage.getItem('inspectStudentName');
-                } catch (err) {
-                    console.error("Error loading student work:", err);
-                }
-                return;
-            }
-
-            // 2. Normal Student Load
-            if (!user) {
-                if (statusPill) statusPill.innerText = "💾 Local Mode (Not Logged In)";
+            if (isTeacher && inspectedUid && db) {
+                db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get().then(doc => {
+                    if (doc.exists) applySavedInputs(doc.data());
+                }).catch(err => console.error("Error loading student work:", err));
                 return;
             }
 
             try {
-                const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
-                if (doc.exists) {
-                    populateInputs(doc.data());
-                } else {
-                    syncWorkToCloud(true);
+                var savedDataStr = localStorage.getItem('computationalThinkingMemory');
+                if (savedDataStr) {
+                    applySavedInputs(JSON.parse(savedDataStr));
                 }
-                if (statusPill) statusPill.innerText = "☁️ Saved to Cloud";
-            } catch (err) {
-                console.error("Error loading cloud data:", err);
-                if (statusPill) statusPill.innerText = "⚠️ Sync Error";
+            } catch (error) {
+                console.log("Local memory loading blocked - ignoring safely.");
             }
-        });
+
+            if (auth && db) {
+                auth.onAuthStateChanged(async (user) => {
+                    if (!user) return;
+
+                    try {
+                        const doc = await db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).get();
+                        if (doc.exists) {
+                            applySavedInputs(doc.data());
+                        } else {
+                            syncWorkToCloud(true);
+                        }
+                    } catch (err) {
+                        console.error("Error loading cloud work:", err);
+                    }
+                });
+            }
+        }
 
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('auto-input')) {
-                syncWorkToCloud(false);
+                saveProgress(false);
                 if (e.target.tagName.toLowerCase() === 'textarea') {
                     e.target.style.height = 'auto';
                     e.target.style.height = e.target.scrollHeight + 'px';
@@ -456,37 +588,98 @@
             }
         });
 
-        async function clearData() {
-            if (confirm("Are you sure you want to clear all your work on this page?")) {
-                const user = auth.currentUser;
-                if (user && !(sessionStorage.getItem('teacherMode') === 'true' && sessionStorage.getItem('inspectStudentUid'))) {
-                    await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
+        async function clearAllData() {
+            if (confirm("Are you sure you want to clear EVERYTHING on this page?")) {
+                try { localStorage.removeItem('computationalThinkingMemory'); } catch(e) {}
+                if (auth && db && auth.currentUser) {
+                    try {
+                        await db.collection('users').doc(auth.currentUser.uid).collection('lessons').doc(LESSON_ID).delete();
+                    } catch (e) {}
                 }
                 window.location.reload();
             }
         }
 
-        function checkAnswers(groupClass, triggerSync = true) {
-            var inputs = document.getElementsByClassName(groupClass);
-            for (var i = 0; i < inputs.length; i++) {
-                var inputElement = inputs[i];
+        window.onload = loadProgress;
+
+        /* ==========================================================================
+           3. TEACHER OVERRIDE VERIFICATION MODAL
+           ========================================================================== */
+        let activeQuestionId = null;
+        function openVerifyModal(qId) {
+            activeQuestionId = qId;
+            document.getElementById('teacher-password-input').value = '';
+            document.getElementById('modal-error-msg').style.display = 'none';
+            document.getElementById('verify-modal').style.display = 'flex';
+            document.getElementById('teacher-password-input').focus();
+        }
+        function closeVerifyModal() {
+            document.getElementById('verify-modal').style.display = 'none';
+            activeQuestionId = null;
+        }
+        function submitVerify() {
+            var pass = document.getElementById('teacher-password-input').value;
+            if (pass === '2525') {
+                var inputEl = document.getElementById(activeQuestionId);
+                inputEl.classList.add('teacher-locked');
+                if (inputEl.classList.contains('input-correct')) {
+                    inputEl.classList.remove('input-correct');
+                    inputEl.classList.add('input-incorrect');
+                } else {
+                    inputEl.classList.remove('input-incorrect');
+                    inputEl.classList.add('input-correct');
+                }
+                closeVerifyModal();
+                syncWorkToCloud(true);
+            } else {
+                document.getElementById('modal-error-msg').style.display = 'block';
+            }
+        }
+        document.getElementById('teacher-password-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') submitVerify();
+        });
+
+        /* ==========================================================================
+           4. BATCH MARKING LOGIC
+           ========================================================================== */
+        function checkParagraphAnswers(groupClass, triggerSync = true) {
+            var inputs = document.querySelectorAll('.' + groupClass);
+            inputs.forEach(function(inputElement) {
+                var overrideBtn = document.getElementById("override-" + inputElement.id);
+                if (overrideBtn) overrideBtn.classList.remove('hidden');
+
+                if (inputElement.classList.contains('teacher-locked')) return;
+
                 var studentAnswer = inputElement.value.toLowerCase().trim();
-                var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers'));
-                var isCorrect = false;
-                
-                for (var j = 0; j < acceptedAnswers.length; j++) {
-                    if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
-                        isCorrect = true;
-                        break;
+                inputElement.classList.remove('input-correct', 'input-incorrect');
+
+                if (studentAnswer === "") return;
+
+                var answersAttr = inputElement.getAttribute('data-answers');
+                if (answersAttr) {
+                    try {
+                        var correctAnswers = JSON.parse(answersAttr);
+                        var isCorrect = correctAnswers.some(function(ans) {
+                            return studentAnswer === ans.toLowerCase() || studentAnswer.includes(ans.toLowerCase());
+                        });
+
+                        if (isCorrect) {
+                            inputElement.classList.add('input-correct');
+                        } else {
+                            inputElement.classList.add('input-incorrect');
+                        }
+                    } catch(e) {
+                        console.error("Error parsing answers", e);
+                    }
+                } else {
+                    // Open textareas (Blue task / notes)
+                    if (studentAnswer.length > 5) {
+                        inputElement.classList.add('input-correct');
+                    } else {
+                        inputElement.classList.add('input-incorrect');
                     }
                 }
-
-                inputElement.classList.remove('input-correct', 'input-incorrect');
-                if (studentAnswer !== "") {
-                    if (isCorrect) inputElement.classList.add('input-correct');
-                    else inputElement.classList.add('input-incorrect');
-                }
-            }
+            });
 
             if (triggerSync) {
                 syncWorkToCloud(true);
