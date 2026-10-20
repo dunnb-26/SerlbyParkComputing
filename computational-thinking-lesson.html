@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -250,6 +249,29 @@
             font-weight: bold;
         }
 
+        .teacher-override-btn { 
+            background-color: #607d8b; 
+            color: white; 
+            border: none; 
+            padding: 5px 10px; 
+            border-radius: 4px; 
+            font-size: 12px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 5px; 
+        }
+        .teacher-override-btn:hover { background-color: #455a64; }
+        .hidden { display: none !important; }
+
+        /* Modal Overlay */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; border-top: 6px solid var(--navy); }
+        .modal-input { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; text-align: center; }
+        .modal-btn-row { display: flex; gap: 10px; }
+        .modal-btn-confirm { flex: 1; background-color: var(--navy); color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-btn-cancel { flex: 1; background-color: #ccc; color: #333; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
+
         .btn-submit {
             background-color: var(--navy);
             color: white;
@@ -303,10 +325,6 @@
 
         .task-intro {
             line-height: 1.6;
-        }
-
-        .hidden {
-            display: none !important;
         }
 
         footer {
@@ -431,7 +449,7 @@
 
             <p style="line-height:2.5; font-size:1.05em;">
                 1. Decomposition means breaking a big problem into
-                <input type="text" id="red_q1" class="auto-input red-input inline-input"
+                <input type="text" id="red_q1" class="auto-input red-input inline-input graded-input"
                     data-label="Red Q1" data-answers='["smaller"]' placeholder="word">
 
                 problems.
@@ -439,7 +457,7 @@
                 <br>
 
                 2. Pattern recognition means finding
-                <input type="text" id="red_q2" class="auto-input red-input inline-input"
+                <input type="text" id="red_q2" class="auto-input red-input inline-input graded-input"
                     data-label="Red Q2" data-answers='["patterns","similarities","similarity"]' placeholder="word">
 
                 between things.
@@ -447,7 +465,7 @@
                 <br>
 
                 3. Abstraction means removing
-                <input type="text" id="red_q3" class="auto-input red-input inline-input"
+                <input type="text" id="red_q3" class="auto-input red-input inline-input graded-input"
                     data-label="Red Q3" data-answers='["unnecessary","irrelevant","unimportant"]' placeholder="word">
 
                 details.
@@ -455,7 +473,7 @@
                 <br>
 
                 4. An algorithm is a set of
-                <input type="text" id="red_q4" class="auto-input red-input inline-input"
+                <input type="text" id="red_q4" class="auto-input red-input inline-input graded-input"
                     data-label="Red Q4" data-answers='["instructions","steps"]' placeholder="word">
 
                 to follow.
@@ -463,19 +481,19 @@
                 <br>
 
                 5. Instructions should be completed in the correct
-                <input type="text" id="red_q5" class="auto-input red-input inline-input"
+                <input type="text" id="red_q5" class="auto-input red-input inline-input graded-input"
                     data-label="Red Q5" data-answers='["order","sequence"]' placeholder="word">.
 
                 <br>
 
                 6. Breaking a big problem into smaller tasks makes it easier to
-                <input type="text" id="red_q6" class="auto-input red-input inline-input"
+                <input type="text" id="red_q6" class="auto-input red-input inline-input graded-input"
                     data-label="Red Q6" data-answers='["solve","manage","complete"]' placeholder="word">.
 
                 <br>
 
                 7. A recipe is an example of an
-                <input type="text" id="red_q7" class="auto-input red-input inline-input"
+                <input type="text" id="red_q7" class="auto-input red-input inline-input graded-input"
                     data-label="Red Q7" data-answers='["algorithm"]' placeholder="word">
 
                 because it gives instructions.
@@ -483,25 +501,25 @@
                 <br>
 
                 8. Spotting that the same thing happens every Friday is finding a
-                <input type="text" id="red_q8" class="auto-input red-input inline-input"
+                <input type="text" id="red_q8" class="auto-input red-input inline-input graded-input"
                     data-label="Red Q8" data-answers='["pattern"]' placeholder="word">.
 
                 <br>
 
                 9. When planning a journey, you can ignore details that are not
-                <input type="text" id="red_q9" class="auto-input red-input inline-input"
+                <input type="text" id="red_q9" class="auto-input red-input inline-input graded-input"
                     data-label="Red Q9" data-answers='["important","relevant","necessary"]' placeholder="word">.
 
                 <br>
 
                 10. When you split a task into smaller tasks, you are using
-                <input type="text" id="red_q10" class="auto-input red-input inline-input"
+                <input type="text" id="red_q10" class="auto-input red-input inline-input graded-input"
                     data-label="Red Q10" data-answers='["decomposition"]' placeholder="word">.
             </p>
 
             <button type="button" class="btn-submit no-print"
-                onclick="checkAnswers('red-input')">
-                Check Red Answers
+                onclick="checkParagraphAnswers('red-input')">
+                Check Answers
             </button>
         </section>
 
@@ -527,41 +545,45 @@
                 <label class="question-label" for="amber_q1">
                     1. Decomposition: You need to clean your bedroom. Name three smaller jobs you could do to complete the task.
                 </label>
-                <textarea id="amber_q1" class="auto-input amber-input"
+                <textarea id="amber_q1" class="auto-input amber-input graded-input"
                     data-label="Amber Q1"
                     placeholder="For example, put clothes away..."></textarea>
+                <div style="text-align: right;"><button id="override-amber_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('amber_q1')">👨‍🏫 Override Score</button></div>
             </div>
 
             <div class="question-row">
                 <label class="question-label" for="amber_q2">
                     2. Abstraction: You are packing your school bag. Which things do you need to remember, and which things could you ignore because they are not needed for school?
                 </label>
-                <textarea id="amber_q2" class="auto-input amber-input"
+                <textarea id="amber_q2" class="auto-input amber-input graded-input"
                     data-label="Amber Q2"
                     placeholder="Explain which things are important and which are not needed..."></textarea>
+                <div style="text-align: right;"><button id="override-amber_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('amber_q2')">👨‍🏫 Override Score</button></div>
             </div>
 
             <div class="question-row">
                 <label class="question-label" for="amber_q3">
                     3. Pattern recognition: You notice that you often forget your PE kit on Wednesdays. How could spotting this pattern help you?
                 </label>
-                <textarea id="amber_q3" class="auto-input amber-input"
+                <textarea id="amber_q3" class="auto-input amber-input graded-input"
                     data-label="Amber Q3"
                     placeholder="Explain what you notice and what you could change..."></textarea>
+                <div style="text-align: right;"><button id="override-amber_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('amber_q3')">👨‍🏫 Override Score</button></div>
             </div>
 
             <div class="question-row">
                 <label class="question-label" for="amber_q4">
                     4. Algorithm: Write four steps for making a piece of toast. Put the steps in the correct order.
                 </label>
-                <textarea id="amber_q4" class="auto-input amber-input"
+                <textarea id="amber_q4" class="auto-input amber-input graded-input"
                     data-label="Amber Q4"
                     placeholder="1. First...&#10;2. Next...&#10;3. Then...&#10;4. Finally..."></textarea>
+                <div style="text-align: right;"><button id="override-amber_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('amber_q4')">👨‍🏫 Override Score</button></div>
             </div>
 
             <button type="button" class="btn-submit no-print"
-                onclick="checkAnswers('amber-input')">
-                Check Amber Answers
+                onclick="checkParagraphAnswers('amber-input')">
+                Check Answers
             </button>
         </section>
 
@@ -584,41 +606,45 @@
                 <label class="question-label" for="green_q1">
                     1. Decomposition: Name three smaller jobs that need to be done before the disco.
                 </label>
-                <textarea id="green_q1" class="auto-input green-input"
+                <textarea id="green_q1" class="auto-input green-input graded-input"
                     data-label="Green Q1"
                     placeholder="Three jobs could be..."></textarea>
+                <div style="text-align: right;"><button id="override-green_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('green_q1')">👨‍🏫 Override Score</button></div>
             </div>
 
             <div class="question-row">
                 <label class="question-label" for="green_q2">
                     2. Abstraction: The school needs to know how many students are attending. Does it need to know each student's favourite colour, shoe size and ticket number? Explain which information is most useful.
                 </label>
-                <textarea id="green_q2" class="auto-input green-input"
+                <textarea id="green_q2" class="auto-input green-input graded-input"
                     data-label="Green Q2"
                     placeholder="The important information is..."></textarea>
+                <div style="text-align: right;"><button id="override-green_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('green_q2')">👨‍🏫 Override Score</button></div>
             </div>
 
             <div class="question-row">
                 <label class="question-label" for="green_q3">
                     3. Pattern recognition: Last year's disco was busiest at the start and many students wanted drinks. How could the school use this information to plan this year's disco?
                 </label>
-                <textarea id="green_q3" class="auto-input green-input"
+                <textarea id="green_q3" class="auto-input green-input graded-input"
                     data-label="Green Q3"
                     placeholder="The school could use this pattern to..."></textarea>
+                <div style="text-align: right;"><button id="override-green_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('green_q3')">👨‍🏫 Override Score</button></div>
             </div>
 
             <div class="question-row">
                 <label class="question-label" for="green_q4">
                     4. Algorithm: Write five steps for a student arriving at the disco, from joining the queue to entering the hall.
                 </label>
-                <textarea id="green_q4" class="auto-input green-input"
+                <textarea id="green_q4" class="auto-input green-input graded-input"
                     data-label="Green Q4"
                     placeholder="1. First...&#10;2. Next...&#10;3. Then...&#10;4. After that...&#10;5. Finally..."></textarea>
+                <div style="text-align: right;"><button id="override-green_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('green_q4')">👨‍🏫 Override Score</button></div>
             </div>
 
             <button type="button" class="btn-submit no-print"
-                onclick="checkAnswers('green-input')">
-                Check Green Answers
+                onclick="checkParagraphAnswers('green-input')">
+                Check Answers
             </button>
         </section>
 
@@ -635,50 +661,55 @@
                 <label class="question-label" for="blue_q1">
                     1. You have been asked to organise a school trip. Use decomposition to split the job into at least five smaller tasks.
                 </label>
-                <textarea id="blue_q1" class="auto-input blue-input"
+                <textarea id="blue_q1" class="auto-input blue-input graded-input"
                     data-label="Blue Q1"
                     placeholder="One task is... Another task is..."></textarea>
+                <div style="text-align: right;"><button id="override-blue_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('blue_q1')">👨‍🏫 Override Score</button></div>
             </div>
 
             <div class="question-row">
                 <label class="question-label" for="blue_q2">
                     2. Use abstraction: the school is making a trip list. It could record each student's name, emergency contact, favourite game, shoe size and whether they have paid. Which details are useful for organising the trip? Which details could be left out, and why?
                 </label>
-                <textarea id="blue_q2" class="auto-input blue-input"
+                <textarea id="blue_q2" class="auto-input blue-input graded-input"
                     data-label="Blue Q2"
                     placeholder="The useful details are... The school can leave out..."></textarea>
+                <div style="text-align: right;"><button id="override-blue_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('blue_q2')">👨‍🏫 Override Score</button></div>
             </div>
 
             <div class="question-row">
                 <label class="question-label" for="blue_q3">
                     3. Use pattern recognition: the school has noticed that students often forget their permission slips. Suggest a pattern the school could look for and explain how it could use that pattern to reduce the problem.
                 </label>
-                <textarea id="blue_q3" class="auto-input blue-input"
+                <textarea id="blue_q3" class="auto-input blue-input graded-input"
                     data-label="Blue Q3"
                     placeholder="The school could look for... It could then..."></textarea>
+                <div style="text-align: right;"><button id="override-blue_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('blue_q3')">👨‍🏫 Override Score</button></div>
             </div>
 
             <div class="question-row">
                 <label class="question-label" for="blue_q4">
                     4. Create an algorithm for getting ready for the trip. Include checking the permission slip, packing a lunch, arriving at school and getting on the coach. Explain why the order matters.
                 </label>
-                <textarea id="blue_q4" class="auto-input blue-input"
+                <textarea id="blue_q4" class="auto-input blue-input graded-input"
                     data-label="Blue Q4"
                     placeholder="Write your steps in order..."></textarea>
+                <div style="text-align: right;"><button id="override-blue_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('blue_q4')">👨‍🏫 Override Score</button></div>
             </div>
 
             <div class="question-row">
                 <label class="question-label" for="blue_q5">
                     5. Choose two of the four computational thinking techniques. Explain how using both could help the school organise a successful trip.
                 </label>
-                <textarea id="blue_q5" class="auto-input blue-input"
+                <textarea id="blue_q5" class="auto-input blue-input graded-input"
                     data-label="Blue Q5"
                     placeholder="I would use... and... because..."></textarea>
+                <div style="text-align: right;"><button id="override-blue_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('blue_q5')">👨‍🏫 Override Score</button></div>
             </div>
 
             <button type="button" class="btn-submit no-print"
                 onclick="checkAnswers('blue-input')">
-                Check Blue Answers
+                Check Answers
             </button>
         </section>
 
@@ -724,13 +755,26 @@
     </button>
 </div>
 
+<!-- TEACHER OVERRIDE MODAL -->
+<div class="modal-overlay" id="verify-modal">
+    <div class="modal-content">
+        <h3>Teacher Verification</h3>
+        <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
+        <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter PIN">
+        <div class="modal-btn-row">
+            <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
+            <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
+        </div>
+    </div>
+</div>
+
 <footer>
     &copy; 2026 Delta Serlby Park, Computing Department
 </footer>
 
 <script>
     /* =========================================================
-       1. FIREBASE SETUP
+       1. FIREBASE SETUP & CLOUD SYNC
        ========================================================= */
 
     const LESSON_ID = "y8-computational-thinking";
@@ -759,14 +803,7 @@
     }
 
     /* =========================================================
-       2. SIMPLE SELF-MARKING ANSWERS
-
-       Red answers use exact accepted answers.
-       Amber, Green and Blue use keyword groups.
-       A longer answer is marked correct when it includes
-       enough of the important ideas.
-       Answers are either correct or incorrect.
-       There are no partial marks.
+       2. ANSWER MARKING RUBRICS & LOGIC
        ========================================================= */
 
     const keywordRubrics = {
@@ -775,44 +812,37 @@
             ["tidy", "put away", "organise", "organize"],
             ["vacuum", "hoover", "clean", "dust", "bed"]
         ],
-
         amber_q2: [
             ["book", "pen", "pencil", "equipment", "timetable", "homework"],
             ["important", "needed", "necessary", "required"],
             ["ignore", "unnecessary", "not needed", "irrelevant", "favourite colour", "shoe size", "toy"]
         ],
-
         amber_q3: [
             ["pattern", "wednesday", "every week", "often", "regularly"],
             ["remind", "check", "pack", "prepare", "night before"],
             ["pe kit", "kit", "forget", "remember"]
         ],
-
         amber_q4: [
             ["bread"],
             ["toaster"],
             ["toast", "cook", "wait"],
             ["remove", "plate", "serve", "butter"]
         ],
-
         green_q1: [
             ["ticket", "sell", "invite", "permission"],
             ["music", "dj", "playlist", "speaker"],
             ["decorate", "hall", "food", "drink", "staff", "supervise", "clean"]
         ],
-
         green_q2: [
             ["name", "ticket", "number", "attendance", "student"],
             ["favourite colour", "shoe size", "not needed", "unnecessary", "irrelevant"],
             ["important", "useful", "needed", "necessary", "know who", "count"]
         ],
-
         green_q3: [
             ["pattern", "last year", "previous", "noticed", "busiest"],
             ["prepare", "plan", "organise", "organize", "staff", "drink", "queue"],
             ["enough", "ready", "avoid", "reduce", "wait", "run out"]
         ],
-
         green_q4: [
             ["queue", "line", "wait"],
             ["ticket", "check", "name", "entry"],
@@ -820,7 +850,6 @@
             ["enter", "go in", "hall"],
             ["order", "next", "finally", "then"]
         ],
-
         blue_q1: [
             ["permission", "form", "consent"],
             ["coach", "transport", "travel"],
@@ -828,21 +857,18 @@
             ["lunch", "food", "drink"],
             ["destination", "activity", "booking", "plan", "schedule", "safety"]
         ],
-
         blue_q2: [
             ["name", "emergency contact", "paid", "payment"],
             ["favourite game", "shoe size", "unnecessary", "irrelevant", "not needed", "leave out"],
             ["privacy", "personal information", "security", "safe", "protect"],
             ["necessary", "needed", "important", "relevant"]
         ],
-
         blue_q3: [
             ["pattern", "often", "regularly", "many students", "every trip"],
             ["permission slip", "form", "forget", "missing"],
             ["remind", "message", "check", "collect", "deadline"],
             ["reduce", "fewer", "less", "avoid"]
         ],
-
         blue_q4: [
             ["permission", "form", "check"],
             ["lunch", "pack", "bag"],
@@ -850,7 +876,6 @@
             ["coach", "board", "get on"],
             ["order", "before", "first", "next", "finally", "because"]
         ],
-
         blue_q5: [
             ["decomposition", "abstraction", "pattern recognition", "algorithm"],
             ["decomposition", "abstraction", "pattern recognition", "algorithm"],
@@ -871,9 +896,7 @@
         const normalAnswer = normaliseText(answer);
         const normalKeyword = normaliseText(keyword);
 
-        if (!normalKeyword) {
-            return false;
-        }
+        if (!normalKeyword) return false;
 
         if (normalKeyword.length <= 2) {
             const escaped = normalKeyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -889,7 +912,7 @@
             return ["red-input", "amber-input", "green-input", "blue-input"].includes(className);
         });
 
-        input.classList.remove("input-correct", "input-incorrect");
+        input.classList.remove("input-correct", "input-incorrect", "correct", "incorrect");
 
         const feedbackId = input.id + "_feedback";
         let feedback = document.getElementById(feedbackId);
@@ -902,9 +925,9 @@
         }
 
         if (answer === "") {
-            input.classList.add("input-incorrect");
-            feedback.textContent = "Incorrect. Enter an answer and try again.";
-            feedback.style.color = "#b71c1c";
+            input.classList.add("input-incorrect", "incorrect");
+            feedback.textContent = "❌ Please enter an answer.";
+            feedback.style.color = "#d32f2f";
             return false;
         }
 
@@ -912,7 +935,6 @@
 
         if (groupClass === "red-input") {
             let acceptedAnswers = [];
-
             try {
                 acceptedAnswers = JSON.parse(input.getAttribute("data-answers") || "[]");
             } catch (error) {
@@ -924,7 +946,6 @@
             });
         } else {
             const rubric = keywordRubrics[input.id] || [];
-
             if (rubric.length > 0) {
                 const matchedGroups = rubric.filter(function(group) {
                     return group.some(function(keyword) {
@@ -938,13 +959,14 @@
         }
 
         input.classList.add(correct ? "input-correct" : "input-incorrect");
+        input.classList.add(correct ? "correct" : "incorrect");
 
         if (correct) {
-            feedback.textContent = "Correct! You have included the key ideas.";
+            feedback.textContent = "✅ Correct!";
             feedback.style.color = "#008f39";
         } else {
-            feedback.textContent = "Not quite. Read the question again and add the important ideas.";
-            feedback.style.color = "#b71c1c";
+            feedback.textContent = "❌ Not quite. Review your answer and try again.";
+            feedback.style.color = "#d32f2f";
         }
 
         return correct;
@@ -955,6 +977,16 @@
         let correctCount = 0;
 
         inputs.forEach(function(input) {
+            const overrideBtn = document.getElementById("override-" + input.id);
+            if (overrideBtn) overrideBtn.classList.remove("hidden");
+
+            if (input.classList.contains("teacher-locked")) {
+                if (input.classList.contains("input-correct") || input.classList.contains("correct")) {
+                    correctCount++;
+                }
+                return;
+            }
+
             if (markAnswer(input)) {
                 correctCount++;
             }
@@ -996,10 +1028,10 @@
 
             let status = "neutral";
 
-            if (input.classList.contains("input-correct")) {
+            if (input.classList.contains("input-correct") || input.classList.contains("correct") || input.classList.contains("teacher-locked")) {
                 status = "correct";
                 correctCount++;
-            } else if (input.classList.contains("input-incorrect")) {
+            } else if (input.classList.contains("input-incorrect") || input.classList.contains("incorrect")) {
                 status = "incorrect";
             }
 
@@ -1027,7 +1059,7 @@
     }
 
     /* =========================================================
-       4. SAVE PROGRESS TO FIREBASE
+       4. SAVE PROGRESS TO FIREBASE CLOUD
        ========================================================= */
 
     function syncWorkToCloud(immediate = false) {
@@ -1046,10 +1078,7 @@
 
         cloudSyncTimer = setTimeout(function() {
             const user = auth.currentUser;
-
-            if (!user) {
-                return;
-            }
+            if (!user) return;
 
             const inputs = document.querySelectorAll(".auto-input");
             const structured = buildStructuredMarkbookItems();
@@ -1097,6 +1126,11 @@
 
             if (data["class_" + index]) {
                 input.className = data["class_" + index];
+                if (input.classList.contains("correct") || input.classList.contains("input-correct") || input.classList.contains("incorrect") || input.classList.contains("input-incorrect") || input.classList.contains("teacher-locked")) {
+                    var btnId = "override-" + input.id;
+                    var btn = document.getElementById(btnId);
+                    if (btn) btn.classList.remove("hidden");
+                }
             }
 
             if (input.tagName.toLowerCase() === "textarea") {
@@ -1165,7 +1199,61 @@
     }
 
     /* =========================================================
-       6. INPUT EVENTS AND TEXTAREA SIZING
+       6. TEACHER OVERRIDE VERIFICATION MODAL
+       ========================================================= */
+
+    let activeQuestionId = null;
+
+    function openVerifyModal(qId) {
+        activeQuestionId = qId;
+        document.getElementById('teacher-password-input').value = '';
+        document.getElementById('modal-error-msg').style.display = 'none';
+        document.getElementById('verify-modal').style.display = 'flex';
+        document.getElementById('teacher-password-input').focus();
+    }
+
+    function closeVerifyModal() {
+        document.getElementById('verify-modal').style.display = 'none';
+        activeQuestionId = null;
+    }
+
+    function submitVerify() {
+        var pass = document.getElementById('teacher-password-input').value;
+        if (pass === '2525') {
+            var inputEl = document.getElementById(activeQuestionId);
+            let feedback = document.getElementById(activeQuestionId + "_feedback");
+            if (!feedback) {
+                feedback = document.createElement("div");
+                feedback.id = activeQuestionId + "_feedback";
+                feedback.className = "keyword-marking-feedback";
+                inputEl.insertAdjacentElement("afterend", feedback);
+            }
+
+            inputEl.classList.add('teacher-locked');
+            if (inputEl.classList.contains('input-correct') || inputEl.classList.contains('correct')) {
+                inputEl.classList.remove('input-correct', 'correct');
+                inputEl.classList.add('input-incorrect', 'incorrect');
+                feedback.textContent = "❌ Marked incorrect by teacher override.";
+                feedback.style.color = "#d32f2f";
+            } else {
+                inputEl.classList.remove('input-incorrect', 'incorrect');
+                inputEl.classList.add('input-correct', 'correct');
+                feedback.textContent = "✅ Correct! (Teacher Approved Override)";
+                feedback.style.color = "#008f39";
+            }
+            closeVerifyModal();
+            saveProgress(true);
+        } else {
+            document.getElementById('modal-error-msg').style.display = 'block';
+        }
+    }
+
+    document.getElementById('teacher-password-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') submitVerify();
+    });
+
+    /* =========================================================
+       7. INPUT EVENTS & TEXTAREA AUTO-RESIZE
        ========================================================= */
 
     document.addEventListener("input", function(event) {
@@ -1184,7 +1272,7 @@
     });
 
     /* =========================================================
-       7. RESET PAGE
+       8. RESET PAGE
        ========================================================= */
 
     async function clearAllData() {
