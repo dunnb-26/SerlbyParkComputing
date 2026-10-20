@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>B5: Profitability and Liquidity - Revision</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
         .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
@@ -36,8 +41,8 @@
         .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
         .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
         .btn-submit:hover { background-color: #152960; }
-        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
-        .btn-pdf:hover { background-color: #124d2d; }
+        .btn-reset { background-color: #d32f2f; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; margin: 20px auto; }
+        .btn-reset:hover { background-color: #b71c1c; }
     </style>
 </head>
 <body>
@@ -53,7 +58,7 @@
                 <h2>B5 Revision Notes</h2>
                 <div class="instruction-box center-text">Use this space to write out your complete notes on profitability, liquidity, improving financial positions, and calculating working capital and profit.</div>
                 <div class="question-wrapper">
-                    <textarea class="auto-input" rows="12" placeholder="Type your revision notes here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                    <textarea class="auto-input notes-textarea" rows="12" placeholder="Type your revision notes here..."></textarea>
                 </div>
             </div>
 
@@ -64,368 +69,368 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 1: Understanding profitability</h3>
                 
                 <div class="question-wrapper">
-                    <label class="question-label">1. What is profitability?</label>
-                    <textarea id="b5_q1" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["how well", "makes profit", "money it makes", "after costs", "successful", "making enough"]], "feedback": "Acceptable: How well a business makes profit, how much money it makes after costs, or if it makes enough to be successful."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q1. What is profitability?</label>
+                    <textarea id="b5_q1" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["how well", "makes profit", "money it makes", "after costs", "successful", "making enough"]], "feedback": "Hint: What do you call the measure of how well a business generates money after costs?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q1')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">2. What is profit?</label>
-                    <textarea id="b5_q2" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["left after costs", "taken away", "revenue", "income is greater than costs"]], "feedback": "Acceptable: Money left after costs are taken away from revenue, or when sales income is greater than costs."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q2. What is profit?</label>
+                    <textarea id="b5_q2" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["left after costs", "taken away", "revenue", "income is greater than costs"]], "feedback": "Hint: What is the money left over after all costs are deducted from revenue?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q2')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">3. What is the difference between revenue and profit?</label>
-                    <textarea id="b5_q3" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["revenue", "earned from sales", "money earned"], ["profit", "remains", "after costs", "deducted"]], "feedback": "Revenue is the money earned from sales; profit is what remains after costs are deducted."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q3. What is the difference between revenue and profit?</label>
+                    <textarea id="b5_q3" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["revenue", "earned from sales", "money earned"], ["profit", "remains", "after costs", "deducted"]], "feedback": "Hint: Think about which one is the total money earned, and which is the money kept after costs."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q3')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">4. Why is profitability important to an entrepreneur?</label>
-                    <textarea id="b5_q4" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["making money", "survive", "grow", "pay the owner", "fund future investment"]], "feedback": "Acceptable: Shows if it is making money, helps it survive/grow, pays the owner, or funds future investment."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q4. Why is profitability important to an entrepreneur?</label>
+                    <textarea id="b5_q4" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["making money", "survive", "grow", "pay the owner", "fund future investment"]], "feedback": "Hint: Why does the owner need to know if the business can survive, grow, or fund future investments?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">5. What might happen if a business makes a loss for a long time?</label>
-                    <textarea id="b5_q5" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["run out of money", "struggle to pay bills", "borrow money", "reduce costs", "close"]], "feedback": "Acceptable: Could run out of money, struggle to pay bills, need to borrow, reduce costs, or eventually close."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q5. What might happen if a business makes a loss for a long time?</label>
+                    <textarea id="b5_q5" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["run out of money", "struggle to pay bills", "borrow money", "reduce costs", "close"]], "feedback": "Hint: If money is consistently lost, what happens to bills, loans, and the future of the business?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q5')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">6. Give two ways a business could increase its profit.</label>
-                    <textarea id="b5_q6" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["increase sales", "reduce costs", "cheaper supplies", "reduce waste", "improve efficiency", "review prices", "attract more"]], "feedback": "Acceptable: Increase sales, reduce costs, negotiate cheaper supplies, reduce waste, improve efficiency, or attract more customers."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q6. Give two ways a business could increase its profit.</label>
+                    <textarea id="b5_q6" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["increase sales", "reduce costs", "cheaper supplies", "reduce waste", "improve efficiency", "review prices", "attract more"]], "feedback": "Hint: Name two strategies, like selling more items or finding cheaper supplies."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q6')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">7. Why might a business with high revenue still have low profitability?</label>
-                    <textarea id="b5_q7" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["costs may be very high", "spend too much", "wages", "stock", "small profit"]], "feedback": "Acceptable: Its costs may be very high, spends too much on wages/stock, or sells at prices leaving a small profit."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q7. Why might a business with high revenue still have low profitability?</label>
+                    <textarea id="b5_q7" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["costs may be very high", "spend too much", "wages", "stock", "small profit"]], "feedback": "Hint: Even if sales are huge, what might be happening with wages, stock, or other expenses?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q7')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">8. Why might an entrepreneur accept lower profit in the short term?</label>
-                    <textarea id="b5_q8" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["attract customers", "launch a new product", "invest in equipment", "advertise", "grow market share"]], "feedback": "Acceptable: To attract customers, launch a new product, invest in equipment, advertise, or grow market share."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q8. Why might an entrepreneur accept lower profit in the short term?</label>
+                    <textarea id="b5_q8" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["attract customers", "launch a new product", "invest in equipment", "advertise", "grow market share"]], "feedback": "Hint: Why might a business sacrifice short-term gains? Think about attracting new buyers or launching products."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q8')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">9. Why might a business want to compare its profit with previous years?</label>
-                    <textarea id="b5_q9" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["improving", "identify problems", "changes have worked", "plan for the future"]], "feedback": "Acceptable: To see whether it is improving, identify problems, check if changes worked, or plan for the future."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q9. Why might a business want to compare its profit with previous years?</label>
+                    <textarea id="b5_q9" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["improving", "identify problems", "changes have worked", "plan for the future"]], "feedback": "Hint: How does checking past performance help spot trends, problems, or plan for the future?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q9')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">10. Is a profitable business always successful? Explain.</label>
-                    <textarea id="b5_q10" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["not necessarily", "no"], ["cash flow problems", "poor customer reviews", "high debts", "falling demand", "whole story"]], "feedback": "Acceptable: Not necessarily. It might still have cash flow problems, poor reviews, high debts, or falling demand."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q10. Is a profitable business always successful? Explain.</label>
+                    <textarea id="b5_q10" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["not necessarily", "no"], ["cash flow problems", "poor customer reviews", "high debts", "falling demand", "whole story"]], "feedback": "Hint: Even if making a profit, could they have cash flow issues or poor reviews? Does profit tell the whole story?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q10')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 2: Understanding liquidity</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">11. What is liquidity?</label>
-                    <textarea id="b5_q11" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["pay its short term bills", "money available", "payments are due", "turned into cash"]], "feedback": "Acceptable: How easily it pays short-term bills, having money available when due, or how quickly assets turn to cash."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q11. What is liquidity?</label>
+                    <textarea id="b5_q11" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["pay its short term bills", "money available", "payments are due", "turned into cash"]], "feedback": "Hint: What term describes having enough available money to pay short-term bills when they are due?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q11')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">12. Why is liquidity important?</label>
-                    <textarea id="b5_q12" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["pay wages", "rent", "suppliers", "keep operating", "avoid missed payments", "financial problems"]], "feedback": "Acceptable: Needs to pay wages/rent/suppliers, keep operating, avoid missed payments, or reduce financial risks."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q12. Why is liquidity important?</label>
+                    <textarea id="b5_q12" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["pay wages", "rent", "suppliers", "keep operating", "avoid missed payments", "financial problems"]], "feedback": "Hint: Why must a business have cash on hand for wages, rent, and suppliers?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q12')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">13. What could happen if a business has poor liquidity?</label>
-                    <textarea id="b5_q13" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["struggle to pay bills", "miss payment deadlines", "overdraft", "loan", "delay paying", "stop trading"]], "feedback": "Acceptable: Struggle to pay bills, miss deadlines, need a loan/overdraft, delay paying suppliers, or stop trading."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q13. What could happen if a business has poor liquidity?</label>
+                    <textarea id="b5_q13" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["struggle to pay bills", "miss payment deadlines", "overdraft", "loan", "delay paying", "stop trading"]], "feedback": "Hint: If they can't pay bills, what happens with loans, suppliers, or trading?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q13')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">14. What is the difference between profitability and liquidity?</label>
-                    <textarea id="b5_q14" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["profitability", "making money", "after costs"], ["liquidity", "available money", "pay bills", "due"]], "feedback": "Profitability is making money after costs; liquidity is having available money to pay bills when they are due."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q14. What is the difference between profitability and liquidity?</label>
+                    <textarea id="b5_q14" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["profitability", "making money", "after costs"], ["liquidity", "available money", "pay bills", "due"]], "feedback": "Hint: Contrast making money (after costs) with having available cash to pay bills."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q14')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">15. Can a business be profitable but have poor liquidity? Explain.</label>
-                    <textarea id="b5_q15" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["yes"], ["sales on credit", "not received the money", "without enough cash", "immediate bills"]], "feedback": "Yes. It may have made sales on credit but hasn't received the cash yet, leaving it unable to pay immediate bills."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q15. Can a business be profitable but have poor liquidity? Explain.</label>
+                    <textarea id="b5_q15" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["yes"], ["sales on credit", "not received the money", "without enough cash", "immediate bills"]], "feedback": "Hint: Could a business make sales on credit but not receive the actual cash yet?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q15')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">16. Can a business have good liquidity but low profitability? Explain.</label>
-                    <textarea id="b5_q16" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["yes"], ["cash saved", "borrowed", "little profit", "trading activities"]], "feedback": "Yes. It might have plenty of cash saved or borrowed, but still makes very little profit from normal trading."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q16. Can a business have good liquidity but low profitability? Explain.</label>
+                    <textarea id="b5_q16" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["yes"], ["cash saved", "borrowed", "little profit", "trading activities"]], "feedback": "Hint: Could they have lots of cash saved or borrowed but still not make money from daily trading?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q16')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">17. What is a liquid asset?</label>
-                    <textarea id="b5_q17" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["turned into cash quickly", "money in a bank account", "cash held"]], "feedback": "Acceptable: An asset that can be turned into cash quickly, such as money in a bank account or cash held."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q17. What is a liquid asset?</label>
+                    <textarea id="b5_q17" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["turned into cash quickly", "money in a bank account", "cash held"]], "feedback": "Hint: What type of asset is cash, or something that can be turned into cash extremely quickly?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q17')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">18. Why is stock usually less liquid than cash?</label>
-                    <textarea id="b5_q18" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["sold before", "receives cash", "take time to find a buyer"]], "feedback": "Acceptable: Stock must be sold before the business receives cash, and it may take time to find a buyer."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q18. Why is stock usually less liquid than cash?</label>
+                    <textarea id="b5_q18" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["sold before", "receives cash", "take time to find a buyer"]], "feedback": "Hint: Can you instantly use stock to pay a bill, or do you have to wait to find a buyer first?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q18')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">19. Why might a business struggle to pay its bills even if it owns expensive equipment?</label>
-                    <textarea id="b5_q19" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["not cash", "take time to sell", "needed to run"]], "feedback": "Acceptable: Equipment is not cash, may take time to sell, and may be needed to run the business."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q19. Why might a business struggle to pay its bills even if it owns expensive equipment?</label>
+                    <textarea id="b5_q19" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["not cash", "take time to sell", "needed to run"]], "feedback": "Hint: Is equipment easy to turn into cash quickly? Is it needed to run the business?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q19')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">20. Give two ways a business could improve its liquidity.</label>
-                    <textarea id="b5_q20" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["chase customers", "reduce unnecessary", "delay non urgent", "sell unused", "overdraft", "cash flow planning"]], "feedback": "Acceptable: Chase customers for payment, reduce spending, delay purchases, sell assets, arrange overdraft, or plan cash flow."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q20. Give two ways a business could improve its liquidity.</label>
+                    <textarea id="b5_q20" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["chase customers", "reduce unnecessary", "delay non urgent", "sell unused", "overdraft", "cash flow planning"]], "feedback": "Hint: How could they speed up cash coming in or slow down cash going out (e.g., chasing customers, delaying purchases)?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q20')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 3: Profitability and liquidity calculations</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">21. A business has revenue of £5,000 and costs of £3,500. Calculate its profit.</label>
-                    <input type="text" id="b5_q21" class="auto-input b5-input" data-rubric='{"keywords": [["1500", "£1500", "1,500", "£1,500"]], "feedback": "£1,500."}' placeholder="Type answer here...">
+                    <label class="question-label">Q21. A business has revenue of £5,000 and costs of £3,500. Calculate its profit.</label>
+                    <input type="text" id="b5_q21" class="auto-input b5-input" data-rubric='{"keywords": [["1500", "£1500", "1,500", "£1,500"]], "feedback": "Hint: Subtract the costs (£3,500) from the revenue (£5,000). Include the currency symbol."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q21')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">22. A business has revenue of £8,000 and costs of £8,600. Calculate its loss.</label>
-                    <input type="text" id="b5_q22" class="auto-input b5-input" data-rubric='{"keywords": [["600", "£600", "-600", "-£600"], ["loss"]], "feedback": "£600 loss."}' placeholder="Type answer here...">
+                    <label class="question-label">Q22. A business has revenue of £8,000 and costs of £8,600. Calculate its loss.</label>
+                    <input type="text" id="b5_q22" class="auto-input b5-input" data-rubric='{"keywords": [["600", "£600", "-600", "-£600"], ["loss"]], "feedback": "Hint: If costs (£8,600) are higher than revenue (£8,000), what is the result? Mention the word '\''loss'\''."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q22')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">23. A business has current assets of £6,000 and current liabilities of £2,000. Calculate its working capital.</label>
-                    <input type="text" id="b5_q23" class="auto-input b5-input" data-rubric='{"keywords": [["4000", "£4000", "4,000", "£4,000"]], "feedback": "£4,000."}' placeholder="Type answer here...">
+                    <label class="question-label">Q23. A business has current assets of £6,000 and current liabilities of £2,000. Calculate its working capital.</label>
+                    <input type="text" id="b5_q23" class="auto-input b5-input" data-rubric='{"keywords": [["4000", "£4000", "4,000", "£4,000"]], "feedback": "Hint: Subtract the current liabilities (£2,000) from the current assets (£6,000). Include the currency symbol."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q23')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">24. A business has current assets of £3,000 and current liabilities of £4,500. Calculate its working capital.</label>
-                    <input type="text" id="b5_q24" class="auto-input b5-input" data-rubric='{"keywords": [["1500", "£1500", "1,500", "-1500", "-£1500"], ["negative"]], "feedback": "-£1,500 (meaning negative working capital)."}' placeholder="Type answer here...">
+                    <label class="question-label">Q24. A business has current assets of £3,000 and current liabilities of £4,500. Calculate its working capital.</label>
+                    <input type="text" id="b5_q24" class="auto-input b5-input" data-rubric='{"keywords": [["1500", "£1500", "1,500", "-1500", "-£1500"], ["negative"]], "feedback": "Hint: Subtract £4,500 from £3,000. It will be a negative number."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q24')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">25. A business has £2,000 in its bank account and £1,500 of bills due soon. How much cash remains after paying those bills?</label>
-                    <input type="text" id="b5_q25" class="auto-input b5-input" data-rubric='{"keywords": [["500", "£500"]], "feedback": "£500."}' placeholder="Type answer here...">
+                    <label class="question-label">Q25. A business has £2,000 in its bank account and £1,500 of bills due soon. How much cash remains after paying those bills?</label>
+                    <input type="text" id="b5_q25" class="auto-input b5-input" data-rubric='{"keywords": [["500", "£500"]], "feedback": "Hint: Subtract the bills (£1,500) from the bank balance (£2,000)."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q25')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">26. A business makes £2,000 profit but has only £300 in the bank. Explain why this could be a problem.</label>
-                    <textarea id="b5_q26" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["not enough cash", "pay bills due soon", "customers have not paid"]], "feedback": "Acceptable: It may not have enough cash to pay bills due soon, especially if customers have not paid yet."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q26. A business makes £2,000 profit but has only £300 in the bank. Explain why this could be a problem.</label>
+                    <textarea id="b5_q26" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["not enough cash", "pay bills due soon", "customers have not paid"]], "feedback": "Hint: If they only have £300, what happens when it'\''s time to pay bills, regardless of the '\''paper'\'' profit?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q26" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q26')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">27. A business has £4,000 in cash and makes a loss of £500 over the month. What does this tell you?</label>
-                    <textarea id="b5_q27" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["cash available", "trading is losing money", "losses continue", "reserves could fall"]], "feedback": "Acceptable: It has cash available now, but trading is losing money. If losses continue, cash reserves will fall."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q27. A business has £4,000 in cash and makes a loss of £500 over the month. What does this tell you?</label>
+                    <textarea id="b5_q27" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["cash available", "trading is losing money", "losses continue", "reserves could fall"]], "feedback": "Hint: They have cash now, but what will happen to their reserves if the monthly losses continue?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q27" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q27')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">28. A business reduces its costs from £4,000 to £3,200 while revenue stays at £6,000. What happens to its profit?</label>
-                    <textarea id="b5_q28" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["rises", "increases", "goes up", "2800", "800"]], "feedback": "Acceptable: Profit rises from £2,000 to £2,800 (an increase of £800)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q28. A business reduces its costs from £4,000 to £3,200 while revenue stays at £6,000. What happens to its profit?</label>
+                    <textarea id="b5_q28" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["rises", "increases", "goes up", "2800", "800"]], "feedback": "Hint: If costs drop by £800 and revenue stays the same, what happens to the profit figure?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q28" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q28')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">29. A business sells products on credit. How could this affect liquidity?</label>
-                    <textarea id="b5_q29" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["wait for customers to pay", "not enough cash available", "cover its own bills"]], "feedback": "Acceptable: It may wait for customers to pay, meaning it might not have enough cash to cover its own bills."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q29. A business sells products on credit. How could this affect liquidity?</label>
+                    <textarea id="b5_q29" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["wait for customers to pay", "not enough cash available", "cover its own bills"]], "feedback": "Hint: If they offer credit, they are waiting for customers to pay. Does this leave them with enough cash for their own bills?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q29" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q29')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">30. Why does having lots of stock not necessarily mean a business has good liquidity?</label>
-                    <textarea id="b5_q30" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["not yet converted into cash", "difficult to sell", "takes time"]], "feedback": "Acceptable: The stock hasn'\''t been converted into cash yet, and it may be difficult/take time to sell."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q30. Why does having lots of stock not necessarily mean a business has good liquidity?</label>
+                    <textarea id="b5_q30" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["not yet converted into cash", "difficult to sell", "takes time"]], "feedback": "Hint: Is stock easily converted into cash? Think about the time it takes to find a buyer."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q30" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q30')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 4: Improving profitability</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">31. Give one way a business could reduce its running costs.</label>
-                    <textarea id="b5_q31" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["less energy", "cheaper rent", "reduce waste", "switch suppliers", "cut unnecessary"]], "feedback": "Acceptable: Use less energy, cheaper rent, reduce waste, switch suppliers, or cut unnecessary costs."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q31. Give one way a business could reduce its running costs.</label>
+                    <textarea id="b5_q31" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["less energy", "cheaper rent", "reduce waste", "switch suppliers", "cut unnecessary"]], "feedback": "Hint: Name one regular expense they could cut, like rent, energy, or waste."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q31" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q31')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">32. Explain how finding a cheaper supplier could increase profit.</label>
-                    <textarea id="b5_q32" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["pays less", "reducing costs", "more money from each sale", "margin"]], "feedback": "Acceptable: The business pays less for stock, reducing costs and leaving more money from each sale."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q32. Explain how finding a cheaper supplier could increase profit.</label>
+                    <textarea id="b5_q32" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["pays less", "reducing costs", "more money from each sale", "margin"]], "feedback": "Hint: If you pay less for your stock, what happens to the profit margin on each sale?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q32" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q32')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">33. Explain how improving product quality could increase profit.</label>
-                    <textarea id="b5_q33" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["more willing to buy", "recommend", "return", "increasing sales", "revenue"]], "feedback": "Acceptable: Customers more willing to buy, recommend, or return, increasing overall sales and revenue."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q33. Explain how improving product quality could increase profit.</label>
+                    <textarea id="b5_q33" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["more willing to buy", "recommend", "return", "increasing sales", "revenue"]], "feedback": "Hint: If customers love the quality, what might they do more often, and who might they tell?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q33" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q33')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">34. Why might reducing staff numbers not always be the best way to improve profit?</label>
-                    <textarea id="b5_q34" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["service could get worse", "overworked", "customers may leave", "sales could fall"]], "feedback": "Acceptable: Service could get worse, remaining staff overworked, customers leave, and sales could fall."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q34. Why might reducing staff numbers not always be the best way to improve profit?</label>
+                    <textarea id="b5_q34" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["service could get worse", "overworked", "customers may leave", "sales could fall"]], "feedback": "Hint: If you cut staff, what happens to the quality of customer service and remaining staff workload?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q34" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q34')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">35. Explain how increasing prices could improve profitability.</label>
-                    <textarea id="b5_q35" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["earns more per sale", "increase profit", "outweighs any lost sales"]], "feedback": "Acceptable: The business earns more per sale, increasing profit if extra income outweighs any lost sales."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q35. Explain how increasing prices could improve profitability.</label>
+                    <textarea id="b5_q35" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["earns more per sale", "increase profit", "outweighs any lost sales"]], "feedback": "Hint: If you charge more per item, how does that affect profit (assuming you don't lose too many sales)?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q35" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q35')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">36. Explain one risk of increasing prices.</label>
-                    <textarea id="b5_q36" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["switch to cheaper", "competitors", "reducing sales", "lowering total profit"]], "feedback": "Acceptable: Customers switch to cheaper competitors, reducing sales and possibly lowering total profit."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q36. Explain one risk of increasing prices.</label>
+                    <textarea id="b5_q36" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["switch to cheaper", "competitors", "reducing sales", "lowering total profit"]], "feedback": "Hint: If prices go up, where might your customers go instead?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q36" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q36')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">37. How could better advertising improve profitability?</label>
-                    <textarea id="b5_q37" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["attract more customers", "increase sales", "earn more revenue", "exceeds advertising cost"]], "feedback": "Acceptable: Attracts more customers, increases sales/revenue, improving profit if income exceeds advertising costs."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q37. How could better advertising improve profitability?</label>
+                    <textarea id="b5_q37" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["attract more customers", "increase sales", "earn more revenue", "exceeds advertising cost"]], "feedback": "Hint: How does advertising boost the number of people buying, and what does that do to revenue?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q37" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q37')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">38. Why might reducing waste improve profitability?</label>
-                    <textarea id="b5_q38" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["less money is wasted", "unused materials", "unsold", "costs fall", "left as profit"]], "feedback": "Acceptable: Less money wasted on unused materials/unsold items, so costs fall and more is left as profit."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q38. Why might reducing waste improve profitability?</label>
+                    <textarea id="b5_q38" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["less money is wasted", "unused materials", "unsold", "costs fall", "left as profit"]], "feedback": "Hint: If you throw away fewer materials, what happens to your costs and profit?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q38" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q38')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 5: Improving liquidity</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">39. How could chasing unpaid invoices improve liquidity?</label>
-                    <textarea id="b5_q39" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["pay sooner", "cash into the business", "pay its own bills"]], "feedback": "Acceptable: Customers pay sooner, bringing cash into the business so it can pay its own bills."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q39. How could chasing unpaid invoices improve liquidity?</label>
+                    <textarea id="b5_q39" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["pay sooner", "cash into the business", "pay its own bills"]], "feedback": "Hint: If customers pay you faster, what does that do to the cash available in your business?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q39" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q39')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">40. Why might a business ask customers to pay a deposit?</label>
-                    <textarea id="b5_q40" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["money earlier", "cover initial costs", "reducing the risk", "cancelling"]], "feedback": "Acceptable: Receives money earlier to cover initial costs, reducing the risk of customers cancelling without paying."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q40. Why might a business ask customers to pay a deposit?</label>
+                    <textarea id="b5_q40" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["money earlier", "cover initial costs", "reducing the risk", "cancelling"]], "feedback": "Hint: Why take money upfront? Think about covering initial costs and preventing cancellations."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q40" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q40')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">41. How could negotiating longer payment terms with suppliers help liquidity?</label>
-                    <textarea id="b5_q41" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["longer to collect money", "manage the timing", "cash coming in"]], "feedback": "Acceptable: Gives longer to collect money from customers before paying suppliers, helping manage cash flow timing."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q41. How could negotiating longer payment terms with suppliers help liquidity?</label>
+                    <textarea id="b5_q41" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["longer to collect money", "manage the timing", "cash coming in"]], "feedback": "Hint: If you have longer to pay suppliers, can you collect customer money first to improve cash flow?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q41" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q41')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">42. Why might selling unused equipment improve liquidity?</label>
-                    <textarea id="b5_q42" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["asset into cash", "pay bills", "still needs"]], "feedback": "Acceptable: Turns an asset into cash that can be used to pay bills."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q42. Why might selling unused equipment improve liquidity?</label>
+                    <textarea id="b5_q42" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["asset into cash", "pay bills", "still needs"]], "feedback": "Hint: How does selling an asset help pay immediate bills?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q42" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q42')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">43. Why might reducing the amount of stock held improve liquidity?</label>
-                    <textarea id="b5_q43" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["less money tied up", "unsold", "cash available"]], "feedback": "Acceptable: Less money is tied up in unsold goods, leaving more cash available for other payments."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q43. Why might reducing the amount of stock held improve liquidity?</label>
+                    <textarea id="b5_q43" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["less money tied up", "unsold", "cash available"]], "feedback": "Hint: If less money is tied up in unsold items, what happens to available cash?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q43" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q43')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">44. How could an overdraft help a business with short-term liquidity problems?</label>
-                    <textarea id="b5_q44" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["access extra money", "pay bills temporarily", "interest", "repaid"]], "feedback": "Acceptable: Access extra money to pay bills temporarily, though interest applies and it must be repaid."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q44. How could an overdraft help a business with short-term liquidity problems?</label>
+                    <textarea id="b5_q44" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["access extra money", "pay bills temporarily", "interest", "repaid"]], "feedback": "Hint: How does a bank overdraft help pay bills temporarily, even though it costs interest?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q44" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q44')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">45. Why might borrowing money not solve every liquidity problem?</label>
-                    <textarea id="b5_q45" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["repayments", "interest", "more pressure later", "underlying cash flow"]], "feedback": "Acceptable: Creates repayments and interest, so it faces more pressure later if the root cash flow problem continues."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q45. Why might borrowing money not solve every liquidity problem?</label>
+                    <textarea id="b5_q45" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["repayments", "interest", "more pressure later", "underlying cash flow"]], "feedback": "Hint: What happens later when the loan needs to be repaid with interest? Does it fix the root problem?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q45" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q45')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">46. Why is it important to plan when money will come in and go out?</label>
-                    <textarea id="b5_q46" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["predict shortages", "prepare for bills", "avoid running out"]], "feedback": "Acceptable: Helps predict shortages, prepare for bills, and avoid running out of cash unexpectedly."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q46. Why is it important to plan when money will come in and go out?</label>
+                    <textarea id="b5_q46" class="auto-input b5-input" rows="2" data-rubric='{"keywords": [["predict shortages", "prepare for bills", "avoid running out"]], "feedback": "Hint: Why is it crucial to predict cash shortages before they happen?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q46" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q46')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 6: Scenario and exam style questions</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">47. A business makes a profit but cannot afford to pay its suppliers this week. Explain the problem.</label>
-                    <textarea id="b5_q47" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["liquidity problem", "not enough cash available", "customers have not paid"]], "feedback": "Acceptable: It has a liquidity problem; it doesn'\''t have enough cash available because customers haven'\''t paid yet."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q47. A business makes a profit but cannot afford to pay its suppliers this week. Explain the problem.</label>
+                    <textarea id="b5_q47" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["liquidity problem", "not enough cash available", "customers have not paid"]], "feedback": "Hint: They have profit on paper, but do they have cash available? Think about credit sales."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q47" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q47')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">48. A business has plenty of cash in the bank but its costs are higher than its sales income. Explain why this is still a concern.</label>
-                    <textarea id="b5_q48" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["making a loss", "using up its cash reserves", "run out of money"]], "feedback": "Acceptable: It is making a loss and using up its cash reserves. If this continues, it will run out of money."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q48. A business has plenty of cash in the bank but its costs are higher than its sales income. Explain why this is still a concern.</label>
+                    <textarea id="b5_q48" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["making a loss", "using up its cash reserves", "run out of money"]], "feedback": "Hint: If costs are higher than income, they are making a loss. What will eventually happen to their cash?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q48" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q48')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">49. A small business wants to increase profitability. Recommend one action and explain why it could work.</label>
-                    <textarea id="b5_q49" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["reduce waste", "improve marketing", "negotiate cheaper", "review prices"], ["leave more money", "lower costs"]], "feedback": "Acceptable: Reduce waste, improve marketing, or negotiate cheaper supplies. Explain how it leaves more money after costs."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q49. A small business wants to increase profitability. Recommend one action and explain why it could work.</label>
+                    <textarea id="b5_q49" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["reduce waste", "improve marketing", "negotiate cheaper", "review prices"], ["leave more money", "lower costs"]], "feedback": "Hint: Suggest a way to cut costs or boost sales, and explain how it leaves more money as profit."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q49" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q49')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">50. A business has many customers but regularly pays its bills late. Suggest one improvement and explain why.</label>
-                    <textarea id="b5_q50" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["chase customers", "request deposits", "negotiate", "payment terms", "cash flow forecast"], ["improve the timing", "receipts and payments"]], "feedback": "Acceptable: Chase customers, request deposits, negotiate terms, or use cash flow forecasts to improve payment timing."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q50. A business has many customers but regularly pays its bills late. Suggest one improvement and explain why.</label>
+                    <textarea id="b5_q50" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["chase customers", "request deposits", "negotiate", "payment terms", "cash flow forecast"], ["improve the timing", "receipts and payments"]], "feedback": "Hint: How can they speed up money coming in (e.g., deposits) or slow down money going out (e.g., negotiate with suppliers)?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q50" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q50')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">51. A business owner wants to buy a new van. Explain why they should consider both profitability and liquidity.</label>
-                    <textarea id="b5_q51" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["profitability helps show", "making enough money"], ["liquidity shows", "afford the upfront cost", "ongoing payments", "struggling"]], "feedback": "Acceptable: Profitability shows if they make enough money overall; liquidity shows if they can afford the upfront/ongoing payments without struggling."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q51. A business owner wants to buy a new van. Explain why they should consider both profitability and liquidity.</label>
+                    <textarea id="b5_q51" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["profitability helps show", "making enough money"], ["liquidity shows", "afford the upfront cost", "ongoing payments", "struggling"]], "feedback": "Hint: Think about why they need to know if they make enough money overall (profitability) AND if they can afford the payments (liquidity)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q51" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q51')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">52. A business cuts prices to attract more customers. Explain how this could affect profitability.</label>
-                    <textarea id="b5_q52" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["sales volume may increase", "earns less per item", "extra sales make up for", "lower selling price"]], "feedback": "Acceptable: Sales volume increases but they earn less per item. Profit only improves if extra sales make up for the lower price."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q52. A business cuts prices to attract more customers. Explain how this could affect profitability.</label>
+                    <textarea id="b5_q52" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["sales volume may increase", "earns less per item", "extra sales make up for", "lower selling price"]], "feedback": "Hint: Sales might increase, but they earn less per item. What must happen to total sales volume to make it worth it?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q52" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q52')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">53. A business has lots of stock that is not selling. Explain how this could affect profitability and liquidity.</label>
-                    <textarea id="b5_q53" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["wastage costs reduce profit", "money tied up", "unavailable to pay bills", "discounts"]], "feedback": "Acceptable: Storage/wastage costs reduce profit, while money tied up in stock makes it unavailable to pay bills (liquidity)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q53. A business has lots of stock that is not selling. Explain how this could affect profitability and liquidity.</label>
+                    <textarea id="b5_q53" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["wastage costs reduce profit", "money tied up", "unavailable to pay bills", "discounts"]], "feedback": "Hint: How do storage/wastage costs hurt profit, and how does tied-up cash hurt liquidity?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q53" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q53')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">54. A business is deciding between cutting costs and increasing sales. What should it consider?</label>
-                    <textarea id="b5_q54" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["how much each costs", "how quickly", "customer demand", "product quality", "competitor activity"]], "feedback": "Acceptable: Consider how much it costs, how quickly it works, customer demand, quality, competitors, and if it improves profit."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q54. A business is deciding between cutting costs and increasing sales. What should it consider?</label>
+                    <textarea id="b5_q54" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["how much each costs", "how quickly", "customer demand", "product quality", "competitor activity"]], "feedback": "Hint: What must they check regarding implementation costs, speed, product quality, and competitor actions?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q54" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q54')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">55. Explain why a business should not focus only on profitability when making financial decisions.</label>
-                    <textarea id="b5_q55" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["profit on paper", "lack cash to pay bills", "meet payments on time"]], "feedback": "Acceptable: It could make a profit on paper but still lack cash to pay bills. It must ensure it meets payments on time."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q55. Explain why a business should not focus only on profitability when making financial decisions.</label>
+                    <textarea id="b5_q55" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["profit on paper", "lack cash to pay bills", "meet payments on time"]], "feedback": "Hint: Profit is on paper. Can you pay bills with profit, or do you need actual cash?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q55" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q55')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">56. Explain why a business should not focus only on liquidity.</label>
-                    <textarea id="b5_q56" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["does not guarantee", "making a profit", "costs remain higher", "cash may eventually run out"]], "feedback": "Acceptable: Having cash doesn't guarantee profit. If costs remain higher than revenue, cash will eventually run out."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q56. Explain why a business should not focus only on liquidity.</label>
+                    <textarea id="b5_q56" class="auto-input b5-input" rows="3" data-rubric='{"keywords": [["does not guarantee", "making a profit", "costs remain higher", "cash may eventually run out"]], "feedback": "Hint: Having cash now is great, but if costs stay higher than revenue, what will eventually happen to the cash?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b5_q56" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b5_q56')">👨‍🏫 Override Score</button></div>
                 </div>
 
-                <button class="btn-submit no-print" onclick="checkAnswers('b5-input')">Check Answers</button>
+                <button class="btn-submit no-print" onclick="checkAnswers('b5-input')">✅ Check Answers</button>
             </div>
         </main>
     </div>
+    
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
-        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+        <button class="btn-reset no-print" onclick="clearData()">Reset Page</button>
     </div>
 
     <!-- SECURE PASSWORD MODAL -->
@@ -444,45 +449,184 @@
     <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
 
     <script>
-        function saveProgress() {
-            var inputs = document.querySelectorAll('.auto-input');
-            var dataToSave = {};
-            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
-            try { localStorage.setItem('enterpriseB5Memory_Smart_v2', JSON.stringify(dataToSave)); } catch (e) {}
+        // --- FIREBASE INITIALIZATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
-        function loadProgress() {
-            var saved = localStorage.getItem('enterpriseB5Memory_Smart_v2');
-            if (saved) {
-                var data = JSON.parse(saved);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "enterprise-b5-profitability";
+
+        /* --- MARKBOOK BUILDER FOR TEACHER DASHBOARD --- */
+        function buildMarkbookData() {
+            const items = [];
+            const inputs = document.querySelectorAll('.auto-input');
+            
+            inputs.forEach((input, i) => {
+                const wrapper = input.closest('.question-wrapper');
+                const labelEl = wrapper ? wrapper.querySelector('.question-label') : null;
+                const labelText = labelEl ? labelEl.innerText.trim() : `Question ${i + 1}`;
+                
+                let status = 'neutral';
+                if (input.classList.contains('correct') || input.classList.contains('teacher-locked')) {
+                    status = 'correct';
+                } else if (input.classList.contains('incorrect')) {
+                    status = 'incorrect';
+                }
+
+                items.push({
+                    index: i,
+                    label: labelText,
+                    value: input.value.trim(),
+                    status: status
+                });
+            });
+
+            // Calculate total correct answers
+            const correctCount = document.querySelectorAll('.auto-input.correct, .auto-input.teacher-locked').length;
+            const gradableInputs = document.querySelectorAll('.b5-input');
+            const totalGradable = gradableInputs.length;
+
+            return {
+                items: items,
+                scoreText: `Score: ${correctCount} / ${totalGradable}`
+            };
+        }
+
+        /* --- CLOUD AUTO-SAVE & AUTO-LOAD --- */
+        let saveTimer;
+        function saveProgressToCloud(immediate = false) {
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                const structured = buildMarkbookData();
+                const payload = {
+                    pageTitle: document.title || "B5: Profitability and Liquidity",
+                    lastUpdated: Date.now(),
+                    scoreText: structured.scoreText,
+                    items: structured.items
+                };
+
+                // Also store inputs explicitly for local legacy support fallback
                 var inputs = document.querySelectorAll('.auto-input');
                 for (var i = 0; i < inputs.length; i++) {
-                    if (data['input_' + i]) {
-                        inputs[i].value = data['input_' + i];
-                        if (data['class_' + i]) {
-                            inputs[i].className = data['class_' + i];
-                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
-                                var btnId = "override-" + inputs[i].id;
-                                var btn = document.getElementById(btnId);
-                                if (btn) btn.classList.remove('hidden');
+                    payload['input_' + i] = inputs[i].value;
+                    payload['class_' + i] = inputs[i].className;
+                }
+
+                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
+                  .set(payload, { merge: true })
+                  .catch(err => console.error("Cloud sync error:", err));
+            }, immediate ? 50 : 800);
+        }
+
+        function applySavedData(data) {
+            if (!data) return;
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                var savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined) {
+                    inputs[i].value = savedVal;
+                    if (data['class_' + i]) {
+                        inputs[i].className = data['class_' + i];
+                        if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect') || inputs[i].classList.contains('teacher-locked')) {
+                            var btnId = "override-" + inputs[i].id;
+                            var btn = document.getElementById(btnId);
+                            if (btn) btn.classList.remove('hidden');
+                            
+                            // Restore feedback visually if teacher-locked
+                            var feedbackDiv = inputs[i].nextElementSibling;
+                            if (inputs[i].classList.contains('teacher-locked') && feedbackDiv) {
+                                if (inputs[i].classList.contains('correct')) {
+                                    feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; 
+                                    feedbackDiv.style.color = "#006100"; 
+                                    feedbackDiv.style.display = "block";
+                                } else {
+                                    feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; 
+                                    feedbackDiv.style.color = "#b71c1c"; 
+                                    feedbackDiv.style.display = "block";
+                                }
                             }
                         }
-                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                            inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                        }
+                    }
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto'; 
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
                     }
                 }
             }
         }
+
+        // --- LOAD DATA FROM FIREBASE ON START ---
+        auth.onAuthStateChanged(async (user) => {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    // Try to clean up local storage from legacy version
+                    try { localStorage.removeItem('enterpriseB5Memory_Smart_v2'); } catch (e) {}
+
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud data:", err);
+                }
+            } else if (!isTeacher) {
+                alert("Please log in on the home page first!");
+                window.location.href = "index.html";
+            }
+        });
+
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('auto-input')) {
-                saveProgress();
+                saveProgressToCloud(false);
                 if (e.target.tagName.toLowerCase() === 'textarea') {
-                    e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';
+                    e.target.style.height = 'auto'; 
+                    e.target.style.height = e.target.scrollHeight + 'px';
                 }
             }
         });
-        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterpriseB5Memory_Smart_v2'); window.location.reload(); } }
-        window.onload = loadProgress;
+
+        // --- RESET / CLEAR DATA FROM FIREBASE CLOUD ---
+        async function clearData() { 
+            if (confirm("Clear all work on this page?")) { 
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
+                    } catch (e) {}
+                }
+                window.location.reload(); 
+            } 
+        }
 
         let activeQuestionId = null;
         function openVerifyModal(qId) {
@@ -512,7 +656,7 @@
                     if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
                 }
                 closeVerifyModal();
-                saveProgress();
+                saveProgressToCloud(true);
             } else {
                 document.getElementById('modal-error-msg').style.display = 'block';
             }
@@ -533,21 +677,21 @@
                     continue; 
                 }
 
-                var studentAnswer = inputElement.value.toLowerCase().replace(/[^a-z0-9\s\+\-\/\*\=\%]/g, " ").replace(/\s+/g, " ").trim();
+                // IMPROVED SANITIZATION: Kept the £ sign, $, ., and , so exact values can be matched
+                var studentAnswer = inputElement.value.toLowerCase().replace(/[^a-z0-9\s\+\-\/\*\=\%£\$\.,]/g, " ").replace(/\s+/g, " ").trim();
                 var rubricStr = inputElement.getAttribute('data-rubric');
                 if(!rubricStr) continue;
+                
                 var rubric;
                 try { rubric = JSON.parse(rubricStr); } catch (error) { continue; }
                 
                 var keywordGroups = rubric.keywords; 
                 inputElement.classList.remove('correct', 'incorrect');
-                if (studentAnswer === "") { if(feedbackDiv) feedbackDiv.style.display = 'none'; continue; }
                 
-                var wordCount = studentAnswer.split(" ").length;
-                if (!keywordGroups || keywordGroups.length === 0) {
-                    inputElement.classList.add('correct');
-                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Answer recorded."; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
-                    continue;
+                // Ignore blank fields
+                if (studentAnswer === "") { 
+                    if(feedbackDiv) feedbackDiv.style.display = 'none'; 
+                    continue; 
                 }
                 
                 var conceptsFound = 0;
@@ -556,21 +700,27 @@
                     var matched = false;
                     for(var s = 0; s < terms.length; s++) {
                         var term = terms[s].toLowerCase().trim();
-                        if (term.length >= 3) { if (studentAnswer.includes(term)) { matched = true; break; } }
-                        else { var regex = new RegExp("\\b" + term + "\\b"); if (regex.test(studentAnswer)) { matched = true; break; } }
+                        
+                        // IMPROVED MATCHING LOGIC
+                        if (term.length <= 2 && term.match(/^[a-z0-9]+$/i)) {
+                            // If it's a very short text word (like "x" or "no"), use a word boundary so "no" doesn't match inside "not"
+                            var regex = new RegExp("\\b" + term + "\\b", "i");
+                            if (regex.test(studentAnswer)) { matched = true; break; }
+                        } else {
+                            // For everything else (longer words, numbers, phrases, math symbols, currency), a simple includes check works best
+                            if (studentAnswer.includes(term)) { matched = true; break; }
+                        }
                     }
                     if(matched) conceptsFound++;
                 }
                 
                 var score = conceptsFound / keywordGroups.length;
-                var isPassed = false;
-                if (keywordGroups.length > 1) { isPassed = (score === 1); }
-                else { isPassed = (score >= 1 || (wordCount >= 4)); }
+                var isPassed = (score === 1);
                 
                 if(feedbackDiv) {
                     if (isPassed) {
                         inputElement.classList.add('correct');
-                        feedbackDiv.innerHTML = "✅ Correct! All required concepts covered.";
+                        feedbackDiv.innerHTML = "✅ Correct! " + rubric.feedback;
                         feedbackDiv.style.color = "#006100";
                         feedbackDiv.style.display = "block";
                     } else if (keywordGroups.length > 1 && score >= 0.5) {
@@ -586,34 +736,7 @@
                     }
                 }
             }
-            saveProgress();
-        }
-
-        function downloadPDF() {
-            var hide = document.querySelectorAll('.no-print');
-            for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
-            document.getElementById('action-buttons').style.display = 'none';
-
-            var textAreas = document.querySelectorAll('textarea');
-            for (var j = 0; j < textAreas.length; j++) {
-                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
-            }
-
-            var element = document.getElementById('pdf-content');
-            var opt = { 
-                margin: 0.3, 
-                filename: 'B5_Profitability_Liquidity.pdf', 
-                image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, 
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
-
-            html2pdf().set(opt).from(element).save().then(function() {
-                for(var b=0; b<hide.length; b++) hide[b].style.display = 'block';
-                document.getElementById('action-buttons').style.display = 'flex';
-                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
-            });
+            saveProgressToCloud(true);
         }
     </script>
 </body>
