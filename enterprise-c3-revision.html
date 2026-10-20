@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>C3: Improving Cash Flow - Revision</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
         .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
@@ -36,8 +41,8 @@
         .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
         .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
         .btn-submit:hover { background-color: #152960; }
-        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
-        .btn-pdf:hover { background-color: #124d2d; }
+        .btn-reset { background-color: #d32f2f; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; margin: 20px auto; }
+        .btn-reset:hover { background-color: #b71c1c; }
     </style>
 </head>
 <body>
@@ -53,7 +58,7 @@
                 <h2>C3 Revision Notes</h2>
                 <div class="instruction-box center-text">Use this space to write out your complete notes on improving cash flow, chasing late payments, reducing stock, delaying spending, and sources of short-term finance (overdrafts, loans, trade credit, selling assets).</div>
                 <div class="question-wrapper">
-                    <textarea class="auto-input" rows="12" placeholder="Type your revision notes here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                    <textarea class="auto-input notes-textarea" rows="12" placeholder="Type your revision notes here..."></textarea>
                 </div>
             </div>
 
@@ -64,354 +69,354 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 1: Key knowledge</h3>
                 
                 <div class="question-wrapper">
-                    <label class="question-label">1. What does it mean to improve cash flow?</label>
-                    <textarea id="c3_q1" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["get more money coming in", "reduce money going out", "more cash available to pay bills"]], "feedback": "Acceptable: Get more money coming in, reduce money going out, or have more cash available to pay bills."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q1. What does it mean to improve cash flow?</label>
+                    <textarea id="c3_q1" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["get more money coming in", "reduce money going out", "more cash available to pay bills"]], "feedback": "Hint: Think about increasing money coming in or lowering money going out so you have more cash available."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q1')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">2. Give three ways a business could improve its cash flow.</label>
-                    <textarea id="c3_q2" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["increase sales", "reduce costs", "chase customers", "loan", "overdraft", "sell unused equipment"]], "feedback": "Acceptable: Increase sales, reduce costs, chase customers, get a loan, arrange an overdraft, or sell equipment."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q2. Give three ways a business could improve its cash flow.</label>
+                    <textarea id="c3_q2" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["increase sales", "reduce costs", "chase customers", "loan", "overdraft", "sell unused equipment"]], "feedback": "Hint: Name three actions like boosting sales, cutting costs, or arranging an overdraft."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q2')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">3. How could increasing sales improve cash flow?</label>
-                    <textarea id="c3_q3" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["more customers buy things", "more money comes in", "more cash available"]], "feedback": "Acceptable: More customers buy things, more money comes in, and the business has more cash available."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q3. How could increasing sales improve cash flow?</label>
+                    <textarea id="c3_q3" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["more customers buy things", "more money comes in", "more cash available"]], "feedback": "Hint: When more customers buy things, what happens to the amount of money coming in?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q3')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">4. How could reducing costs improve cash flow?</label>
-                    <textarea id="c3_q4" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["less money goes out", "more cash is left over", "more money to cover expenses"]], "feedback": "Acceptable: Less money goes out, more cash is left over, or more money to cover expenses."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q4. How could reducing costs improve cash flow?</label>
+                    <textarea id="c3_q4" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["less money goes out", "more cash is left over", "more money to cover expenses"]], "feedback": "Hint: If fewer funds are spent on expenses, what happens to the cash balance?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">5. What does chasing late payments mean?</label>
-                    <textarea id="c3_q5" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["contacting customers", "owing money", "reminding", "asking for overdue"]], "feedback": "Acceptable: Contacting customers who owe money, reminding them to pay, or asking for overdue money."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q5. What does chasing late payments mean?</label>
+                    <textarea id="c3_q5" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["contacting customers", "owing money", "reminding", "asking for overdue"]], "feedback": "Hint: What do you call contacting clients who haven't paid their bills on time to remind them?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q5')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">6. How could chasing late payments improve cash flow?</label>
-                    <textarea id="c3_q6" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["receives money sooner", "cash to pay suppliers", "wages", "rent"]], "feedback": "Acceptable: The business receives money sooner, giving it cash to pay suppliers, wages or rent."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q6. How could chasing late payments improve cash flow?</label>
+                    <textarea id="c3_q6" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["receives money sooner", "cash to pay suppliers", "wages", "rent"]], "feedback": "Hint: How does getting people to pay faster help you cover things like wages and rent?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q6')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">7. What are payment terms?</label>
-                    <textarea id="c3_q7" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["when customers must pay", "how long", "agreed deadline"]], "feedback": "Acceptable: The rules about when customers must pay, how long they have, or the agreed deadline."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q7. What are payment terms?</label>
+                    <textarea id="c3_q7" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["when customers must pay", "how long", "agreed deadline"]], "feedback": "Hint: What rules specify the deadline by which customers are expected to pay?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q7')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">8. How could shorter payment terms improve cash flow?</label>
-                    <textarea id="c3_q8" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["less time to pay", "money may arrive sooner", "cover its bills"]], "feedback": "Acceptable: Customers have less time to pay, so money arrives sooner, helping cover bills."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q8. How could shorter payment terms improve cash flow?</label>
+                    <textarea id="c3_q8" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["less time to pay", "money may arrive sooner", "cover its bills"]], "feedback": "Hint: If customers have less time to pay up, when does the money arrive?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q8')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">9. What is a cash discount?</label>
-                    <textarea id="c3_q9" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["reduction in price", "encourage customers to pay early", "quickly"]], "feedback": "Acceptable: A reduction in price offered to encourage customers to pay early or quickly."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q9. What is a cash discount?</label>
+                    <textarea id="c3_q9" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["reduction in price", "encourage customers to pay early", "quickly"]], "feedback": "Hint: Why might a business offer a price cut if a bill is settled ahead of schedule?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q9')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">10. How could offering a discount for early payment help?</label>
-                    <textarea id="c3_q10" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["pay sooner", "cash into the business earlier", "receives slightly less"]], "feedback": "Acceptable: Customers pay sooner, bringing cash in earlier (even though the business receives slightly less)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q10. How could offering a discount for early payment help?</label>
+                    <textarea id="c3_q10" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["pay sooner", "cash into the business earlier", "receives slightly less"]], "feedback": "Hint: It brings cash in faster, even if you receive slightly less total money."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q10')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">11. How could a business reduce the amount of stock it holds?</label>
-                    <textarea id="c3_q11" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["smaller amounts", "order more often", "avoid buying things that do not sell", "existing stock first"]], "feedback": "Acceptable: Buy smaller amounts, order more often, avoid slow sellers, or use existing stock first."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q11. How could a business reduce the amount of stock it holds?</label>
+                    <textarea id="c3_q11" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["smaller amounts", "order more often", "avoid buying things that do not sell", "existing stock first"]], "feedback": "Hint: Think about ordering smaller batches or avoiding dead stock."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q11')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">12. Why could holding less stock improve cash flow?</label>
-                    <textarea id="c3_q12" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["less money is tied up", "unsold products", "more cash available for bills"]], "feedback": "Acceptable: Less money is tied up in unsold products, leaving more cash available for bills."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q12. Why could holding less stock improve cash flow?</label>
+                    <textarea id="c3_q12" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["less money is tied up", "unsold products", "more cash available for bills"]], "feedback": "Hint: Less money is trapped sitting in a warehouse as unsold items."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q12')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">13. What is delaying spending?</label>
-                    <textarea id="c3_q13" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["waiting before buying", "putting off non urgent", "avoiding spending straight away"]], "feedback": "Acceptable: Waiting before buying something, putting off non-urgent purchases, or avoiding spending right away."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q13. What is delaying spending?</label>
+                    <textarea id="c3_q13" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["waiting before buying", "putting off non urgent", "avoiding spending straight away"]], "feedback": "Hint: What does it mean to postpone non-essential purchases for a later date?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q13')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">14. How could delaying the purchase of new equipment help?</label>
-                    <textarea id="c3_q14" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["cash stays in the business", "longer", "pay essential bills first"]], "feedback": "Acceptable: Cash stays in the business longer, allowing it to pay essential bills first."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q14. How could delaying the purchase of new equipment help?</label>
+                    <textarea id="c3_q14" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["cash stays in the business", "longer", "pay essential bills first"]], "feedback": "Hint: If you hold onto your cash instead of buying machinery right now, what can you pay instead?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q14')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">15. Why should a business be careful about delaying spending?</label>
-                    <textarea id="c3_q15" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["might need the equipment", "repairs could get worse", "unreliable", "productivity"]], "feedback": "Acceptable: Might need the equipment, repairs get worse, or old equipment becomes unreliable/reduces productivity."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q15. Why should a business be careful about delaying spending?</label>
+                    <textarea id="c3_q15" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["might need the equipment", "repairs could get worse", "unreliable", "productivity"]], "feedback": "Hint: What happens if essential tools break down completely because you refused to replace them?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q15')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 2: Sources of short-term finance</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">16. What is an overdraft?</label>
-                    <textarea id="c3_q16" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["agreement with the bank", "spend more money than is in the account", "borrowing through the bank account"]], "feedback": "Acceptable: Bank agreement to spend more than is in the account, or borrowing through the bank account."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q16. What is an overdraft?</label>
+                    <textarea id="c3_q16" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["agreement with the bank", "spend more money than is in the account", "borrowing through the bank account"]], "feedback": "Hint: Think about an arrangement with your bank allowing you to withdraw more money than you actually have."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q16')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">17. How could an overdraft improve cash flow?</label>
-                    <textarea id="c3_q17" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["access to extra money", "pay bills", "covers a temporary shortage"]], "feedback": "Acceptable: Gives access to extra money to pay bills, or covers a temporary shortage until customers pay."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q17. How could an overdraft improve cash flow?</label>
+                    <textarea id="c3_q17" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["access to extra money", "pay bills", "covers a temporary shortage"]], "feedback": "Hint: It provides a safety net to cover short-term bill shortages."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q17')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">18. Give one disadvantage of using an overdraft.</label>
-                    <textarea id="c3_q18" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["interest", "fees", "expensive", "withdraw", "repaid"]], "feedback": "Acceptable: Interest/fees can be expensive, bank can withdraw it, or it must be repaid."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q18. Give one disadvantage of using an overdraft.</label>
+                    <textarea id="c3_q18" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["interest", "fees", "expensive", "withdraw", "repaid"]], "feedback": "Hint: Watch out for high bank interest and fees, or the bank's right to demand repayment."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q18')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">19. What is a business loan?</label>
-                    <textarea id="c3_q19" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["borrowed from a bank", "lender", "repaid", "interest"]], "feedback": "Acceptable: Money borrowed from a bank or lender that must be repaid, usually with interest."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q19. What is a business loan?</label>
+                    <textarea id="c3_q19" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["borrowed from a bank", "lender", "repaid", "interest"]], "feedback": "Hint: A lump sum of money borrowed from a financial institution that is paid back over time with interest."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q19')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">20. How could a loan help a business with cash flow problems?</label>
-                    <textarea id="c3_q20" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["provides money to cover costs", "pays suppliers or wages", "time to improve income"]], "feedback": "Acceptable: Provides money to cover costs, helps pay suppliers/wages, or gives time to improve income."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q20. How could a loan help a business with cash flow problems?</label>
+                    <textarea id="c3_q20" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["provides money to cover costs", "pays suppliers or wages", "time to improve income"]], "feedback": "Hint: It injects cash to handle immediate expenses while you fix underlying sales issues."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q20')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">21. Give one disadvantage of taking out a loan.</label>
-                    <textarea id="c3_q21" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["interest increases", "repayments", "debt increases", "struggle to repay"]], "feedback": "Acceptable: Interest increases cost, repayments must be made, debt increases, or might struggle to repay."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q21. Give one disadvantage of taking out a loan.</label>
+                    <textarea id="c3_q21" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["interest increases", "repayments", "debt increases", "struggle to repay"]], "feedback": "Hint: Think about monthly repayments and the extra cost of interest."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q21')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">22. What is trade credit?</label>
-                    <textarea id="c3_q22" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["goods now and paying later", "buying stock without paying immediately"]], "feedback": "Acceptable: Receiving goods now and paying the supplier later, or buying stock without paying immediately."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q22. What is trade credit?</label>
+                    <textarea id="c3_q22" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["goods now and paying later", "buying stock without paying immediately"]], "feedback": "Hint: Getting materials from a supplier now with an agreement to pay them weeks later."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q22')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">23. How could trade credit improve cash flow?</label>
-                    <textarea id="c3_q23" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["sell stock before paying", "keeping cash available"]], "feedback": "Acceptable: Can sell stock before paying for it, keeping cash available for other expenses in the meantime."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q23. How could trade credit improve cash flow?</label>
+                    <textarea id="c3_q23" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["sell stock before paying", "keeping cash available"]], "feedback": "Hint: You can sell the items to customers and get cash *before* the supplier bill is actually due."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q23')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">24. Give one disadvantage of trade credit.</label>
-                    <textarea id="c3_q24" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["still be paid", "damage the relationship", "refuse future credit"]], "feedback": "Acceptable: Supplier must still be paid, late payments damage relationships, or supplier may refuse future credit."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q24. Give one disadvantage of trade credit.</label>
+                    <textarea id="c3_q24" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["still be paid", "damage the relationship", "refuse future credit"]], "feedback": "Hint: What happens if you fail to clear the balance by the deadline? Suppliers might cut you off."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q24')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">25. What does selling unused assets mean?</label>
-                    <textarea id="c3_q25" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["equipment", "vehicles", "things the business owns but no longer needs"]], "feedback": "Acceptable: Selling equipment, vehicles or other things the business owns but no longer needs."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q25. What does selling unused assets mean?</label>
+                    <textarea id="c3_q25" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["equipment", "vehicles", "things the business owns but no longer needs"]], "feedback": "Hint: Getting rid of old machinery or vehicles that aren't being used anymore."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q25')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">26. How could selling unused assets improve cash flow?</label>
-                    <textarea id="c3_q26" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["brings money in", "releases cash", "tied up", "immediate bills"]], "feedback": "Acceptable: Brings money in, releases cash tied up in equipment, or helps pay immediate bills."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q26. How could selling unused assets improve cash flow?</label>
+                    <textarea id="c3_q26" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["brings money in", "releases cash", "tied up", "immediate bills"]], "feedback": "Hint: It converts idle equipment into a cash injection to clear bills."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q26" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q26')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">27. Give one disadvantage of selling assets.</label>
-                    <textarea id="c3_q27" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["loses the item", "buy a replacement", "less than it is worth"]], "feedback": "Acceptable: Business loses the item, may need a replacement later, or might sell it for less than it's worth."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q27. Give one disadvantage of selling assets.</label>
+                    <textarea id="c3_q27" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["loses the item", "buy a replacement", "less than it is worth"]], "feedback": "Hint: You lose the tool/equipment permanently and might undervalue it in a quick sale."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q27" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q27')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">28. How could the owner invest more of their own money?</label>
-                    <textarea id="c3_q28" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["personal savings", "add more of their own money", "cover expenses"]], "feedback": "Acceptable: Put personal savings into the business, or add personal money to cover expenses."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q28. How could the owner invest more of their own money?</label>
+                    <textarea id="c3_q28" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["personal savings", "add more of their own money", "cover expenses"]], "feedback": "Hint: The owner can pump personal savings directly into the business account."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q28" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q28')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">29. Give one disadvantage of using personal savings.</label>
-                    <textarea id="c3_q29" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["less personal money", "risk losing", "may not provide enough"]], "feedback": "Acceptable: Owner has less personal money, risks losing savings, or it may not provide enough to solve the problem."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q29. Give one disadvantage of using personal savings.</label>
+                    <textarea id="c3_q29" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["less personal money", "risk losing", "may not provide enough"]], "feedback": "Hint: The owner risks losing their personal nest egg if the business still fails."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q29" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q29')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 3: Applying improvements to scenarios</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">30. A business has lots of customers who pay late. Suggest one improvement.</label>
-                    <textarea id="c3_q30" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["chase overdue invoices", "payment reminders", "shorter payment deadlines", "deposits"]], "feedback": "Acceptable: Chase overdue invoices, send reminders, set shorter payment deadlines, or ask for deposits."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q30. A business has lots of customers who pay late. Suggest one improvement.</label>
+                    <textarea id="c3_q30" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["chase overdue invoices", "payment reminders", "shorter payment deadlines", "deposits"]], "feedback": "Hint: Think about sending reminders earlier or tightening up payment deadlines."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q30" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q30')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">31. A shop has too much unsold stock. Suggest one improvement.</label>
-                    <textarea id="c3_q31" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["reduce future orders", "discount slow selling", "run a sale", "smaller quantities"]], "feedback": "Acceptable: Reduce future orders, discount slow-selling products, run a sale, or order smaller quantities."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q31. A shop has too much unsold stock. Suggest one improvement.</label>
+                    <textarea id="c3_q31" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["reduce future orders", "discount slow selling", "run a sale", "smaller quantities"]], "feedback": "Hint: How can they clear old items (sales/discounts) and order fewer items next time?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q31" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q31')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">32. A business spends too much on electricity. Suggest one improvement.</label>
-                    <textarea id="c3_q32" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["switch off", "energy efficient", "compare energy suppliers", "reduce unnecessary"]], "feedback": "Acceptable: Switch off unused equipment, use energy-efficient devices, compare suppliers, or reduce usage."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q32. A business spends too much on electricity. Suggest one improvement.</label>
+                    <textarea id="c3_q32" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["switch off", "energy efficient", "compare energy suppliers", "reduce unnecessary"]], "feedback": "Hint: Think about turning things off or finding a cheaper utility tariff."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q32" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q32')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">33. A business has very few customers. Suggest one improvement.</label>
-                    <textarea id="c3_q33" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["advertise more effectively", "social media", "promotions", "improve the product", "target the right customers"]], "feedback": "Acceptable: Advertise more effectively, use social media, offer promotions, improve product, or target right customers."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q33. A business has very few customers. Suggest one improvement.</label>
+                    <textarea id="c3_q33" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["advertise more effectively", "social media", "promotions", "improve the product", "target the right customers"]], "feedback": "Hint: How can they get the word out to boost footfall or web traffic?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q33" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q33')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">34. A business needs to pay suppliers today but will not receive customer payments until next week. Suggest one improvement.</label>
-                    <textarea id="c3_q34" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["overdraft", "negotiate a later payment", "chase customers", "savings"]], "feedback": "Acceptable: Arrange a short-term overdraft, negotiate later payment with suppliers, chase customers, or use savings."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q34. A business needs to pay suppliers today but will not receive customer payments until next week. Suggest one improvement.</label>
+                    <textarea id="c3_q34" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["overdraft", "negotiate a later payment", "chase customers", "savings"]], "feedback": "Hint: Think about short-term fixes like a bank overdraft or asking the supplier for extra days."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q34" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q34')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">35. A business is paying for a large storage unit it rarely uses. Suggest one improvement.</label>
-                    <textarea id="c3_q35" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["smaller premises", "cheaper rent", "end the rental agreement", "reduce storage"]], "feedback": "Acceptable: Move to smaller premises, negotiate cheaper rent, end the rental agreement, or reduce storage."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q35. A business is paying for a large storage unit it rarely uses. Suggest one improvement.</label>
+                    <textarea id="c3_q35" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["smaller premises", "cheaper rent", "end the rental agreement", "reduce storage"]], "feedback": "Hint: Can they cancel the rental contract or downsize to save money?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q35" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q35')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">36. A business has a cash shortage every January. Suggest one improvement.</label>
-                    <textarea id="c3_q36" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["save cash during busy months", "overdraft in advance", "reduce spending in january", "plan seasonal"]], "feedback": "Acceptable: Save cash during busy months, arrange an overdraft in advance, reduce spending, or plan seasonal cash flow."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q36. A business has a cash shortage every January. Suggest one improvement.</label>
+                    <textarea id="c3_q36" class="auto-input c3-input" rows="2" data-rubric='{"keywords": [["save cash during busy months", "overdraft in advance", "reduce spending in january", "plan seasonal"]], "feedback": "Hint: Since it happens predictably every year, how can they prep during the busy months?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q36" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q36')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">37. A business is considering offering customers 10% off if they pay early. Explain one possible benefit.</label>
-                    <textarea id="c3_q37" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["pay sooner", "cash arrives earlier", "pay its bills on time"]], "feedback": "Acceptable: Customers may pay sooner, cash arrives earlier, and the business can pay its bills on time."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q37. A business is considering offering customers 10% off if they pay early. Explain one possible benefit.</label>
+                    <textarea id="c3_q37" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["pay sooner", "cash arrives earlier", "pay its bills on time"]], "feedback": "Hint: It accelerates cash arrival so you have money ready for upcoming bills."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q37" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q37')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">38. Explain one possible disadvantage of offering a discount for early payment.</label>
-                    <textarea id="c3_q38" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["less money per sale", "reducing its profit margin", "paid on time anyway"]], "feedback": "Acceptable: Receives less money per sale (reducing profit margin), and customers might have paid on time anyway."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q38. Explain one possible disadvantage of offering a discount for early payment.</label>
+                    <textarea id="c3_q38" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["less money per sale", "reducing its profit margin", "paid on time anyway"]], "feedback": "Hint: You lose 10% of revenue per sale, and some people might have paid on time anyway without the discount."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q38" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q38')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">39. A business wants to buy new computers but is struggling to pay wages. Suggest what it should do.</label>
-                    <textarea id="c3_q39" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["delay the purchase", "prioritise wages", "cash flow forecast", "finance if essential"]], "feedback": "Acceptable: Delay the purchase, prioritise wages, check cash flow forecast, or arrange finance if computers are essential."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q39. A business wants to buy new computers but is struggling to pay wages. Suggest what it should do.</label>
+                    <textarea id="c3_q39" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["delay the purchase", "prioritise wages", "cash flow forecast", "finance if essential"]], "feedback": "Hint: Staff wages are essential. What should they do with the computer purchase plan?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q39" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q39')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">40. A business is thinking about taking a loan to solve a cash flow problem. What should it consider?</label>
-                    <textarea id="c3_q40" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["interest and repayments", "afford the loan", "how long the cash shortage", "problem will happen again"]], "feedback": "Acceptable: Interest/repayments, whether it can afford it, how long the shortage lasts, or if the problem will happen again."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q40. A business is thinking about taking a loan to solve a cash flow problem. What should it consider?</label>
+                    <textarea id="c3_q40" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["interest and repayments", "afford the loan", "how long the cash shortage", "problem will happen again"]], "feedback": "Hint: Think about loan interest, affordability, and whether it treats the root cause."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q40" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q40')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 4: Explain and evaluate questions</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">41. Explain why reducing costs might be a good way to improve cash flow.</label>
-                    <textarea id="c3_q41" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["less money leaves", "more cash remains available", "cheaper supplier"]], "feedback": "Acceptable: Less money leaves the business so more cash remains to pay bills (e.g. switching to a cheaper supplier)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q41. Explain why reducing costs might be a good way to improve cash flow.</label>
+                    <textarea id="c3_q41" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["less money leaves", "more cash remains available", "cheaper supplier"]], "feedback": "Hint: Lowering outflows ensures more cash stays put in the account."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q41" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q41')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">42. Explain why increasing sales might not solve a cash flow problem straight away.</label>
-                    <textarea id="c3_q42" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["customers might buy on credit", "pay later", "without receiving the cash immediately"]], "feedback": "Acceptable: Customers might buy on credit and pay later, so sales increase without cash arriving immediately."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q42. Explain why increasing sales might not solve a cash flow problem straight away.</label>
+                    <textarea id="c3_q42" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["customers might buy on credit", "pay later", "without receiving the cash immediately"]], "feedback": "Hint: Remember credit sales mean cash is delayed even if sales look high on paper."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q42" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q42')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">43. Explain why a business should not cut every expense.</label>
-                    <textarea id="c3_q43" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["essential", "cutting staff or quality", "damage the business", "fewer sales"]], "feedback": "Acceptable: Some costs are essential, cutting staff/quality damages the business, and lower spending can lead to fewer sales."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q43. Explain why a business should not cut every expense.</label>
+                    <textarea id="c3_q43" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["essential", "cutting staff or quality", "damage the business", "fewer sales"]], "feedback": "Hint: Some expenses are vital for generating revenue. What happens if you cut advertising or top staff?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q43" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q43')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">44. Which is better for a business with temporary cash flow problems, an overdraft or selling equipment?</label>
-                    <textarea id="c3_q44" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["overdraft", "short term gap", "keeps its equipment", "interest"], ["selling unused equipment", "avoids borrowing"]], "feedback": "Acceptable: Overdraft is better for temporary gaps because it keeps equipment (though interest applies), while selling avoids borrowing."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q44. Which is better for a business with temporary cash flow problems, an overdraft or selling equipment?</label>
+                    <textarea id="c3_q44" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["overdraft", "short term gap", "keeps its equipment", "interest"], ["selling unused equipment", "avoids borrowing"]], "feedback": "Hint: An overdraft is built for short-term gaps without giving up productive assets, though it carries interest."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q44" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q44')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">45. Explain why negotiating more time to pay suppliers could help.</label>
-                    <textarea id="c3_q45" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["keeps its cash for longer", "receive money from customers first"]], "feedback": "Acceptable: Keeps cash for longer, giving time to receive money from customers before paying suppliers."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q45. Explain why negotiating more time to pay suppliers could help.</label>
+                    <textarea id="c3_q45" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["keeps its cash for longer", "receive money from customers first"]], "feedback": "Hint: It delays your outflows so you can gather cash from your own customers first."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q45" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q45')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">46. Explain why improving cash flow does not always mean improving profitability.</label>
-                    <textarea id="c3_q46" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["cash flow is about timing", "income minus costs", "borrowing money can improve cash available", "does not automatically increase profit"]], "feedback": "Acceptable: Cash flow is about timing (money in/out) while profit is income minus costs. Borrowing improves cash but not profit."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q46. Explain why improving cash flow does not always mean improving profitability.</label>
+                    <textarea id="c3_q46" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["cash flow is about timing", "income minus costs", "borrowing money can improve cash available", "does not automatically increase profit"]], "feedback": "Hint: Cash flow is timing; profit is income minus costs. A bank loan boosts cash flow but increases debt, not profit."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q46" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q46')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">47. A business cuts advertising to save money. Explain one possible risk.</label>
-                    <textarea id="c3_q47" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["saves in short term", "fewer customers", "reduce future sales", "cash inflows"]], "feedback": "Acceptable: Spends less short-term, but fewer customers hear about it, reducing future sales and cash inflows."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q47. A business cuts advertising to save money. Explain one possible risk.</label>
+                    <textarea id="c3_q47" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["saves in short term", "fewer customers", "reduce future sales", "cash inflows"]], "feedback": "Hint: Saving money today might mean fewer people see your brand tomorrow, hurting future sales."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q47" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q47')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">48. A business offers a big sale to bring in cash quickly. Explain one possible risk.</label>
-                    <textarea id="c3_q48" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["attract customers", "cash coming in", "lower prices", "earns less", "less profit"]], "feedback": "Acceptable: Brings in cash, but lower prices mean it earns less per product and could make less overall profit."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q48. A business offers a big sale to bring in cash quickly. Explain one possible risk.</label>
+                    <textarea id="c3_q48" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["attract customers", "cash coming in", "lower prices", "earns less", "less profit"]], "feedback": "Hint: You get cash fast, but rock-bottom prices mean you earn less profit per unit."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q48" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q48')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">49. Why should a business identify the cause of its cash flow problem before choosing a solution?</label>
-                    <textarea id="c3_q49" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["choose the right action", "chase late payments", "rather than taking on unnecessary debt"]], "feedback": "Acceptable: Chooses the right action (e.g. chasing payments if customers owe money) instead of taking unnecessary debt."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q49. Why should a business identify the cause of its cash flow problem before choosing a solution?</label>
+                    <textarea id="c3_q49" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["choose the right action", "chase late payments", "rather than taking on unnecessary debt"]], "feedback": "Hint: If late payments are the issue, chasing invoices helps. If costs are too high, cutting costs helps. Match the fix to the root cause."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q49" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q49')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">50. Explain how a cash flow forecast can help a business choose an improvement.</label>
-                    <textarea id="c3_q50" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["shows when shortages are expected", "cut costs", "increase sales", "arrange short term finance"]], "feedback": "Acceptable: Shows when shortages are expected, helping owner decide whether to cut costs, increase sales, or finance."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q50. Explain how a cash flow forecast can help a business choose an improvement.</label>
+                    <textarea id="c3_q50" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["shows when shortages are expected", "cut costs", "increase sales", "arrange short term finance"]], "feedback": "Hint: Seeing exactly *when* a deficit is predicted tells you when you need to act."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q50" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q50')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 5: Challenge questions</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">51. A business has £500 cash available but must pay £1,200 in bills tomorrow. Suggest two possible actions.</label>
-                    <textarea id="c3_q51" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["chase customers", "negotiate later payment", "overdraft", "savings", "delay non essential"]], "feedback": "Acceptable: Chase overdue payments, negotiate later payment dates, arrange overdraft, use savings, or delay spending."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q51. A business has £500 cash available but must pay £1,200 in bills tomorrow. Suggest two possible actions.</label>
+                    <textarea id="c3_q51" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["chase customers", "negotiate later payment", "overdraft", "savings", "delay non essential"]], "feedback": "Hint: Name two immediate ways to bridge that £700 gap by tomorrow."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q51" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q51')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">52. A business has a temporary cash shortage because a customer owes £5,000. Why might an overdraft be suitable?</label>
-                    <textarea id="c3_q52" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["cover bills while", "wait for the 5000", "fees", "repay"]], "feedback": "Acceptable: Covers bills while waiting for the £5,000, though they must consider fees and whether they can repay it."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q52. A business has a temporary cash shortage because a customer owes £5,000. Why might an overdraft be suitable?</label>
+                    <textarea id="c3_q52" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["cover bills while", "wait for the 5000", "fees", "repay"]], "feedback": "Hint: It covers bills temporarily until the £5,000 customer payment lands."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q52" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q52')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">53. A business has had cash flow problems for six months. Why might borrowing more money not be the best solution?</label>
-                    <textarea id="c3_q53" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["repayments and interest", "underlying problem continues", "reduce costs", "improve sales"]], "feedback": "Acceptable: Creates more repayments/interest while the root problem continues. It needs to reduce costs or improve sales/collections."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q53. A business has had cash flow problems for six months. Why might borrowing more money not be the best solution?</label>
+                    <textarea id="c3_q53" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["repayments and interest", "underlying problem continues", "reduce costs", "improve sales"]], "feedback": "Hint: If problems persist for half a year, borrowing just adds interest debt to an ongoing operational failure."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q53" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q53')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">54. A business wants to improve cash flow by asking suppliers for 60 days to pay instead of 30. Explain a benefit and a risk.</label>
-                    <textarea id="c3_q54" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["keeps cash for longer", "receive money from customers first"], ["refuse", "charge more", "stop offering credit"]], "feedback": "Acceptable: Benefit (keeps cash longer, get customer money first). Risk (suppliers may refuse, charge more, or stop credit)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q54. A business wants to improve cash flow by asking suppliers for 60 days to pay instead of 30. Explain a benefit and a risk.</label>
+                    <textarea id="c3_q54" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["keeps cash for longer", "receive money from customers first"], ["refuse", "charge more", "stop offering credit"]], "feedback": "Hint: Benefit (more time to get customer cash). Risk (suppliers might refuse or lose trust)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q54" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q54')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">55. Which improvement might be best for a business with high costs and low sales? Explain your answer.</label>
-                    <textarea id="c3_q55" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["reduce unnecessary costs", "improve marketing", "sales"], ["tackles both money going out and coming in"]], "feedback": "Acceptable: Reduce unnecessary costs AND improve marketing/sales, because this tackles both money going out and money coming in."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q55. Which improvement might be best for a business with high costs and low sales? Explain your answer.</label>
+                    <textarea id="c3_q55" class="auto-input c3-input" rows="3" data-rubric='{"keywords": [["reduce unnecessary costs", "improve marketing", "sales"], ["tackles both money going out and coming in"]], "feedback": "Hint: You need a double-barrelled approach: fix money going out (costs) and money coming in (sales)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c3_q55" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c3_q55')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -421,8 +426,7 @@
         </main>
     </div>
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
-        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+        <button class="btn-reset no-print" onclick="clearData()">Reset Page</button>
     </div>
 
     <!-- SECURE PASSWORD MODAL -->
@@ -441,45 +445,184 @@
     <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
 
     <script>
-        function saveProgress() {
-            var inputs = document.querySelectorAll('.auto-input');
-            var dataToSave = {};
-            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
-            try { localStorage.setItem('enterpriseC3Memory_Smart_v1', JSON.stringify(dataToSave)); } catch (e) {}
+        // --- FIREBASE INITIALIZATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
-        function loadProgress() {
-            var saved = localStorage.getItem('enterpriseC3Memory_Smart_v1');
-            if (saved) {
-                var data = JSON.parse(saved);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "enterprise-c3-cashflow";
+
+        /* --- MARKBOOK BUILDER FOR TEACHER DASHBOARD --- */
+        function buildMarkbookData() {
+            const items = [];
+            const inputs = document.querySelectorAll('.auto-input');
+            
+            inputs.forEach((input, i) => {
+                const wrapper = input.closest('.question-wrapper');
+                const labelEl = wrapper ? wrapper.querySelector('.question-label') : null;
+                const labelText = labelEl ? labelEl.innerText.trim() : `Question ${i + 1}`;
+                
+                let status = 'neutral';
+                if (input.classList.contains('correct') || input.classList.contains('teacher-locked')) {
+                    status = 'correct';
+                } else if (input.classList.contains('incorrect')) {
+                    status = 'incorrect';
+                }
+
+                items.push({
+                    index: i,
+                    label: labelText,
+                    value: input.value.trim(),
+                    status: status
+                });
+            });
+
+            // Calculate total correct answers
+            const correctCount = document.querySelectorAll('.auto-input.correct, .auto-input.teacher-locked').length;
+            const gradableInputs = document.querySelectorAll('.c3-input');
+            const totalGradable = gradableInputs.length;
+
+            return {
+                items: items,
+                scoreText: `Score: ${correctCount} / ${totalGradable}`
+            };
+        }
+
+        /* --- CLOUD AUTO-SAVE & AUTO-LOAD --- */
+        let saveTimer;
+        function saveProgressToCloud(immediate = false) {
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                const structured = buildMarkbookData();
+                const payload = {
+                    pageTitle: document.title || "C3: Improving Cash Flow",
+                    lastUpdated: Date.now(),
+                    scoreText: structured.scoreText,
+                    items: structured.items
+                };
+
+                // Also store inputs explicitly for local legacy support fallback
                 var inputs = document.querySelectorAll('.auto-input');
                 for (var i = 0; i < inputs.length; i++) {
-                    if (data['input_' + i]) {
-                        inputs[i].value = data['input_' + i];
-                        if (data['class_' + i]) {
-                            inputs[i].className = data['class_' + i];
-                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
-                                var btnId = "override-" + inputs[i].id;
-                                var btn = document.getElementById(btnId);
-                                if (btn) btn.classList.remove('hidden');
+                    payload['input_' + i] = inputs[i].value;
+                    payload['class_' + i] = inputs[i].className;
+                }
+
+                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
+                  .set(payload, { merge: true })
+                  .catch(err => console.error("Cloud sync error:", err));
+            }, immediate ? 50 : 800);
+        }
+
+        function applySavedData(data) {
+            if (!data) return;
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                var savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined) {
+                    inputs[i].value = savedVal;
+                    if (data['class_' + i]) {
+                        inputs[i].className = data['class_' + i];
+                        if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect') || inputs[i].classList.contains('teacher-locked')) {
+                            var btnId = "override-" + inputs[i].id;
+                            var btn = document.getElementById(btnId);
+                            if (btn) btn.classList.remove('hidden');
+                            
+                            // Restore feedback visually if teacher-locked
+                            var feedbackDiv = inputs[i].nextElementSibling;
+                            if (inputs[i].classList.contains('teacher-locked') && feedbackDiv) {
+                                if (inputs[i].classList.contains('correct')) {
+                                    feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; 
+                                    feedbackDiv.style.color = "#006100"; 
+                                    feedbackDiv.style.display = "block";
+                                } else {
+                                    feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; 
+                                    feedbackDiv.style.color = "#b71c1c"; 
+                                    feedbackDiv.style.display = "block";
+                                }
                             }
                         }
-                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                            inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                        }
+                    }
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto'; 
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
                     }
                 }
             }
         }
+
+        // --- LOAD DATA FROM FIREBASE ON START ---
+        auth.onAuthStateChanged(async (user) => {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    // Try to clean up local storage from legacy version
+                    try { localStorage.removeItem('enterpriseC3Memory_Smart_v1'); } catch (e) {}
+
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud data:", err);
+                }
+            } else if (!isTeacher) {
+                alert("Please log in on the home page first!");
+                window.location.href = "index.html";
+            }
+        });
+
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('auto-input')) {
-                saveProgress();
+                saveProgressToCloud(false);
                 if (e.target.tagName.toLowerCase() === 'textarea') {
-                    e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';
+                    e.target.style.height = 'auto'; 
+                    e.target.style.height = e.target.scrollHeight + 'px';
                 }
             }
         });
-        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterpriseC3Memory_Smart_v1'); window.location.reload(); } }
-        window.onload = loadProgress;
+
+        // --- RESET / CLEAR DATA FROM FIREBASE CLOUD ---
+        async function clearData() { 
+            if (confirm("Clear all work on this page?")) { 
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
+                    } catch (e) {}
+                }
+                window.location.reload(); 
+            } 
+        }
 
         let activeQuestionId = null;
         function openVerifyModal(qId) {
@@ -509,7 +652,7 @@
                     if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
                 }
                 closeVerifyModal();
-                saveProgress();
+                saveProgressToCloud(true);
             } else {
                 document.getElementById('modal-error-msg').style.display = 'block';
             }
@@ -583,34 +726,7 @@
                     }
                 }
             }
-            saveProgress();
-        }
-
-        function downloadPDF() {
-            var hide = document.querySelectorAll('.no-print');
-            for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
-            document.getElementById('action-buttons').style.display = 'none';
-
-            var textAreas = document.querySelectorAll('textarea');
-            for (var j = 0; j < textAreas.length; j++) {
-                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
-            }
-
-            var element = document.getElementById('pdf-content');
-            var opt = { 
-                margin: 0.3, 
-                filename: 'C3_Improving_Cash_Flow.pdf', 
-                image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, 
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
-
-            html2pdf().set(opt).from(element).save().then(function() {
-                for(var b=0; b<hide.length; b++) hide[b].style.display = 'block';
-                document.getElementById('action-buttons').style.display = 'flex';
-                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
-            });
+            saveProgressToCloud(true);
         }
     </script>
 </body>
