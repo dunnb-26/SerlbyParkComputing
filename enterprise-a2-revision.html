@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A2: The 4Ps of the Marketing Mix - Revision</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
         .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
@@ -36,11 +41,14 @@
         .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
         .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
         .btn-submit:hover { background-color: #152960; }
-        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
-        .btn-pdf:hover { background-color: #124d2d; }
+        .btn-reset { background-color: #d32f2f; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; margin: 20px auto; }
+        .btn-reset:hover { background-color: #b71c1c; }
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; justify-content: center; align-items: center; font-size: 1.5em; color: #1e3a8a; font-weight: bold; transition: opacity 0.5s; }
     </style>
 </head>
 <body>
+    <div id="loading-overlay">Loading your workspace from cloud...</div>
+
     <div id="pdf-content">
         <header>
             <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
@@ -51,9 +59,9 @@
         <main class="task-container">
             <div class="task-card task-prep">
                 <h2>A2 Revision Notes</h2>
-                <div class="instruction-box center-text">Use this space to write out your complete notes on the 4P's, product life cycle, multichannel marketing and marketing mix.</div>
+                <div class="instruction-box center-text">Use this space to write out your complete notes on the 4Ps, product life cycle, multichannel marketing and marketing mix.</div>
                 <div class="question-wrapper">
-                    <textarea class="auto-input" rows="12" placeholder="Type your revision notes here..."></textarea>
+                    <textarea class="auto-input notes-textarea" rows="12" placeholder="Type your revision notes here..."></textarea>
                 </div>
             </div>
 
@@ -64,636 +72,636 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Part 1: The marketing mix</h3>
                 
                 <div class="question-wrapper">
-                    <label class="question-label">1. What is the marketing mix?</label>
-                    <textarea id="a2_q1" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["4ps", "four things", "four", "decides what to sell", "how to advertise", "where to sell"]], "feedback": "Acceptable: The 4Ps, the four things a business considers, or how it decides what to sell/charge/advertise."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q1. What is the marketing mix?</label>
+                    <textarea id="a2_q1" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["4ps", "four things", "four", "decides what to sell", "how to advertise", "where to sell"]], "feedback": "Hint: What four key elements (the 4Ps) does a business consider when selling?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q1')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">2. What are the 4Ps?</label>
-                    <textarea id="a2_q2" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["product"], ["price"], ["place"], ["promotion"]], "feedback": "Product, Price, Place and Promotion."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q2. What are the 4Ps?</label>
+                    <textarea id="a2_q2" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["product"], ["price"], ["place"], ["promotion"]], "feedback": "Hint: List the four words starting with 'P'."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q2')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">3. What does Product mean?</label>
-                    <textarea id="a2_q3" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["sells", "item", "service", "customer gets"]], "feedback": "Acceptable: What the business sells, the item or service customers buy."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q3. What does Product mean?</label>
+                    <textarea id="a2_q3" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["sells", "item", "service", "customer gets"]], "feedback": "Hint: What is the physical item or service that a customer actually buys?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q3')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">4. What does Price mean?</label>
-                    <textarea id="a2_q4" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["pays", "cost", "amount charged", "charge"]], "feedback": "Acceptable: How much the customer pays, the cost, or the amount charged."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q4. What does Price mean?</label>
+                    <textarea id="a2_q4" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["pays", "cost", "amount charged", "charge"]], "feedback": "Hint: Think about the amount of money a customer is charged."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">5. What does Place mean?</label>
-                    <textarea id="a2_q5" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["where", "how customers get", "online", "shop"]], "feedback": "Acceptable: Where the product is sold or how customers get the product."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q5. What does Place mean?</label>
+                    <textarea id="a2_q5" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["where", "how customers get", "online", "shop"]], "feedback": "Hint: Think about the location or method used to get the product to the customer."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q5')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">6. What does Promotion mean?</label>
-                    <textarea id="a2_q6" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["tells people", "advertising", "interested", "encouraging"]], "feedback": "Acceptable: How the business tells people, advertising, or encouraging customers to buy."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q6. What does Promotion mean?</label>
+                    <textarea id="a2_q6" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["tells people", "advertising", "interested", "encouraging"]], "feedback": "Hint: How does a business advertise or tell people about what they are selling?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q6')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">7. Why is the marketing mix important?</label>
-                    <textarea id="a2_q7" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["attract", "sell more", "compete", "decisions", "meet customer needs"]], "feedback": "Acceptable: Helps attract customers, sell more products, compete, or meet customer needs."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q7. Why is the marketing mix important?</label>
+                    <textarea id="a2_q7" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["attract", "sell more", "compete", "decisions", "meet customer needs"]], "feedback": "Hint: Why do businesses need a good strategy to attract buyers and compete?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q7')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">8. Why should the 4Ps work well together?</label>
-                    <textarea id="a2_q8" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["suit each other", "match", "joined up plan", "work together"]], "feedback": "Acceptable: They need to suit each other, match the target customers, and create a joined up plan."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q8. Why should the 4Ps work well together?</label>
+                    <textarea id="a2_q8" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["suit each other", "match", "joined up plan", "work together"]], "feedback": "Hint: Think about why pricing a luxury item cheaply might confuse people."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q8')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">9. What could happen if a business gets its marketing mix wrong?</label>
-                    <textarea id="a2_q9" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["lose customers", "sales fall", "too expensive", "not know where", "lose money"]], "feedback": "Acceptable: Might lose customers, sales could fall, or people might think it is too expensive."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q9. What could happen if a business gets its marketing mix wrong?</label>
+                    <textarea id="a2_q9" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["lose customers", "sales fall", "too expensive", "not know where", "lose money"]], "feedback": "Hint: What happens to sales or customers if a product is in the wrong place or too expensive?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q9')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">10. Give an example of how a business could use the 4Ps.</label>
-                    <textarea id="a2_q10" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["sells", "charges", "advertises", "offers", "online", "shop", "price", "product", "promotion"]], "feedback": "Acceptable: Any sensible example showing a product being sold, priced, and advertised (e.g., A pizza shop sells pizzas for £10, online, and advertises on social media)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q10. Give an example of how a business could use the 4Ps.</label>
+                    <textarea id="a2_q10" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["sells", "charges", "advertises", "offers", "online", "shop", "price", "product", "promotion"]], "feedback": "Hint: Give a real-world example covering what is sold, how much it costs, where it's sold, and how it's advertised."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q10')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Part 2: Product</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">11. What is meant by a product?</label>
-                    <textarea id="a2_q11" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["sells", "physical item", "service", "pay for"]], "feedback": "Acceptable: Something a business sells, a physical item/service, or something customers pay for."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q11. What is meant by a product?</label>
+                    <textarea id="a2_q11" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["sells", "physical item", "service", "pay for"]], "feedback": "Hint: What is the good or service that a customer gives money for?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q11')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">12. Give two examples of products.</label>
-                    <textarea id="a2_q12" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["trainers", "phones", "food", "drinks", "haircuts", "repairs", "subscriptions", "clothes", "games"]], "feedback": "Acceptable: Trainers, phones, food, haircuts, streaming subscriptions, etc."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q12. Give two examples of products.</label>
+                    <textarea id="a2_q12" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["trainers", "phones", "food", "drinks", "haircuts", "repairs", "subscriptions", "clothes", "games"]], "feedback": "Hint: Name two things you might buy in a shop or online."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q12')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">13. What is a product's quality?</label>
-                    <textarea id="a2_q13" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["good it is", "works", "lasts", "expectations"]], "feedback": "Acceptable: How good it is, how well it works, how long it lasts, or meeting expectations."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q13. What is a product's quality?</label>
+                    <textarea id="a2_q13" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["good it is", "works", "lasts", "expectations"]], "feedback": "Hint: Think about how well-made something is or how long it lasts."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q13')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">14. Why might quality be important to customers?</label>
-                    <textarea id="a2_q14" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["works properly", "break", "value for money", "happy"]], "feedback": "Acceptable: They want it to work properly, not break, want value for money, or to be happy."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q14. Why might quality be important to customers?</label>
+                    <textarea id="a2_q14" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["works properly", "break", "value for money", "happy"]], "feedback": "Hint: Why do you want the things you buy to be well-made and not break?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q14')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">15. What is product design?</label>
-                    <textarea id="a2_q15" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["looks", "made", "shape", "style", "features", "appearance", "put together"]], "feedback": "Acceptable: How it looks/is made, its shape, style, features, or appearance."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q15. What is product design?</label>
+                    <textarea id="a2_q15" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["looks", "made", "shape", "style", "features", "appearance", "put together"]], "feedback": "Hint: Think about the style, shape, features, and how it looks."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q15')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">16. Why might product design matter?</label>
-                    <textarea id="a2_q16" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["look better", "attract", "easier to use", "stand out", "compete"]], "feedback": "Acceptable: Makes it look better, attracts customers, easier to use, or helps it stand out."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q16. Why might product design matter?</label>
+                    <textarea id="a2_q16" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["look better", "attract", "easier to use", "stand out", "compete"]], "feedback": "Hint: How does looking good or being easy to use help it sell?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q16')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">17. Why might a business add extra features to a product?</label>
-                    <textarea id="a2_q17" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["more useful", "more for their money", "different", "persuade", "buy"]], "feedback": "Acceptable: To make it more useful, give customers more value, make it different from competitors, or persuade them to buy."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q17. Why might a business add extra features to a product?</label>
+                    <textarea id="a2_q17" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["more useful", "more for their money", "different", "persuade", "buy"]], "feedback": "Hint: How do extra additions make a product stand out from rivals?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q17')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">18. What is packaging?</label>
-                    <textarea id="a2_q18" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["box", "wrapper", "bottle", "container", "protects", "presents"]], "feedback": "Acceptable: The box, wrapper, bottle or container it comes in, or what protects/presents it."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q18. What is packaging?</label>
+                    <textarea id="a2_q18" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["box", "wrapper", "bottle", "container", "protects", "presents"]], "feedback": "Hint: What do you call the box, wrapper, or bottle that holds an item?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q18')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">19. Why is packaging important?</label>
-                    <textarea id="a2_q19" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["protects", "attractive", "information", "recognise", "brand", "carry", "store"]], "feedback": "Acceptable: Protects the product, makes it attractive, gives info, helps recognise the brand, or makes it easier to carry."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q19. Why is packaging important?</label>
+                    <textarea id="a2_q19" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["protects", "attractive", "information", "recognise", "brand", "carry", "store"]], "feedback": "Hint: Think about protection, display information, and attracting the eye."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q19')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">20. What is branding?</label>
-                    <textarea id="a2_q20" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["name", "logo", "design", "identity", "recognise", "stand out"]], "feedback": "Acceptable: The name, logo, design or identity that helps people recognise it and stand out."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q20. What is branding?</label>
+                    <textarea id="a2_q20" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["name", "logo", "design", "identity", "recognise", "stand out"]], "feedback": "Hint: Think about logos, specific names, and overall visual identity."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q20')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">21. Why is branding important?</label>
-                    <textarea id="a2_q21" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["recognise", "memorable", "trust", "stand out", "choose it", "over competitors"]], "feedback": "Acceptable: People can recognise it, makes it memorable, builds trust, or helps it stand out from competitors."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q21. Why is branding important?</label>
+                    <textarea id="a2_q21" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["recognise", "memorable", "trust", "stand out", "choose it", "over competitors"]], "feedback": "Hint: Why is it helpful if people instantly recognize your logo and trust it?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q21')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">22. What is a USP?</label>
-                    <textarea id="a2_q22" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["unique selling point", "special", "different", "reason customers choose"]], "feedback": "Acceptable: Unique Selling Point, something special/different about it, or a reason customers choose it."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q22. What is a USP?</label>
+                    <textarea id="a2_q22" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["unique selling point", "special", "different", "reason customers choose"]], "feedback": "Hint: What does USP stand for and what does it mean?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q22')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">23. Give an example of a USP.</label>
-                    <textarea id="a2_q23" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["battery life", "15 minutes", "recycled materials", "unique flavour", "special", "different"]], "feedback": "Acceptable: Very long battery life, 15-minute delivery, made from recycled materials, or a unique flavour."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q23. Give an example of a USP.</label>
+                    <textarea id="a2_q23" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["battery life", "15 minutes", "recycled materials", "unique flavour", "special", "different"]], "feedback": "Hint: Name a specific, unique feature that makes a product different from all others."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q23')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">24. Why might a business change its product?</label>
-                    <textarea id="a2_q24" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["trends", "feedback", "improve", "compete", "fix", "attract"]], "feedback": "Acceptable: To keep up with trends, respond to feedback, improve quality, compete, or fix a problem."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q24. Why might a business change its product?</label>
+                    <textarea id="a2_q24" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["trends", "feedback", "improve", "compete", "fix", "attract"]], "feedback": "Hint: Why would you update something if sales start dropping or if customers complain?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q24')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">25. What could happen if a product does not meet customer needs?</label>
-                    <textarea id="a2_q25" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["stop buying", "sales fall", "complain", "competitor", "lose money"]], "feedback": "Acceptable: People may stop buying, sales fall, customers complain, or buy from a competitor."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q25. What could happen if a product does not meet customer needs?</label>
+                    <textarea id="a2_q25" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["stop buying", "sales fall", "complain", "competitor", "lose money"]], "feedback": "Hint: What will customers do if the product doesn't do what they need it to?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q25')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Part 3: Price</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">26. What is meant by pricing?</label>
-                    <textarea id="a2_q26" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["how much", "charge", "amount customers pay", "selling price"]], "feedback": "Acceptable: Deciding how much to charge, setting the amount customers pay, or choosing the selling price."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q26. What is meant by pricing?</label>
+                    <textarea id="a2_q26" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["how much", "charge", "amount customers pay", "selling price"]], "feedback": "Hint: What do you call the process of deciding the amount to charge?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q26" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q26')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">27. Why is price important to customers?</label>
-                    <textarea id="a2_q27" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["afford", "compare", "value for money", "cheaper alternative"]], "feedback": "Acceptable: They need to afford it, they compare prices, they want value for money, or may choose cheaper alternatives."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q27. Why is price important to customers?</label>
+                    <textarea id="a2_q27" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["afford", "compare", "value for money", "cheaper alternative"]], "feedback": "Hint: Why do shoppers look at price tags before buying?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q27" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q27')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">28. Why is price important to a business?</label>
-                    <textarea id="a2_q28" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["makes", "profit", "how many people buy", "costs are covered", "compares", "competitors"]], "feedback": "Acceptable: Affects how much money they make, how many buy, covers costs, and compares to competitors."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q28. Why is price important to a business?</label>
+                    <textarea id="a2_q28" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["makes", "profit", "how many people buy", "costs are covered", "compares", "competitors"]], "feedback": "Hint: Think about how the price affects the business's profits and covering costs."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q28" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q28')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">29. What is a high price sometimes used to suggest?</label>
-                    <textarea id="a2_q29" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["luxury", "high quality", "exclusivity", "special", "pay more"]], "feedback": "Acceptable: Luxury, high quality, exclusivity, or that it is aimed at people willing to pay more."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q29. What is a high price sometimes used to suggest?</label>
+                    <textarea id="a2_q29" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["luxury", "high quality", "exclusivity", "special", "pay more"]], "feedback": "Hint: What does a high price tag usually make people think about the product's quality?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q29" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q29')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">30. What is a low price sometimes used to achieve?</label>
-                    <textarea id="a2_q30" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["attract", "encourage", "try", "compete", "budget", "cheaper"]], "feedback": "Acceptable: Attract more customers, encourage people to try it, compete with alternatives, or appeal to budgets."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q30. What is a low price sometimes used to achieve?</label>
+                    <textarea id="a2_q30" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["attract", "encourage", "try", "compete", "budget", "cheaper"]], "feedback": "Hint: Why might setting a cheap price bring in lots of new buyers?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q30" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q30')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">31. Give one advantage of charging a high price.</label>
-                    <textarea id="a2_q31" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["more money", "profit", "cover costs", "luxury", "associate price with quality"]], "feedback": "Acceptable: Could make more money per sale, cover higher costs, or create a luxury image."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q31. Give one advantage of charging a high price.</label>
+                    <textarea id="a2_q31" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["more money", "profit", "cover costs", "luxury", "associate price with quality"]], "feedback": "Hint: How does a high price benefit the amount of profit made per item?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q31" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q31')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">32. Give one disadvantage of charging a high price.</label>
-                    <textarea id="a2_q32" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["fewer people", "afford", "competitors", "sales fall", "not worth"]], "feedback": "Acceptable: Fewer people afford it, customers buy from competitors, sales fall, or they may not think it is worth it."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q32. Give one disadvantage of charging a high price.</label>
+                    <textarea id="a2_q32" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["fewer people", "afford", "competitors", "sales fall", "not worth"]], "feedback": "Hint: What happens if people think it is too expensive compared to rivals?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q32" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q32')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">33. Give one advantage of charging a low price.</label>
-                    <textarea id="a2_q33" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["attract", "affordable", "compete", "try it"]], "feedback": "Acceptable: Attracts more customers, makes it affordable, helps compete, or encourages people to try it."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q33. Give one advantage of charging a low price.</label>
+                    <textarea id="a2_q33" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["attract", "affordable", "compete", "try it"]], "feedback": "Hint: How does a cheap price affect the number of people who will try it?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q33" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q33')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">34. Give one disadvantage of charging a low price.</label>
-                    <textarea id="a2_q34" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["less money", "struggle to cover costs", "poor quality", "sell lots"]], "feedback": "Acceptable: Makes less money per item, might struggle to cover costs, or customers might think it is poor quality."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q34. Give one disadvantage of charging a low price.</label>
+                    <textarea id="a2_q34" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["less money", "struggle to cover costs", "poor quality", "sell lots"]], "feedback": "Hint: What happens to profits, or what might people assume about the quality if it's too cheap?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q34" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q34')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">35. Why might a business offer a discount?</label>
-                    <textarea id="a2_q35" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["attract", "clear old stock", "increase sales", "sooner", "compete"]], "feedback": "Acceptable: To attract customers, clear old stock, increase sales, encourage buying sooner, or compete."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q35. Why might a business offer a discount?</label>
+                    <textarea id="a2_q35" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["attract", "clear old stock", "increase sales", "sooner", "compete"]], "feedback": "Hint: Why put items on 'sale' at the end of a season?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q35" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q35')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">36. What is a special offer?</label>
-                    <textarea id="a2_q36" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["temporary", "deal", "discount", "buy one get one", "encourages"]], "feedback": "Acceptable: A temporary deal, a discount, a BOGOF offer, or a deal encouraging people to buy."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q36. What is a special offer?</label>
+                    <textarea id="a2_q36" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["temporary", "deal", "discount", "buy one get one", "encourages"]], "feedback": "Hint: Think of promotions like Buy One Get One Free or temporary discounts."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q36" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q36')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">37. Why might a business charge different prices for similar products?</label>
-                    <textarea id="a2_q37" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["better quality", "features", "popular", "different customers", "different target"]], "feedback": "Acceptable: One is better quality, has more features, is more popular, or is aimed at different customers."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q37. Why might a business charge different prices for similar products?</label>
+                    <textarea id="a2_q37" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["better quality", "features", "popular", "different customers", "different target"]], "feedback": "Hint: Why would a premium version of a phone cost more than the standard version?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q37" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q37')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">38. Why might a business check competitors' prices?</label>
-                    <textarea id="a2_q38" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["competitive", "avoid charging too much", "better deal", "what customers pay"]], "feedback": "Acceptable: To see if their price is competitive, avoid charging too much, offer a better deal, or understand the market."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q38. Why might a business check competitors' prices?</label>
+                    <textarea id="a2_q38" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["competitive", "avoid charging too much", "better deal", "what customers pay"]], "feedback": "Hint: Why does a supermarket check what the other supermarkets are charging?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q38" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q38')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">39. A business sells a basic T-shirt for £8 and a designer T-shirt for £40. Why might the prices be different?</label>
-                    <textarea id="a2_q39" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["brand", "materials", "design", "target market", "pay more for the name"]], "feedback": "Acceptable: The designer one has a well-known brand, better materials, special design, or customers pay for the name."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q39. A business sells a basic T-shirt for £8 and a designer T-shirt for £40. Why might the prices be different?</label>
+                    <textarea id="a2_q39" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["brand", "materials", "design", "target market", "pay more for the name"]], "feedback": "Hint: Think about the impact of the brand name and the materials used."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q39" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q39')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">40. A new business wants customers to try its product. Why might it start with a low price?</label>
-                    <textarea id="a2_q40" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["willing to try", "cheap", "attract attention", "compete", "established", "first time"]], "feedback": "Acceptable: People are more willing to try cheap things, attracts attention, competes with established brands, or encourages first-time buyers."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q40. A new business wants customers to try its product. Why might it start with a low price?</label>
+                    <textarea id="a2_q40" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["willing to try", "cheap", "attract attention", "compete", "established", "first time"]], "feedback": "Hint: Why does an introductory low price get people to take a risk on a new brand?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q40" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q40')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Part 4: Place</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">41. What does Place mean in the marketing mix?</label>
-                    <textarea id="a2_q41" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["where", "reaches customers", "buy", "receive"]], "feedback": "Acceptable: Where a product is sold, how it reaches customers, or where people buy/receive it."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q41. What does Place mean in the marketing mix?</label>
+                    <textarea id="a2_q41" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["where", "reaches customers", "buy", "receive"]], "feedback": "Hint: Think about the location or the method customers use to access the product."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q41" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q41')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">42. Give two places where a product could be sold.</label>
-                    <textarea id="a2_q42" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["shop", "website", "market", "supermarket", "centre", "app", "social media"]], "feedback": "Acceptable: A shop, a website, market stall, supermarket, shopping centre, app, or social media shop."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q42. Give two places where a product could be sold.</label>
+                    <textarea id="a2_q42" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["shop", "website", "market", "supermarket", "centre", "app", "social media"]], "feedback": "Hint: Name two different locations (physical or digital) where you can buy things."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q42" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q42')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">43. What is online selling?</label>
-                    <textarea id="a2_q43" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["internet", "website", "app", "without visiting", "physical shop"]], "feedback": "Acceptable: Selling through the internet, website or app, without visiting a physical shop."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q43. What is online selling?</label>
+                    <textarea id="a2_q43" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["internet", "website", "app", "without visiting", "physical shop"]], "feedback": "Hint: What do you call selling via websites and apps instead of high street stores?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q43" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q43')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">44. Give one advantage of selling online.</label>
-                    <textarea id="a2_q44" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["from home", "further away", "lower costs", "different times", "24"]], "feedback": "Acceptable: Shop from home, reaches people further away, lower costs, or shop at different times (24/7)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q44. Give one advantage of selling online.</label>
+                    <textarea id="a2_q44" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["from home", "further away", "lower costs", "different times", "24"]], "feedback": "Hint: Why do businesses like selling on the internet? Think about reach and 24/7 access."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q44" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q44')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">45. Give one disadvantage of selling online.</label>
-                    <textarea id="a2_q45" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["delivery", "time", "cannot try", "costs", "technical problems", "competition"]], "feedback": "Acceptable: Delivery takes time/costs money, cannot try product first, technical problems, or online competition."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q45. Give one disadvantage of selling online.</label>
+                    <textarea id="a2_q45" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["delivery", "time", "cannot try", "costs", "technical problems", "competition"]], "feedback": "Hint: What is annoying about ordering online? Think about delivery times or seeing the item in person."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q45" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q45')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">46. Give one advantage of selling from a physical shop.</label>
-                    <textarea id="a2_q46" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["see", "try", "straight away", "speak to staff", "help"]], "feedback": "Acceptable: Customers can see/try products, take them home straight away, speak to staff, or get help."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q46. Give one advantage of selling from a physical shop.</label>
+                    <textarea id="a2_q46" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["see", "try", "straight away", "speak to staff", "help"]], "feedback": "Hint: What is the benefit of walking into a store and holding the item?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q46" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q46')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">47. Give one disadvantage of selling from a physical shop.</label>
-                    <textarea id="a2_q47" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["rent", "bills", "expensive", "opening hours", "fewer people", "travel"]], "feedback": "Acceptable: Rent/bills are expensive, limited opening hours, or only reaches people able to travel there."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q47. Give one disadvantage of selling from a physical shop.</label>
+                    <textarea id="a2_q47" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["rent", "bills", "expensive", "opening hours", "fewer people", "travel"]], "feedback": "Hint: Think about the costs of keeping a building open and limits on who can travel to it."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q47" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q47')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">48. What is meant by distribution?</label>
-                    <textarea id="a2_q48" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["get from", "reaches", "delivered", "supplied", "route"]], "feedback": "Acceptable: How products get from business to customer, how goods are delivered/supplied, or the route it takes."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q48. What is meant by distribution?</label>
+                    <textarea id="a2_q48" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["get from", "reaches", "delivered", "supplied", "route"]], "feedback": "Hint: What word describes the process of moving goods to the customer?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q48" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q48')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">49. Why is delivery important to an online business?</label>
-                    <textarea id="a2_q49" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["receive", "upset", "late", "trust", "complaints", "refunds"]], "feedback": "Acceptable: Customers need to receive orders, late deliveries upset people, reliable delivery builds trust, or poor delivery causes complaints."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q49. Why is delivery important to an online business?</label>
+                    <textarea id="a2_q49" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["receive", "upset", "late", "trust", "complaints", "refunds"]], "feedback": "Hint: Why do customers care about when and how their package arrives?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q49" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q49')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">50. Why might a business sell through another shop rather than directly to customers?</label>
-                    <textarea id="a2_q50" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["reach more", "existing customer", "more places", "avoid running"]], "feedback": "Acceptable: Can reach more customers, use the shop's existing base, sell in more places, or avoid running their own shop."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q50. Why might a business sell through another shop rather than directly to customers?</label>
+                    <textarea id="a2_q50" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["reach more", "existing customer", "more places", "avoid running"]], "feedback": "Hint: Why let supermarkets sell your drinks instead of opening your own drink shop?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q50" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q50')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">51. Why might a business sell directly to customers?</label>
-                    <textarea id="a2_q51" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["more control", "customer service", "keep more", "relationships"]], "feedback": "Acceptable: More control over sales/service, keeps more of the selling price, or builds relationships with customers."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q51. Why might a business sell directly to customers?</label>
+                    <textarea id="a2_q51" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["more control", "customer service", "keep more", "relationships"]], "feedback": "Hint: If you don't use a middleman, what happens to your profit margin and customer relationship?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q51" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q51')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">52. Why might a business choose a location with lots of passing people?</label>
-                    <textarea id="a2_q52" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["notice", "potential customers", "visit", "increase sales"]], "feedback": "Acceptable: More people notice it, more potential customers may visit, which could increase sales."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q52. Why might a business choose a location with lots of passing people?</label>
+                    <textarea id="a2_q52" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["notice", "potential customers", "visit", "increase sales"]], "feedback": "Hint: Why are shops in busy city centres more successful than those on quiet streets?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q52" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q52')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">53. Why might a business choose to operate in a cheaper location?</label>
-                    <textarea id="a2_q53" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["save on rent", "bills", "reduce costs", "cover expenses"]], "feedback": "Acceptable: Save on rent/bills, reduce costs, or make it easier to cover expenses."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q53. Why might a business choose to operate in a cheaper location?</label>
+                    <textarea id="a2_q53" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["save on rent", "bills", "reduce costs", "cover expenses"]], "feedback": "Hint: Why would a warehouse style store prefer the edge of town?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q53" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q53')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">54. A local bakery sells cakes. Suggest a suitable place to sell them and explain why.</label>
-                    <textarea id="a2_q54" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["shop", "online", "market", "cafes", "local"]], "feedback": "Acceptable: A shop (locals visit), online (order for delivery), market stall (passing customers), or supplying cafes."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q54. A local bakery sells cakes. Suggest a suitable place to sell them and explain why.</label>
+                    <textarea id="a2_q54" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["shop", "online", "market", "cafes", "local"]], "feedback": "Hint: Give a location (e.g. a market stall or local shop) and explain why it fits a bakery."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q54" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q54')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">55. A business sells large sofas. Why might it use a website as well as a showroom?</label>
-                    <textarea id="a2_q55" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["browse online", "try", "see", "reach more", "choice"]], "feedback": "Acceptable: Browse online before visiting, showroom lets them try/see sofas, reaches more people, gives more choice."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q55. A business sells large sofas. Why might it use a website as well as a showroom?</label>
+                    <textarea id="a2_q55" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["browse online", "try", "see", "reach more", "choice"]], "feedback": "Hint: Why is it good to let people browse online but also sit on the sofa in person?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q55" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q55')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Part 5: Promotion</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">56. What does Promotion mean?</label>
-                    <textarea id="a2_q56" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["advertising", "telling people", "interested", "exists"]], "feedback": "Acceptable: Advertising the product, telling people about it, getting customers interested, or letting them know it exists."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q56. What does Promotion mean?</label>
+                    <textarea id="a2_q56" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["advertising", "telling people", "interested", "exists"]], "feedback": "Hint: What covers all the ways a business tells people about its product?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q56" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q56')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">57. Give two examples of promotional methods.</label>
-                    <textarea id="a2_q57" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["social media", "posters", "leaflets", "tv", "radio", "email", "influencer", "competitions", "offers"]], "feedback": "Acceptable: Social media, posters, leaflets, TV/radio adverts, email, influencers, competitions, special offers."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q57. Give two examples of promotional methods.</label>
+                    <textarea id="a2_q57" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["social media", "posters", "leaflets", "tv", "radio", "email", "influencer", "competitions", "offers"]], "feedback": "Hint: Name two advertising methods."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q57" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q57')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">58. What is advertising?</label>
-                    <textarea id="a2_q58" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["paying", "promote", "showing", "telling", "encourage"]], "feedback": "Acceptable: Paying to promote a product, showing/telling people about it to encourage them to buy."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q58. What is advertising?</label>
+                    <textarea id="a2_q58" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["paying", "promote", "showing", "telling", "encourage"]], "feedback": "Hint: What is the term for paying to show promotional messages?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q58" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q58')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">59. Why might a business use social media to promote products?</label>
-                    <textarea id="a2_q59" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["lots of people", "spread quickly", "cheap", "specific audience", "share"]], "feedback": "Acceptable: Lots of people use it, posts spread quickly, it can be cheap, targets specific audiences, or users can share it."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q59. Why might a business use social media to promote products?</label>
+                    <textarea id="a2_q59" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["lots of people", "spread quickly", "cheap", "specific audience", "share"]], "feedback": "Hint: Why use Instagram or TikTok to advertise?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q59" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q59')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">60. Give one disadvantage of using social media promotion.</label>
-                    <textarea id="a2_q60" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["not reach many", "negative comments", "takes time", "not use that platform"]], "feedback": "Acceptable: Might not reach many, negative comments can spread, takes time to manage, or target customers might not use it."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q60. Give one disadvantage of using social media promotion.</label>
+                    <textarea id="a2_q60" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["not reach many", "negative comments", "takes time", "not use that platform"]], "feedback": "Hint: Think about negative comments or the fact that older audiences might not use it."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q60" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q60')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">61. Why might a business use leaflets or posters?</label>
-                    <textarea id="a2_q61" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["local people", "event", "offer", "aware", "passing by"]], "feedback": "Acceptable: To reach local people, advertise an event/offer, or attract people passing by."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q61. Why might a business use leaflets or posters?</label>
+                    <textarea id="a2_q61" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["local people", "event", "offer", "aware", "passing by"]], "feedback": "Hint: Why put a paper flyer through a letterbox or on a noticeboard?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q61" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q61')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">62. Give one disadvantage of leaflets or posters.</label>
-                    <textarea id="a2_q62" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["ignore", "cost money", "print", "not interested", "thrown away"]], "feedback": "Acceptable: People might ignore them, costs money to print, reaches people not interested, or gets thrown away."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q62. Give one disadvantage of leaflets or posters.</label>
+                    <textarea id="a2_q62" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["ignore", "cost money", "print", "not interested", "thrown away"]], "feedback": "Hint: What usually happens to leaflets when people aren't interested?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q62" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q62')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">63. Why might a business use influencers to promote a product?</label>
-                    <textarea id="a2_q63" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["trust", "reach lots", "match the target", "recommendation"]], "feedback": "Acceptable: Followers trust them, reaches lots of people, audience matches the target market, or recommendations encourage sales."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q63. Why might a business use influencers to promote a product?</label>
+                    <textarea id="a2_q63" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["trust", "reach lots", "match the target", "recommendation"]], "feedback": "Hint: Why pay a YouTube star to hold your product?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q63" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q63')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">64. Give one disadvantage of using an influencer.</label>
-                    <textarea id="a2_q64" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["charge a lot", "expensive", "not buy", "bad reputation", "wrong people"]], "feedback": "Acceptable: May charge a lot, followers might not buy, bad reputation affects the business, or doesn't reach the right people."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q64. Give one disadvantage of using an influencer.</label>
+                    <textarea id="a2_q64" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["charge a lot", "expensive", "not buy", "bad reputation", "wrong people"]], "feedback": "Hint: What happens if the influencer gets 'canceled' or charges too much?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q64" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q64')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">65. Why might a business use email marketing?</label>
-                    <textarea id="a2_q65" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["existing customers", "offers", "new products", "repeat", "personalised"]], "feedback": "Acceptable: Tell existing customers about offers, advertise new products, encourage repeat purchases, or send personalised deals."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q65. Why might a business use email marketing?</label>
+                    <textarea id="a2_q65" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["existing customers", "offers", "new products", "repeat", "personalised"]], "feedback": "Hint: Why send newsletters directly to customers' inboxes?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q65" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q65')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">66. What is word of mouth?</label>
-                    <textarea id="a2_q66" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["telling others", "recommendations", "friends", "family", "talking"]], "feedback": "Acceptable: People telling others about a business, recommendations from friends/family, or customers talking about their experience."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q66. What is word of mouth?</label>
+                    <textarea id="a2_q66" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["telling others", "recommendations", "friends", "family", "talking"]], "feedback": "Hint: What is it called when friends recommend a place to each other?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q66" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q66')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">67. Why can word of mouth be useful?</label>
-                    <textarea id="a2_q67" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["free", "trust", "new customers", "good reputation"]], "feedback": "Acceptable: It can be free, people trust recommendations, happy customers bring in new ones, or it builds a good reputation."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q67. Why can word of mouth be useful?</label>
+                    <textarea id="a2_q67" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["free", "trust", "new customers", "good reputation"]], "feedback": "Hint: Why is this method trusted more than paid ads?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q67" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q67')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">68. What is one disadvantage of word of mouth?</label>
-                    <textarea id="a2_q68" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["cannot control", "bad experiences", "spread", "takes time"]], "feedback": "Acceptable: Cannot control what people say, bad experiences can spread, or it takes time to reach enough people."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q68. What is one disadvantage of word of mouth?</label>
+                    <textarea id="a2_q68" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["cannot control", "bad experiences", "spread", "takes time"]], "feedback": "Hint: What happens if someone has a bad experience and tells all their friends?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q68" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q68')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">69. Why might a business run a competition?</label>
-                    <textarea id="a2_q69" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["attention", "new followers", "share", "increase interest"]], "feedback": "Acceptable: To get attention, attract new followers, encourage sharing, or increase interest in products."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q69. Why might a business run a competition?</label>
+                    <textarea id="a2_q69" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["attention", "new followers", "share", "increase interest"]], "feedback": "Hint: Why do brands say 'Tag 3 friends to win'?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q69" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q69')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">70. Why might a business promote a special offer?</label>
-                    <textarea id="a2_q70" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["encourage", "increase sales", "attract", "clear stock", "compete"]], "feedback": "Acceptable: To encourage buying, increase sales, attract new customers, clear stock, or compete."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q70. Why might a business promote a special offer?</label>
+                    <textarea id="a2_q70" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["encourage", "increase sales", "attract", "clear stock", "compete"]], "feedback": "Hint: Why drop prices temporarily?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q70" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q70')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">71. Why should promotional material be suitable for its target market?</label>
-                    <textarea id="a2_q71" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["interest the right people", "understand", "reach people who might buy", "avoid wasting"]], "feedback": "Acceptable: Needs to interest the right people, use language/images they understand, reach buyers, or avoid wasting money."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q71. Why should promotional material be suitable for its target market?</label>
+                    <textarea id="a2_q71" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["interest the right people", "understand", "reach people who might buy", "avoid wasting"]], "feedback": "Hint: Why should you avoid advertising skateboards in a retirement magazine?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q71" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q71')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">72. Why might a business use different promotional methods at the same time?</label>
-                    <textarea id="a2_q72" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["reach more", "different customers", "remind", "increase the chance"]], "feedback": "Acceptable: To reach more people, appeal to different customers, remind people, or increase the chance it is seen."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q72. Why might a business use different promotional methods at the same time?</label>
+                    <textarea id="a2_q72" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["reach more", "different customers", "remind", "increase the chance"]], "feedback": "Hint: Why use both TV ads and social media at the same time?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q72" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q72')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">73. A business sells toys to young children. Who should its promotion target and why?</label>
-                    <textarea id="a2_q73" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["parents", "carers", "families", "buy", "pay", "children", "interest"]], "feedback": "Acceptable: Parents/carers because they buy the toys, or children to create interest (though parents pay)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q73. A business sells toys to young children. Who should its promotion target and why?</label>
+                    <textarea id="a2_q73" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["parents", "carers", "families", "buy", "pay", "children", "interest"]], "feedback": "Hint: Who actually has the money to buy them, and who wants to play with them?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q73" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q73')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">74. A new café wants more local customers. Suggest a promotional method and explain why.</label>
-                    <textarea id="a2_q74" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["local social media", "leaflets", "posters", "opening offer", "nearby"]], "feedback": "Acceptable: Local social media (nearby people see it), leaflets (reach local homes), posters (passers-by notice), opening offer (encourages trying)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q74. A new café wants more local customers. Suggest a promotional method and explain why.</label>
+                    <textarea id="a2_q74" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["local social media", "leaflets", "posters", "opening offer", "nearby"]], "feedback": "Hint: Pick a local method (like flyers) and explain how it gets local attention."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q74" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q74')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Part 6: Product life cycle</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">75. What is the product life cycle?</label>
-                    <textarea id="a2_q75" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["stages", "launched", "sales", "change over time"]], "feedback": "Acceptable: The stages a product goes through from launch, or how sales change over time."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q75. What is the product life cycle?</label>
+                    <textarea id="a2_q75" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["stages", "launched", "sales", "change over time"]], "feedback": "Hint: Think of the path from introduction, growth, maturity, to decline."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q75" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q75')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">76. What happens during the introduction stage?</label>
-                    <textarea id="a2_q76" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["new", "not many people know", "low sales", "promoting"]], "feedback": "Acceptable: The product is new, not many know it, sales are low, or money is spent promoting it."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q76. What happens during the introduction stage?</label>
+                    <textarea id="a2_q76" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["new", "not many people know", "low sales", "promoting"]], "feedback": "Hint: What happens when it is first launched?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q76" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q76')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">77. What happens during the growth stage?</label>
-                    <textarea id="a2_q77" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["rising", "hear about it", "more customers", "popular"]], "feedback": "Acceptable: Sales rise, more hear about it, more buy it, or it becomes popular."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q77. What happens during the growth stage?</label>
+                    <textarea id="a2_q77" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["rising", "hear about it", "more customers", "popular"]], "feedback": "Hint: What happens as it gains popularity and sales increase?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q77" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q77')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">78. What happens during the maturity stage?</label>
-                    <textarea id="a2_q78" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["high", "level off", "know about it", "growth slows", "competitors"]], "feedback": "Acceptable: Sales are high/level off, target market already knows it, growth slows, or competitors sell similar items."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q78. What happens during the maturity stage?</label>
+                    <textarea id="a2_q78" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["high", "level off", "know about it", "growth slows", "competitors"]], "feedback": "Hint: What happens when sales peak and steady out?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q78" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q78')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">79. What happens during the decline stage?</label>
-                    <textarea id="a2_q79" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["fall", "fewer people", "newer alternatives", "stop selling"]], "feedback": "Acceptable: Sales fall, fewer people want it, customers move to alternatives, or the business updates/stops it."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q79. What happens during the decline stage?</label>
+                    <textarea id="a2_q79" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["fall", "fewer people", "newer alternatives", "stop selling"]], "feedback": "Hint: What happens when a product gets old and people stop buying it?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q79" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q79')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">80. Why might a business advertise a new product heavily when it launches?</label>
-                    <textarea id="a2_q80" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["let people know", "exists", "try it", "explain", "first customers"]], "feedback": "Acceptable: To let people know it exists, encourage trying it, explain what it does, or attract first customers."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q80. Why might a business advertise a new product heavily when it launches?</label>
+                    <textarea id="a2_q80" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["let people know", "exists", "try it", "explain", "first customers"]], "feedback": "Hint: Why do you need ads if no one has heard of it yet?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q80" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q80')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">81. Why might a business change or update a product when sales start falling?</label>
-                    <textarea id="a2_q81" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["interesting again", "trends", "compete", "attract customers back"]], "feedback": "Acceptable: To make it interesting again, keep up with trends, compete with new products, or attract customers back."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q81. Why might a business change or update a product when sales start falling?</label>
+                    <textarea id="a2_q81" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["interesting again", "trends", "compete", "attract customers back"]], "feedback": "Hint: Why release 'Version 2.0'?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q81" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q81')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">82. What could a business do if a product is no longer selling well?</label>
-                    <textarea id="a2_q82" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["reduce price", "advertise differently", "redesign", "new version", "different group", "stop selling"]], "feedback": "Acceptable: Reduce price, advertise differently, redesign, offer new version, target different group, or stop selling."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q82. What could a business do if a product is no longer selling well?</label>
+                    <textarea id="a2_q82" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["reduce price", "advertise differently", "redesign", "new version", "different group", "stop selling"]], "feedback": "Hint: What can they do to clear stock or revive interest?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q82" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q82')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Part 7: Multichannel marketing</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">83. What is multichannel marketing?</label>
-                    <textarea id="a2_q83" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["more than one way", "different methods", "shops and online", "several ways"]], "feedback": "Acceptable: Using more than one way to sell/promote, reaching customers through different methods (e.g. shops and online)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q83. What is multichannel marketing?</label>
+                    <textarea id="a2_q83" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["more than one way", "different methods", "shops and online", "several ways"]], "feedback": "Hint: What is the term for selling via both an app and a physical shop?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q83" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q83')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">84. Give an example of a business using multiple channels.</label>
-                    <textarea id="a2_q84" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["shop and website", "social media and leaflets", "app and store"]], "feedback": "Acceptable: Selling in a shop and on a website, advertising on social media and leaflets, or app and store."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q84. Give an example of a business using multiple channels.</label>
+                    <textarea id="a2_q84" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["shop and website", "social media and leaflets", "app and store"]], "feedback": "Hint: Combine two different methods (e.g., website and high street store)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q84" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q84')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">85. Give one advantage of using multiple sales channels.</label>
-                    <textarea id="a2_q85" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["reach more", "more choice", "prefer", "sales may increase"]], "feedback": "Acceptable: Reach more customers, customers have more choice, shop how they prefer, or sales increase."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q85. Give one advantage of using multiple sales channels.</label>
+                    <textarea id="a2_q85" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["reach more", "more choice", "prefer", "sales may increase"]], "feedback": "Hint: How does being in more places affect total sales?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q85" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q85')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">86. Give one disadvantage of using multiple sales channels.</label>
-                    <textarea id="a2_q86" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["cost more", "more time", "stock harder", "go wrong"]], "feedback": "Acceptable: Costs more, takes more time to manage, stock is harder to track, or more things can go wrong."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q86. Give one disadvantage of using multiple sales channels.</label>
+                    <textarea id="a2_q86" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["cost more", "more time", "stock harder", "go wrong"]], "feedback": "Hint: Think about the cost and difficulty of managing both a shop and a website."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q86" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q86')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">87. Why might customers like being able to buy online and in store?</label>
-                    <textarea id="a2_q87" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["more choice", "browse online", "collect in store", "try in person", "convenient time"]], "feedback": "Acceptable: More choice, can browse online/collect in store, try products in person, or shop at convenient times."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q87. Why might customers like being able to buy online and in store?</label>
+                    <textarea id="a2_q87" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["more choice", "browse online", "collect in store", "try in person", "convenient time"]], "feedback": "Hint: Why do customers love 'Click and Collect'?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q87" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q87')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">88. Why might a business advertise online but also use posters?</label>
-                    <textarea id="a2_q88" class="auto-input a1-input" rows="2" data-rubric='{"keywords": [["internet users", "local people", "different customers", "increase awareness"]], "feedback": "Acceptable: Online reaches internet users, posters reach local people, different customers use different media, increases awareness."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q88. Why might a business advertise online but also use posters?</label>
+                    <textarea id="a2_q88" class="auto-input a2-input" rows="2" data-rubric='{"keywords": [["internet users", "local people", "different customers", "increase awareness"]], "feedback": "Hint: How do posters and online ads hit different types of people?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q88" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q88')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Part 8: Exam style application questions</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">89. A small business sells handmade candles. Suggest one suitable product decision and explain why.</label>
-                    <textarea id="a2_q89" class="auto-input a1-input" rows="3" data-rubric='{"keywords": [["packaging", "scents", "ingredients", "unique design", "gift", "preferences", "smell", "stand out"]], "feedback": "Acceptable: Attractive packaging (looks like a gift), different scents (different preferences), or unique designs (stand out)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q89. A small business sells handmade candles. Suggest one suitable product decision and explain why.</label>
+                    <textarea id="a2_q89" class="auto-input a2-input" rows="3" data-rubric='{"keywords": [["packaging", "scents", "ingredients", "unique design", "gift", "preferences", "smell", "stand out"]], "feedback": "Hint: Pick a 'Product' trait like scents or packaging and explain how it helps."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q89" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q89')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">90. A new takeaway is struggling to attract customers. Suggest one pricing decision and explain why.</label>
-                    <textarea id="a2_q90" class="auto-input a1-input" rows="3" data-rubric='{"keywords": [["discount", "meal deals", "affordable", "check competitors", "try the food", "more for their money"]], "feedback": "Acceptable: Offer a discount (persuade trying), meal deals (get more for money), or keep prices affordable."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q90. A new takeaway is struggling to attract customers. Suggest one pricing decision and explain why.</label>
+                    <textarea id="a2_q90" class="auto-input a2-input" rows="3" data-rubric='{"keywords": [["discount", "meal deals", "affordable", "check competitors", "try the food", "more for their money"]], "feedback": "Hint: Pick a 'Price' trait like meal deals or discounts and explain how it draws people in."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q90" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q90')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">91. A small clothing business only sells at a market stall. Suggest one way it could improve its Place strategy.</label>
-                    <textarea id="a2_q91" class="auto-input a1-input" rows="3" data-rubric='{"keywords": [["online", "social media", "local shop", "other markets", "orders", "reach people"]], "feedback": "Acceptable: Sell online, use social media to take orders, sell through a local shop, or attend other markets."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q91. A small clothing business only sells at a market stall. Suggest one way it could improve its Place strategy.</label>
+                    <textarea id="a2_q91" class="auto-input a2-input" rows="3" data-rubric='{"keywords": [["online", "social media", "local shop", "other markets", "orders", "reach people"]], "feedback": "Hint: Where else besides a physical stall could they sell their goods? (Think digital)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q91" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q91')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">92. A new barber shop wants more customers. Suggest one promotional method and explain why it could work.</label>
-                    <textarea id="a2_q92" class="auto-input a1-input" rows="3" data-rubric='{"keywords": [["pictures", "social media", "discount", "recommend", "posters", "leaflets"]], "feedback": "Acceptable: Post pictures on social media, offer first-time discounts, recommend-a-friend discounts, or local posters."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q92. A new barber shop wants more customers. Suggest one promotional method and explain why it could work.</label>
+                    <textarea id="a2_q92" class="auto-input a2-input" rows="3" data-rubric='{"keywords": [["pictures", "social media", "discount", "recommend", "posters", "leaflets"]], "feedback": "Hint: Name a promotion (like social media or flyers) and explain how it gets people in the door."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q92" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q92')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">93. A business sells expensive designer trainers. Explain how two of the 4Ps could help it attract customers.</label>
-                    <textarea id="a2_q93" class="auto-input a1-input" rows="4" data-rubric='{"keywords": [["product", "quality", "design", "price", "higher", "luxury", "place", "website", "shops", "promotion", "influencers", "social media"]], "feedback": "Acceptable: Product (good quality/design), Price (high for luxury image), Place (branded website), Promotion (influencers/social media)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q93. A business sells expensive designer trainers. Explain how two of the 4Ps could help it attract customers.</label>
+                    <textarea id="a2_q93" class="auto-input a2-input" rows="4" data-rubric='{"keywords": [["product", "quality", "design", "price", "higher", "luxury", "place", "website", "shops", "promotion", "influencers", "social media"]], "feedback": "Hint: Pick two 'Ps' (like Price and Promotion) and explain how they build a luxury vibe."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q93" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q93')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">94. A business sells reusable water bottles but is getting very few sales. Suggest two changes it could make to its marketing mix.</label>
-                    <textarea id="a2_q94" class="auto-input a1-input" rows="4" data-rubric='{"keywords": [["colours", "sizes", "discount", "supermarkets", "online", "social media", "advertise"]], "feedback": "Acceptable: Product (more colours), Price (discount), Place (sell in supermarkets/online), Promotion (advertise on social media)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q94. A business sells reusable water bottles but is getting very few sales. Suggest two changes it could make to its marketing mix.</label>
+                    <textarea id="a2_q94" class="auto-input a2-input" rows="4" data-rubric='{"keywords": [["colours", "sizes", "discount", "supermarkets", "online", "social media", "advertise"]], "feedback": "Hint: Name two changes (e.g., lowering the price, or advertising on Instagram) that could boost sales."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q94" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q94')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">95. A business sells school bags. Explain why it should consider its target market when deciding on its 4Ps.</label>
-                    <textarea id="a2_q95" class="auto-input a1-input" rows="4" data-rubric='{"keywords": [["want", "affordable", "parents", "students", "competitors", "access"]], "feedback": "Acceptable: Must sell what students want, at a price parents/students can afford, in places they access, or they will go to competitors."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q95. A business sells school bags. Explain why it should consider its target market when deciding on its 4Ps.</label>
+                    <textarea id="a2_q95" class="auto-input a2-input" rows="4" data-rubric='{"keywords": [["want", "affordable", "parents", "students", "competitors", "access"]], "feedback": "Hint: Think about how price, style, and advertising must appeal directly to students/parents."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q95" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q95')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">96. A business sells a product online for £25, but its competitors sell similar products for £15. Suggest what the business could do and explain why.</label>
-                    <textarea id="a2_q96" class="auto-input a1-input" rows="4" data-rubric='{"keywords": [["reduce", "explain why", "quality", "discount", "bundle", "better value"]], "feedback": "Acceptable: Reduce price to compete, explain why it's worth more (better quality), offer a bundle, or improve promotion."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q96. A business sells a product online for £25, but its competitors sell similar products for £15. Suggest what the business could do and explain why.</label>
+                    <textarea id="a2_q96" class="auto-input a2-input" rows="4" data-rubric='{"keywords": [["reduce", "explain why", "quality", "discount", "bundle", "better value"]], "feedback": "Hint: What should they do about their price, or how should they justify it being higher?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q96" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q96')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">97. A café has good food but very few customers know it exists. Which part of the marketing mix should it focus on first, and why?</label>
-                    <textarea id="a2_q97" class="auto-input a1-input" rows="3" data-rubric='{"keywords": [["promotion", "advertising", "social media", "posters", "let people know"]], "feedback": "Acceptable: Promotion, because it needs to let people know it exists (via social media, posters, discounts)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q97. A café has good food but very few customers know it exists. Which part of the marketing mix should it focus on first, and why?</label>
+                    <textarea id="a2_q97" class="auto-input a2-input" rows="3" data-rubric='{"keywords": [["promotion", "advertising", "social media", "posters", "let people know"]], "feedback": "Hint: Which of the 4Ps focuses on making people aware of the business?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q97" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q97')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">98. A business advertises a product to teenagers, but most of its customers are adults. What might be wrong with its marketing?</label>
-                    <textarea id="a2_q98" class="auto-input a1-input" rows="3" data-rubric='{"keywords": [["wrong people", "not reach", "research", "change target", "change advertising"]], "feedback": "Acceptable: Targeting the wrong people, advertising not reaching buyers, needs to research and change target/advertising."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q98. A business advertises a product to teenagers, but most of its customers are adults. What might be wrong with its marketing?</label>
+                    <textarea id="a2_q98" class="auto-input a2-input" rows="3" data-rubric='{"keywords": [["wrong people", "not reach", "research", "change target", "change advertising"]], "feedback": "Hint: Are they aiming at the right group? What should they do differently?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q98" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q98')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">99. Explain why a business should not automatically choose the cheapest promotional method.</label>
-                    <textarea id="a2_q99" class="auto-input a1-input" rows="3" data-rubric='{"keywords": [["right people", "not get noticed", "reach more", "lead to sales", "worth it"]], "feedback": "Acceptable: Might not reach the right people, cheap ads may not get noticed, spending more could lead to more sales."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q99. Explain why a business should not automatically choose the cheapest promotional method.</label>
+                    <textarea id="a2_q99" class="auto-input a2-input" rows="3" data-rubric='{"keywords": [["right people", "not get noticed", "reach more", "lead to sales", "worth it"]], "feedback": "Hint: Why might a free Facebook post fail while a paid advert succeeds?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q99" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q99')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">100. A business has a good product, but customers find it difficult to buy. Explain which part of the marketing mix needs improving and suggest a change.</label>
-                    <textarea id="a2_q100" class="auto-input a1-input" rows="3" data-rubric='{"keywords": [["place", "online", "delivery", "more shops", "easier", "collection"]], "feedback": "Acceptable: Place. They should start selling online, offer delivery, or sell through more shops to make it easier."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q100. A business has a good product, but customers find it difficult to buy. Explain which part of the marketing mix needs improving and suggest a change.</label>
+                    <textarea id="a2_q100" class="auto-input a2-input" rows="3" data-rubric='{"keywords": [["place", "online", "delivery", "more shops", "easier", "collection"]], "feedback": "Hint: Which of the 4Ps is about where things are sold, and how could they fix it?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a2_q100" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a2_q100')">👨‍🏫 Override Score</button></div>
                 </div>
 
-                <button class="btn-submit no-print" onclick="checkAnswers('a1-input')">Check Answers</button>
+                <button class="btn-submit no-print" onclick="checkAnswers('a2-input')">Check Answers</button>
             </div>
         </main>
     </div>
+
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
-        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+        <button class="btn-reset no-print" onclick="clearData()">Reset Page</button>
     </div>
 
     <!-- SECURE PASSWORD MODAL -->
@@ -712,189 +720,9 @@
     <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
 
     <script>
-        function saveProgress() {
-            var inputs = document.querySelectorAll('.auto-input');
-            var dataToSave = {};
-            for (var i = 0; i < inputs.length; i++) { 
-                dataToSave['input_' + i] = inputs[i].value; 
-                dataToSave['class_' + i] = inputs[i].className; 
-            }
-            try { localStorage.setItem('enterpriseA2Memory_v3', JSON.stringify(dataToSave)); } catch (e) {}
-        }
-
-        function loadProgress() {
-            var saved = localStorage.getItem('enterpriseA2Memory_v3');
-            if (saved) {
-                var data = JSON.parse(saved);
-                var inputs = document.querySelectorAll('.auto-input');
-                for (var i = 0; i < inputs.length; i++) {
-                    if (data['input_' + i]) {
-                        inputs[i].value = data['input_' + i];
-                        if (data['class_' + i]) {
-                            inputs[i].className = data['class_' + i];
-                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
-                                var btnId = "override-" + inputs[i].id;
-                                var btn = document.getElementById(btnId);
-                                if (btn) btn.classList.remove('hidden');
-                            }
-                        }
-                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                            inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                        }
-                    }
-                }
-            }
-        }
-
-        document.addEventListener('input', function(e) {
-            if (e.target.classList.contains('auto-input')) {
-                saveProgress();
-                if (e.target.tagName.toLowerCase() === 'textarea') {
-                    e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';
-                }
-            }
-        });
-
-        function clearData() { 
-            if (confirm("Clear all work?")) { 
-                localStorage.removeItem('enterpriseA2Memory_v3'); 
-                window.location.reload(); 
-            } 
-        }
-
-        window.onload = loadProgress;
-
-        let activeQuestionId = null;
-        function openVerifyModal(qId) {
-            activeQuestionId = qId;
-            document.getElementById('teacher-password-input').value = '';
-            document.getElementById('modal-error-msg').style.display = 'none';
-            document.getElementById('verify-modal').style.display = 'flex';
-            document.getElementById('teacher-password-input').focus();
-        }
-        function closeVerifyModal() {
-            document.getElementById('verify-modal').style.display = 'none';
-            activeQuestionId = null;
-        }
-        function submitVerify() {
-            var pass = document.getElementById('teacher-password-input').value;
-            if (pass === '2525') {
-                var inputEl = document.getElementById(activeQuestionId);
-                var feedbackDiv = inputEl.nextElementSibling;
-                inputEl.classList.add('teacher-locked');
-                if (inputEl.classList.contains('correct')) {
-                    inputEl.classList.remove('correct');
-                    inputEl.classList.add('incorrect');
-                    if(feedbackDiv) { feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; feedbackDiv.style.color = "#b71c1c"; feedbackDiv.style.display = "block"; }
-                } else {
-                    inputEl.classList.remove('incorrect');
-                    inputEl.classList.add('correct');
-                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
-                }
-                closeVerifyModal();
-                saveProgress();
-            } else {
-                document.getElementById('modal-error-msg').style.display = 'block';
-            }
-        }
-        document.getElementById('teacher-password-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') submitVerify();
-        });
-
-        function checkAnswers(groupClass) {
-            var inputs = document.querySelectorAll('.' + groupClass);
-            for (var i = 0; i < inputs.length; i++) {
-                var inputElement = inputs[i];
-                var feedbackDiv = inputElement.nextElementSibling;
-                var overrideBtn = document.getElementById("override-" + inputElement.id);
-                if (overrideBtn) overrideBtn.classList.remove('hidden');
-
-                if (inputElement.classList.contains('teacher-locked')) {
-                    continue; 
-                }
-
-                var studentAnswer = inputElement.value.toLowerCase().replace(/[^a-z0-9\s\+\-\/\*\=\%]/g, " ").replace(/\s+/g, " ").trim();
-                var rubricStr = inputElement.getAttribute('data-rubric');
-                if(!rubricStr) continue;
-                var rubric;
-                try { rubric = JSON.parse(rubricStr); } catch (error) { continue; }
-                
-                var keywordGroups = rubric.keywords; 
-                inputElement.classList.remove('correct', 'incorrect');
-                if (studentAnswer === "") { if(feedbackDiv) feedbackDiv.style.display = 'none'; continue; }
-                
-                var wordCount = studentAnswer.split(" ").length;
-                if (!keywordGroups || keywordGroups.length === 0) {
-                    inputElement.classList.add('correct');
-                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Answer recorded."; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
-                    continue;
-                }
-                
-                var conceptsFound = 0;
-                for(var k = 0; k < keywordGroups.length; k++) {
-                    var terms = keywordGroups[k];
-                    var matched = false;
-                    for(var s = 0; s < terms.length; s++) {
-                        var term = terms[s].toLowerCase().trim();
-                        if (term.length >= 3) { if (studentAnswer.includes(term)) { matched = true; break; } }
-                        else { var regex = new RegExp("\\b" + term + "\\b"); if (regex.test(studentAnswer)) { matched = true; break; } }
-                    }
-                    if(matched) conceptsFound++;
-                }
-                
-                var score = conceptsFound / keywordGroups.length;
-                var isPassed = false;
-                if (keywordGroups.length > 1) { isPassed = (score === 1); }
-                else { isPassed = (score >= 1 || (wordCount >= 4)); }
-                
-                if(feedbackDiv) {
-                    if (isPassed) {
-                        inputElement.classList.add('correct');
-                        feedbackDiv.innerHTML = "✅ Correct! All required concepts covered.";
-                        feedbackDiv.style.color = "#006100";
-                        feedbackDiv.style.display = "block";
-                    } else if (keywordGroups.length > 1 && score >= 0.5) {
-                        inputElement.classList.add('incorrect');
-                        feedbackDiv.innerHTML = "⚠️ Partial credit (" + conceptsFound + "/" + keywordGroups.length + " concepts). " + rubric.feedback;
-                        feedbackDiv.style.color = "#b27a00";
-                        feedbackDiv.style.display = "block";
-                    } else {
-                        inputElement.classList.add('incorrect');
-                        feedbackDiv.innerHTML = "❌ Not quite. " + rubric.feedback;
-                        feedbackDiv.style.color = "#b71c1c";
-                        feedbackDiv.style.display = "block";
-                    }
-                }
-            }
-            saveProgress();
-        }
-
-        function downloadPDF() {
-            var hide = document.querySelectorAll('.no-print');
-            for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
-            document.getElementById('action-buttons').style.display = 'none';
-
-            var textAreas = document.querySelectorAll('textarea');
-            for (var j = 0; j < textAreas.length; j++) {
-                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
-            }
-
-            var element = document.getElementById('pdf-content');
-            var opt = { 
-                margin: 0.3, 
-                filename: 'A2_Marketing_Mix.pdf', 
-                image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, 
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
-
-            html2pdf().set(opt).from(element).save().then(function() {
-                for(var b=0; b<hide.length; b++) hide[b].style.display = 'block';
-                document.getElementById('action-buttons').style.display = 'flex';
-                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
-            });
-        }
-    </script>
-</body>
-</html>
+        // --- FIREBASE INITIALIZATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park
