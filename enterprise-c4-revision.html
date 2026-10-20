@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>C4: Break Even Analysis - Revision</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
         .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
@@ -36,8 +41,8 @@
         .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
         .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
         .btn-submit:hover { background-color: #152960; }
-        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
-        .btn-pdf:hover { background-color: #124d2d; }
+        .btn-reset { background-color: #d32f2f; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; margin: 20px auto; }
+        .btn-reset:hover { background-color: #b71c1c; }
     </style>
 </head>
 <body>
@@ -53,7 +58,7 @@
                 <h2>C4 Revision Notes</h2>
                 <div class="instruction-box center-text">Use this space to write out your complete notes on break-even point, contribution per unit, fixed and variable costs, break-even charts, and factors affecting break-even.</div>
                 <div class="question-wrapper">
-                    <textarea class="auto-input" rows="12" placeholder="Type your revision notes here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                    <textarea class="auto-input notes-textarea" rows="12" placeholder="Type your revision notes here..."></textarea>
                 </div>
             </div>
 
@@ -64,354 +69,354 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 1: Key knowledge</h3>
                 
                 <div class="question-wrapper">
-                    <label class="question-label">1. What is break even?</label>
-                    <textarea id="c4_q1" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["no profit and no loss", "income equals total costs", "money coming in covers all the costs"]], "feedback": "Acceptable: When a business makes no profit and no loss, income equals total costs, or money covers all costs."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q1. What is break even?</label>
+                    <textarea id="c4_q1" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["no profit and no loss", "income equals total costs", "money coming in covers all the costs"]], "feedback": "Hint: What financial milestone is reached when total income exactly matches total costs, resulting in neither a profit nor a loss?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q1')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">2. What is the break even point?</label>
-                    <textarea id="c4_q2" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["number of products", "needs to sell to cover its costs", "total revenue equals total costs"]], "feedback": "Acceptable: The number of products a business needs to sell to cover its costs, or where total revenue equals total costs."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q2. What is the break even point?</label>
+                    <textarea id="c4_q2" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["number of products", "needs to sell to cover its costs", "total revenue equals total costs"]], "feedback": "Hint: Think of the specific quantity of output a business must sell so that revenue equals total costs."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q2')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">3. What is break even analysis?</label>
-                    <textarea id="c4_q3" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["working out how many products need to be sold", "stop making a loss", "start making a profit"]], "feedback": "Acceptable: Working out how many products need to be sold to cover costs, or calculating when it stops making a loss."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q3. What is break even analysis?</label>
+                    <textarea id="c4_q3" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["working out how many products need to be sold", "stop making a loss", "start making a profit"]], "feedback": "Hint: How does a business calculate the sales volume needed to avoid a loss and start making a profit?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q3')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">4. What is revenue?</label>
-                    <textarea id="c4_q4" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["money made from sales", "money received", "sales income"]], "feedback": "Acceptable: Money made from sales, money received from selling products/services, or sales income."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q4. What is revenue?</label>
+                    <textarea id="c4_q4" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["money made from sales", "money received", "sales income"]], "feedback": "Hint: What do you call the total income generated from selling goods or services?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">5. How do you calculate revenue?</label>
-                    <textarea id="c4_q5" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["selling price", "price per item"], ["multiplied", "times", "*", "x"], ["number sold", "quantity"]], "feedback": "Acceptable: Selling price multiplied by the number sold (Price x Quantity)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q5. How do you calculate revenue?</label>
+                    <textarea id="c4_q5" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["selling price", "price per item"], ["multiplied", "times", "*", "x"], ["number sold", "quantity"]], "feedback": "Hint: What two factors do you multiply together to find total revenue?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q5')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">6. What are fixed costs?</label>
-                    <textarea id="c4_q6" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["stay the same", "regardless of how many products", "rent", "insurance"]], "feedback": "Acceptable: Costs that stay the same regardless of how many products are made or sold (e.g. rent, insurance)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q6. What are fixed costs?</label>
+                    <textarea id="c4_q6" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["stay the same", "regardless of how many products", "rent", "insurance"]], "feedback": "Hint: Think about expenses like rent that do not change when output increases or decreases."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q6')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">7. Give three examples of fixed costs.</label>
-                    <textarea id="c4_q7" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["rent", "insurance", "business rates", "salaries", "subscriptions", "loan repayments"]], "feedback": "Acceptable: Rent, insurance, business rates, salaries, subscriptions, loan repayments."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q7. Give three examples of fixed costs.</label>
+                    <textarea id="c4_q7" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["rent", "insurance", "business rates", "salaries", "subscriptions", "loan repayments"]], "feedback": "Hint: Name three regular overhead costs that remain constant regardless of production level."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q7')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">8. What are variable costs?</label>
-                    <textarea id="c4_q8" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["change depending on how many products", "rise when production increases"]], "feedback": "Acceptable: Costs that change depending on how many products are made or sold."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q8. What are variable costs?</label>
+                    <textarea id="c4_q8" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["change depending on how many products", "rise when production increases"]], "feedback": "Hint: Think about expenses that go up or down directly with the number of units produced."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q8')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">9. Give three examples of variable costs.</label>
-                    <textarea id="c4_q9" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["materials", "packaging", "ingredients", "components", "delivery costs"]], "feedback": "Acceptable: Materials, packaging, ingredients, components, or delivery costs per order."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q9. Give three examples of variable costs.</label>
+                    <textarea id="c4_q9" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["materials", "packaging", "ingredients", "components", "delivery costs"]], "feedback": "Hint: Name three direct expenses tied to manufacturing units, like raw materials or packaging."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q9')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">10. What are total costs?</label>
-                    <textarea id="c4_q10" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["all the business s costs added together", "fixed costs plus variable costs"]], "feedback": "Acceptable: All the business'\''s costs added together, or fixed costs plus variable costs."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q10. What are total costs?</label>
+                    <textarea id="c4_q10" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["all the business s costs added together", "fixed costs plus variable costs"]], "feedback": "Hint: What do you get when you combine fixed and variable expenses together?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q10')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">11. What is a selling price?</label>
-                    <textarea id="c4_q11" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["amount a customer pays for one product", "service"]], "feedback": "Acceptable: The amount a customer pays for one product or service."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q11. What is a selling price?</label>
+                    <textarea id="c4_q11" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["amount a customer pays for one product", "service"]], "feedback": "Hint: How much does an individual customer pay to buy a single unit of output?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q11')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">12. What is contribution per unit?</label>
-                    <textarea id="c4_q12" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["selling price minus variable cost", "amount each sale contributes", "fixed costs and then profit"]], "feedback": "Acceptable: Selling price minus variable cost per product, or amount each sale contributes towards fixed costs/profit."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q12. What is contribution per unit?</label>
+                    <textarea id="c4_q12" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["selling price minus variable cost", "amount each sale contributes", "fixed costs and then profit"]], "feedback": "Hint: What is left from selling one item after paying its variable cost, which goes towards covering fixed costs?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q12')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">13. What does it mean if a business sells below its break even point?</label>
-                    <textarea id="c4_q13" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["loss", "revenue is not enough to cover all costs"]], "feedback": "Acceptable: It makes a loss, or sales revenue is not enough to cover all costs."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q13. What does it mean if a business sells below its break even point?</label>
+                    <textarea id="c4_q13" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["loss", "revenue is not enough to cover all costs"]], "feedback": "Hint: If output is under the break-even threshold, is the business profitable or losing money?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q13')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">14. What does it mean if a business sells above its break even point?</label>
-                    <textarea id="c4_q14" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["profit", "revenue covers costs and there is money left over"]], "feedback": "Acceptable: It makes a profit, revenue covers costs, and there is money left over."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q14. What does it mean if a business sells above its break even point?</label>
+                    <textarea id="c4_q14" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["profit", "revenue covers costs and there is money left over"]], "feedback": "Hint: Once sales exceed the break-even volume, what financial return does the business start generating?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q14')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">15. Why might a business want to know its break even point?</label>
-                    <textarea id="c4_q15" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["sales targets", "plan prices", "how many products it needs to sell", "idea is realistic"]], "feedback": "Acceptable: To set sales targets, plan prices, see how many products to sell, or judge if an idea is realistic."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q15. Why might a business want to know its break even point?</label>
+                    <textarea id="c4_q15" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["sales targets", "plan prices", "how many products it needs to sell", "idea is realistic"]], "feedback": "Hint: How does knowing this volume help with goal-setting, pricing strategies, and assessing feasibility?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q15')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 2: Break even calculations</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">16. A product sells for £10 and costs £4 in variable costs per unit. Calculate the contribution per unit.</label>
-                    <input type="text" id="c4_q16" class="auto-input c4-input" data-rubric='{"keywords": [["6", "£6"]], "feedback": "£6 (£10 minus £4)."}' placeholder="Type answer here...">
+                    <label class="question-label">Q16. A product sells for £10 and costs £4 in variable costs per unit. Calculate the contribution per unit.</label>
+                    <input type="text" id="c4_q16" class="auto-input c4-input" data-rubric='{"keywords": [["6", "£6"]], "feedback": "Hint: Subtract the variable cost (£4) from the selling price (£10)."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q16')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">17. Fixed costs are £600 and contribution per unit is £6. Calculate the break even point.</label>
-                    <input type="text" id="c4_q17" class="auto-input c4-input" data-rubric='{"keywords": [["100"]], "feedback": "100 units (£600 divided by £6)."}' placeholder="Type answer here...">
+                    <label class="question-label">Q17. Fixed costs are £600 and contribution per unit is £6. Calculate the break even point.</label>
+                    <input type="text" id="c4_q17" class="auto-input c4-input" data-rubric='{"keywords": [["100"]], "feedback": "Hint: Divide fixed costs (£600) by the contribution per unit (£6)."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q17')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">18. Fixed costs are £1,000. Each product sells for £15 and has variable costs of £5. Calculate the break even point.</label>
-                    <input type="text" id="c4_q18" class="auto-input c4-input" data-rubric='{"keywords": [["100"]], "feedback": "100 units (Contribution is £10, so £1,000 divided by £10)."}' placeholder="Type answer here...">
+                    <label class="question-label">Q18. Fixed costs are £1,000. Each product sells for £15 and has variable costs of £5. Calculate the break even point.</label>
+                    <input type="text" id="c4_q18" class="auto-input c4-input" data-rubric='{"keywords": [["100"]], "feedback": "Hint: First find contribution (£15 - £5 = £10), then divide fixed costs (£1,000) by that contribution."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q18')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">19. A business sells products for £20 each. Variable costs are £8 per product and fixed costs are £1,200. Calculate the break even point.</label>
-                    <input type="text" id="c4_q19" class="auto-input c4-input" data-rubric='{"keywords": [["100"]], "feedback": "100 units (Contribution is £12, so £1,200 divided by £12)."}' placeholder="Type answer here...">
+                    <label class="question-label">Q19. A business sells products for £20 each. Variable costs are £8 per product and fixed costs are £1,200. Calculate the break even point.</label>
+                    <input type="text" id="c4_q19" class="auto-input c4-input" data-rubric='{"keywords": [["100"]], "feedback": "Hint: Calculate contribution (£20 - £8 = £12), then divide £1,200 by £12."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q19')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">20. Fixed costs are £800 and contribution per unit is £4. How many units must be sold to break even?</label>
-                    <input type="text" id="c4_q20" class="auto-input c4-input" data-rubric='{"keywords": [["200"]], "feedback": "200 units (£800 divided by £4)."}' placeholder="Type answer here...">
+                    <label class="question-label">Q20. Fixed costs are £800 and contribution per unit is £4. How many units must be sold to break even?</label>
+                    <input type="text" id="c4_q20" class="auto-input c4-input" data-rubric='{"keywords": [["200"]], "feedback": "Hint: Divide fixed costs (£800) by the contribution per unit (£4)."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q20')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">21. A business sells 150 products for £10 each. Calculate its revenue.</label>
-                    <input type="text" id="c4_q21" class="auto-input c4-input" data-rubric='{"keywords": [["1500", "£1500", "1,500", "£1,500"]], "feedback": "£1,500 (150 multiplied by £10)."}' placeholder="Type answer here...">
+                    <label class="question-label">Q21. A business sells 150 products for £10 each. Calculate its revenue.</label>
+                    <input type="text" id="c4_q21" class="auto-input c4-input" data-rubric='{"keywords": [["1500", "£1500", "1,500", "£1,500"]], "feedback": "Hint: Multiply quantity (150) by price (£10). Include the currency symbol."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q21')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">22. A business has fixed costs of £500 and variable costs of £300. Calculate total costs.</label>
-                    <input type="text" id="c4_q22" class="auto-input c4-input" data-rubric='{"keywords": [["800", "£800"]], "feedback": "£800 (£500 plus £300)."}' placeholder="Type answer here...">
+                    <label class="question-label">Q22. A business has fixed costs of £500 and variable costs of £300. Calculate total costs.</label>
+                    <input type="text" id="c4_q22" class="auto-input c4-input" data-rubric='{"keywords": [["800", "£800"]], "feedback": "Hint: Add fixed costs (£500) and variable costs (£300) together. Include the currency symbol."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q22')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">23. A product sells for £12 and costs £7 in variable costs. What is the contribution per unit?</label>
-                    <input type="text" id="c4_q23" class="auto-input c4-input" data-rubric='{"keywords": [["5", "£5"]], "feedback": "£5 (£12 minus £7)."}' placeholder="Type answer here...">
+                    <label class="question-label">Q23. A product sells for £12 and costs £7 in variable costs. What is the contribution per unit?</label>
+                    <input type="text" id="c4_q23" class="auto-input c4-input" data-rubric='{"keywords": [["5", "£5"]], "feedback": "Hint: Subtract variable costs (£7) from the selling price (£12). Include the currency symbol."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q23')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">24. Fixed costs are £900 and contribution is £5 per unit. Calculate break even.</label>
-                    <input type="text" id="c4_q24" class="auto-input c4-input" data-rubric='{"keywords": [["180"]], "feedback": "180 units (£900 divided by £5)."}' placeholder="Type answer here...">
+                    <label class="question-label">Q24. Fixed costs are £900 and contribution is £5 per unit. Calculate break even.</label>
+                    <input type="text" id="c4_q24" class="auto-input c4-input" data-rubric='{"keywords": [["180"]], "feedback": "Hint: Divide fixed costs (£900) by the contribution (£5)."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q24')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">25. A business breaks even at 100 units and sells 130 units. How many units above break even has it sold?</label>
-                    <input type="text" id="c4_q25" class="auto-input c4-input" data-rubric='{"keywords": [["30"]], "feedback": "30 units (130 minus 100)."}' placeholder="Type answer here...">
+                    <label class="question-label">Q25. A business breaks even at 100 units and sells 130 units. How many units above break even has it sold?</label>
+                    <input type="text" id="c4_q25" class="auto-input c4-input" data-rubric='{"keywords": [["30"]], "feedback": "Hint: Subtract the break-even point (100) from actual units sold (130)."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q25')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">26. A business breaks even at 200 units but only sells 150. What does this mean?</label>
-                    <textarea id="c4_q26" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["50 units below", "not sold enough", "make a loss"]], "feedback": "Acceptable: It is 50 units below break even, hasn'\''t sold enough to cover costs, and will make a loss."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q26. A business breaks even at 200 units but only sells 150. What does this mean?</label>
+                    <textarea id="c4_q26" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["50 units below", "not sold enough", "make a loss"]], "feedback": "Hint: Selling fewer units than the break-even volume results in what financial outcome?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q26" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q26')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">27. Fixed costs are £600. A business sells 100 units with a contribution of £8 each. Has it broken even?</label>
-                    <textarea id="c4_q27" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["yes", "contribution totals 800", "covers the 600", "200 profit"]], "feedback": "Acceptable: Yes. Contribution totals £800 which covers the £600 fixed costs, leaving £200 profit."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q27. Fixed costs are £600. A business sells 100 units with a contribution of £8 each. Has it broken even?</label>
+                    <textarea id="c4_q27" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["yes", "contribution totals 800", "covers the 600", "200 profit"]], "feedback": "Hint: Total contribution is 100 x £8 = £800. Compare this to the fixed costs of £600."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q27" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q27')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">28. Fixed costs are £1,000. Contribution per unit is £5. The business sells 150 units. How much profit or loss does it make?</label>
-                    <input type="text" id="c4_q28" class="auto-input c4-input" data-rubric='{"keywords": [["250", "£250"], ["loss"]], "feedback": "£250 loss (contribution is £750, which is £250 below fixed costs)."}' placeholder="Type answer here...">
+                    <label class="question-label">Q28. Fixed costs are £1,000. Contribution per unit is £5. The business sells 150 units. How much profit or loss does it make?</label>
+                    <input type="text" id="c4_q28" class="auto-input c4-input" data-rubric='{"keywords": [["250", "£250"], ["loss"]], "feedback": "Hint: Total contribution is 150 x £5 = £750. Compare this to fixed costs (£1,000)."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q28" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q28')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">29. Fixed costs are £800. Contribution per unit is £10. The business sells 100 units. Calculate profit.</label>
-                    <input type="text" id="c4_q29" class="auto-input c4-input" data-rubric='{"keywords": [["200", "£200"]], "feedback": "£200 (total contribution is £1,000 minus £800 fixed costs)."}' placeholder="Type answer here...">
+                    <label class="question-label">Q29. Fixed costs are £800. Contribution per unit is £10. The business sells 100 units. Calculate profit.</label>
+                    <input type="text" id="c4_q29" class="auto-input c4-input" data-rubric='{"keywords": [["200", "£200"]], "feedback": "Hint: Total contribution is 100 x £10 = £1,000. Subtract fixed costs (£800). Include the currency symbol."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q29" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q29')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">30. Fixed costs are £1,200. Contribution per unit is £6. The business sells 250 units. Calculate profit.</label>
-                    <input type="text" id="c4_q30" class="auto-input c4-input" data-rubric='{"keywords": [["300", "£300"]], "feedback": "£300 (contribution is £1,500 minus £1,200 fixed costs)."}' placeholder="Type answer here...">
+                    <label class="question-label">Q30. Fixed costs are £1,200. Contribution per unit is £6. The business sells 250 units. Calculate profit.</label>
+                    <input type="text" id="c4_q30" class="auto-input c4-input" data-rubric='{"keywords": [["300", "£300"]], "feedback": "Hint: Total contribution is 250 x £6 = £1,500. Subtract fixed costs (£1,200). Include the currency symbol."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q30" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q30')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 3: Understanding break even charts</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">31. What does a break even chart show?</label>
-                    <textarea id="c4_q31" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["costs", "revenue", "break even point", "how sales compare with costs"]], "feedback": "Acceptable: Costs, revenue and break-even point, or how sales compare with costs."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q31. What does a break even chart show?</label>
+                    <textarea id="c4_q31" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["costs", "revenue", "break even point", "how sales compare with costs"]], "feedback": "Hint: Think of the graphical lines tracking costs and revenue relative to output."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q31" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q31')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">32. What does the revenue line show?</label>
-                    <textarea id="c4_q32" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["money coming in from sales", "sales income as the number sold increases"]], "feedback": "Acceptable: Money coming in from sales, or sales income as the number sold increases."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q32. What does the revenue line show?</label>
+                    <textarea id="c4_q32" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["money coming in from sales", "sales income as the number sold increases"]], "feedback": "Hint: How does sales income grow on the graph as more units are sold?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q32" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q32')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">33. What does the total cost line show?</label>
-                    <textarea id="c4_q33" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["fixed and variable costs combined", "how much the business spends overall"]], "feedback": "Acceptable: Fixed and variable costs combined, or how much the business spends overall."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q33. What does the total cost line show?</label>
+                    <textarea id="c4_q33" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["fixed and variable costs combined", "how much the business spends overall"]], "feedback": "Hint: What combined expenses does this upward-sloping line represent on the chart?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q33" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q33')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">34. Where is the break even point on a chart?</label>
-                    <textarea id="c4_q34" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["revenue line crosses the total cost line", "income and costs are equal"]], "feedback": "Acceptable: Where the revenue line crosses the total cost line, or where income equals costs."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q34. Where is the break even point on a chart?</label>
+                    <textarea id="c4_q34" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["revenue line crosses the total cost line", "income and costs are equal"]], "feedback": "Hint: Locate the intersection point where total revenue meets total costs."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q34" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q34')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">35. What area of a break even chart represents a loss?</label>
-                    <textarea id="c4_q35" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["total costs are higher than revenue", "before the break even point"]], "feedback": "Acceptable: The area where total costs are higher than revenue (before the break-even point)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q35. What area of a break even chart represents a loss?</label>
+                    <textarea id="c4_q35" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["total costs are higher than revenue", "before the break even point"]], "feedback": "Hint: Look at the section of the chart *before* the intersection where costs sit above revenue."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q35" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q35')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">36. What area represents profit?</label>
-                    <textarea id="c4_q36" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["revenue is higher than total costs", "after the break even point"]], "feedback": "Acceptable: The area where revenue is higher than total costs (after the break-even point)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q36. What area represents profit?</label>
+                    <textarea id="c4_q36" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["revenue is higher than total costs", "after the break even point"]], "feedback": "Hint: Look at the section of the chart *after* the intersection where revenue rises above total costs."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q36" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q36')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">37. What happens to total costs as more products are made?</label>
-                    <textarea id="c4_q37" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["rise", "increase", "variable costs increase"]], "feedback": "Acceptable: Total costs usually rise because variable costs increase (even though fixed costs stay the same)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q37. What happens to total costs as more products are made?</label>
+                    <textarea id="c4_q37" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["rise", "increase", "variable costs increase"]], "feedback": "Hint: Do total expenses go up or down as production increases?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q37" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q37')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">38. Why does the revenue line usually rise as more products are sold?</label>
-                    <textarea id="c4_q38" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["more products sold means more sales income", "selling price stays the same"]], "feedback": "Acceptable: More products sold means more sales income (assuming selling price stays the same)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q38. Why does the revenue line usually rise as more products are sold?</label>
+                    <textarea id="c4_q38" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["more products sold means more sales income", "selling price stays the same"]], "feedback": "Hint: Selling more units brings in more cumulative cash income."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q38" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q38')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">39. What happens to the break even point if fixed costs increase?</label>
-                    <textarea id="c4_q39" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["rises", "increases", "more products must be sold"]], "feedback": "Acceptable: It rises; more products must be sold to cover the higher fixed costs."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q39. What happens to the break even point if fixed costs increase?</label>
+                    <textarea id="c4_q39" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["rises", "increases", "more products must be sold"]], "feedback": "Hint: If your overhead bills go up, do you need to sell more or fewer items to cover them?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q39" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q39')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">40. What happens to the break even point if contribution per unit increases?</label>
-                    <textarea id="c4_q40" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["falls", "decreases", "fewer units are needed"]], "feedback": "Acceptable: It falls, because each sale contributes more towards fixed costs, so fewer units are needed."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q40. What happens to the break even point if contribution per unit increases?</label>
+                    <textarea id="c4_q40" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["falls", "decreases", "fewer units are needed"]], "feedback": "Hint: If each item contributes more cash to covering fixed expenses, do you need to sell more or fewer units?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q40" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q40')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 4: Factors affecting break even</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">41. How could increasing the selling price affect break even?</label>
-                    <textarea id="c4_q41" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["lower the break even point", "contribution per product increases"]], "feedback": "Acceptable: It could lower the break-even point because contribution per product increases."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q41. How could increasing the selling price affect break even?</label>
+                    <textarea id="c4_q41" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["lower the break even point", "contribution per product increases"]], "feedback": "Hint: A higher price means higher contribution per unit, lowering the break-even quantity."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q41" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q41')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">42. How could reducing variable costs affect break even?</label>
-                    <textarea id="c4_q42" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["lower the break even point", "contributes more towards fixed costs"]], "feedback": "Acceptable: It could lower the break-even point as each product contributes more towards fixed costs."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q42. How could reducing variable costs affect break even?</label>
+                    <textarea id="c4_q42" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["lower the break even point", "contributes more towards fixed costs"]], "feedback": "Hint: Lowering component or material expenses increases contribution, lowering the break-even point."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q42" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q42')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">43. How could increasing rent affect break even?</label>
-                    <textarea id="c4_q43" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["increase the break even point", "fixed costs are higher", "more products need to be sold"]], "feedback": "Acceptable: It increases the break-even point because fixed costs are higher, so more products must be sold."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q43. How could increasing rent affect break even?</label>
+                    <textarea id="c4_q43" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["increase the break even point", "fixed costs are higher", "more products need to be sold"]], "feedback": "Hint: Higher rent means higher fixed costs, driving the break-even point upward."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q43" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q43')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">44. How could buying cheaper materials affect break even?</label>
-                    <textarea id="c4_q44" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["reduce variable costs", "increase contribution", "fewer products"]], "feedback": "Acceptable: Reduces variable costs and increases contribution per unit, meaning fewer products need to be sold."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q44. How could buying cheaper materials affect break even?</label>
+                    <textarea id="c4_q44" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["reduce variable costs", "increase contribution", "fewer products"]], "feedback": "Hint: Cheaper materials lower variable costs, reducing the break-even threshold."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q44" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q44')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">45. Why might raising the selling price not always be a good idea?</label>
-                    <textarea id="c4_q45" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["customers might buy less", "competitors may be cheaper", "demand could fall"]], "feedback": "Acceptable: Customers might buy less, competitors might be cheaper, or demand could fall so sales targets aren'\''t met."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q45. Why might raising the selling price not always be a good idea?</label>
+                    <textarea id="c4_q45" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["customers might buy less", "competitors may be cheaper", "demand could fall"]], "feedback": "Hint: Think about customer reaction and competitors undercutting your price."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q45" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q45')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">46. Why might a business try to lower its break even point?</label>
-                    <textarea id="c4_q46" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["sell fewer products to cover costs", "less risk of making a loss", "easier to become profitable"]], "feedback": "Acceptable: Needs to sell fewer products to cover costs, faces less risk of loss, and becomes profitable easier."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q46. Why might a business try to lower its break even point?</label>
+                    <textarea id="c4_q46" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["sell fewer products to cover costs", "less risk of making a loss", "easier to become profitable"]], "feedback": "Hint: Lowering it means fewer sales are required before starting to make a profit."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q46" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q46')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">47. What could happen if a business overestimates how many products it can sell?</label>
-                    <textarea id="c4_q47" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["not reach break even", "make a loss", "left with unsold stock"]], "feedback": "Acceptable: May not reach break-even, could make a loss, or might be left with unsold stock."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q47. What could happen if a business overestimates how many products it can sell?</label>
+                    <textarea id="c4_q47" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["not reach break even", "make a loss", "left with unsold stock"]], "feedback": "Hint: If sales fall short of predictions, you might miss break-even and incur a loss."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q47" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q47')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">48. Why is break even analysis useful before launching a product?</label>
-                    <textarea id="c4_q48" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["estimate the sales needed", "assess whether expected demand is realistic", "pricing decisions"]], "feedback": "Acceptable: Estimates sales needed to cover costs, assesses if demand is realistic, and informs pricing."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q48. Why is break even analysis useful before launching a product?</label>
+                    <textarea id="c4_q48" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["estimate the sales needed", "assess whether expected demand is realistic", "pricing decisions"]], "feedback": "Hint: It helps evaluate whether projected sales targets are realistically achievable."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q48" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q48')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">49. Give one limitation of break even analysis.</label>
-                    <textarea id="c4_q49" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["relies on estimates", "assumes prices and costs behave predictably", "demand can change"]], "feedback": "Acceptable: Relies on estimates, assumes predictable behaviour, demand can change, or products might not sell at planned prices."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q49. Give one limitation of break even analysis.</label>
+                    <textarea id="c4_q49" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["relies on estimates", "assumes prices and costs behave predictably", "demand can change"]], "feedback": "Hint: Remember it relies on assumptions and forecasts rather than absolute certainty."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q49" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q49')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">50. Why might a break even calculation be less reliable if costs change often?</label>
-                    <textarea id="c4_q50" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["quickly become out of date", "actual number needed to break even may be different"]], "feedback": "Acceptable: It quickly becomes out of date, meaning the actual number needed to break-even will be different."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q50. Why might a break even calculation be less reliable if costs change often?</label>
+                    <textarea id="c4_q50" class="auto-input c4-input" rows="2" data-rubric='{"keywords": [["quickly become out of date", "actual number needed to break even may be different"]], "feedback": "Hint: Volatile costs quickly render past calculations outdated."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q50" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q50')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 5: Challenge questions</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">51. A business has a high break even point. Explain one risk.</label>
-                    <textarea id="c4_q51" class="auto-input c4-input" rows="3" data-rubric='{"keywords": [["sell lots of products", "making profit", "demand is low", "make a loss"]], "feedback": "Acceptable: Must sell lots of products before profit, and if demand is low it could make a loss."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q51. A business has a high break even point. Explain one risk.</label>
+                    <textarea id="c4_q51" class="auto-input c4-input" rows="3" data-rubric='{"keywords": [["sell lots of products", "making profit", "demand is low", "make a loss"]], "feedback": "Hint: High fixed costs mean high volume is required before turning a profit, amplifying risk if demand dips."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q51" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q51')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">52. A business reduces its variable cost per product from £6 to £4. Explain how this could help.</label>
-                    <textarea id="c4_q52" class="auto-input c4-input" rows="3" data-rubric='{"keywords": [["contribution per unit increases", "fewer products may be needed to cover fixed costs"]], "feedback": "Acceptable: Contribution per unit increases by £2, so fewer products are needed to cover fixed costs."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q52. A business reduces its variable cost per product from £6 to £4. Explain how this could help.</label>
+                    <textarea id="c4_q52" class="auto-input c4-input" rows="3" data-rubric='{"keywords": [["contribution per unit increases", "fewer products may be needed to cover fixed costs"]], "feedback": "Hint: Lower variable costs increase per-unit contribution, reducing the required break-even sales volume."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q52" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q52')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">53. A business has fixed costs of £2,000, sells products for £25 and has variable costs of £15 each. Calculate break even.</label>
-                    <input type="text" id="c4_q53" class="auto-input c4-input" data-rubric='{"keywords": [["200"]], "feedback": "200 units (Contribution is £10, so £2,000 divided by £10)."}' placeholder="Type answer here...">
+                    <label class="question-label">Q53. A business has fixed costs of £2,000, sells products for £25 and has variable costs of £15 each. Calculate break even.</label>
+                    <input type="text" id="c4_q53" class="auto-input c4-input" data-rubric='{"keywords": [["200"]], "feedback": "Hint: Contribution is £25 - £15 = £10. Divide fixed costs (£2,000) by £10."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q53" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q53')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">54. A business breaks even at 200 units but expects to sell only 150. Suggest one action.</label>
-                    <textarea id="c4_q54" class="auto-input c4-input" rows="3" data-rubric='{"keywords": [["reduce fixed costs", "reduce variable costs", "increase the selling price", "improve marketing"]], "feedback": "Acceptable: Reduce fixed/variable costs, increase selling price, or improve marketing to boost sales."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q54. A business breaks even at 200 units but expects to sell only 150. Suggest one action.</label>
+                    <textarea id="c4_q54" class="auto-input c4-input" rows="3" data-rubric='{"keywords": [["reduce fixed costs", "reduce variable costs", "increase the selling price", "improve marketing"]], "feedback": "Hint: What can they adjust regarding price, costs, or marketing to close the 50-unit gap?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q54" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q54')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">55. Explain why a business should not rely only on break even analysis when making decisions.</label>
-                    <textarea id="c4_q55" class="auto-input c4-input" rows="3" data-rubric='{"keywords": [["estimates", "does not guarantee sales", "customer demand may change", "competition", "cash flow"]], "feedback": "Acceptable: Based on estimates, doesn't guarantee sales, demand can change, and misses factors like competition or cash flow."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q55. Explain why a business should not rely only on break even analysis when making decisions.</label>
+                    <textarea id="c4_q55" class="auto-input c4-input" rows="3" data-rubric='{"keywords": [["estimates", "does not guarantee sales", "customer demand may change", "competition", "cash flow"]], "feedback": "Hint: Consider factors like actual market response, cash flow, and shifting competitor behavior which models don't guarantee."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c4_q55" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c4_q55')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -421,8 +426,7 @@
         </main>
     </div>
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
-        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+        <button class="btn-reset no-print" onclick="clearData()">Reset Page</button>
     </div>
 
     <!-- SECURE PASSWORD MODAL -->
@@ -441,45 +445,184 @@
     <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
 
     <script>
-        function saveProgress() {
-            var inputs = document.querySelectorAll('.auto-input');
-            var dataToSave = {};
-            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
-            try { localStorage.setItem('enterpriseC4Memory_Smart_v1', JSON.stringify(dataToSave)); } catch (e) {}
+        // --- FIREBASE INITIALIZATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
-        function loadProgress() {
-            var saved = localStorage.getItem('enterpriseC4Memory_Smart_v1');
-            if (saved) {
-                var data = JSON.parse(saved);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "enterprise-c4-breakeven";
+
+        /* --- MARKBOOK BUILDER FOR TEACHER DASHBOARD --- */
+        function buildMarkbookData() {
+            const items = [];
+            const inputs = document.querySelectorAll('.auto-input');
+            
+            inputs.forEach((input, i) => {
+                const wrapper = input.closest('.question-wrapper');
+                const labelEl = wrapper ? wrapper.querySelector('.question-label') : null;
+                const labelText = labelEl ? labelEl.innerText.trim() : `Question ${i + 1}`;
+                
+                let status = 'neutral';
+                if (input.classList.contains('correct') || input.classList.contains('teacher-locked')) {
+                    status = 'correct';
+                } else if (input.classList.contains('incorrect')) {
+                    status = 'incorrect';
+                }
+
+                items.push({
+                    index: i,
+                    label: labelText,
+                    value: input.value.trim(),
+                    status: status
+                });
+            });
+
+            // Calculate total correct answers
+            const correctCount = document.querySelectorAll('.auto-input.correct, .auto-input.teacher-locked').length;
+            const gradableInputs = document.querySelectorAll('.c4-input');
+            const totalGradable = gradableInputs.length;
+
+            return {
+                items: items,
+                scoreText: `Score: ${correctCount} / ${totalGradable}`
+            };
+        }
+
+        /* --- CLOUD AUTO-SAVE & AUTO-LOAD --- */
+        let saveTimer;
+        function saveProgressToCloud(immediate = false) {
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                const structured = buildMarkbookData();
+                const payload = {
+                    pageTitle: document.title || "C4: Break Even Analysis",
+                    lastUpdated: Date.now(),
+                    scoreText: structured.scoreText,
+                    items: structured.items
+                };
+
+                // Also store inputs explicitly for local legacy support fallback
                 var inputs = document.querySelectorAll('.auto-input');
                 for (var i = 0; i < inputs.length; i++) {
-                    if (data['input_' + i]) {
-                        inputs[i].value = data['input_' + i];
-                        if (data['class_' + i]) {
-                            inputs[i].className = data['class_' + i];
-                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
-                                var btnId = "override-" + inputs[i].id;
-                                var btn = document.getElementById(btnId);
-                                if (btn) btn.classList.remove('hidden');
+                    payload['input_' + i] = inputs[i].value;
+                    payload['class_' + i] = inputs[i].className;
+                }
+
+                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
+                  .set(payload, { merge: true })
+                  .catch(err => console.error("Cloud sync error:", err));
+            }, immediate ? 50 : 800);
+        }
+
+        function applySavedData(data) {
+            if (!data) return;
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                var savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined) {
+                    inputs[i].value = savedVal;
+                    if (data['class_' + i]) {
+                        inputs[i].className = data['class_' + i];
+                        if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect') || inputs[i].classList.contains('teacher-locked')) {
+                            var btnId = "override-" + inputs[i].id;
+                            var btn = document.getElementById(btnId);
+                            if (btn) btn.classList.remove('hidden');
+                            
+                            // Restore feedback visually if teacher-locked
+                            var feedbackDiv = inputs[i].nextElementSibling;
+                            if (inputs[i].classList.contains('teacher-locked') && feedbackDiv) {
+                                if (inputs[i].classList.contains('correct')) {
+                                    feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; 
+                                    feedbackDiv.style.color = "#006100"; 
+                                    feedbackDiv.style.display = "block";
+                                } else {
+                                    feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; 
+                                    feedbackDiv.style.color = "#b71c1c"; 
+                                    feedbackDiv.style.display = "block";
+                                }
                             }
                         }
-                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                            inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                        }
+                    }
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto'; 
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
                     }
                 }
             }
         }
+
+        // --- LOAD DATA FROM FIREBASE ON START ---
+        auth.onAuthStateChanged(async (user) => {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    // Try to clean up local storage from legacy version
+                    try { localStorage.removeItem('enterpriseC4Memory_Smart_v1'); } catch (e) {}
+
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud data:", err);
+                }
+            } else if (!isTeacher) {
+                alert("Please log in on the home page first!");
+                window.location.href = "index.html";
+            }
+        });
+
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('auto-input')) {
-                saveProgress();
+                saveProgressToCloud(false);
                 if (e.target.tagName.toLowerCase() === 'textarea') {
-                    e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';
+                    e.target.style.height = 'auto'; 
+                    e.target.style.height = e.target.scrollHeight + 'px';
                 }
             }
         });
-        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterpriseC4Memory_Smart_v1'); window.location.reload(); } }
-        window.onload = loadProgress;
+
+        // --- RESET / CLEAR DATA FROM FIREBASE CLOUD ---
+        async function clearData() { 
+            if (confirm("Clear all work on this page?")) { 
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
+                    } catch (e) {}
+                }
+                window.location.reload(); 
+            } 
+        }
 
         let activeQuestionId = null;
         function openVerifyModal(qId) {
@@ -509,7 +652,7 @@
                     if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
                 }
                 closeVerifyModal();
-                saveProgress();
+                saveProgressToCloud(true);
             } else {
                 document.getElementById('modal-error-msg').style.display = 'block';
             }
@@ -530,21 +673,21 @@
                     continue; 
                 }
 
-                var studentAnswer = inputElement.value.toLowerCase().replace(/[^a-z0-9\s\+\-\/\*\=\%]/g, " ").replace(/\s+/g, " ").trim();
+                // IMPROVED SANITIZATION: Kept the £ sign, $, ., and , so exact values can be matched
+                var studentAnswer = inputElement.value.toLowerCase().replace(/[^a-z0-9\s\+\-\/\*\=\%£\$\.,]/g, " ").replace(/\s+/g, " ").trim();
                 var rubricStr = inputElement.getAttribute('data-rubric');
                 if(!rubricStr) continue;
+                
                 var rubric;
                 try { rubric = JSON.parse(rubricStr); } catch (error) { continue; }
                 
                 var keywordGroups = rubric.keywords; 
                 inputElement.classList.remove('correct', 'incorrect');
-                if (studentAnswer === "") { if(feedbackDiv) feedbackDiv.style.display = 'none'; continue; }
                 
-                var wordCount = studentAnswer.split(" ").length;
-                if (!keywordGroups || keywordGroups.length === 0) {
-                    inputElement.classList.add('correct');
-                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Answer recorded."; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
-                    continue;
+                // Ignore blank fields
+                if (studentAnswer === "") { 
+                    if(feedbackDiv) feedbackDiv.style.display = 'none'; 
+                    continue; 
                 }
                 
                 var conceptsFound = 0;
@@ -553,21 +696,27 @@
                     var matched = false;
                     for(var s = 0; s < terms.length; s++) {
                         var term = terms[s].toLowerCase().trim();
-                        if (term.length >= 3) { if (studentAnswer.includes(term)) { matched = true; break; } }
-                        else { var regex = new RegExp("\\b" + term + "\\b"); if (regex.test(studentAnswer)) { matched = true; break; } }
+                        
+                        // IMPROVED MATCHING LOGIC
+                        if (term.length <= 2 && term.match(/^[a-z0-9]+$/i)) {
+                            // If it's a very short text word (like "x" or "no"), use a word boundary so "no" doesn't match inside "not"
+                            var regex = new RegExp("\\b" + term + "\\b", "i");
+                            if (regex.test(studentAnswer)) { matched = true; break; }
+                        } else {
+                            // For everything else (longer words, numbers, phrases, math symbols, currency), a simple includes check works best
+                            if (studentAnswer.includes(term)) { matched = true; break; }
+                        }
                     }
                     if(matched) conceptsFound++;
                 }
                 
                 var score = conceptsFound / keywordGroups.length;
-                var isPassed = false;
-                if (keywordGroups.length > 1) { isPassed = (score === 1); }
-                else { isPassed = (score >= 1 || (wordCount >= 4)); }
+                var isPassed = (score === 1);
                 
                 if(feedbackDiv) {
                     if (isPassed) {
                         inputElement.classList.add('correct');
-                        feedbackDiv.innerHTML = "✅ Correct! All required concepts covered.";
+                        feedbackDiv.innerHTML = "✅ Correct! " + rubric.feedback;
                         feedbackDiv.style.color = "#006100";
                         feedbackDiv.style.display = "block";
                     } else if (keywordGroups.length > 1 && score >= 0.5) {
@@ -583,34 +732,7 @@
                     }
                 }
             }
-            saveProgress();
-        }
-
-        function downloadPDF() {
-            var hide = document.querySelectorAll('.no-print');
-            for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
-            document.getElementById('action-buttons').style.display = 'none';
-
-            var textAreas = document.querySelectorAll('textarea');
-            for (var j = 0; j < textAreas.length; j++) {
-                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
-            }
-
-            var element = document.getElementById('pdf-content');
-            var opt = { 
-                margin: 0.3, 
-                filename: 'C4_Break_Even.pdf', 
-                image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, 
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
-
-            html2pdf().set(opt).from(element).save().then(function() {
-                for(var b=0; b<hide.length; b++) hide[b].style.display = 'block';
-                document.getElementById('action-buttons').style.display = 'flex';
-                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
-            });
+            saveProgressToCloud(true);
         }
     </script>
 </body>
