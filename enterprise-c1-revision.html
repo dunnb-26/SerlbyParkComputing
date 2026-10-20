@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>C1: Budgeting - Revision</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
         .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
@@ -14,19 +19,27 @@
         .task-card h2 { margin-top: 0; color: #333; }
         .task-prep h2 { color: #607d8b; }
         .task-navy h2 { color: #1e3a8a; }
-        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; }
+        
+        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; border-left: 4px solid #dfaa2b; }
         .center-text { text-align: center; }
+        
         .question-wrapper { margin-bottom: 25px; page-break-inside: avoid !important; break-inside: avoid !important; }
         .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
+        
         .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit; }
         .auto-input:focus { outline: none; border-color: #666; }
         textarea.auto-input { resize: vertical; min-height: 80px; }
+        
         .correct { border-color: #388e3c !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
         .incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
-        .feedback-msg { font-size: 14px; margin-top: 8px; font-weight: bold; display: none; }
+        
+        .feedback-msg { font-size: 14px; margin-top: 8px; color: #333; display: none; background-color: #f1f1f1; padding: 10px; border-radius: 4px; border-left: 4px solid #607d8b; font-weight: 500; }
+        
         .teacher-override-btn { background-color: #607d8b; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; margin-top: 5px; }
         .teacher-override-btn:hover { background-color: #455a64; }
+        
         .hidden { display: none !important; }
+        
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 25px; border-radius: 8px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; border-top: 6px solid #1e3a8a; }
         .modal-input { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; text-align: center; }
@@ -34,10 +47,12 @@
         .modal-btn-confirm { flex: 1; background-color: #1e3a8a; color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
         .modal-btn-cancel { flex: 1; background-color: #ccc; color: #333; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
         .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
-        .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
-        .btn-submit:hover { background-color: #152960; }
-        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
-        .btn-pdf:hover { background-color: #124d2d; }
+        
+        .btn-submit { background-color: #dfaa2b; color: #1e3a8a; border: none; padding: 15px 20px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
+        .btn-submit:hover { background-color: #c99722; }
+        
+        .btn-reset { background-color: #d32f2f; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; margin: 20px auto; }
+        .btn-reset:hover { background-color: #b71c1c; }
     </style>
 </head>
 <body>
@@ -53,7 +68,7 @@
                 <h2>C1 Revision Notes</h2>
                 <div class="instruction-box center-text">Use this space to write out your complete notes on budgets, income and expenditure, surpluses and deficits, and calculating budget variances.</div>
                 <div class="question-wrapper">
-                    <textarea class="auto-input" rows="12" placeholder="Type your revision notes here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                    <textarea id="main_notes" class="auto-input notes-textarea" rows="12" placeholder="Type your revision notes here..."></textarea>
                 </div>
             </div>
 
@@ -65,70 +80,70 @@
                 
                 <div class="question-wrapper">
                     <label class="question-label">1. What is a budget?</label>
-                    <textarea id="c1_q1" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["plan for money", "estimate", "expected income", "expected spending", "coming in and going out"]], "feedback": "Acceptable: A plan for money, an estimate of money coming in and going out, or showing expected income/spending."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q1" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["plan for money", "estimate", "expected income", "expected spending", "coming in and going out"]], "feedback": "Hint: What do you call a financial plan showing expected money coming in and going out?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q1')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">2. Why might a business create a budget?</label>
-                    <textarea id="c1_q2" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["control spending", "plan ahead", "avoid running out", "set targets", "check whether it can afford"]], "feedback": "Acceptable: To control spending, plan ahead, avoid running out of money, set targets, or check if it can afford things."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q2" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["control spending", "plan ahead", "avoid running out", "set targets", "check whether it can afford"]], "feedback": "Hint: Why would an owner need to estimate their future spending? Think about control and targets."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q2')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">3. What is budgeted income?</label>
-                    <textarea id="c1_q3" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["expects to receive", "predicted sales", "expected money coming in"]], "feedback": "Acceptable: Money the business expects to receive, predicted sales revenue, or expected money coming in."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q3" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["expects to receive", "predicted sales", "expected money coming in"]], "feedback": "Hint: What is the specific term for money a business expects or predicts it will receive?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q3')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">4. What is budgeted expenditure?</label>
-                    <textarea id="c1_q4" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["expects to spend", "planned costs", "expected money going out"]], "feedback": "Acceptable: Money the business expects to spend, planned costs, or expected money going out."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q4" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["expects to spend", "planned costs", "expected money going out"]], "feedback": "Hint: What is the specific term for money a business plans or expects to spend?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">5. What is a budget surplus?</label>
-                    <textarea id="c1_q5" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["income is greater", "spending", "money left over", "after planned costs"]], "feedback": "Acceptable: When expected income is greater than spending, or having money left over after planned costs."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q5" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["income is greater", "spending", "money left over", "after planned costs"]], "feedback": "Hint: What do you call it when planned income is higher than planned spending, leaving money left over?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q5')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">6. What is a budget deficit?</label>
-                    <textarea id="c1_q6" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["spending is greater", "income", "spend more", "expects to receive"]], "feedback": "Acceptable: When expected spending is greater than income, or planning to spend more than it expects to receive."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q6" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["spending is greater", "income", "spend more", "expects to receive"]], "feedback": "Hint: What do you call it when expected spending is higher than expected income?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q6')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">7. What is the difference between a budget and actual figures?</label>
-                    <textarea id="c1_q7" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["budget", "expected", "planned", "plan"], ["actual", "what really happened", "actually", "reality"]], "feedback": "A budget is what the business expected/planned to happen, while actual figures show what really happened."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q7" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["budget", "expected", "planned", "plan"], ["actual", "what really happened", "actually", "reality"]], "feedback": "Hint: Think about what was predicted or planned versus what happened in reality."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q7')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">8. Why should a business compare its budget with actual results?</label>
-                    <textarea id="c1_q8" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["spent too much", "met expectations", "identify problems", "improve future plans"]], "feedback": "Acceptable: To see if it spent too much, check if sales met expectations, identify problems, or improve future plans."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q8" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["spent too much", "met expectations", "identify problems", "improve future plans"]], "feedback": "Hint: How does checking plans against reality help spot problems and improve future plans?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q8')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">9. Who might use a business budget?</label>
-                    <textarea id="c1_q9" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["owner", "entrepreneur", "managers", "finance staff", "partners"]], "feedback": "Acceptable: The owner, entrepreneur, managers, finance staff, or business partners."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q9" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["owner", "entrepreneur", "managers", "finance staff", "partners"]], "feedback": "Hint: Who inside the business needs to see financial plans to manage departments or the whole company?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q9')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">10. What could happen if a business does not plan its spending?</label>
-                    <textarea id="c1_q10" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["overspend", "short of money", "struggle to pay bills", "waste money", "poor decisions"]], "feedback": "Acceptable: It may overspend, run short of money, struggle to pay bills, waste money, or make poor decisions."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q10" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["overspend", "short of money", "struggle to pay bills", "waste money", "poor decisions"]], "feedback": "Hint: If they don't plan their spending, what could go wrong with their money or bills?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q10')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -136,61 +151,61 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 2: Income and expenditure</h3>
                 <div class="question-wrapper">
                     <label class="question-label">11. Give three examples of income a business might budget for.</label>
-                    <textarea id="c1_q11" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["sales revenue", "service fees", "selling products", "rental income", "investment", "loan"]], "feedback": "Acceptable: Sales revenue, service fees, selling products, rental income, investment received, loan money."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q11" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["sales revenue", "service fees", "selling products", "rental income", "investment", "loan"]], "feedback": "Hint: Think of three ways money comes in, such as sales revenue, service fees, or loans."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q11')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">12. Give three examples of expenditure a business might budget for.</label>
-                    <textarea id="c1_q12" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["rent", "wages", "stock", "materials", "electricity", "insurance", "advertising", "delivery"]], "feedback": "Acceptable: Rent, wages, stock, materials, electricity, insurance, advertising, delivery costs."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q12" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["rent", "wages", "stock", "materials", "electricity", "insurance", "advertising", "delivery"]], "feedback": "Hint: Think of three typical bills a business must pay to operate, like rent or wages."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q12')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">13. Why might a business budget for lower sales in January than in December?</label>
-                    <textarea id="c1_q13" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["fall after christmas", "spend less", "seasonal", "fewer customers"]], "feedback": "Acceptable: Demand falls after Christmas, customers spend less, seasonal products sell less, or expect fewer customers."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q13" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["fall after christmas", "spend less", "seasonal", "fewer customers"]], "feedback": "Hint: What happens to customer demand right after the Christmas shopping season ends?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q13')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">14. Why should a business include rent in its budget?</label>
-                    <textarea id="c1_q14" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["regular expense", "afford the payment", "missing rent", "cause problems"]], "feedback": "Acceptable: It's a regular expense, it needs to ensure it can afford it, or missing rent payments causes problems."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q14" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["regular expense", "afford the payment", "missing rent", "cause problems"]], "feedback": "Hint: Why must a fixed, regular expense like rent always be included to prevent serious problems?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q14')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">15. Why might a business budget for advertising?</label>
-                    <textarea id="c1_q15" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["plan its marketing", "avoid overspending", "promote products", "attract customers"]], "feedback": "Acceptable: To plan marketing spending, avoid overspending, promote products, or attract customers."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q15" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["plan its marketing", "avoid overspending", "promote products", "attract customers"]], "feedback": "Hint: Why must they plan how much to spend on promoting products to attract buyers?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q15')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">16. Why could a business's income be difficult to predict?</label>
-                    <textarea id="c1_q16" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["demand changes", "competitors", "economy", "out of fashion", "season"]], "feedback": "Acceptable: Customer demand changes, competitors, economy changes, go out of fashion, or seasonal variations."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q16" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["demand changes", "competitors", "economy", "out of fashion", "season"]], "feedback": "Hint: Think about external factors that change suddenly, like customer demand, the economy, or new competitors."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q16')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">17. Why could expenditure be higher than expected?</label>
-                    <textarea id="c1_q17" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["supplier prices increase", "more stock is needed", "equipment breaks", "energy costs rise", "unexpected repairs"]], "feedback": "Acceptable: Supplier prices increase, more stock needed, equipment breaks, energy costs rise, unexpected repairs."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q17" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["supplier prices increase", "more stock is needed", "equipment breaks", "energy costs rise", "unexpected repairs"]], "feedback": "Hint: What unexpected things could happen to supplier prices, machinery, or energy bills?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q17')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">18. Why might a business keep some money aside for unexpected costs?</label>
-                    <textarea id="c1_q18" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["emergencies", "repairs", "unexpected bills", "running out of money"]], "feedback": "Acceptable: To cover emergencies, pay for repairs, deal with unexpected bills, or reduce the risk of running out of money."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q18" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["emergencies", "repairs", "unexpected bills", "running out of money"]], "feedback": "Hint: Why do they need an emergency fund? Think about sudden repairs or surprise bills."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q18')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">19. What is the difference between fixed and variable expenditure?</label>
-                    <textarea id="c1_q19" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["fixed", "stay the same", "does not change"], ["variable", "change", "production", "sales", "output"]], "feedback": "Fixed costs generally stay the same, while variable costs change with production or sales."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q19" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["fixed", "stay the same", "does not change"], ["variable", "change", "production", "sales", "output"]], "feedback": "Hint: Think about which ones change based on how much is produced/sold and which ones stay the same."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q19')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">20. Give an example of how sales could affect expenditure.</label>
-                    <textarea id="c1_q20" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["more", "buying more", "ingredients", "stock", "packaging", "delivery"]], "feedback": "Acceptable: Selling more cakes means buying more ingredients, or selling more clothes needs more stock/packaging."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q20" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["more", "buying more", "ingredients", "stock", "packaging", "delivery"]], "feedback": "Hint: If you sell more products, what extra things do you need to buy to make or send them?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q20')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -198,61 +213,61 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 3: Budget calculations</h3>
                 <div class="question-wrapper">
                     <label class="question-label">21. A business expects income of £3,000 and expenditure of £2,000. Calculate its budget surplus.</label>
-                    <input type="text" id="c1_q21" class="auto-input c1-input" data-rubric='{"keywords": [["1000", "£1000", "1,000", "£1,000"], ["surplus"]], "feedback": "£1,000 surplus."}' placeholder="Type answer here...">
+                    <input type="text" id="c1_q21" class="auto-input c1-input" data-rubric='{"keywords": [["1000", "£1000", "1,000", "£1,000"], ["surplus"]], "feedback": "Hint: Subtract expenditure (£2,000) from income (£3,000). Include the currency symbol."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q21')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">22. A business expects income of £4,500 and expenditure of £5,000. Calculate its budget deficit.</label>
-                    <input type="text" id="c1_q22" class="auto-input c1-input" data-rubric='{"keywords": [["500", "£500", "-500", "-£500"], ["deficit"]], "feedback": "£500 deficit."}' placeholder="Type answer here...">
+                    <input type="text" id="c1_q22" class="auto-input c1-input" data-rubric='{"keywords": [["500", "£500", "-500", "-£500"], ["deficit"]], "feedback": "Hint: Subtract income (£4,500) from expenditure (£5,000). Include the currency symbol."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q22')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">23. A business budgets £800 for rent, £400 for wages and £300 for advertising. Calculate total expenditure.</label>
-                    <input type="text" id="c1_q23" class="auto-input c1-input" data-rubric='{"keywords": [["1500", "£1500", "1,500", "£1,500"]], "feedback": "£1,500."}' placeholder="Type answer here...">
+                    <input type="text" id="c1_q23" class="auto-input c1-input" data-rubric='{"keywords": [["1500", "£1500", "1,500", "£1,500"]], "feedback": "Hint: Add all the costs together (£800 + £400 + £300). Include the currency symbol."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q23')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">24. A business expects sales of £2,500 and other income of £500. Calculate total budgeted income.</label>
-                    <input type="text" id="c1_q24" class="auto-input c1-input" data-rubric='{"keywords": [["3000", "£3000", "3,000", "£3,000"]], "feedback": "£3,000."}' placeholder="Type answer here...">
+                    <input type="text" id="c1_q24" class="auto-input c1-input" data-rubric='{"keywords": [["3000", "£3000", "3,000", "£3,000"]], "feedback": "Hint: Add the sales (£2,500) and the other income (£500) together. Include the currency symbol."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q24')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">25. A business budgets income of £6,000 and expenditure of £4,750. How much money does it expect to have left?</label>
-                    <input type="text" id="c1_q25" class="auto-input c1-input" data-rubric='{"keywords": [["1250", "£1250", "1,250", "£1,250"], ["surplus", "left"]], "feedback": "£1,250 surplus/left."}' placeholder="Type answer here...">
+                    <input type="text" id="c1_q25" class="auto-input c1-input" data-rubric='{"keywords": [["1250", "£1250", "1,250", "£1,250"], ["surplus", "left"]], "feedback": "Hint: Subtract the expenditure (£4,750) from the income (£6,000). Include the currency symbol."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q25')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">26. A business budgets £1,000 for stock but actually spends £1,250. By how much has it overspent?</label>
-                    <input type="text" id="c1_q26" class="auto-input c1-input" data-rubric='{"keywords": [["250", "£250"]], "feedback": "£250."}' placeholder="Type answer here...">
+                    <input type="text" id="c1_q26" class="auto-input c1-input" data-rubric='{"keywords": [["250", "£250"]], "feedback": "Hint: Find the difference between the planned amount (£1,000) and the actual amount (£1,250)."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q26" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q26')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">27. A business budgets revenue of £5,000 but actually receives £4,200. How much lower is its actual income?</label>
-                    <input type="text" id="c1_q27" class="auto-input c1-input" data-rubric='{"keywords": [["800", "£800"], ["lower"]], "feedback": "£800 lower than budget."}' placeholder="Type answer here...">
+                    <input type="text" id="c1_q27" class="auto-input c1-input" data-rubric='{"keywords": [["800", "£800"], ["lower"]], "feedback": "Hint: Find the difference between £5,000 and £4,200."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q27" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q27')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">28. A business budgets £2,000 for expenses but actually spends £1,700. How much has it underspent?</label>
-                    <input type="text" id="c1_q28" class="auto-input c1-input" data-rubric='{"keywords": [["300", "£300"]], "feedback": "£300."}' placeholder="Type answer here...">
+                    <input type="text" id="c1_q28" class="auto-input c1-input" data-rubric='{"keywords": [["300", "£300"]], "feedback": "Hint: Find the difference between £2,000 and £1,700."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q28" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q28')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">29. A business expects income of £7,000 and costs of £5,500. It then spends an extra £600 on repairs. How much is left after expenditure?</label>
-                    <input type="text" id="c1_q29" class="auto-input c1-input" data-rubric='{"keywords": [["900", "£900"]], "feedback": "£900 surplus."}' placeholder="Type answer here...">
+                    <input type="text" id="c1_q29" class="auto-input c1-input" data-rubric='{"keywords": [["900", "£900"]], "feedback": "Hint: Total income is £7,000. Total costs are £5,500 + £600. What is the difference?"}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q29" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q29')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">30. A business expects income of £2,400 and expenditure of £2,400. What is its budget position?</label>
-                    <input type="text" id="c1_q30" class="auto-input c1-input" data-rubric='{"keywords": [["break even", "no surplus", "no deficit", "zero"]], "feedback": "Break even, no surplus or deficit."}' placeholder="Type answer here...">
+                    <input type="text" id="c1_q30" class="auto-input c1-input" data-rubric='{"keywords": [["break even", "no surplus", "no deficit", "zero"]], "feedback": "Hint: If income and spending are exactly the same, what is this called? (Two words)"}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q30" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q30')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -260,61 +275,61 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 4: Budget variances</h3>
                 <div class="question-wrapper">
                     <label class="question-label">31. What is a budget variance?</label>
-                    <textarea id="c1_q31" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["difference", "planned", "actual", "above or below"]], "feedback": "Acceptable: The difference between planned figures and actual figures, or how much a result is above/below budget."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q31" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["difference", "planned", "actual", "above or below"]], "feedback": "Hint: What is the term for the difference between a planned budget figure and the actual figure?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q31" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q31')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">32. What is a favourable variance?</label>
-                    <textarea id="c1_q32" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["better", "expected", "higher income", "lower costs"]], "feedback": "Acceptable: A result that is better for the business than expected (e.g. higher income or lower costs)."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q32" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["better", "expected", "higher income", "lower costs"]], "feedback": "Hint: What is it called when a variance is better for the business (e.g., higher income or lower costs)?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q32" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q32')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">33. What is an adverse variance?</label>
-                    <textarea id="c1_q33" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["worse", "expected", "lower income", "higher costs"]], "feedback": "Acceptable: A result that is worse for the business than expected (e.g. lower income or higher costs)."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q33" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["worse", "expected", "lower income", "higher costs"]], "feedback": "Hint: What is it called when a variance is worse for the business (e.g., lower income or higher costs)?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q33" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q33')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">34. A business budgets £1,000 for advertising but spends £800. What is the variance?</label>
-                    <textarea id="c1_q34" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["200", "£200"], ["under budget", "favourable", "less"]], "feedback": "Acceptable: £200 under budget or £200 favourable (it spent less than planned)."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q34" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["200", "£200"], ["under budget", "favourable", "less"]], "feedback": "Hint: Find the difference and state if it is favourable or adverse. (£1000 - £800)"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q34" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q34')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">35. A business budgets sales income of £4,000 but receives £3,500. What is the variance?</label>
-                    <textarea id="c1_q35" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["500", "£500"], ["below", "adverse", "lower"]], "feedback": "Acceptable: £500 below budget or £500 adverse (income was lower than expected)."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q35" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["500", "£500"], ["below", "adverse", "lower"]], "feedback": "Hint: Find the difference and state if it is favourable or adverse. (£4000 - £3500)"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q35" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q35')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">36. Why might a business investigate an adverse variance?</label>
-                    <textarea id="c1_q36" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["find out why", "too high", "too low", "prevent", "update future"]], "feedback": "Acceptable: To find out why spending was too high/income too low, prevent it happening again, or update future budgets."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q36" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["find out why", "too high", "too low", "prevent", "update future"]], "feedback": "Hint: Why must an owner find out why spending was too high or income too low?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q36" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q36')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">37. Is spending less than budget always a good thing? Explain.</label>
-                    <textarea id="c1_q37" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["no"], ["saved money", "cut important", "advertising", "training", "stock", "lost sales"]], "feedback": "Acceptable: No. It saved money, but might have cut important advertising/training/stock which lost sales as a result."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q37" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["no"], ["saved money", "cut important", "advertising", "training", "stock", "lost sales"]], "feedback": "Hint: Could spending less mean they cut important things like advertising or stock, which hurts sales?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q37" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q37')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">38. Why might actual income be higher than budgeted income?</label>
-                    <textarea id="c1_q38" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["more customers", "successful advertising", "higher prices", "popular", "increased demand"]], "feedback": "Acceptable: More customers than expected, successful advertising, higher prices, a popular product, or increased demand."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q38" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["more customers", "successful advertising", "higher prices", "popular", "increased demand"]], "feedback": "Hint: What positive changes in demand, advertising, or pricing could bring in more money than expected?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q38" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q38')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">39. Why might actual costs be lower than budgeted costs?</label>
-                    <textarea id="c1_q39" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["cheaper supplier", "less waste", "lower energy", "fewer repairs", "lower spending"]], "feedback": "Acceptable: A cheaper supplier, less waste, lower energy use, fewer repairs, or lower than expected spending."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q39" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["cheaper supplier", "less waste", "lower energy", "fewer repairs", "lower spending"]], "feedback": "Hint: What positive changes in suppliers, waste, or energy use could make bills lower than expected?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q39" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q39')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">40. Why should a business not ignore small budget variances?</label>
-                    <textarea id="c1_q40" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["build up", "repeat", "bigger problem", "addressing"]], "feedback": "Acceptable: Small differences can build up over time, repeat regularly, or indicate a bigger problem needing attention."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q40" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["build up", "repeat", "bigger problem", "addressing"]], "feedback": "Hint: Why shouldn't they ignore tiny differences that repeat every single month?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q40" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q40')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -322,49 +337,49 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 5: Why budgets are useful</h3>
                 <div class="question-wrapper">
                     <label class="question-label">41. Explain how a budget could help a new business.</label>
-                    <textarea id="c1_q41" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["estimate start up", "running costs", "how much money is needed", "cover spending"]], "feedback": "Acceptable: Helps the owner estimate start-up/running costs, plan how much money is needed, or check if income covers spending."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q41" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["estimate start up", "running costs", "how much money is needed", "cover spending"]], "feedback": "Hint: How does predicting start-up and running costs help them know exactly how much money they need to open?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q41" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q41')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">42. Explain how a budget could help a business control costs.</label>
-                    <textarea id="c1_q42" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["spending limits", "actual costs to be compared", "identify overspending"]], "feedback": "Acceptable: It sets spending limits and allows actual costs to be compared with plans to identify overspending."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q42" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["spending limits", "actual costs to be compared", "identify overspending"]], "feedback": "Hint: How does setting spending limits help them spot if they are overspending later on?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q42" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q42')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">43. Explain how a budget could help an entrepreneur decide whether to buy new equipment.</label>
-                    <textarea id="c1_q43" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["fits their planned", "enough money is available", "after other costs"]], "feedback": "Acceptable: They check if the purchase fits planned spending and if enough money is available after other costs."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q43" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["fits their planned", "enough money is available", "after other costs"]], "feedback": "Hint: How does looking at the plan show them if there is enough money left over after essential bills are paid?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q43" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q43')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">44. Explain why budgets may need updating.</label>
-                    <textarea id="c1_q44" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["sales", "costs", "circumstances", "change", "realistic"]], "feedback": "Acceptable: Sales, costs and circumstances can change, so original estimates may no longer be realistic."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q44" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["sales", "costs", "circumstances", "change", "realistic"]], "feedback": "Hint: Why do plans need changing if costs or sales suddenly shift in reality?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q44" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q44')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">45. Explain how a budget could help a business prepare for quieter months.</label>
-                    <textarea id="c1_q45" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["estimate lower sales", "save money", "reduce spending", "cover regular bills"]], "feedback": "Acceptable: Estimates lower sales so they can save money/reduce spending in advance to cover regular bills."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q45" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["estimate lower sales", "save money", "reduce spending", "cover regular bills"]], "feedback": "Hint: If they know income will drop, what can they do with their spending or savings in advance?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q45" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q45')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">46. Explain one limitation of using a budget.</label>
-                    <textarea id="c1_q46" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["estimates", "actual", "different", "unexpected events", "inaccurate"]], "feedback": "Acceptable: It is based on estimates, so actual figures might be different. Unexpected events can make it inaccurate."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q46" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["estimates", "actual", "different", "unexpected events", "inaccurate"]], "feedback": "Hint: Because a budget is just a plan or estimate, what happens when unexpected events occur?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q46" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q46')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">47. Why might an entrepreneur set a spending limit for each department?</label>
-                    <textarea id="c1_q47" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["control costs", "clear limits", "reduces the risk of overspending"]], "feedback": "Acceptable: Helps control costs, gives clear limits, and reduces the risk of overspending."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q47" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["control costs", "clear limits", "reduces the risk of overspending"]], "feedback": "Hint: How does giving each department a strict limit reduce the overall risk of the business overspending?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q47" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q47')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">48. Why is it important to make realistic budget estimates?</label>
-                    <textarea id="c1_q48" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["poor decisions", "unexpected shortages", "cannot afford"]], "feedback": "Acceptable: Unrealistic figures lead to poor decisions, unexpected shortages, or spending they cannot afford."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q48" class="auto-input c1-input" rows="2" data-rubric='{"keywords": [["poor decisions", "unexpected shortages", "cannot afford"]], "feedback": "Hint: What happens to decisions and cash flow if the figures they plan with are totally unrealistic?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q48" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q48')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -372,60 +387,59 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 6: Scenario and exam style questions</h3>
                 <div class="question-wrapper">
                     <label class="question-label">49. A small café budgets £5,000 income and £4,000 expenditure. Calculate its expected surplus and explain what it means.</label>
-                    <textarea id="c1_q49" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["1000", "£1000", "1,000", "£1,000", "surplus"], ["higher than spending", "available", "savings", "investment", "unexpected"]], "feedback": "Acceptable: £1,000 surplus. Income is £1,000 higher than spending, leaving money available for savings/unexpected costs."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q49" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["1000", "£1000", "1,000", "£1,000", "surplus"], ["higher than spending", "available", "savings", "investment", "unexpected"]], "feedback": "Hint: Subtract £4,000 from £5,000. What does having this extra money mean for the business?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q49" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q49')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">50. A business has spent £600 more than planned on stock. Suggest one action and explain why it could help.</label>
-                    <textarea id="c1_q50" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["check stock", "overordering", "compare suppliers", "negotiate", "reduce waste"], ["reduce future spending"]], "feedback": "Acceptable: Check stock levels (avoid overordering), compare suppliers, or reduce waste. These actions reduce future spending."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q50" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["check stock", "overordering", "compare suppliers", "negotiate", "reduce waste"], ["reduce future spending"]], "feedback": "Hint: What should they do about their ordering process or suppliers to stop this happening again?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q50" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q50')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">51. A business's sales are lower than budgeted for three months in a row. Explain what the owner should do.</label>
-                    <textarea id="c1_q51" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["investigate", "review advertising", "prices", "feedback", "update future", "realistic"]], "feedback": "Acceptable: Investigate why, review advertising/prices, check feedback, and update future budgets to be realistic."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q51" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["investigate", "review advertising", "prices", "feedback", "update future", "realistic"]], "feedback": "Hint: Should they ignore it, or investigate prices/advertising and update their future plans?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q51" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q51')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">52. A business budgets £2,000 for wages but actually spends £2,500. Explain one possible reason and one action it could take.</label>
-                    <textarea id="c1_q52" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["extra staff hours", "unexpected cover"], ["review staffing", "future wage budgets", "maintaining"]], "feedback": "Acceptable: Reason (extra staff hours, unexpected cover). Action (review staffing needs or update future wage budgets)."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q52" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["extra staff hours", "unexpected cover"], ["review staffing", "future wage budgets", "maintaining"]], "feedback": "Hint: Why might wages go up (e.g., extra hours)? What should they do to the budget next time?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q52" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q52')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">53. A business has budgeted a surplus, but an unexpected repair costs £1,200. Explain how this could affect the budget.</label>
-                    <textarea id="c1_q53" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["surplus will fall", "1200", "deficit", "less than"]], "feedback": "Acceptable: The surplus falls by £1,200. It could become a deficit if the original surplus was less than £1,200."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q53" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["surplus will fall", "1200", "deficit", "less than"]], "feedback": "Hint: What happens to the planned surplus if they suddenly have to pay out an extra £1,200?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q53" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q53')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">54. A business owner wants to expand but has a budget deficit. Explain why expansion could be risky.</label>
-                    <textarea id="c1_q54" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["exceed income", "add more costs", "risk of cash shortages", "extra income or finance"]], "feedback": "Acceptable: Spending already exceeds income. Expansion adds more costs, increasing the risk of cash shortages without extra finance."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q54" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["exceed income", "add more costs", "risk of cash shortages", "extra income or finance"]], "feedback": "Hint: If they are already spending more than they earn, why is adding even more expansion costs dangerous?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q54" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q54')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">55. Explain why a budget can help an entrepreneur make better decisions but cannot guarantee success.</label>
-                    <textarea id="c1_q55" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["plan spending", "identify potential problems", "estimates", "cannot predict", "demand", "competition"]], "feedback": "Acceptable: It helps plan spending/identify problems, but relies on estimates and can't predict every change in demand or competition."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q55" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["plan spending", "identify potential problems", "estimates", "cannot predict", "demand", "competition"]], "feedback": "Hint: Can a plan predict every single change in customer demand or what competitors will do?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q55" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q55')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">56. A business has a favourable variance because it spent less on advertising than planned. Explain why the owner should investigate this.</label>
-                    <textarea id="c1_q56" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["saved money", "missed advertising opportunities", "lost potential sales", "check whether the saving affected performance"]], "feedback": "Acceptable: It saved money, but might have missed opportunities and lost sales. The owner should check if the saving hurt performance."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="c1_q56" class="auto-input c1-input" rows="3" data-rubric='{"keywords": [["saved money", "missed advertising opportunities", "lost potential sales", "check whether the saving affected performance"]], "feedback": "Hint: If they saved money on advertising, what might that have done to their sales performance?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-c1_q56" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('c1_q56')">👨‍🏫 Override Score</button></div>
                 </div>
 
-                <button class="btn-submit no-print" onclick="checkAnswers('c1-input')">Check Answers</button>
+                <button class="btn-submit no-print" onclick="checkAnswers('c1-input')">✅ Check Answers</button>
             </div>
         </main>
     </div>
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
-        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+        <button class="btn-reset no-print" onclick="clearData()">Reset Page</button>
     </div>
 
     <!-- SECURE PASSWORD MODAL -->
@@ -444,45 +458,184 @@
     <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
 
     <script>
-        function saveProgress() {
-            var inputs = document.querySelectorAll('.auto-input');
-            var dataToSave = {};
-            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
-            try { localStorage.setItem('enterpriseC1Memory_Smart_v1', JSON.stringify(dataToSave)); } catch (e) {}
+        // --- FIREBASE INITIALIZATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
-        function loadProgress() {
-            var saved = localStorage.getItem('enterpriseC1Memory_Smart_v1');
-            if (saved) {
-                var data = JSON.parse(saved);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "enterprise-c1-budgeting";
+
+        /* --- MARKBOOK BUILDER FOR TEACHER DASHBOARD --- */
+        function buildMarkbookData() {
+            const items = [];
+            const inputs = document.querySelectorAll('.auto-input');
+            
+            inputs.forEach((input, i) => {
+                const wrapper = input.closest('.question-wrapper');
+                const labelEl = wrapper ? wrapper.querySelector('.question-label') : null;
+                const labelText = labelEl ? labelEl.innerText.trim() : `Question ${i + 1}`;
+                
+                let status = 'neutral';
+                if (input.classList.contains('correct') || input.classList.contains('teacher-locked')) {
+                    status = 'correct';
+                } else if (input.classList.contains('incorrect')) {
+                    status = 'incorrect';
+                }
+
+                items.push({
+                    index: i,
+                    label: labelText,
+                    value: input.value.trim(),
+                    status: status
+                });
+            });
+
+            // Calculate total correct answers
+            const correctCount = document.querySelectorAll('.auto-input.correct, .auto-input.teacher-locked').length;
+            const gradableInputs = document.querySelectorAll('.c1-input');
+            const totalGradable = gradableInputs.length;
+
+            return {
+                items: items,
+                scoreText: `Score: ${correctCount} / ${totalGradable}`
+            };
+        }
+
+        /* --- CLOUD AUTO-SAVE & AUTO-LOAD --- */
+        let saveTimer;
+        function saveProgressToCloud(immediate = false) {
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                const structured = buildMarkbookData();
+                const payload = {
+                    pageTitle: document.title || "C1: Budgeting",
+                    lastUpdated: Date.now(),
+                    scoreText: structured.scoreText,
+                    items: structured.items
+                };
+
+                // Also store inputs explicitly for local legacy support fallback
                 var inputs = document.querySelectorAll('.auto-input');
                 for (var i = 0; i < inputs.length; i++) {
-                    if (data['input_' + i]) {
-                        inputs[i].value = data['input_' + i];
-                        if (data['class_' + i]) {
-                            inputs[i].className = data['class_' + i];
-                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
-                                var btnId = "override-" + inputs[i].id;
-                                var btn = document.getElementById(btnId);
-                                if (btn) btn.classList.remove('hidden');
+                    payload['input_' + i] = inputs[i].value;
+                    payload['class_' + i] = inputs[i].className;
+                }
+
+                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
+                  .set(payload, { merge: true })
+                  .catch(err => console.error("Cloud sync error:", err));
+            }, immediate ? 50 : 800);
+        }
+
+        function applySavedData(data) {
+            if (!data) return;
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                var savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined) {
+                    inputs[i].value = savedVal;
+                    if (data['class_' + i]) {
+                        inputs[i].className = data['class_' + i];
+                        if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect') || inputs[i].classList.contains('teacher-locked')) {
+                            var btnId = "override-" + inputs[i].id;
+                            var btn = document.getElementById(btnId);
+                            if (btn) btn.classList.remove('hidden');
+                            
+                            // Restore feedback visually if teacher-locked
+                            var feedbackDiv = inputs[i].nextElementSibling;
+                            if (inputs[i].classList.contains('teacher-locked') && feedbackDiv) {
+                                if (inputs[i].classList.contains('correct')) {
+                                    feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; 
+                                    feedbackDiv.style.color = "#006100"; 
+                                    feedbackDiv.style.display = "block";
+                                } else {
+                                    feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; 
+                                    feedbackDiv.style.color = "#b71c1c"; 
+                                    feedbackDiv.style.display = "block";
+                                }
                             }
                         }
-                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                            inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                        }
+                    }
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto'; 
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
                     }
                 }
             }
         }
+
+        // --- LOAD DATA FROM FIREBASE ON START ---
+        auth.onAuthStateChanged(async (user) => {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    // Try to clean up local storage from legacy version
+                    try { localStorage.removeItem('enterpriseC1Memory_Smart_v1'); } catch (e) {}
+
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud data:", err);
+                }
+            } else if (!isTeacher) {
+                alert("Please log in on the home page first!");
+                window.location.href = "index.html";
+            }
+        });
+
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('auto-input')) {
-                saveProgress();
+                saveProgressToCloud(false);
                 if (e.target.tagName.toLowerCase() === 'textarea') {
-                    e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';
+                    e.target.style.height = 'auto'; 
+                    e.target.style.height = e.target.scrollHeight + 'px';
                 }
             }
         });
-        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterpriseC1Memory_Smart_v1'); window.location.reload(); } }
-        window.onload = loadProgress;
+
+        // --- RESET / CLEAR DATA FROM FIREBASE CLOUD ---
+        async function clearData() { 
+            if (confirm("Clear all work on this page?")) { 
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
+                    } catch (e) {}
+                }
+                window.location.reload(); 
+            } 
+        }
 
         let activeQuestionId = null;
         function openVerifyModal(qId) {
@@ -512,7 +665,7 @@
                     if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
                 }
                 closeVerifyModal();
-                saveProgress();
+                saveProgressToCloud(true);
             } else {
                 document.getElementById('modal-error-msg').style.display = 'block';
             }
@@ -533,21 +686,21 @@
                     continue; 
                 }
 
-                var studentAnswer = inputElement.value.toLowerCase().replace(/[^a-z0-9\s\+\-\/\*\=\%]/g, " ").replace(/\s+/g, " ").trim();
+                // IMPROVED SANITIZATION: Kept the £ sign, $, ., and , so exact values can be matched
+                var studentAnswer = inputElement.value.toLowerCase().replace(/[^a-z0-9\s\+\-\/\*\=\%£\$\.,]/g, " ").replace(/\s+/g, " ").trim();
                 var rubricStr = inputElement.getAttribute('data-rubric');
                 if(!rubricStr) continue;
+                
                 var rubric;
                 try { rubric = JSON.parse(rubricStr); } catch (error) { continue; }
                 
                 var keywordGroups = rubric.keywords; 
                 inputElement.classList.remove('correct', 'incorrect');
-                if (studentAnswer === "") { if(feedbackDiv) feedbackDiv.style.display = 'none'; continue; }
                 
-                var wordCount = studentAnswer.split(" ").length;
-                if (!keywordGroups || keywordGroups.length === 0) {
-                    inputElement.classList.add('correct');
-                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Answer recorded."; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
-                    continue;
+                // Ignore blank fields
+                if (studentAnswer === "") { 
+                    if(feedbackDiv) feedbackDiv.style.display = 'none'; 
+                    continue; 
                 }
                 
                 var conceptsFound = 0;
@@ -556,21 +709,27 @@
                     var matched = false;
                     for(var s = 0; s < terms.length; s++) {
                         var term = terms[s].toLowerCase().trim();
-                        if (term.length >= 3) { if (studentAnswer.includes(term)) { matched = true; break; } }
-                        else { var regex = new RegExp("\\b" + term + "\\b"); if (regex.test(studentAnswer)) { matched = true; break; } }
+                        
+                        // IMPROVED MATCHING LOGIC
+                        if (term.length <= 2 && term.match(/^[a-z0-9]+$/i)) {
+                            // If it's a very short text word (like "x" or "no"), use a word boundary so "no" doesn't match inside "not"
+                            var regex = new RegExp("\\b" + term + "\\b", "i");
+                            if (regex.test(studentAnswer)) { matched = true; break; }
+                        } else {
+                            // For everything else (longer words, numbers, phrases, math symbols, currency), a simple includes check works best
+                            if (studentAnswer.includes(term)) { matched = true; break; }
+                        }
                     }
                     if(matched) conceptsFound++;
                 }
                 
                 var score = conceptsFound / keywordGroups.length;
-                var isPassed = false;
-                if (keywordGroups.length > 1) { isPassed = (score === 1); }
-                else { isPassed = (score >= 1 || (wordCount >= 4)); }
+                var isPassed = (score === 1);
                 
                 if(feedbackDiv) {
                     if (isPassed) {
                         inputElement.classList.add('correct');
-                        feedbackDiv.innerHTML = "✅ Correct! All required concepts covered.";
+                        feedbackDiv.innerHTML = "✅ Correct! " + rubric.feedback;
                         feedbackDiv.style.color = "#006100";
                         feedbackDiv.style.display = "block";
                     } else if (keywordGroups.length > 1 && score >= 0.5) {
@@ -586,34 +745,7 @@
                     }
                 }
             }
-            saveProgress();
-        }
-
-        function downloadPDF() {
-            var hide = document.querySelectorAll('.no-print');
-            for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
-            document.getElementById('action-buttons').style.display = 'none';
-
-            var textAreas = document.querySelectorAll('textarea');
-            for (var j = 0; j < textAreas.length; j++) {
-                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
-            }
-
-            var element = document.getElementById('pdf-content');
-            var opt = { 
-                margin: 0.3, 
-                filename: 'C1_Budgeting.pdf', 
-                image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, 
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
-
-            html2pdf().set(opt).from(element).save().then(function() {
-                for(var b=0; b<hide.length; b++) hide[b].style.display = 'block';
-                document.getElementById('action-buttons').style.display = 'flex';
-                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
-            });
+            saveProgressToCloud(true);
         }
     </script>
 </body>
