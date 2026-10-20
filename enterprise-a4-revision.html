@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A4: Trust, Reputation and Loyalty - Revision</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f6f8; margin: 0; padding: 0; }
-        header { background-color: #1e3a8a; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        header h1 { margin: 0; font-size: 1.5em; }
-        .back-btn { color: white; text-decoration: none; font-weight: bold; }
-        
         .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
         .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
         .task-prep { border-top: 6px solid #607d8b; } 
@@ -50,16 +50,16 @@
         .btn-submit { background-color: #dfaa2b; color: #1e3a8a; border: none; padding: 15px 20px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
         .btn-submit:hover { background-color: #c99722; }
         
-        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; margin-top: 15px; }
-        .btn-pdf:hover { background-color: #124d2d; }
+        .btn-reset { background-color: #d32f2f; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; margin: 0 auto; }
+        .btn-reset:hover { background-color: #b71c1c; }
     </style>
 </head>
 <body>
     <div id="pdf-content">
         <header>
-            <div class="header-left"><span>Enterprise Revision</span></div>
+            <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
             <div class="header-center"><h1>A4: Trust, Reputation and Loyalty</h1></div>
-            <div class="header-right"><a href="javascript:history.back()" class="back-btn">&larr; Back</a></div>
+            <div class="header-right"><a href="enterprise-revision.html" class="back-btn">&larr; Back to Hub</a></div>
         </header>
 
         <main class="task-container">
@@ -68,7 +68,7 @@
                 <h2>A4 Revision Notes</h2>
                 <div class="instruction-box center-text">Use this space to write out your complete notes on customer trust, business reputation, building customer loyalty, responding to reviews, and providing good customer service.</div>
                 <div class="question-wrapper">
-                    <textarea id="main_notes" class="auto-input" rows="12" placeholder="Type your revision notes here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                    <textarea id="main_notes" class="auto-input notes-textarea" rows="12" placeholder="Type your revision notes here..."></textarea>
                 </div>
             </div>
 
@@ -81,70 +81,70 @@
                 
                 <div class="question-wrapper">
                     <label class="question-label">1. What does customer trust mean?</label>
-                    <textarea id="a4_q1" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["believe", "rely", "get what they paid for", "do what it says"]], "feedback": "Acceptable: Customers believe the business will do what it says, rely on it, or trust they will get what they paid for."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q1" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["believe", "rely", "get what they paid for", "do what it says"]], "feedback": "Hint: What does it mean when customers believe a business will keep its promises and deliver what they paid for?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q1')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">2. What is a business's reputation?</label>
-                    <textarea id="a4_q2" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["think about", "say about", "good or bad", "impression"]], "feedback": "Acceptable: What people think/say about the business, if it is seen as good/bad, or the impression people have of it."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q2" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["think about", "say about", "good or bad", "impression"]], "feedback": "Hint: Think about the overall impression people have of a business, based on what they think and say about it."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q2')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">3. What is customer loyalty?</label>
-                    <textarea id="a4_q3" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["coming back", "repeatedly", "choose the business", "stick with a brand", "instead of competitors"]], "feedback": "Acceptable: Customers keep coming back, buy repeatedly, choose it over competitors, or stick with the brand."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q3" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["coming back", "repeatedly", "choose the business", "stick with a brand", "instead of competitors"]], "feedback": "Hint: What do we call it when customers repeatedly return to buy from the same brand instead of its competitors?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q3')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">4. Give one way a business can build trust.</label>
-                    <textarea id="a4_q4" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["honest", "good quality", "promises", "on time", "fairly", "clear prices"]], "feedback": "Acceptable: Be honest, provide good quality, keep promises, deliver on time, handle complaints fairly, or have clear prices."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q4" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["honest", "good quality", "promises", "on time", "fairly", "clear prices"]], "feedback": "Hint: What actions can a business take to show customers they are reliable and honest?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">5. Give one way a business can build a good reputation.</label>
-                    <textarea id="a4_q5" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["good service", "reliable", "positive reviews", "treat customers well", "resolve problems", "value for money"]], "feedback": "Acceptable: Provide good service, reliable products, get positive reviews, treat customers well, or offer value for money."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q5" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["good service", "reliable", "positive reviews", "treat customers well", "resolve problems", "value for money"]], "feedback": "Hint: How can treating customers well and providing great service improve how the public sees the business?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q5')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">6. Give one way a business can encourage customer loyalty.</label>
-                    <textarea id="a4_q6" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["loyalty cards", "good service", "rewards", "discounts", "good quality", "valued"]], "feedback": "Acceptable: Offer loyalty cards, give rewards/discounts, provide good service, or make customers feel valued."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q6" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["loyalty cards", "good service", "rewards", "discounts", "good quality", "valued"]], "feedback": "Hint: Think about reward schemes, discounts, or specific ways to make returning customers feel valued."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q6')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">7. What is a customer review?</label>
-                    <textarea id="a4_q7" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["feedback", "opinion", "experience", "rating", "comment"]], "feedback": "Acceptable: Feedback from a buyer, an opinion about their experience, or a rating/comment about a business."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q7" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["feedback", "opinion", "experience", "rating", "comment"]], "feedback": "Hint: What do you call a buyer's public rating or feedback about their experience?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q7')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">8. What is word of mouth?</label>
-                    <textarea id="a4_q8" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["telling others", "recommendations", "friends", "family", "talking"]], "feedback": "Acceptable: People telling others about a business, recommendations from friends/family, or customers talking about experiences."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q8" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["telling others", "recommendations", "friends", "family", "talking"]], "feedback": "Hint: Think about how news spreads when friends and family recommend a business to each other in conversation."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q8')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">9. What is a repeat purchase?</label>
-                    <textarea id="a4_q9" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["buying from the same", "same business again", "same product another time", "buy more", "returning"]], "feedback": "Acceptable: Buying from the same business again, purchasing the same product another time, or returning to buy more."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q9" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["buying from the same", "same business again", "same product another time", "buy more", "returning"]], "feedback": "Hint: What is it called when a customer returns to buy something they have bought before?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q9')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">10. What is customer service?</label>
-                    <textarea id="a4_q10" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["helps", "treats", "answering", "sorting out problems", "before or after buying"]], "feedback": "Acceptable: How a business helps/treats customers, answering questions, or sorting out problems before/after buying."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q10" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["helps", "treats", "answering", "sorting out problems", "before or after buying"]], "feedback": "Hint: Think about how a business helps shoppers, answers their questions, and resolves their problems."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q10')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -153,70 +153,70 @@
                 
                 <div class="question-wrapper">
                     <label class="question-label">11. Why is trust important to a business?</label>
-                    <textarea id="a4_q11" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["willing to buy", "feel safer", "come back", "recommendations"]], "feedback": "Acceptable: Customers more willing to buy, feel safer spending money, come back, or recommend the business."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q11" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["willing to buy", "feel safer", "come back", "recommendations"]], "feedback": "Hint: Why do customers prefer to spend their money at places they feel safe and confident in?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q11')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">12. Why might customers avoid a business they do not trust?</label>
-                    <textarea id="a4_q12" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["ripped off", "not as promised", "losing money", "reliable"]], "feedback": "Acceptable: Might think they will be ripped off, product not as promised, worry about losing money, or prefer reliable places."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q12" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["ripped off", "not as promised", "losing money", "reliable"]], "feedback": "Hint: What are people worried might happen to their money or the product if they buy from an unreliable source?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q12')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">13. Why should a business be honest about its products?</label>
-                    <textarea id="a4_q13" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["know what they are buying", "false claims", "complaints", "lose trust", "bad reputation"]], "feedback": "Acceptable: Customers need to know what they are buying, false claims lead to complaints, lose trust, or get a bad reputation."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q13" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["know what they are buying", "false claims", "complaints", "lose trust", "bad reputation"]], "feedback": "Hint: What happens to a business's reputation and customer trust if people discover they've been lied to?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q13')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">14. Why is keeping promises important?</label>
-                    <textarea id="a4_q14" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["expect to get", "reliable", "return", "breaking promises", "complaints"]], "feedback": "Acceptable: Customers expect to get what was promised, shows it is reliable, they return, or breaking promises leads to complaints."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q14" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["expect to get", "reliable", "return", "breaking promises", "complaints"]], "feedback": "Hint: Think about how keeping your word makes people see the business as reliable."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q14')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">15. Why is delivering orders on time important?</label>
-                    <textarea id="a4_q15" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["receive what they need", "when expected", "less likely to complain", "relied on"]], "feedback": "Acceptable: Receive what they need when expected, less likely to complain, shows business can be relied on."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q15" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["receive what they need", "when expected", "less likely to complain", "relied on"]], "feedback": "Hint: Why does arriving exactly when expected help prove the business is reliable and prevent complaints?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q15')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">16. How can clear prices help build trust?</label>
-                    <textarea id="a4_q16" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["know what they will pay", "fewer surprises", "hidden costs", "honest"]], "feedback": "Acceptable: Know what they will pay, fewer surprises, avoids hidden costs, or feel the business is being honest."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q16" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["know what they will pay", "fewer surprises", "hidden costs", "honest"]], "feedback": "Hint: How does hiding extra fees hurt trust, and how does upfront pricing prevent surprises?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q16')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">17. Why might a money-back guarantee help build trust?</label>
-                    <textarea id="a4_q17" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["less worried", "money back", "goes wrong", "confidence"]], "feedback": "Acceptable: Feel less worried about buying, know they may get money back if things go wrong, shows confidence in product."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q17" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["less worried", "money back", "goes wrong", "confidence"]], "feedback": "Hint: How does a refund promise remove the risk for the buyer and show the seller's confidence?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q17')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">18. How can a business show that its products are reliable?</label>
-                    <textarea id="a4_q18" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["good quality", "test", "fix faults", "warranties", "respond to complaints", "work as expected"]], "feedback": "Acceptable: Offer good quality, test products, fix faults, provide warranties, respond to complaints, or make sure they work."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q18" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["good quality", "test", "fix faults", "warranties", "respond to complaints", "work as expected"]], "feedback": "Hint: What can a business do to prove their items won't break (e.g., testing, warranties, fixing faults)?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q18')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">19. Why might customers trust a business they have used before?</label>
-                    <textarea id="a4_q19" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["know what to expect", "good experience", "reliable", "delivered on its promises"]], "feedback": "Acceptable: Know what to expect, had a good experience, know it is reliable, or it delivered on its promises previously."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q19" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["know what to expect", "good experience", "reliable", "delivered on its promises"]], "feedback": "Hint: Why do people go back to places they've already had a good experience with?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q19')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">20. Can a business lose trust even if its products are good? Explain.</label>
-                    <textarea id="a4_q20" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["yes", "rude", "late", "unclear", "ignored", "badly treated"]], "feedback": "Acceptable: Yes, staff might be rude, late deliveries, unclear prices, ignored complaints, or feeling badly treated."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q20" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["yes", "rude", "late", "unclear", "ignored", "badly treated"]], "feedback": "Hint: Can poor service, rude staff, or bad delivery ruin a customer's trust even if the item itself is perfect?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q20')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -225,70 +225,70 @@
                 
                 <div class="question-wrapper">
                     <label class="question-label">21. Why is a good reputation useful?</label>
-                    <textarea id="a4_q21" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["attracts customers", "recommend", "trust it more", "stand out"]], "feedback": "Acceptable: Attracts customers, people recommend it, customers trust it more, helps it stand out from competitors."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q21" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["attracts customers", "recommend", "trust it more", "stand out"]], "feedback": "Hint: Why is being known for excellence helpful for getting recommendations and standing out from competitors?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q21')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">22. How can a business develop a bad reputation?</label>
-                    <textarea id="a4_q22" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["poor quality", "bad service", "overcharge", "lie", "ignore complaints", "late"]], "feedback": "Acceptable: Sell poor quality, bad service, overcharge, lie about products, ignore complaints, or repeatedly deliver late."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q22" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["poor quality", "bad service", "overcharge", "lie", "ignore complaints", "late"]], "feedback": "Hint: Think about what actions—like terrible service, overcharging, or ignoring complaints—make people angry."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q22')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">23. How can online reviews affect a business?</label>
-                    <textarea id="a4_q23" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["attract", "put people off", "deciding where to buy", "influence trust"]], "feedback": "Acceptable: Good reviews attract, bad reviews put people off, helps people decide where to buy, or influences trust."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q23" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["attract", "put people off", "deciding where to buy", "influence trust"]], "feedback": "Hint: How do star ratings and comments on the internet influence whether someone decides to buy?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q23')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">24. Why might people check reviews before buying something?</label>
-                    <textarea id="a4_q24" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["any good", "happy", "wasting money", "trusted"]], "feedback": "Acceptable: To see if it is good, check if others were happy, avoid wasting money, or check if it can be trusted."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q24" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["any good", "happy", "wasting money", "trusted"]], "feedback": "Hint: Why do you read what other buyers say before you risk your own money?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q24')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">25. How can a business respond to a negative review?</label>
-                    <textarea id="a4_q25" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["apologise", "investigate", "put it right", "politely", "improve"]], "feedback": "Acceptable: Apologise, investigate the problem, offer to put it right, contact them politely, or explain how it will improve."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q25" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["apologise", "investigate", "put it right", "politely", "improve"]], "feedback": "Hint: What steps should a business take to fix a mistake, show they care, and prevent it from happening again?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q25')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">26. Why should a business not ignore customer complaints?</label>
-                    <textarea id="a4_q26" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["worse", "bad review", "lose future sales", "do not matter"]], "feedback": "Acceptable: The problem may get worse, customer leaves bad review, lose future sales, or customers feel they do not matter."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q26" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["worse", "bad review", "lose future sales", "do not matter"]], "feedback": "Hint: If you ignore an angry customer, what might they do online, and how will it affect future sales?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q26" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q26')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">27. Why might a bad reputation spread quickly?</label>
-                    <textarea id="a4_q27" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["online", "lots of people", "friends tell others", "shared widely"]], "feedback": "Acceptable: Experiences are shared online, reviews are seen by lots of people, friends tell others, or posts are shared widely."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q27" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["online", "lots of people", "friends tell others", "shared widely"]], "feedback": "Hint: Think about how fast bad news spreads on social media and through word of mouth."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q27" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q27')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">28. Can one bad review destroy a business's reputation? Explain.</label>
-                    <textarea id="a4_q28" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["not necessarily", "unusual", "several", "bigger problem"]], "feedback": "Acceptable: Not necessarily (one may be unusual), but several similar complaints could make people think there is a bigger problem."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q28" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["not necessarily", "unusual", "several", "bigger problem"]], "feedback": "Hint: Does one single bad comment ruin everything, or does it take a pattern of multiple bad comments to really cause damage?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q28" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q28')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">29. Why is it important for a business to provide consistent service?</label>
-                    <textarea id="a4_q29" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["what to expect", "trust", "more likely each time", "inconsistent", "put people off"]], "feedback": "Acceptable: Know what to expect, more likely to trust it, good experience is likely each time, inconsistent service puts people off."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q29" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["what to expect", "trust", "more likely each time", "inconsistent", "put people off"]], "feedback": "Hint: Why is it important that a customer gets the same high-quality experience every single time they visit?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q29" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q29')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">30. Give an example of a business action that could improve its reputation after a mistake.</label>
-                    <textarea id="a4_q30" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["replace", "refund", "apologise", "deliver", "fix", "change procedures"]], "feedback": "Acceptable: Replace a faulty product, give a refund, apologise, deliver a missing order, fix quickly, or change procedures."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q30" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["replace", "refund", "apologise", "deliver", "fix", "change procedures"]], "feedback": "Hint: What specific things can a business offer (like a refund or replacement) to turn a bad situation around?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q30" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q30')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -297,70 +297,70 @@
                 
                 <div class="question-wrapper">
                     <label class="question-label">31. Why are loyal customers valuable to a business?</label>
-                    <textarea id="a4_q31" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["keep buying", "repeat sales", "recommend", "reliable income"]], "feedback": "Acceptable: Keep buying, provide repeat sales, may recommend the business, or help create reliable income."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q31" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["keep buying", "repeat sales", "recommend", "reliable income"]], "feedback": "Hint: Why are returning customers so valuable in terms of steady income and word-of-mouth promotion?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q31" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q31')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">32. Why might it be cheaper to keep existing customers than attract new ones?</label>
-                    <textarea id="a4_q32" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["advertising", "already know", "easier to encourage"]], "feedback": "Acceptable: Does not need to spend as much on advertising, they already know the business, or it is easier to encourage another purchase."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q32" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["advertising", "already know", "easier to encourage"]], "feedback": "Hint: Think about why advertising to brand new people costs more than simply reminding existing fans to come back."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q32" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q32')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">33. How can a loyalty card encourage customers to return?</label>
-                    <textarea id="a4_q33" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["points", "rewards", "discounts", "reason to choose"]], "feedback": "Acceptable: Earn points/rewards, get discounts after several purchases, or have a reason to choose that business again."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q33" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["points", "rewards", "discounts", "reason to choose"]], "feedback": "Hint: How does earning points or getting a 10th free reward give someone a reason to pick the same shop?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q33" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q33')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">34. Why might good customer service encourage loyalty?</label>
-                    <textarea id="a4_q34" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["valued", "problems are sorted", "enjoy", "return"]], "feedback": "Acceptable: Customers feel valued, problems are sorted out, they enjoy the experience, or are more likely to return."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q34" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["valued", "problems are sorted", "enjoy", "return"]], "feedback": "Hint: How does being treated wonderfully make a customer feel about returning in the future?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q34" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q34')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">35. How can discounts encourage repeat purchases?</label>
-                    <textarea id="a4_q35" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["save money", "reason to come back", "instead of a competitor"]], "feedback": "Acceptable: Save money, have a reason to come back, or choose the business instead of a competitor."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q35" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["save money", "reason to come back", "instead of a competitor"]], "feedback": "Hint: How does offering a price reduction to a returning customer encourage them to choose you over a rival?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q35" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q35')">👨‍🏫 Override Score</button></div>
                 </div>
                 
                 <div class="question-wrapper">
                     <label class="question-label">36. What is a loyalty scheme?</label>
-                    <textarea id="a4_q36" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["program", "rewards", "returning", "card", "points"]], "feedback": "Acceptable: A program that rewards customers for returning, such as a loyalty card or points system."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q36" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["program", "rewards", "returning", "card", "points"]], "feedback": "Hint: What do we call a structured system (like a points card) designed to reward people for repeat visits?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q36" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q36')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">37. Give one example of a loyalty reward.</label>
-                    <textarea id="a4_q37" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["free", "discount", "voucher", "early access", "points"]], "feedback": "Acceptable: A free product, discount code, money-off voucher, or early access to sales."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q37" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["free", "discount", "voucher", "early access", "points"]], "feedback": "Hint: Name a specific perk you might get for being a loyal customer, like a freebie or a voucher."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q37" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q37')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">38. Why might a customer stop being loyal to a business?</label>
-                    <textarea id="a4_q38" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["bad experience", "price increase", "prices went up", "competitor", "poor quality"]], "feedback": "Acceptable: Had a bad experience, prices increased, a competitor is better/cheaper, or quality dropped."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q38" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["bad experience", "price increase", "prices went up", "competitor", "poor quality"]], "feedback": "Hint: What negative changes (like higher prices or a drop in quality) might make a regular customer leave?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q38" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q38')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">39. How does resolving a complaint quickly affect loyalty?</label>
-                    <textarea id="a4_q39" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["cares", "restores trust", "listened to", "happy again"]], "feedback": "Acceptable: Shows the business cares, restores trust, makes them feel listened to, or makes them happy again."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q39" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["cares", "restores trust", "listened to", "happy again"]], "feedback": "Hint: How does fixing an issue rapidly make the customer feel valued and restore their faith in the brand?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q39" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q39')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">40. Why is good communication important for building loyalty?</label>
-                    <textarea id="a4_q40" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["informed", "builds relationship", "offers", "updates", "trust"]], "feedback": "Acceptable: Keeps customers informed, builds a relationship, tells them about offers/updates, or maintains trust."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a4_q40" class="auto-input a4-input" rows="2" data-rubric='{"keywords": [["informed", "builds relationship", "offers", "updates", "trust"]], "feedback": "Hint: Why is staying in touch (with updates or offers) a good way to maintain a strong relationship with buyers?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a4_q40" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a4_q40')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -368,9 +368,11 @@
                 <button class="btn-submit no-print" onclick="markWork()">✅ Mark My Work</button>
             </div>
             
-            <button class="btn-pdf no-print" onclick="downloadPDF()">📄 Download PDF</button>
-
         </main>
+    </div>
+    
+    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
+        <button class="btn-reset no-print" onclick="clearData()">Reset Page</button>
     </div>
 
     <!-- Teacher Override Modal -->
@@ -386,7 +388,225 @@
         </div>
     </div>
 
+    <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
+
     <script>
+        // --- FIREBASE INITIALIZATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "enterprise-a4-trust";
+
+        /* --- MARKBOOK BUILDER FOR TEACHER DASHBOARD --- */
+        function buildMarkbookData() {
+            const items = [];
+            const inputs = document.querySelectorAll('.auto-input');
+            
+            inputs.forEach((input, i) => {
+                const wrapper = input.closest('.question-wrapper');
+                const labelEl = wrapper ? wrapper.querySelector('.question-label') : null;
+                const labelText = labelEl ? labelEl.innerText.trim() : `Question ${i + 1}`;
+                
+                let status = 'neutral';
+                if (input.classList.contains('correct') || input.classList.contains('teacher-locked')) {
+                    status = 'correct';
+                } else if (input.classList.contains('incorrect')) {
+                    status = 'incorrect';
+                }
+
+                items.push({
+                    index: i,
+                    label: labelText,
+                    value: input.value.trim(),
+                    status: status
+                });
+            });
+
+            // Calculate total correct answers
+            const correctCount = document.querySelectorAll('.auto-input.correct, .auto-input.teacher-locked').length;
+            const gradableInputs = document.querySelectorAll('.a4-input');
+            const totalGradable = gradableInputs.length;
+
+            return {
+                items: items,
+                scoreText: `Score: ${correctCount} / ${totalGradable}`
+            };
+        }
+
+        /* --- CLOUD AUTO-SAVE & AUTO-LOAD --- */
+        let saveTimer;
+        function saveProgressToCloud(immediate = false) {
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                const structured = buildMarkbookData();
+                const payload = {
+                    pageTitle: document.title || "A4: Trust, Reputation and Loyalty",
+                    lastUpdated: Date.now(),
+                    scoreText: structured.scoreText,
+                    items: structured.items
+                };
+
+                // Also store inputs explicitly for local legacy support fallback
+                var inputs = document.querySelectorAll('.auto-input');
+                for (var i = 0; i < inputs.length; i++) {
+                    payload['input_' + i] = inputs[i].value;
+                    payload['class_' + i] = inputs[i].className;
+                }
+
+                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
+                  .set(payload, { merge: true })
+                  .catch(err => console.error("Cloud sync error:", err));
+            }, immediate ? 50 : 800);
+        }
+
+        function applySavedData(data) {
+            if (!data) return;
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                var savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined) {
+                    inputs[i].value = savedVal;
+                    if (data['class_' + i]) {
+                        inputs[i].className = data['class_' + i];
+                        if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect') || inputs[i].classList.contains('teacher-locked')) {
+                            var btnId = "override-" + inputs[i].id;
+                            var btn = document.getElementById(btnId);
+                            if (btn) btn.classList.remove('hidden');
+                            
+                            // Restore feedback visually if teacher-locked
+                            var feedbackDiv = inputs[i].nextElementSibling;
+                            if (inputs[i].classList.contains('teacher-locked') && feedbackDiv) {
+                                if (inputs[i].classList.contains('correct')) {
+                                    feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; 
+                                    feedbackDiv.style.color = "#006100"; 
+                                    feedbackDiv.style.display = "block";
+                                } else {
+                                    feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; 
+                                    feedbackDiv.style.color = "#b71c1c"; 
+                                    feedbackDiv.style.display = "block";
+                                }
+                            }
+                        }
+                    }
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto'; 
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
+                    }
+                }
+            }
+        }
+
+        // --- LOAD DATA FROM FIREBASE ON START ---
+        auth.onAuthStateChanged(async (user) => {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    // Try to clean up local storage from legacy version
+                    try { localStorage.removeItem('Enterprise_A4_Revision'); } catch (e) {}
+
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud data:", err);
+                }
+            } else if (!isTeacher) {
+                alert("Please log in on the home page first!");
+                window.location.href = "index.html";
+            }
+        });
+
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                saveProgressToCloud(false);
+                if (e.target.tagName.toLowerCase() === 'textarea') {
+                    e.target.style.height = 'auto'; 
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                }
+            }
+        });
+
+        // --- RESET / CLEAR DATA FROM FIREBASE CLOUD ---
+        async function clearData() { 
+            if (confirm("Clear all work on this page?")) { 
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
+                    } catch (e) {}
+                }
+                window.location.reload(); 
+            } 
+        }
+
+        let activeQuestionId = null;
+        function openVerifyModal(qId) {
+            activeQuestionId = qId;
+            document.getElementById('teacher-password-input').value = '';
+            document.getElementById('modal-error-msg').style.display = 'none';
+            document.getElementById('verify-modal').style.display = 'flex';
+            document.getElementById('teacher-password-input').focus();
+        }
+        function closeVerifyModal() {
+            document.getElementById('verify-modal').style.display = 'none';
+            activeQuestionId = null;
+        }
+        function submitVerify() {
+            var pass = document.getElementById('teacher-password-input').value;
+            if (pass === '2525') {
+                var inputEl = document.getElementById(activeQuestionId);
+                var feedbackDiv = inputEl.nextElementSibling;
+                inputEl.classList.add('teacher-locked');
+                if (inputEl.classList.contains('correct')) {
+                    inputEl.classList.remove('correct');
+                    inputEl.classList.add('incorrect');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; feedbackDiv.style.color = "#b71c1c"; feedbackDiv.style.display = "block"; }
+                } else {
+                    inputEl.classList.remove('incorrect');
+                    inputEl.classList.add('correct');
+                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
+                }
+                closeVerifyModal();
+                saveProgressToCloud(true);
+            } else {
+                document.getElementById('modal-error-msg').style.display = 'block';
+            }
+        }
+        document.getElementById('teacher-password-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') submitVerify();
+        });
+
         // SMART MARKER LOGIC
         function markWork() {
             document.querySelectorAll('.a4-input').forEach(input => {
@@ -419,123 +639,8 @@
                     if(overrideBtn) overrideBtn.classList.remove('hidden');
                 }
             });
-            saveData();
+            saveProgressToCloud(true);
         }
-
-        // TEACHER OVERRIDE MODAL
-        let currentOverrideId = null;
-        
-        function openVerifyModal(id) {
-            currentOverrideId = id;
-            document.getElementById('teacher-password-input').value = '';
-            document.getElementById('modal-error-msg').style.display = 'none';
-            document.getElementById('verify-modal').style.display = 'flex';
-            document.getElementById('teacher-password-input').focus();
-        }
-        
-        function closeVerifyModal() {
-            document.getElementById('verify-modal').style.display = 'none';
-            currentOverrideId = null;
-        }
-        
-        function submitVerify() {
-            const pass = document.getElementById('teacher-password-input').value;
-            if (pass === '2525') {
-                const el = document.getElementById(currentOverrideId);
-                const inputId = currentOverrideId.replace('override-', '');
-                const inputEl = document.getElementById(inputId);
-                
-                if (inputEl) {
-                    if (inputEl.classList.contains('incorrect')) {
-                        inputEl.classList.remove('incorrect');
-                        inputEl.classList.add('correct');
-                    } else {
-                        inputEl.classList.remove('correct');
-                        inputEl.classList.add('incorrect');
-                    }
-                }
-                closeVerifyModal();
-                saveData();
-            } else {
-                document.getElementById('modal-error-msg').style.display = 'block';
-            }
-        }
-
-        document.getElementById('teacher-password-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') submitVerify();
-        });
-
-        // PDF GENERATION
-        function downloadPDF() {
-            const noPrint = document.querySelectorAll('.no-print');
-            noPrint.forEach(el => el.style.display = 'none');
-            
-            // Fix textareas for rendering to PDF
-            document.querySelectorAll('textarea').forEach(el => {
-                el.innerHTML = el.value;
-                el.style.height = el.scrollHeight + 'px';
-            });
-
-            const element = document.getElementById('pdf-content');
-            html2pdf().set({
-                margin: 0.3,
-                filename: 'A4_Revision_Trust_Reputation.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            }).from(element).save().then(() => {
-                noPrint.forEach(el => el.style.display = '');
-            });
-        }
-
-        // LOCAL STORAGE
-        function saveData() {
-            const data = {};
-            document.querySelectorAll('textarea').forEach(el => {
-                data[el.id || 'notes'] = { value: el.value, class: el.className };
-            });
-            localStorage.setItem('Enterprise_A4_Revision', JSON.stringify(data));
-        }
-
-        function loadData() {
-            const saved = localStorage.getItem('Enterprise_A4_Revision');
-            if (saved) {
-                const data = JSON.parse(saved);
-                document.querySelectorAll('textarea').forEach(el => {
-                    const id = el.id || 'notes';
-                    if (data[id]) {
-                        el.value = data[id].value;
-                        el.className = data[id].class;
-                        el.style.height = el.scrollHeight + 'px';
-                        
-                        // Restore feedback visibility and buttons if previously marked
-                        if (data[id].class.includes('correct') || data[id].class.includes('incorrect')) {
-                            const feedback = el.nextElementSibling;
-                            if (feedback && feedback.classList.contains('feedback-msg')) {
-                                const rubric = JSON.parse(el.getAttribute('data-rubric'));
-                                feedback.innerText = rubric.feedback;
-                                feedback.style.display = 'block';
-                                
-                                const btn = el.parentElement.querySelector('.teacher-override-btn');
-                                if (btn) btn.classList.remove('hidden');
-                            }
-                        }
-                    }
-                });
-            }
-        }
-
-        // Setup event listeners
-        window.onload = loadData;
-        document.addEventListener('input', e => {
-            if (e.target.tagName === 'TEXTAREA') {
-                saveData();
-                // Auto resize
-                e.target.style.height = 'auto'; 
-                e.target.style.height = e.target.scrollHeight + 'px';
-            }
-        });
     </script>
 </body>
 </html>
