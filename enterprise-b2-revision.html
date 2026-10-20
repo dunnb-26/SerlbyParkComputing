@@ -5,8 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>B2: Payment Methods - Revision</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f6f8; margin: 0; padding: 0; }
+        header { background-color: #1e3a8a; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        header h1 { margin: 0; font-size: 1.5em; }
+        .back-btn { color: white; text-decoration: none; font-weight: bold; }
+        
         .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
         .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
         .task-prep { border-top: 6px solid #607d8b; } 
@@ -14,19 +24,27 @@
         .task-card h2 { margin-top: 0; color: #333; }
         .task-prep h2 { color: #607d8b; }
         .task-navy h2 { color: #1e3a8a; }
-        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; }
+        
+        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; border-left: 4px solid #dfaa2b; }
         .center-text { text-align: center; }
+        
         .question-wrapper { margin-bottom: 25px; page-break-inside: avoid !important; break-inside: avoid !important; }
         .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
+        
         .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit; }
         .auto-input:focus { outline: none; border-color: #666; }
         textarea.auto-input { resize: vertical; min-height: 80px; }
+        
         .correct { border-color: #388e3c !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
         .incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
-        .feedback-msg { font-size: 14px; margin-top: 8px; font-weight: bold; display: none; }
+        
+        .feedback-msg { font-size: 14px; margin-top: 8px; color: #333; display: none; background-color: #f1f1f1; padding: 10px; border-radius: 4px; border-left: 4px solid #607d8b; font-weight: 500; }
+        
         .teacher-override-btn { background-color: #607d8b; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; margin-top: 5px; }
         .teacher-override-btn:hover { background-color: #455a64; }
+        
         .hidden { display: none !important; }
+        
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 25px; border-radius: 8px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; border-top: 6px solid #1e3a8a; }
         .modal-input { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; text-align: center; }
@@ -34,18 +52,20 @@
         .modal-btn-confirm { flex: 1; background-color: #1e3a8a; color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
         .modal-btn-cancel { flex: 1; background-color: #ccc; color: #333; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
         .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
-        .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
-        .btn-submit:hover { background-color: #152960; }
-        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
-        .btn-pdf:hover { background-color: #124d2d; }
+        
+        .btn-submit { background-color: #dfaa2b; color: #1e3a8a; border: none; padding: 15px 20px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
+        .btn-submit:hover { background-color: #c99722; }
+        
+        .btn-reset { background-color: #d32f2f; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; margin: 20px auto; }
+        .btn-reset:hover { background-color: #b71c1c; }
     </style>
 </head>
 <body>
     <div id="pdf-content">
         <header>
-            <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
+            <div class="header-left"><span>Enterprise Revision</span></div>
             <div class="header-center"><h1>B2: Payment Methods</h1></div>
-            <div class="header-right"><a href="enterprise-revision.html" class="back-btn">&larr; Back to Hub</a></div>
+            <div class="header-right"><a href="javascript:history.back()" class="back-btn">&larr; Back</a></div>
         </header>
 
         <main class="task-container">
@@ -53,7 +73,7 @@
                 <h2>B2 Revision Notes</h2>
                 <div class="instruction-box center-text">Use this space to write out your complete notes on different payment methods, their advantages and disadvantages for both customers and businesses, and how to choose the right payment method.</div>
                 <div class="question-wrapper">
-                    <textarea class="auto-input" rows="12" placeholder="Type your revision notes here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                    <textarea id="main_notes" class="auto-input notes-textarea" rows="12" placeholder="Type your revision notes here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
                 </div>
             </div>
 
@@ -65,70 +85,70 @@
                 
                 <div class="question-wrapper">
                     <label class="question-label">1. What is a payment method?</label>
-                    <textarea id="b2_q1" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["way to pay", "gives a business money", "transferring money", "pay for goods", "pay for services"]], "feedback": "Acceptable: A way to pay for something, how a customer gives a business money, or a way of transferring money."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q1" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["way to pay", "gives a business money", "transferring money", "pay for goods", "pay for services"]], "feedback": "Hint: Think about how a customer transfers money to a business to buy goods or services."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q1')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">2. Name a way a customer can pay for something.</label>
-                    <textarea id="b2_q2" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["cash", "debit card", "credit card", "bank transfer", "contactless", "mobile payment", "online", "buy now pay later"]], "feedback": "Acceptable: Cash, debit card, credit card, bank transfer, contactless, mobile payment, online, or BNPL."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q2" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["cash", "debit card", "credit card", "bank transfer", "contactless", "mobile payment", "online", "buy now pay later"]], "feedback": "Hint: Think of anything from physical coins to tapping your phone."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q2')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">3. What is a cash payment?</label>
-                    <textarea id="b2_q3" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["physical", "notes", "coins", "handing over", "in person"]], "feedback": "Acceptable: Paying with physical notes and coins, or handing over money in person."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q3" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["physical", "notes", "coins", "handing over", "in person"]], "feedback": "Hint: What do we call paying with physical notes and coins in person?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q3')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">4. What is a debit card payment?</label>
-                    <textarea id="b2_q4" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["bank account", "taken from your account", "own money"]], "feedback": "Acceptable: Paying using money in your bank account, or money being taken from your account."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q4" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["bank account", "taken from your account", "own money"]], "feedback": "Hint: Think about using a card where the money is taken directly from your own bank account."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">5. What is a credit card payment?</label>
-                    <textarea id="b2_q5" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["borrowed", "provider", "paying now and repaying", "company later"]], "feedback": "Acceptable: Paying using borrowed money, or paying now and repaying the credit card company later."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q5" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["borrowed", "provider", "paying now and repaying", "company later"]], "feedback": "Hint: Think about using a card to pay now with borrowed money that you have to repay later."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q5')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">6. What is a contactless payment?</label>
-                    <textarea id="b2_q6" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["tapping", "without inserting", "without using cash", "machine"]], "feedback": "Acceptable: Tapping a card or phone on a machine, or paying without inserting the card."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q6" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["tapping", "without inserting", "without using cash", "machine"]], "feedback": "Hint: What do you call it when you just tap your card or phone on the card machine?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q6')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">7. What is a bank transfer?</label>
-                    <textarea id="b2_q7" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["moving money directly", "account to another", "electronically"]], "feedback": "Acceptable: Moving money directly from one bank account to another, or sending money electronically."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q7" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["moving money directly", "account to another", "electronically"]], "feedback": "Hint: What do you call it when you move money electronically from one account directly to another?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q7')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">8. What is an online payment?</label>
-                    <textarea id="b2_q8" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["website", "app", "entering payment details", "buy something online"]], "feedback": "Acceptable: Paying through a website or app, or entering details to buy something online."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q8" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["website", "app", "entering payment details", "buy something online"]], "feedback": "Hint: How do you pay for things on a website or an app without visiting a shop?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q8')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">9. What is a mobile payment?</label>
-                    <textarea id="b2_q9" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["phone", "smartwatch", "apple pay", "google pay", "device"]], "feedback": "Acceptable: Paying using a phone or smartwatch, such as Apple Pay or Google Pay."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q9" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["phone", "smartwatch", "apple pay", "google pay", "device"]], "feedback": "Hint: Think about using your phone or smartwatch, like Apple Pay or Google Pay."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q9')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">10. What does buy now pay later mean?</label>
-                    <textarea id="b2_q10" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["now and paying later", "instalments", "delaying payment", "klarna", "clearpay"]], "feedback": "Acceptable: Getting the product now and paying later, or splitting the cost into instalments."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q10" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["now and paying later", "instalments", "delaying payment", "klarna", "clearpay"]], "feedback": "Hint: Think about services like Klarna where you get the item immediately but split the cost into instalments."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q10')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -136,97 +156,97 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 2: Advantages and disadvantages of payment methods</h3>
                 <div class="question-wrapper">
                     <label class="question-label">11. Give one advantage of cash for a business.</label>
-                    <textarea id="b2_q11" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["no card processing fees", "immediate", "small purchases", "no card machine"]], "feedback": "Acceptable: No card processing fees, payment is immediate, good for small purchases, or no card machine needed."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q11" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["no card processing fees", "immediate", "small purchases", "no card machine"]], "feedback": "Hint: What fees does a business avoid when they don't use a card machine?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q11')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">12. Give one disadvantage of cash for a business.</label>
-                    <textarea id="b2_q12" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["stolen", "counted", "stored", "banking", "do not carry cash"]], "feedback": "Acceptable: It can be stolen, needs counting/storing, requires banking, or some customers do not carry cash."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q12" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["stolen", "counted", "stored", "banking", "do not carry cash"]], "feedback": "Hint: What are the risks of keeping lots of physical money in a till, and how does it get to the bank?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q12')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">13. Give one advantage of debit cards for customers.</label>
-                    <textarea id="b2_q13" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["convenient", "quick", "no need to carry cash", "directly from their bank"]], "feedback": "Acceptable: Convenient, quick, no need to carry cash, or money comes directly from their bank."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q13" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["convenient", "quick", "no need to carry cash", "directly from their bank"]], "feedback": "Hint: Why is it more convenient than carrying a bulky wallet full of coins?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q13')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">14. Give one disadvantage of debit cards for customers.</label>
-                    <textarea id="b2_q14" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["enough money", "stolen", "not work", "machine broken"]], "feedback": "Acceptable: Need enough money in account, card details can be stolen, or payment systems may not work."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q14" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["enough money", "stolen", "not work", "machine broken"]], "feedback": "Hint: What happens if your bank account is empty or the shop's machine is broken?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q14')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">15. Give one advantage of credit cards for customers.</label>
-                    <textarea id="b2_q15" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["before paying", "extra protection", "unexpected costs", "buy now"]], "feedback": "Acceptable: Buy before paying the bill, extra protection on purchases, or useful for unexpected costs."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q15" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["before paying", "extra protection", "unexpected costs", "buy now"]], "feedback": "Hint: How does it help if you have an unexpected cost today but don't get paid until next week?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q15')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">16. Give one disadvantage of credit cards for customers.</label>
-                    <textarea id="b2_q16" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["interest", "debt", "late payment fees", "difficult to manage"]], "feedback": "Acceptable: Interest may be charged, debt can build up, late payment fees, or spending becomes hard to manage."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q16" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["interest", "debt", "late payment fees", "difficult to manage"]], "feedback": "Hint: What happens if you don't pay the bill back on time? Think about debt and fees."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q16')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">17. Give one advantage of contactless payments for a business.</label>
-                    <textarea id="b2_q17" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["quick", "faster", "easier to buy", "queues move"]], "feedback": "Acceptable: Payments are quick, queues move faster, or customers find it easier to buy."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q17" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["quick", "faster", "easier to buy", "queues move"]], "feedback": "Hint: How does a simple 'tap' affect the speed of the queue?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q17')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">18. Give one disadvantage of accepting card payments for a business.</label>
-                    <textarea id="b2_q18" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["fees", "cost money", "rely on internet", "systems down", "machine broken"]], "feedback": "Acceptable: Card processing fees, card machine costs money, or relies on internet/payment systems working."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q18" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["fees", "cost money", "rely on internet", "systems down", "machine broken"]], "feedback": "Hint: What do banks charge the business for every transaction, and what happens if the internet goes down?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q18')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">19. Give one advantage of bank transfers for a business.</label>
-                    <textarea id="b2_q19" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["directly to the business", "large payments", "payment record"]], "feedback": "Acceptable: Money sent directly to the business account, useful for large payments, or creates a payment record."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q19" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["directly to the business", "large payments", "payment record"]], "feedback": "Hint: Why is it the safest and easiest way to accept a very large payment, like for a car or a house?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q19')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">20. Give one disadvantage of bank transfers.</label>
-                    <textarea id="b2_q20" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["delayed", "wrong account", "enter bank details", "inconvenient", "mistake"]], "feedback": "Acceptable: Payments can be delayed, sent to the wrong account, requires entering details, or is inconvenient."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q20" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["delayed", "wrong account", "enter bank details", "inconvenient", "mistake"]], "feedback": "Hint: What can go wrong if a customer types in the account number incorrectly?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q20')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">21. Give one advantage of online payments.</label>
-                    <textarea id="b2_q21" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["any time", "different locations", "convenient for online", "home"]], "feedback": "Acceptable: Buy at any time, sell to different locations, or convenient for online shopping."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q21" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["any time", "different locations", "convenient for online", "home"]], "feedback": "Hint: How does it help customers who want to shop at 2am from their sofa?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q21')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">22. Give one disadvantage of online payments.</label>
-                    <textarea id="b2_q22" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["fraud", "technical problems", "fees", "worry about sharing", "hacked"]], "feedback": "Acceptable: Fraud risk, technical problems, transaction fees, or customers worry about sharing details."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q22" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["fraud", "technical problems", "fees", "worry about sharing", "hacked"]], "feedback": "Hint: Think about hackers, internet outages, or the risk of fraud."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q22')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">23. Give one advantage of mobile payments.</label>
-                    <textarea id="b2_q23" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["convenient", "quick", "no physical card", "device they already carry", "phone"]], "feedback": "Acceptable: Convenient, quick, no physical card needed, or uses a device they already carry."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q23" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["convenient", "quick", "no physical card", "device they already carry", "phone"]], "feedback": "Hint: Why is it easier if you forget your wallet but still have your phone?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q23')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">24. Give one disadvantage of mobile payments.</label>
-                    <textarea id="b2_q24" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["battery", "not supported", "fail", "do not use mobile wallets"]], "feedback": "Acceptable: Phone battery runs out, device not supported, payment system fails, or customers don't use mobile wallets."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q24" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["battery", "not supported", "fail", "do not use mobile wallets"]], "feedback": "Hint: What happens if your phone battery dies while you are at the till?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q24')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">25. Give one advantage of buy now pay later for customers.</label>
-                    <textarea id="b2_q25" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["spread the cost", "before paying the full amount", "manage the timing", "instalments"]], "feedback": "Acceptable: Can spread the cost, get item before paying full amount, or manage timing of payments."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q25" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["spread the cost", "before paying the full amount", "manage the timing", "instalments"]], "feedback": "Hint: How does it help if you want an expensive jacket but can't afford the full price today?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q25')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">26. Give one disadvantage of buy now pay later.</label>
-                    <textarea id="b2_q26" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["more than they can afford", "miss payments", "debt", "face charges", "fees"]], "feedback": "Acceptable: Spend more than they can afford, miss payments, build up debt, or face extra charges/fees."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q26" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["more than they can afford", "miss payments", "debt", "face charges", "fees"]], "feedback": "Hint: What is the danger if you forget to make the later payments?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q26" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q26')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -234,61 +254,61 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 3: Choosing the right payment method</h3>
                 <div class="question-wrapper">
                     <label class="question-label">27. Why might a small market stall prefer cash?</label>
-                    <textarea id="b2_q27" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["simple", "immediately", "avoid card fees", "small purchases"]], "feedback": "Acceptable: It is simple, payment is immediate, avoids card processing fees, or suits small purchases."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q27" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["simple", "immediately", "avoid card fees", "small purchases"]], "feedback": "Hint: What expensive fees do they avoid, and why is it easier for tiny purchases?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q27" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q27')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">28. Why might a large supermarket accept several payment methods?</label>
-                    <textarea id="b2_q28" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["preferences", "convenient", "fewer customers are turned away", "faster", "queues move"]], "feedback": "Acceptable: Customers have different preferences, makes it convenient, fewer customers turned away, or queues move faster."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q28" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["preferences", "convenient", "fewer customers are turned away", "faster", "queues move"]], "feedback": "Hint: Think about ensuring no customer is turned away and keeping the queues moving fast."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q28" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q28')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">29. Why would an online clothing business accept online card payments?</label>
-                    <textarea id="b2_q29" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["cannot hand over cash", "shop from home", "processed through the website", "distance"]], "feedback": "Acceptable: Cannot hand over cash in person, can shop from home, or processed through the website."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q29" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["cannot hand over cash", "shop from home", "processed through the website", "distance"]], "feedback": "Hint: Why can't you use cash when shopping from your sofa at home?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q29" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q29')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">30. Why might a business selling expensive equipment accept bank transfers?</label>
-                    <textarea id="b2_q30" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["large amounts", "record", "convenient for business", "directly"]], "feedback": "Acceptable: Large amounts can be transferred directly, provides a payment record, or is convenient for business customers."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q30" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["large amounts", "record", "convenient for business", "directly"]], "feedback": "Hint: Why is it the most secure way to handle massive transactions between businesses?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q30" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q30')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">31. Why might a mobile food van accept contactless payments?</label>
-                    <textarea id="b2_q31" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["quickly", "reduces the need for change", "do not carry cash", "fast"]], "feedback": "Acceptable: Customers pay quickly, reduces the need for change, or many people do not carry cash."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q31" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["quickly", "reduces the need for change", "do not carry cash", "fast"]], "feedback": "Hint: How does a simple 'tap' speed up serving a long line of hungry people?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q31" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q31')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">32. Why might a business not want to accept credit cards?</label>
-                    <textarea id="b2_q32" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["avoid processing fees", "chargebacks", "simple"]], "feedback": "Acceptable: To avoid processing fees, reduce the risk of chargebacks, or keep payment arrangements simple."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q32" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["avoid processing fees", "chargebacks", "simple"]], "feedback": "Hint: What do credit card companies charge the business for the privilege of using their service?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q32" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q32')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">33. Why might a business offer payment in instalments?</label>
-                    <textarea id="b2_q33" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["affordable", "spread the cost", "encourage customers to buy", "expensive"]], "feedback": "Acceptable: Product becomes more affordable upfront, spreads the cost, or encourages buying expensive items."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q33" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["affordable", "spread the cost", "encourage customers to buy", "expensive"]], "feedback": "Hint: How does splitting the bill make an expensive product seem more affordable?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q33" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q33')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">34. Why might a business prefer immediate payment rather than allowing customers to pay later?</label>
-                    <textarea id="b2_q34" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["sooner", "reduces the risk of unpaid", "pay its own costs", "cash flow"]], "feedback": "Acceptable: Receives money sooner, reduces unpaid bills, helps pay own costs, or manages cash flow easier."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q34" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["sooner", "reduces the risk of unpaid", "pay its own costs", "cash flow"]], "feedback": "Hint: Why is having money in your bank account today better than hoping the customer pays next month?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q34" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q34')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">35. Why is it important for a business to consider its customers when choosing payment methods?</label>
-                    <textarea id="b2_q35" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["convenient way to pay", "prefer different methods", "lose sales", "turn away"]], "feedback": "Acceptable: Customers need a convenient way to pay, prefer different methods, or limited choices could lose sales."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q35" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["convenient way to pay", "prefer different methods", "lose sales", "turn away"]], "feedback": "Hint: What happens if you only accept cash but all your customers only carry phones/cards?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q35" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q35')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">36. Why might a business use a payment provider for online transactions?</label>
-                    <textarea id="b2_q36" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["securely", "different cards", "checkout easier", "reduce the need to build", "safe"]], "feedback": "Acceptable: To process securely, handle different cards, make checkout easier, or avoid building their own system."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q36" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["securely", "different cards", "checkout easier", "reduce the need to build", "safe"]], "feedback": "Hint: Why is it easier to use PayPal or Stripe rather than trying to build your own secure bank link?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q36" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q36')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -296,61 +316,61 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 4: Scenario questions</h3>
                 <div class="question-wrapper">
                     <label class="question-label">37. A teenager buys a drink in a shop. Which payment methods could they use?</label>
-                    <textarea id="b2_q37" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["cash", "debit card", "contactless", "mobile payment"]], "feedback": "Acceptable: Cash, debit card, contactless card, or mobile payment if supported."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q37" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["cash", "debit card", "contactless", "mobile payment"]], "feedback": "Hint: Think of the most common physical and digital ways young people pay in a local shop."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q37" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q37')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">38. A customer buys a £1,500 laptop. Why might they use a credit card or finance option?</label>
-                    <textarea id="b2_q38" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["spread the cost", "not want to pay the full amount", "protection", "instalments"]], "feedback": "Acceptable: May not want to pay full amount immediately, want to spread the cost, or want extra purchase protection."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q38" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["spread the cost", "not want to pay the full amount", "protection", "instalments"]], "feedback": "Hint: What is the benefit of spreading the cost or getting extra purchase protection on big items?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q38" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q38')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">39. A business sells handmade jewellery through a website. Which payment methods could it offer?</label>
-                    <textarea id="b2_q39" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["debit cards", "credit cards", "online payment", "digital wallets", "secure"]], "feedback": "Acceptable: Debit cards, credit cards, online payment services, digital wallets, or secure online options."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q39" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["debit cards", "credit cards", "online payment", "digital wallets", "secure"]], "feedback": "Hint: What secure digital methods are used for online shopping checkouts?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q39" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q39')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">40. A customer has no cash and the card machine is broken. What problem could this cause for the business?</label>
-                    <textarea id="b2_q40" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["not be able to buy", "sale could be lost", "alternative", "lose money"]], "feedback": "Acceptable: Customer cannot buy anything, sale is lost, or business needs an alternative payment method."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q40" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["not be able to buy", "sale could be lost", "alternative", "lose money"]], "feedback": "Hint: If the customer literally cannot pay, what happens to the sale?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q40" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q40')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">41. A small business accepts only cash. Explain one possible disadvantage.</label>
-                    <textarea id="b2_q41" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["not carry cash", "leave without buying", "reduce sales", "lost customers"]], "feedback": "Acceptable: Some customers do not carry cash, leave without buying, reducing sales and revenue."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q41" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["not carry cash", "leave without buying", "reduce sales", "lost customers"]], "feedback": "Hint: What happens if a customer turns up with only a mobile phone to pay?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q41" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q41')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">42. A shop starts accepting contactless payments. Explain one possible benefit.</label>
-                    <textarea id="b2_q42" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["faster", "reducing queues", "convenient", "satisfaction", "quick"]], "feedback": "Acceptable: Customers pay faster, reducing queues, making shopping more convenient and improving satisfaction."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q42" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["faster", "reducing queues", "convenient", "satisfaction", "quick"]], "feedback": "Hint: How does tapping a card speed up the queue and improve convenience?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q42" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q42')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">43. An online business offers buy now pay later. Explain one possible risk.</label>
-                    <textarea id="b2_q43" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["miss repayments", "debt", "damage their finances", "complaints", "cannot afford"]], "feedback": "Acceptable: Customers miss repayments/get into debt, damaging finances or leading to complaints against the business."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q43" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["miss repayments", "debt", "damage their finances", "complaints", "cannot afford"]], "feedback": "Hint: What happens to the customer if they forget to make the later payments, and how might they react to the business?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q43" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q43')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">44. A business sells products to other businesses. Why might bank transfers be suitable?</label>
-                    <textarea id="b2_q44" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["larger payments", "create records", "convenient for paying invoices", "b2b"]], "feedback": "Acceptable: Businesses make larger payments, transfers create records, and it's convenient for paying invoices."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q44" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["larger payments", "create records", "convenient for paying invoices", "b2b"]], "feedback": "Hint: Why do businesses prefer an electronic record of a very large payment?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q44" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q44')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">45. A customer pays using a debit card but their account has insufficient funds. What could happen?</label>
-                    <textarea id="b2_q45" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["declined", "need another", "lose the sale", "cannot pay"]], "feedback": "Acceptable: Payment declined, customer needs another method, or the business loses the sale."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q45" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["declined", "need another", "lose the sale", "cannot pay"]], "feedback": "Hint: What will the card machine say, and what will the customer have to do to get the product?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q45" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q45')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">46. A business accepts card payments but has to pay transaction fees. Explain the impact.</label>
-                    <textarea id="b2_q46" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["less money", "reduce its profit", "attract more customers", "increase sales"]], "feedback": "Acceptable: Business keeps less money/reduced profit, but accepting cards may attract more customers/increase sales."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q46" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["less money", "reduce its profit", "attract more customers", "increase sales"]], "feedback": "Hint: Even though the fee reduces profit on each sale, why might it still lead to more overall sales?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q46" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q46')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -358,81 +378,81 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 5: Challenge questions</h3>
                 <div class="question-wrapper">
                     <label class="question-label">47. Explain why a business might accept both cash and card payments.</label>
-                    <textarea id="b2_q47" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["prefer different methods", "easier for more people", "prevent lost sales", "increase revenue", "choice"]], "feedback": "Acceptable: Customers prefer different methods, makes payment easier for more people, prevents lost sales, increases revenue."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q47" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["prefer different methods", "easier for more people", "prevent lost sales", "increase revenue", "choice"]], "feedback": "Hint: Think about offering choice so you never have to turn a customer away."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q47" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q47')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">48. Explain why accepting online payments could help a business grow.</label>
-                    <textarea id="b2_q48" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["anywhere", "without visiting", "more potential customers", "increase sales"]], "feedback": "Acceptable: Customers buy from anywhere without visiting the shop, accessing more potential customers/increasing sales."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q48" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["anywhere", "without visiting", "more potential customers", "increase sales"]], "feedback": "Hint: If you aren't limited by your physical shop's location, who else can buy from you?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q48" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q48')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">49. Explain why cash might be unsuitable for an online business.</label>
-                    <textarea id="b2_q49" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["cannot hand over notes", "electronic way", "collect payment before sending", "distance"]], "feedback": "Acceptable: Cannot hand over physical notes via website; business needs an electronic way to collect payment before sending."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q49" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["cannot hand over notes", "electronic way", "collect payment before sending", "distance"]], "feedback": "Hint: Think about the physical impossibility of handing notes through a computer screen."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q49" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q49')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">50. Explain why card payment fees might be a problem for a small business.</label>
-                    <textarea id="b2_q50" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["increase the cost", "reducing the money", "reduce profit", "low profit margins"]], "feedback": "Acceptable: Fees increase transaction cost, reducing money kept from sales and reducing profit (especially on low margins)."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q50" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["increase the cost", "reducing the money", "reduce profit", "low profit margins"]], "feedback": "Hint: If profit margins are already tiny, what does the bank taking a cut do to the overall profits?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q50" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q50')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">51. Explain why offering several payment methods might increase sales.</label>
-                    <textarea id="b2_q51" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["easiest", "fewer may abandon", "cannot pay in their preferred way", "choice"]], "feedback": "Acceptable: Customers choose the easiest method, so fewer abandon purchases because they couldn't pay their preferred way."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q51" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["easiest", "fewer may abandon", "cannot pay in their preferred way", "choice"]], "feedback": "Hint: Think about how having choices stops customers from abandoning a sale because their favourite method isn't available."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q51" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q51')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">52. Explain why a business should consider security when choosing a payment method.</label>
-                    <textarea id="b2_q52" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["expose customer details", "fraud", "financial losses", "complaints", "damage to the business's reputation"]], "feedback": "Acceptable: Insecure payments expose details/lead to fraud, causing financial losses, complaints, and reputation damage."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q52" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["expose customer details", "fraud", "financial losses", "complaints", "damage to the business's reputation"]], "feedback": "Hint: What happens to a business's reputation if an insecure method causes a customer to be hacked?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q52" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q52')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">53. A business sells cheap snacks at lunchtime. Recommend a suitable payment method and explain why.</label>
-                    <textarea id="b2_q53" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["contactless", "quick", "convenient", "cash", "simple", "avoid card fees"]], "feedback": "Acceptable: Contactless (quick/convenient, queues move faster) or Cash (simple, avoids card fees)."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q53" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["contactless", "quick", "convenient", "cash", "simple", "avoid card fees"]], "feedback": "Hint: Think about speed to keep queues short (contactless) or avoiding tiny card fees on 50p crisps (cash)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q53" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q53')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">54. A furniture company sells £3,000 sofas. Recommend a payment method and explain why.</label>
-                    <textarea id="b2_q54" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["card payment", "bank transfer", "finance", "large transactions", "spread the cost"]], "feedback": "Acceptable: Card or bank transfer (handle large amounts safely), or finance options (helps spread cost)."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q54" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["card payment", "bank transfer", "finance", "large transactions", "spread the cost"]], "feedback": "Hint: Think about how people pay for very large transactions safely, or how they might spread the cost over time."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q54" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q54')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">55. A small business wants to reduce the chance of customers failing to pay. Recommend a payment approach.</label>
-                    <textarea id="b2_q55" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["at the time of purchase", "before dispatch", "deposit", "reduces the amount", "improve cash flow"]], "feedback": "Acceptable: Ask for payment at time of purchase, pay before dispatch, or require a deposit."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q55" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["at the time of purchase", "before dispatch", "deposit", "reduces the amount", "improve cash flow"]], "feedback": "Hint: How does making someone pay *before* they receive the product solve this problem?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q55" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q55')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">56. Explain why the best payment method may differ between two businesses.</label>
-                    <textarea id="b2_q56" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["different products", "different customers", "online or in person", "different fees", "payment amounts"]], "feedback": "Acceptable: Sell different products, have different customers, online vs in-person, face different fees, handle different amounts."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q56" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["different products", "different customers", "online or in person", "different fees", "payment amounts"]], "feedback": "Hint: Would an online car dealership and a physical sweet shop need the exact same payment options? Why not?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q56" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q56')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">57. A business is deciding whether to offer buy now pay later. What should it consider?</label>
-                    <textarea id="b2_q57" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["customer demand", "fees", "responsibility for missed", "affects sales", "trust", "reputation"]], "feedback": "Acceptable: Customer demand, provider fees, who takes responsibility for missed payments, effects on sales/reputation."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="b2_q57" class="auto-input b2-input" rows="2" data-rubric='{"keywords": [["customer demand", "fees", "responsibility for missed", "affects sales", "trust", "reputation"]], "feedback": "Hint: They need to think about customer demand, who covers the fees, and what happens if a customer misses a payment."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b2_q57" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b2_q57')">👨‍🏫 Override Score</button></div>
                 </div>
 
-                <button class="btn-submit no-print" onclick="checkAnswers('b2-input')">Check Answers</button>
+                <button class="btn-submit no-print" onclick="checkAnswers('b2-input')">✅ Check Answers</button>
             </div>
         </main>
     </div>
+    
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
-        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+        <button class="btn-reset no-print" onclick="clearData()">Reset Page</button>
     </div>
 
-    <!-- SECURE PASSWORD MODAL -->
+    <!-- Teacher Override Modal -->
     <div class="modal-overlay" id="verify-modal">
         <div class="modal-content">
             <h3>Teacher Verification</h3>
@@ -448,45 +468,184 @@
     <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
 
     <script>
-        function saveProgress() {
-            var inputs = document.querySelectorAll('.auto-input');
-            var dataToSave = {};
-            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
-            try { localStorage.setItem('enterpriseB2Memory_Smart_v1', JSON.stringify(dataToSave)); } catch (e) {}
+        // --- FIREBASE INITIALIZATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
-        function loadProgress() {
-            var saved = localStorage.getItem('enterpriseB2Memory_Smart_v1');
-            if (saved) {
-                var data = JSON.parse(saved);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "enterprise-b2-payment";
+
+        /* --- MARKBOOK BUILDER FOR TEACHER DASHBOARD --- */
+        function buildMarkbookData() {
+            const items = [];
+            const inputs = document.querySelectorAll('.auto-input');
+            
+            inputs.forEach((input, i) => {
+                const wrapper = input.closest('.question-wrapper');
+                const labelEl = wrapper ? wrapper.querySelector('.question-label') : null;
+                const labelText = labelEl ? labelEl.innerText.trim() : `Question ${i + 1}`;
+                
+                let status = 'neutral';
+                if (input.classList.contains('correct') || input.classList.contains('teacher-locked')) {
+                    status = 'correct';
+                } else if (input.classList.contains('incorrect')) {
+                    status = 'incorrect';
+                }
+
+                items.push({
+                    index: i,
+                    label: labelText,
+                    value: input.value.trim(),
+                    status: status
+                });
+            });
+
+            // Calculate total correct answers
+            const correctCount = document.querySelectorAll('.auto-input.correct, .auto-input.teacher-locked').length;
+            const gradableInputs = document.querySelectorAll('.b2-input');
+            const totalGradable = gradableInputs.length;
+
+            return {
+                items: items,
+                scoreText: `Score: ${correctCount} / ${totalGradable}`
+            };
+        }
+
+        /* --- CLOUD AUTO-SAVE & AUTO-LOAD --- */
+        let saveTimer;
+        function saveProgressToCloud(immediate = false) {
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                const structured = buildMarkbookData();
+                const payload = {
+                    pageTitle: document.title || "B2: Payment Methods",
+                    lastUpdated: Date.now(),
+                    scoreText: structured.scoreText,
+                    items: structured.items
+                };
+
+                // Also store inputs explicitly for local legacy support fallback
                 var inputs = document.querySelectorAll('.auto-input');
                 for (var i = 0; i < inputs.length; i++) {
-                    if (data['input_' + i]) {
-                        inputs[i].value = data['input_' + i];
-                        if (data['class_' + i]) {
-                            inputs[i].className = data['class_' + i];
-                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
-                                var btnId = "override-" + inputs[i].id;
-                                var btn = document.getElementById(btnId);
-                                if (btn) btn.classList.remove('hidden');
+                    payload['input_' + i] = inputs[i].value;
+                    payload['class_' + i] = inputs[i].className;
+                }
+
+                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
+                  .set(payload, { merge: true })
+                  .catch(err => console.error("Cloud sync error:", err));
+            }, immediate ? 50 : 800);
+        }
+
+        function applySavedData(data) {
+            if (!data) return;
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                var savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined) {
+                    inputs[i].value = savedVal;
+                    if (data['class_' + i]) {
+                        inputs[i].className = data['class_' + i];
+                        if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect') || inputs[i].classList.contains('teacher-locked')) {
+                            var btnId = "override-" + inputs[i].id;
+                            var btn = document.getElementById(btnId);
+                            if (btn) btn.classList.remove('hidden');
+                            
+                            // Restore feedback visually if teacher-locked
+                            var feedbackDiv = inputs[i].nextElementSibling;
+                            if (inputs[i].classList.contains('teacher-locked') && feedbackDiv) {
+                                if (inputs[i].classList.contains('correct')) {
+                                    feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; 
+                                    feedbackDiv.style.color = "#006100"; 
+                                    feedbackDiv.style.display = "block";
+                                } else {
+                                    feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; 
+                                    feedbackDiv.style.color = "#b71c1c"; 
+                                    feedbackDiv.style.display = "block";
+                                }
                             }
                         }
-                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                            inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                        }
+                    }
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto'; 
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
                     }
                 }
             }
         }
+
+        // --- LOAD DATA FROM FIREBASE ON START ---
+        auth.onAuthStateChanged(async (user) => {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    // Try to clean up local storage from legacy version
+                    try { localStorage.removeItem('enterpriseB2Memory_Smart_v1'); } catch (e) {}
+
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud data:", err);
+                }
+            } else if (!isTeacher) {
+                alert("Please log in on the home page first!");
+                window.location.href = "index.html";
+            }
+        });
+
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('auto-input')) {
-                saveProgress();
+                saveProgressToCloud(false);
                 if (e.target.tagName.toLowerCase() === 'textarea') {
-                    e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';
+                    e.target.style.height = 'auto'; 
+                    e.target.style.height = e.target.scrollHeight + 'px';
                 }
             }
         });
-        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterpriseB2Memory_Smart_v1'); window.location.reload(); } }
-        window.onload = loadProgress;
+
+        // --- RESET / CLEAR DATA FROM FIREBASE CLOUD ---
+        async function clearData() { 
+            if (confirm("Clear all work on this page?")) { 
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
+                    } catch (e) {}
+                }
+                window.location.reload(); 
+            } 
+        }
 
         let activeQuestionId = null;
         function openVerifyModal(qId) {
@@ -516,7 +675,7 @@
                     if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
                 }
                 closeVerifyModal();
-                saveProgress();
+                saveProgressToCloud(true);
             } else {
                 document.getElementById('modal-error-msg').style.display = 'block';
             }
@@ -590,34 +749,7 @@
                     }
                 }
             }
-            saveProgress();
-        }
-
-        function downloadPDF() {
-            var hide = document.querySelectorAll('.no-print');
-            for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
-            document.getElementById('action-buttons').style.display = 'none';
-
-            var textAreas = document.querySelectorAll('textarea');
-            for (var j = 0; j < textAreas.length; j++) {
-                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
-            }
-
-            var element = document.getElementById('pdf-content');
-            var opt = { 
-                margin: 0.3, 
-                filename: 'B2_Payment_Methods.pdf', 
-                image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, 
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
-
-            html2pdf().set(opt).from(element).save().then(function() {
-                for(var b=0; b<hide.length; b++) hide[b].style.display = 'block';
-                document.getElementById('action-buttons').style.display = 'flex';
-                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
-            });
+            saveProgressToCloud(true);
         }
     </script>
 </body>
