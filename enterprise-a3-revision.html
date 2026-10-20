@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A3: Choice of Marketing Methods - Revision</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
         .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
@@ -36,11 +41,14 @@
         .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
         .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
         .btn-submit:hover { background-color: #152960; }
-        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
-        .btn-pdf:hover { background-color: #124d2d; }
+        .btn-reset { background-color: #d32f2f; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; margin: 20px auto; }
+        .btn-reset:hover { background-color: #b71c1c; }
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; justify-content: center; align-items: center; font-size: 1.5em; color: #1e3a8a; font-weight: bold; transition: opacity 0.5s; }
     </style>
 </head>
 <body>
+    <div id="loading-overlay">Loading your workspace from cloud...</div>
+
     <div id="pdf-content">
         <header>
             <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
@@ -53,7 +61,7 @@
                 <h2>A3 Revision Notes</h2>
                 <div class="instruction-box center-text">Use this space to write out your complete notes on factors influencing marketing methods (product, brand image, target market, speed, cost, competitors, entrepreneur's experience).</div>
                 <div class="question-wrapper">
-                    <textarea class="auto-input" rows="12" placeholder="Type your revision notes here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                    <textarea class="auto-input notes-textarea" rows="12" placeholder="Type your revision notes here..."></textarea>
                 </div>
             </div>
 
@@ -65,49 +73,49 @@
                 
                 <div class="question-wrapper">
                     <label class="question-label">1. What is a marketing method?</label>
-                    <textarea id="a3_q1" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["advertise", "promote", "tell people", "attract"]], "feedback": "Acceptable: A way to advertise, promote a product, tell people about a business, or attract customers."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q1" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["advertise", "promote", "tell people", "attract"]], "feedback": "Hint: Think about ways a business advertises, promotes a product, or tells people about what they do."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q1')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">2. Give two examples of marketing methods.</label>
-                    <textarea id="a3_q2" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["social media", "posters", "leaflets", "websites", "email", "tv", "radio", "influencers", "sponsorship", "word of mouth"]], "feedback": "Acceptable: Social media, posters, leaflets, websites, TV/radio adverts, influencers, etc."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q2" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["social media", "posters", "leaflets", "websites", "email", "tv", "radio", "influencers", "sponsorship", "word of mouth"]], "feedback": "Hint: Think of two different places you see or hear adverts, like on your phone or on TV."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q2')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">3. Give one factor that affects the choice of marketing method.</label>
-                    <textarea id="a3_q3" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["cost", "budget", "product", "brand image", "target customers", "speed", "competitors", "experience", "accessibility", "reach"]], "feedback": "Acceptable: Cost, the product, brand image, target customers, speed, competitors, experience, accessibility."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q3" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["cost", "budget", "product", "brand image", "target customers", "speed", "competitors", "experience", "accessibility", "reach"]], "feedback": "Hint: What might influence a business decision? Think about their budget, who they are selling to, or what rivals are doing."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q3')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">4. Why can't every business use exactly the same marketing methods?</label>
-                    <textarea id="a3_q4" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["different things", "different budgets", "target different", "different skills", "different images"]], "feedback": "Acceptable: They sell different things, have different budgets, target different people, or want different images."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q4" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["different things", "different budgets", "target different", "different skills", "different images"]], "feedback": "Hint: Do all businesses have the same budget, sell the same products, or aim at the exact same people?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">5. What does target market mean?</label>
-                    <textarea id="a3_q5" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["wants to sell to", "intended customers", "likely to buy"]], "feedback": "Acceptable: The people the business wants to sell to, its intended customers, or people likely to buy."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q5" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["wants to sell to", "intended customers", "likely to buy"]], "feedback": "Hint: What do you call the specific group of people a business is aiming to sell to?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q5')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">6. What is meant by brand image?</label>
-                    <textarea id="a3_q6" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["people see the business", "impression", "looks cheap", "expensive", "professional", "trustworthy"]], "feedback": "Acceptable: How people see the business, the impression it gives (e.g. cheap, expensive, professional)."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q6" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["people see the business", "impression", "looks cheap", "expensive", "professional", "trustworthy"]], "feedback": "Hint: Think about the overall impression or personality a business presents to the public."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q6')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
                     <label class="question-label">7. What does accessibility mean when choosing a marketing method?</label>
-                    <textarea id="a3_q7" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["easy it is", "access", "see", "view", "available"]], "feedback": "Acceptable: How easy it is for customers to access/see the advert, or if it is available to the intended audience."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q7" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["easy it is", "access", "see", "view", "available"]], "feedback": "Hint: How easy is it for the target audience to actually see or get to the promotional material?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q7')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -115,49 +123,49 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Part 2: Appropriateness for the product and brand image</h3>
                 <div class="question-wrapper">
                     <label class="question-label">8. Why should a business choose a marketing method that suits its product?</label>
-                    <textarea id="a3_q8" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["make sense", "show the product", "interest", "work better"]], "feedback": "Acceptable: The advert needs to make sense, show the product properly, interest buyers, or work better."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q8" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["make sense", "show the product", "interest", "work better"]], "feedback": "Hint: Why is it important that the way you advertise actually fits what you are selling?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q8')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">9. A business sells luxury watches. Suggest a suitable marketing method and explain why.</label>
-                    <textarea id="a3_q9" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["website", "premium", "influencer", "luxury", "magazine", "wealthy", "expensive"]], "feedback": "Acceptable: High quality website (looks premium), an influencer (reaches luxury buyers), or a magazine (aimed at wealthy customers)."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q9" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["website", "premium", "influencer", "luxury", "magazine", "wealthy", "expensive"]], "feedback": "Hint: Where would wealthy customers expect to see high-end adverts? Think about premium formats."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q9')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">10. A local takeaway wants more customers. Suggest a suitable marketing method and explain why.</label>
-                    <textarea id="a3_q10" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["local social media", "nearby", "leaflets", "local homes", "discount", "persuade"]], "feedback": "Acceptable: Local social media (nearby people see it), leaflets (reach local homes), or discounts (persuade people)."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q10" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["local social media", "nearby", "leaflets", "local homes", "discount", "persuade"]], "feedback": "Hint: What cheap methods reach people living very close by?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q10')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">11. Why might a luxury business avoid cheap-looking or poorly designed adverts?</label>
-                    <textarea id="a3_q11" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["low quality", "damage its image", "put customers off", "not worth its price"]], "feedback": "Acceptable: Makes it look low quality, damages its image, puts customers off, or makes it seem not worth the price."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q11" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["low quality", "damage its image", "put customers off", "not worth its price"]], "feedback": "Hint: If a premium product has a cheap advert, what will customers think about its real value?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q11')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">12. Why might a business selling toys use colourful images or videos?</label>
-                    <textarea id="a3_q12" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["attract attention", "looks like", "fun", "appeal to children", "parents"]], "feedback": "Acceptable: Attracts attention, shows what it looks like, makes it seem fun, or appeals to children/parents."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q12" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["attract attention", "looks like", "fun", "appeal to children", "parents"]], "feedback": "Hint: What grabs a child's attention and makes a toy look fun to play with?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q12')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">13. Why might a business selling professional services use a website?</label>
-                    <textarea id="a3_q13" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["look professional", "explain the services", "reviews", "contact details", "trust"]], "feedback": "Acceptable: Looks professional, explains services, shows reviews, provides contact details, or builds trust."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q13" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["look professional", "explain the services", "reviews", "contact details", "trust"]], "feedback": "Hint: Why does a professional service need a place to show detail, reviews, and contact info to build trust?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q13')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">14. Could the same marketing method work well for one business but badly for another? Explain.</label>
-                    <textarea id="a3_q14" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["yes", "different products", "target different people", "target market", "audience"]], "feedback": "Acceptable: Yes, businesses sell different products and target different people (e.g. TikTok works for young people but not older people)."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q14" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["yes", "different products", "target different people", "target market", "audience"]], "feedback": "Hint: Would a method that works for teenagers automatically work for pensioners?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q14')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">15. A business sells handmade jewellery. Give two suitable marketing methods.</label>
-                    <textarea id="a3_q15" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["instagram", "videos", "online shop", "craft fairs", "market", "influencer", "website"]], "feedback": "Acceptable: Instagram photos, videos, online shop, craft fairs, local markets, influencer posts, or a website."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q15" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["instagram", "videos", "online shop", "craft fairs", "market", "influencer", "website"]], "feedback": "Hint: Think about highly visual platforms for crafts, or physical places where handmade goods are sold locally."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q15')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -165,49 +173,49 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Part 3: Speed, accessibility and reaching the target market</h3>
                 <div class="question-wrapper">
                     <label class="question-label">16. Why might a business want a marketing method that spreads information quickly?</label>
-                    <textarea id="a3_q16" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["new product", "short term offer", "respond to competitors", "before an event", "sale"]], "feedback": "Acceptable: To promote a new product, short-term offer, respond to competitors, or attract customers before an event."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q16" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["new product", "short term offer", "respond to competitors", "before an event", "sale"]], "feedback": "Hint: Why might you need people to know something *right now*? Think about sales or events."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q16')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">17. Which could spread information faster: social media or delivering leaflets door-to-door? Explain.</label>
-                    <textarea id="a3_q17" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["social media", "lots of people quickly", "instant", "takes time", "slower"]], "feedback": "Acceptable: Social media can reach lots of people quickly/instantly, while delivering leaflets takes time."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q17" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["social media", "lots of people quickly", "instant", "takes time", "slower"]], "feedback": "Hint: Which one happens instantly at the push of a button, and which requires physically walking to houses?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q17')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">18. Why is it important to reach the target market?</label>
-                    <textarea id="a3_q18" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["likely to buy", "avoids wasting money", "more sales"]], "feedback": "Acceptable: The right people are more likely to buy, avoids wasting money on uninterested people, leads to more sales."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q18" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["likely to buy", "avoids wasting money", "more sales"]], "feedback": "Hint: Why is it a waste of money to show adverts to people who will never buy your product?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q18')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">19. A business targets teenagers. Suggest a marketing method and explain why.</label>
-                    <textarea id="a3_q19" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["tiktok", "instagram", "youtube", "social media", "use these platforms", "influencers", "online videos"]], "feedback": "Acceptable: TikTok/Instagram/YouTube because many teenagers use them, or gaming/music influencers/videos."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q19" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["tiktok", "instagram", "youtube", "social media", "use these platforms", "influencers", "online videos"]], "feedback": "Hint: Which social media platforms or video sites are most popular with teenagers right now?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q19')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">20. A business targets elderly customers who rarely use social media. What could it use instead?</label>
-                    <textarea id="a3_q20" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["local newspapers", "leaflets", "posters", "radio", "community events", "word of mouth", "accessible"]], "feedback": "Acceptable: Local newspapers, leaflets, posters, radio, or word of mouth because they are more accessible."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q20" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["local newspapers", "leaflets", "posters", "radio", "community events", "word of mouth", "accessible"]], "feedback": "Hint: If they don't use the internet, what traditional or physical methods can reach them?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q20')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">21. Why might a business use a local newspaper instead of a national TV advert?</label>
-                    <textarea id="a3_q21" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["local customers", "cheaper", "cannot use", "waste"]], "feedback": "Acceptable: Mainly wants local customers, it's cheaper, or a national advert reaches people who can't use its services."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q21" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["local customers", "cheaper", "cannot use", "waste"]], "feedback": "Hint: Why pay to advertise to the whole country if only people in your town can visit you?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q21')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">22. Why might a business use social media to promote a flash sale?</label>
-                    <textarea id="a3_q22" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["post quickly", "share", "straight away", "urgency", "fast"]], "feedback": "Acceptable: It can post quickly, people share it, customers see the deal straight away, creates urgency."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q22" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["post quickly", "share", "straight away", "urgency", "fast"]], "feedback": "Hint: If a sale is happening today only, why is an instant post better than a printed leaflet?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q22')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">23. What could happen if an advert does not reach the intended customers?</label>
-                    <textarea id="a3_q23" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["few people buy", "waste money", "sales may not increase", "fail", "purpose"]], "feedback": "Acceptable: Few people buy, business wastes money, sales don't increase, or advert fails its purpose."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q23" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["few people buy", "waste money", "sales may not increase", "fail", "purpose"]], "feedback": "Hint: If the wrong people see the advert, what happens to the money spent and the sales?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q23')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -215,49 +223,49 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Part 4: Cost to the enterprise</h3>
                 <div class="question-wrapper">
                     <label class="question-label">24. Why is cost important when choosing a marketing method?</label>
-                    <textarea id="a3_q24" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["limited budget", "afford", "reduce profit", "worthwhile"]], "feedback": "Acceptable: Business has a limited budget, needs to afford it, it reduces profit, needs to be worthwhile."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q24" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["limited budget", "afford", "reduce profit", "worthwhile"]], "feedback": "Hint: Why does the amount of money a business has available dictate what they can do?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q24')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">25. Give two low cost marketing methods.</label>
-                    <textarea id="a3_q25" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["social media", "word of mouth", "email", "posters", "free business listing"]], "feedback": "Acceptable: Social media posts, word of mouth, emails, homemade posters, free listings."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q25" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["social media", "word of mouth", "email", "posters", "free business listing"]], "feedback": "Hint: What methods can be done for free or very little money online or locally?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q25')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">26. Give two marketing methods that could be expensive.</label>
-                    <textarea id="a3_q26" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["tv", "television", "celebrity", "endorsements", "billboard", "national magazine", "popular influencer"]], "feedback": "Acceptable: TV adverts, celebrity endorsements, billboards, national magazines, popular influencers."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q26" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["tv", "television", "celebrity", "endorsements", "billboard", "national magazine", "popular influencer"]], "feedback": "Hint: Think of massive national campaigns, like TV spots or paying famous celebrities."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q26" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q26')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">27. Why might a small business use social media instead of TV advertising?</label>
-                    <textarea id="a3_q27" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["cheaper", "chosen audience", "cannot afford tv", "post content itself"]], "feedback": "Acceptable: It is cheaper, reaches a chosen audience, they can't afford TV, or they can post it themselves."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q27" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["cheaper", "chosen audience", "cannot afford tv", "post content itself"]], "feedback": "Hint: Compare the massive cost of making a TV advert with setting up a free business profile online."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q27" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q27')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">28. Does the cheapest marketing method always provide the best value? Explain.</label>
-                    <textarea id="a3_q28" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["no", "very few people", "wrong audience", "no sales", "more expensive could be worthwhile", "attracts enough"]], "feedback": "Acceptable: No, it might reach few people, the wrong audience, or make no sales. Expensive methods are worthwhile if they work."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q28" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["no", "very few people", "wrong audience", "no sales", "more expensive could be worthwhile", "attracts enough"]], "feedback": "Hint: Does 'cheap' always mean it actually gets sales? Sometimes spending more brings in more."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q28" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q28')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">29. A business has only £100 to spend on promotion. What should it consider?</label>
-                    <textarea id="a3_q29" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["afford", "who to reach", "how many people", "lead to sales", "create itself"]], "feedback": "Acceptable: What it can afford, who to reach, how many will see it, if it leads to sales, or if they can create it themselves."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q29" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["afford", "who to reach", "how many people", "lead to sales", "create itself"]], "feedback": "Hint: With only £100, what do they need to make sure that money achieves?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q29" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q29')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">30. Why might a business spend more on promotion if it expects to gain more customers?</label>
-                    <textarea id="a3_q30" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["cover the cost", "more profit", "grow", "works"]], "feedback": "Acceptable: More sales cover the extra cost, it makes more profit overall, or helps the business grow."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q30" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["cover the cost", "more profit", "grow", "works"]], "feedback": "Hint: If an expensive advert brings in thousands of new paying customers, why is the cost worth it?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q30" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q30')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">31. Explain one risk of spending too much on marketing.</label>
-                    <textarea id="a3_q31" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["not earn back", "exceed revenue", "profit fall", "not enough money"]], "feedback": "Acceptable: Might not earn the money back, costs exceed extra revenue, profit falls, or not enough money for other expenses."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q31" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["not earn back", "exceed revenue", "profit fall", "not enough money"]], "feedback": "Hint: What happens if the advert costs more than the profit made from new sales?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q31" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q31')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -265,37 +273,37 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Part 5: Competitors' activities</h3>
                 <div class="question-wrapper">
                     <label class="question-label">32. Why might a business look at how its competitors advertise?</label>
-                    <textarea id="a3_q32" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["what works", "copy ideas", "opportunities", "understand", "stand out"]], "feedback": "Acceptable: To see what works, copy useful ideas safely, spot opportunities, or find ways to stand out."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q32" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["what works", "copy ideas", "opportunities", "understand", "stand out"]], "feedback": "Hint: How can checking out rivals help a business figure out what to do (or not do)?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q32" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q32')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">33. A competitor is getting lots of attention on TikTok. What might another business do?</label>
-                    <textarea id="a3_q33" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["try tiktok", "different videos", "influencer", "unique", "another method", "different platform"]], "feedback": "Acceptable: Try TikTok too, create better videos, use influencers, promote something unique, or choose a different platform."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q33" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["try tiktok", "different videos", "influencer", "unique", "another method", "different platform"]], "feedback": "Hint: Should they join the same platform to compete, or find a different way to stand out?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q33" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q33')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">34. Why might a business want its promotion to stand out from competitors?</label>
-                    <textarea id="a3_q34" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["notice", "remember", "choose it", "makes it different"]], "feedback": "Acceptable: So people notice it, remember the brand, choose it instead, or understand what makes it different."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q34" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["notice", "remember", "choose it", "makes it different"]], "feedback": "Hint: If all adverts look the same, will customers remember whose is whose?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q34" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q34')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">35. Why might copying a competitor's marketing exactly be a bad idea?</label>
-                    <textarea id="a3_q35" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["not suit", "unoriginal", "doing it better", "fail to stand out"]], "feedback": "Acceptable: Might not suit its own customers, looks unoriginal, competitor does it better, or it fails to stand out."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q35" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["not suit", "unoriginal", "doing it better", "fail to stand out"]], "feedback": "Hint: Why is being a 'copycat' bad for a brand's unique image?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q35" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q35')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">36. Two cafés operate on the same street. One offers discounts on social media. What could the other café do to compete?</label>
-                    <textarea id="a3_q36" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["own deal", "advertise food", "loyalty cards", "reviews", "photos", "different", "homemade"]], "feedback": "Acceptable: Offer its own deal, use loyalty cards, promote reviews/photos, or emphasise something different (e.g. homemade cakes)."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q36" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["own deal", "advertise food", "loyalty cards", "reviews", "photos", "different", "homemade"]], "feedback": "Hint: What could the other café do differently to win customers back without just copying the discount?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q36" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q36')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">37. Why should a business not assume that a method used by a competitor will work equally well for it?</label>
-                    <textarea id="a3_q37" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["different customers", "budgets", "products", "skills", "brand images", "not suit"]], "feedback": "Acceptable: They may have different customers, budgets, products, skills, or images, so the method might not suit them."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q37" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["different customers", "budgets", "products", "skills", "brand images", "not suit"]], "feedback": "Hint: Do all businesses have the exact same budget, target audience, and brand personality?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q37" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q37')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -303,37 +311,37 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Part 6: Experience of the entrepreneur</h3>
                 <div class="question-wrapper">
                     <label class="question-label">38. What is meant by the entrepreneur's experience?</label>
-                    <textarea id="a3_q38" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["already knows", "skills", "previous", "confidence"]], "feedback": "Acceptable: What the owner already knows, their skills, previous experience, or confidence with marketing methods."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q38" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["already knows", "skills", "previous", "confidence"]], "feedback": "Hint: Think about the skills or past knowledge the business owner themselves has."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q38" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q38')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">39. Why might an entrepreneur choose a marketing method they already understand?</label>
-                    <textarea id="a3_q39" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["know how", "confident", "without paying", "fewer mistakes"]], "feedback": "Acceptable: They know how to use it, feel confident, don't have to pay someone else, or make fewer mistakes."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q39" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["know how", "confident", "without paying", "fewer mistakes"]], "feedback": "Hint: Why is it easier and cheaper to do something you already know how to do?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q39" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q39')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">40. How could a lack of experience affect marketing choices?</label>
-                    <textarea id="a3_q40" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["struggle", "waste money", "mistakes", "need training", "help from an expert"]], "feedback": "Acceptable: They might struggle, waste money, make mistakes, or need training/help from an expert."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q40" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["struggle", "waste money", "mistakes", "need training", "help from an expert"]], "feedback": "Hint: What could go wrong if someone tries a complex method they don't understand?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q40" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q40')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">41. An entrepreneur is very good at making videos but knows little about designing websites. What might they choose to do?</label>
-                    <textarea id="a3_q41" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["video promotion", "social media", "learn", "hire someone", "get help"]], "feedback": "Acceptable: Use video promotion on social media, learn website design, or hire someone to build the website."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q41" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["video promotion", "social media", "learn", "hire someone", "get help"]], "feedback": "Hint: They could stick to their strengths (video), learn a new skill, or pay an expert."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q41" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q41')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">42. Should an entrepreneur only use marketing methods they already know? Explain.</label>
-                    <textarea id="a3_q42" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["no", "learn new skills", "training", "ask an expert", "suits their customers", "budget"]], "feedback": "Acceptable: No, they can learn new skills, get training, ask an expert, or try methods that better suit their customers/budget."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q42" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["no", "learn new skills", "training", "ask an expert", "suits their customers", "budget"]], "feedback": "Hint: Should an owner limit the business to only what they know right now, or can they get help/learn?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q42" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q42')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">43. Why might an entrepreneur's previous experience help them choose effective marketing?</label>
-                    <textarea id="a3_q43" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["what has worked before", "understand customers", "how much", "avoid previous mistakes"]], "feedback": "Acceptable: They know what worked before, understand their customers, know costs, or avoid previous mistakes."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q43" class="auto-input a3-input" rows="2" data-rubric='{"keywords": [["what has worked before", "understand customers", "how much", "avoid previous mistakes"]], "feedback": "Hint: How does having done it before stop them from wasting money or making errors?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q43" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q43')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -341,55 +349,55 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Part 7: Exam style scenario questions</h3>
                 <div class="question-wrapper">
                     <label class="question-label">44. A new business sells handmade cakes from home. It has a small budget and wants to attract customers in its local area. Suggest one suitable marketing method and explain why.</label>
-                    <textarea id="a3_q44" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["social media", "cheap", "local", "leaflets", "nearby", "word of mouth", "recommend", "community groups"]], "feedback": "Acceptable: Social media (cheap, local reach), leaflets (nearby homes), word of mouth (recommendations), local groups."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q44" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["social media", "cheap", "local", "leaflets", "nearby", "word of mouth", "recommend", "community groups"]], "feedback": "Hint: Suggest a low-cost method that specifically targets nearby neighbours."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q44" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q44')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">45. A company sells expensive designer clothing and wants to keep a premium image. Suggest one suitable marketing method and explain why.</label>
-                    <textarea id="a3_q45" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["influencers", "fashion", "website", "high quality", "magazines", "luxury", "videos", "attractive"]], "feedback": "Acceptable: Fashion influencers, a high-quality professional website, fashion magazines, or high-quality videos."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q45" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["influencers", "fashion", "website", "high quality", "magazines", "luxury", "videos", "attractive"]], "feedback": "Hint: Where do people expect to see premium, expensive fashion advertised?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q45" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q45')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">46. A small business wants to advertise a one-day sale tomorrow. Which factor is especially important, and which method could it use?</label>
-                    <textarea id="a3_q46" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["speed", "before it happens", "social media", "email", "website banner", "quickly"]], "feedback": "Acceptable: Speed is important (people need to know before it happens). Use social media, email, or a website banner."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q46" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["speed", "before it happens", "social media", "email", "website banner", "quickly"]], "feedback": "Hint: If it is happening tomorrow, what is the most important factor, and what digital method is fastest?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q46" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q46')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">47. A business spends £2,000 on a national advert but only sells products in one small town. Explain why this marketing choice might be unsuitable.</label>
-                    <textarea id="a3_q47" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["wasting money", "cannot buy", "local advert", "limited area", "cost more than sales"]], "feedback": "Acceptable: Wasting money on people who can't buy, local advert is better, limited area, or costs more than sales generated."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q47" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["wasting money", "cannot buy", "local advert", "limited area", "cost more than sales"]], "feedback": "Hint: Why pay to show your advert to people hundreds of miles away who will never visit?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q47" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q47')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">48. A competitor uses a popular influencer to advertise sports clothing. Explain one reason why another sports clothing business might use a different marketing method.</label>
-                    <textarea id="a3_q48" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["stand out", "expensive", "reach target better", "sports clubs", "local events"]], "feedback": "Acceptable: To stand out, influencer is too expensive, another method reaches their specific target better (e.g. sports clubs)."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q48" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["stand out", "expensive", "reach target better", "sports clubs", "local events"]], "feedback": "Hint: Give a reason why copying the influencer idea might be too costly or unoriginal."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q48" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q48')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">49. An entrepreneur has never used social media for business but thinks it could help attract customers. What should they consider before deciding to use it?</label>
-                    <textarea id="a3_q49" class="auto-input a3-input" rows="4" data-rubric='{"keywords": [["target customers", "use it", "skills", "time", "training", "budget", "brand image", "suit"]], "feedback": "Acceptable: Do target customers use it? Do they have skills/time? Do they need training? Does it fit budget/brand image?"}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q49" class="auto-input a3-input" rows="4" data-rubric='{"keywords": [["target customers", "use it", "skills", "time", "training", "budget", "brand image", "suit"]], "feedback": "Hint: What questions should they ask about their own skills, target audience, and time before jumping in?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q49" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q49')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">50. A business has a limited budget, targets teenagers and sells gaming accessories. Recommend a marketing method and explain your choice using two relevant factors.</label>
-                    <textarea id="a3_q50" class="auto-input a3-input" rows="4" data-rubric='{"keywords": [["social media", "low cost", "reach teenagers", "influencers", "gaming videos", "communities"]], "feedback": "Acceptable: Social media (low cost, reaches teens), gaming influencers (reaches target, check cost), gaming videos, or online communities."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q50" class="auto-input a3-input" rows="4" data-rubric='{"keywords": [["social media", "low cost", "reach teenagers", "influencers", "gaming videos", "communities"]], "feedback": "Hint: Pick a method that reaches teens cheaply, and explain how it fits the budget and audience."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q50" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q50')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">51. A business sells mobility aids to older customers. Explain why it should think carefully before choosing TikTok as its main marketing method.</label>
-                    <textarea id="a3_q51" class="auto-input a3-input" rows="4" data-rubric='{"keywords": [["not use tiktok", "not reach", "newspapers", "leaflets", "directories", "research where"]], "feedback": "Acceptable: Target customers may not use TikTok, so it won't reach them. Local papers or leaflets may be more suitable."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q51" class="auto-input a3-input" rows="4" data-rubric='{"keywords": [["not use tiktok", "not reach", "newspapers", "leaflets", "directories", "research where"]], "feedback": "Hint: Do many older people use TikTok? If not, what traditional method might work better?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q51" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q51')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">52. Explain why a business should consider more than one factor when choosing a marketing method.</label>
-                    <textarea id="a3_q52" class="auto-input a3-input" rows="4" data-rubric='{"keywords": [["cheap but not reach", "damage brand", "cost", "suitability", "competitors", "skills together", "affordable"]], "feedback": "Acceptable: A cheap method might not reach the right people. Must consider cost, target, brand, and skills together to find what works."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q52" class="auto-input a3-input" rows="4" data-rubric='{"keywords": [["cheap but not reach", "damage brand", "cost", "suitability", "competitors", "skills together", "affordable"]], "feedback": "Hint: Why isn't 'cost' the only thing that matters? Think about the audience and the brand image."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q52" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q52')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -397,31 +405,31 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Part 8: Challenge questions</h3>
                 <div class="question-wrapper">
                     <label class="question-label">53. A business can afford either a cheap advert that reaches 500 people or a more expensive advert that reaches 5,000 people. Which should it choose?</label>
-                    <textarea id="a3_q53" class="auto-input a3-input" rows="4" data-rubric='{"keywords": [["expensive", "interested", "extra sales", "cheaper", "right customers", "unlikely to buy", "more information"]], "feedback": "Acceptable: Expensive if the extra reach brings enough sales to cover costs, or cheap if the expensive one reaches people unlikely to buy. Need more info to decide."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q53" class="auto-input a3-input" rows="4" data-rubric='{"keywords": [["expensive", "interested", "extra sales", "cheaper", "right customers", "unlikely to buy", "more information"]], "feedback": "Hint: Which one brings in more *paying* customers compared to its cost? How do you weigh reach versus price?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q53" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q53')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">54. A business uses social media because its competitor does, but it gets very few sales. Give two possible reasons.</label>
-                    <textarea id="a3_q54" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["target customers may not use", "not interesting", "more followers", "not appeal", "different method"]], "feedback": "Acceptable: Its customers might not use that platform, its content is boring, the competitor has more followers, or product doesn't appeal."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q54" class="auto-input a3-input" rows="3" data-rubric='{"keywords": [["target customers may not use", "not interesting", "more followers", "not appeal", "different method"]], "feedback": "Hint: Even if the platform is the same, what might be wrong with their followers, content, or audience?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q54" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q54')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">55. A business has a great product but very little money for advertising. Explain how the entrepreneur could still promote it effectively.</label>
-                    <textarea id="a3_q55" class="auto-input a3-input" rows="4" data-rubric='{"keywords": [["social media for free", "recommend", "reviews", "local community groups", "create videos", "email existing"]], "feedback": "Acceptable: Free social media, encourage word of mouth/reviews, use local groups, make own videos, or email existing customers."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q55" class="auto-input a3-input" rows="4" data-rubric='{"keywords": [["social media for free", "recommend", "reviews", "local community groups", "create videos", "email existing"]], "feedback": "Hint: What free or extremely low-cost digital methods can they rely on?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q55" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q55')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">56. A business sells high-quality handmade furniture. Explain how its product, target market, budget and brand image could affect its choice of marketing method.</label>
-                    <textarea id="a3_q56" class="auto-input a3-input" rows="5" data-rubric='{"keywords": [["good photographs", "quality", "pay more", "budget may rule out", "professional website", "magazine", "premium", "showrooms"]], "feedback": "Acceptable: Needs good photos, targets those paying more, budget rules out TV, needs professional website/magazine for premium image, or uses showrooms."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q56" class="auto-input a3-input" rows="5" data-rubric='{"keywords": [["good photographs", "quality", "pay more", "budget may rule out", "professional website", "magazine", "premium", "showrooms"]], "feedback": "Hint: Combine the factors: high price needs premium image, handmade needs good photos, small budget rules out TV."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q56" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q56')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
                     <label class="question-label">57. Explain why the entrepreneur's experience should not be the only factor when choosing a marketing method.</label>
-                    <textarea id="a3_q57" class="auto-input a3-input" rows="4" data-rubric='{"keywords": [["not reach right customers", "expensive", "not suit", "competitors", "learn new", "get help"]], "feedback": "Acceptable: What they know might not reach the right customers, could be expensive, might not suit the brand, or competitors are doing better."}' placeholder="Type answer here..."></textarea>
+                    <textarea id="a3_q57" class="auto-input a3-input" rows="4" data-rubric='{"keywords": [["not reach right customers", "expensive", "not suit", "competitors", "learn new", "get help"]], "feedback": "Hint: Just because the owner knows how to do something, does it mean the target audience will actually see it?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-a3_q57" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('a3_q57')">👨‍🏫 Override Score</button></div>
                 </div>
@@ -430,9 +438,9 @@
             </div>
         </main>
     </div>
+
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
-        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+        <button class="btn-reset no-print" onclick="clearData()">Reset Page</button>
     </div>
 
     <!-- SECURE PASSWORD MODAL -->
@@ -451,45 +459,194 @@
     <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
 
     <script>
-        function saveProgress() {
-            var inputs = document.querySelectorAll('.auto-input');
-            var dataToSave = {};
-            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
-            try { localStorage.setItem('enterpriseA3Memory_Smart_v2', JSON.stringify(dataToSave)); } catch (e) {}
+        // --- FIREBASE INITIALIZATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
-        function loadProgress() {
-            var saved = localStorage.getItem('enterpriseA3Memory_Smart_v2');
-            if (saved) {
-                var data = JSON.parse(saved);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "enterprise-a3-marketing";
+
+        /* --- MARKBOOK BUILDER FOR TEACHER DASHBOARD --- */
+        function buildMarkbookData() {
+            const items = [];
+            const inputs = document.querySelectorAll('.auto-input');
+            
+            inputs.forEach((input, i) => {
+                const wrapper = input.closest('.question-wrapper');
+                const labelEl = wrapper ? wrapper.querySelector('.question-label') : null;
+                const labelText = labelEl ? labelEl.innerText.trim() : `Question ${i + 1}`;
+                
+                let status = 'neutral';
+                if (input.classList.contains('correct') || input.classList.contains('teacher-locked')) {
+                    status = 'correct';
+                } else if (input.classList.contains('incorrect')) {
+                    status = 'incorrect';
+                }
+
+                items.push({
+                    index: i,
+                    label: labelText,
+                    value: input.value.trim(),
+                    status: status
+                });
+            });
+
+            // Calculate total correct answers
+            const correctCount = document.querySelectorAll('.auto-input.correct, .auto-input.teacher-locked').length;
+            const gradableInputs = document.querySelectorAll('.a3-input');
+            const totalGradable = gradableInputs.length;
+
+            return {
+                items: items,
+                scoreText: `Score: ${correctCount} / ${totalGradable}`
+            };
+        }
+
+        /* --- CLOUD AUTO-SAVE & AUTO-LOAD --- */
+        let saveTimer;
+        function saveProgressToCloud(immediate = false) {
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                const structured = buildMarkbookData();
+                const payload = {
+                    pageTitle: document.title || "A3: Choice of Marketing Methods",
+                    lastUpdated: Date.now(),
+                    scoreText: structured.scoreText,
+                    items: structured.items
+                };
+
+                // Also store inputs explicitly for local legacy support fallback
                 var inputs = document.querySelectorAll('.auto-input');
                 for (var i = 0; i < inputs.length; i++) {
-                    if (data['input_' + i]) {
-                        inputs[i].value = data['input_' + i];
-                        if (data['class_' + i]) {
-                            inputs[i].className = data['class_' + i];
-                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
-                                var btnId = "override-" + inputs[i].id;
-                                var btn = document.getElementById(btnId);
-                                if (btn) btn.classList.remove('hidden');
+                    payload['input_' + i] = inputs[i].value;
+                    payload['class_' + i] = inputs[i].className;
+                }
+
+                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
+                  .set(payload, { merge: true })
+                  .catch(err => console.error("Cloud sync error:", err));
+            }, immediate ? 50 : 800);
+        }
+
+        function applySavedData(data) {
+            if (!data) return;
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                var savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined) {
+                    inputs[i].value = savedVal;
+                    if (data['class_' + i]) {
+                        inputs[i].className = data['class_' + i];
+                        if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect') || inputs[i].classList.contains('teacher-locked')) {
+                            var btnId = "override-" + inputs[i].id;
+                            var btn = document.getElementById(btnId);
+                            if (btn) btn.classList.remove('hidden');
+                            
+                            // Restore feedback visually if teacher-locked
+                            var feedbackDiv = inputs[i].nextElementSibling;
+                            if (inputs[i].classList.contains('teacher-locked') && feedbackDiv) {
+                                if (inputs[i].classList.contains('correct')) {
+                                    feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; 
+                                    feedbackDiv.style.color = "#006100"; 
+                                    feedbackDiv.style.display = "block";
+                                } else {
+                                    feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; 
+                                    feedbackDiv.style.color = "#b71c1c"; 
+                                    feedbackDiv.style.display = "block";
+                                }
                             }
                         }
-                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                            inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                        }
+                    }
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto'; 
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
                     }
                 }
             }
         }
+
+        function hideLoading() {
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) {
+                overlay.style.opacity = '0';
+                setTimeout(() => { overlay.style.display = 'none'; }, 500);
+            }
+        }
+
+        // --- LOAD DATA FROM FIREBASE ON START ---
+        auth.onAuthStateChanged(async (user) => {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                hideLoading();
+                return;
+            }
+
+            if (user) {
+                try {
+                    // Try to clean up local storage from legacy version
+                    try { localStorage.removeItem('enterpriseA3Memory_Smart_v2'); } catch (e) {}
+
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud data:", err);
+                }
+            } else if (!isTeacher) {
+                alert("Please log in on the home page first!");
+                window.location.href = "index.html";
+            }
+            hideLoading();
+        });
+
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('auto-input')) {
-                saveProgress();
+                saveProgressToCloud(false);
                 if (e.target.tagName.toLowerCase() === 'textarea') {
-                    e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';
+                    e.target.style.height = 'auto'; 
+                    e.target.style.height = e.target.scrollHeight + 'px';
                 }
             }
         });
-        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterpriseA3Memory_Smart_v2'); window.location.reload(); } }
-        window.onload = loadProgress;
+
+        // --- RESET / CLEAR DATA FROM FIREBASE CLOUD ---
+        async function clearData() { 
+            if (confirm("Clear all work on this page?")) { 
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
+                    } catch (e) {}
+                }
+                window.location.reload(); 
+            } 
+        }
 
         let activeQuestionId = null;
         function openVerifyModal(qId) {
@@ -519,7 +676,7 @@
                     if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
                 }
                 closeVerifyModal();
-                saveProgress();
+                saveProgressToCloud(true);
             } else {
                 document.getElementById('modal-error-msg').style.display = 'block';
             }
@@ -593,34 +750,7 @@
                     }
                 }
             }
-            saveProgress();
-        }
-
-        function downloadPDF() {
-            var hide = document.querySelectorAll('.no-print');
-            for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
-            document.getElementById('action-buttons').style.display = 'none';
-
-            var textAreas = document.querySelectorAll('textarea');
-            for (var j = 0; j < textAreas.length; j++) {
-                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
-            }
-
-            var element = document.getElementById('pdf-content');
-            var opt = { 
-                margin: 0.3, 
-                filename: 'A3_Choice_of_Marketing.pdf', 
-                image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, 
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
-
-            html2pdf().set(opt).from(element).save().then(function() {
-                for(var b=0; b<hide.length; b++) hide[b].style.display = 'block';
-                document.getElementById('action-buttons').style.display = 'flex';
-                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
-            });
+            saveProgressToCloud(true);
         }
     </script>
 </body>
