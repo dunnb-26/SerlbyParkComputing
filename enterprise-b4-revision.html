@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>B4: Financial Statements - Revision</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
         .task-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid !important; break-inside: avoid !important; transition: all 0.3s ease; }
@@ -36,8 +41,8 @@
         .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
         .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; transition: background-color 0.2s; }
         .btn-submit:hover { background-color: #152960; }
-        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
-        .btn-pdf:hover { background-color: #124d2d; }
+        .btn-reset { background-color: #d32f2f; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; margin: 20px auto; }
+        .btn-reset:hover { background-color: #b71c1c; }
     </style>
 </head>
 <body>
@@ -53,7 +58,7 @@
                 <h2>B4 Revision Notes</h2>
                 <div class="instruction-box center-text">Use this space to write out your complete notes on income statements, statements of financial position, profit calculations, assets, liabilities, and working capital.</div>
                 <div class="question-wrapper">
-                    <textarea class="auto-input" rows="12" placeholder="Type your revision notes here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                    <textarea class="auto-input notes-textarea" rows="12" placeholder="Type your revision notes here..."></textarea>
                 </div>
             </div>
 
@@ -64,392 +69,392 @@
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 1: Understanding financial statements</h3>
                 
                 <div class="question-wrapper">
-                    <label class="question-label">1. What is a financial statement?</label>
-                    <textarea id="b4_q1" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["financial information", "report about its money", "how the business is doing financially"]], "feedback": "Acceptable: A document showing financial information, a report about its money, or how the business is doing financially."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q1. What is a financial statement?</label>
+                    <textarea id="b4_q1" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["financial information", "report about its money", "how the business is doing financially"]], "feedback": "Hint: What do you call a formal report that shows how a business is doing financially?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q1')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">2. Why does a business produce financial statements?</label>
-                    <textarea id="b4_q2" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["making money", "financial position", "monitor performance", "plan spending", "provide information"]], "feedback": "Acceptable: To see if it is making money, check its financial position, monitor performance, or provide info to lenders."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q2. Why does a business produce financial statements?</label>
+                    <textarea id="b4_q2" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["making money", "financial position", "monitor performance", "plan spending", "provide information"]], "feedback": "Hint: Why would an owner or a bank need to see exactly how much money is coming in and going out?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q2')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">3. Name two financial statements a business might produce.</label>
-                    <textarea id="b4_q3" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["income statement", "profit and loss", "financial position", "balance sheet", "cash flow"]], "feedback": "Acceptable: Income statement (profit and loss), statement of financial position (balance sheet), or cash flow statement."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q3. Name two financial statements a business might produce.</label>
+                    <textarea id="b4_q3" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["income statement", "profit and loss", "financial position", "balance sheet", "cash flow"]], "feedback": "Hint: Name two of the main official financial reports (e.g., one that shows profit, and one that shows what a business owns)."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q3')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">4. What is an income statement?</label>
-                    <textarea id="b4_q4" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["revenue", "costs", "profit or loss", "over a period", "made money during"]], "feedback": "Acceptable: A report showing revenue, costs and profit/loss over a period of time."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q4. What is an income statement?</label>
+                    <textarea id="b4_q4" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["revenue", "costs", "profit or loss", "over a period", "made money during"]], "feedback": "Hint: Which report shows revenue and costs over a period of time to calculate profit?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">5. What is a statement of financial position?</label>
-                    <textarea id="b4_q5" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["snapshot", "owns and owes", "particular date", "assets", "liabilities", "equity"]], "feedback": "Acceptable: A snapshot of what a business owns and owes at a particular date, showing assets, liabilities and equity."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q5. What is a statement of financial position?</label>
+                    <textarea id="b4_q5" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["snapshot", "owns and owes", "particular date", "assets", "liabilities", "equity"]], "feedback": "Hint: Which report acts as a snapshot showing the assets and liabilities on a specific date?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q5')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">6. What is the difference between an income statement and a statement of financial position?</label>
-                    <textarea id="b4_q6" class="auto-input b4-input" rows="3" data-rubric='{"keywords": [["income statement", "performance", "over a period"], ["financial position", "owns and owes", "specific date", "snapshot"]], "feedback": "An income statement shows performance over a period, while a statement of financial position shows what it owns and owes on a specific date."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q6. What is the difference between an income statement and a statement of financial position?</label>
+                    <textarea id="b4_q6" class="auto-input b4-input" rows="3" data-rubric='{"keywords": [["income statement", "performance", "over a period"], ["financial position", "owns and owes", "specific date", "snapshot"]], "feedback": "Hint: One shows profit performance over time, the other takes a snapshot of what is owned and owed."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q6" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q6')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">7. Who might use a business's financial statements?</label>
-                    <textarea id="b4_q7" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["owner", "managers", "banks", "lenders", "investors", "accountants", "tax"]], "feedback": "Acceptable: The owner, managers, banks, lenders, investors, accountants, or tax authorities."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q7. Who might use a business's financial statements?</label>
+                    <textarea id="b4_q7" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["owner", "managers", "banks", "lenders", "investors", "accountants", "tax"]], "feedback": "Hint: Think of the people who manage the business, lend it money, or collect taxes."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q7" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q7')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">8. Why might a bank want to see a business's financial statements?</label>
-                    <textarea id="b4_q8" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["afford a loan", "financially stable", "assess the risk", "lending money"]], "feedback": "Acceptable: To judge whether it can afford a loan, check if it is financially stable, or assess the risk of lending money."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q8. Why might a bank want to see a business's financial statements?</label>
+                    <textarea id="b4_q8" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["afford a loan", "financially stable", "assess the risk", "lending money"]], "feedback": "Hint: If a business asks for a loan, what does the bank need to check first?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q8" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q8')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">9. Why might an entrepreneur look at last year's financial statements?</label>
-                    <textarea id="b4_q9" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["compare performance", "increased", "identify problems", "plan future spending", "make decisions"]], "feedback": "Acceptable: To compare performance, see if profit increased, identify problems, or plan future spending."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q9. Why might an entrepreneur look at last year's financial statements?</label>
+                    <textarea id="b4_q9" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["compare performance", "increased", "identify problems", "plan future spending", "make decisions"]], "feedback": "Hint: How does comparing past data help an owner spot problems or plan for the future?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q9" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q9')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-wrapper">
-                    <label class="question-label">10. What could happen if financial statements contain inaccurate information?</label>
-                    <textarea id="b4_q10" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["poor decisions", "misled", "problems could be missed", "need correcting"]], "feedback": "Acceptable: The owner makes poor decisions, lenders are misled, problems missed, or records need correcting."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q10. What could happen if financial statements contain inaccurate information?</label>
+                    <textarea id="b4_q10" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["poor decisions", "misled", "problems could be missed", "need correcting"]], "feedback": "Hint: What happens if the owner or the bank bases their decisions on numbers that are wrong?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q10" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q10')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 2: Income statements and profit</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">11. What is revenue in an income statement?</label>
-                    <textarea id="b4_q11" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["earned from sales", "sales income", "total value", "sold"]], "feedback": "Acceptable: Money earned from sales, sales income, or the total value of products/services sold."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q11. What is revenue in an income statement?</label>
+                    <textarea id="b4_q11" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["earned from sales", "sales income", "total value", "sold"]], "feedback": "Hint: In an income statement, what do we call the total amount of money brought in from selling goods?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q11" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q11')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">12. What are expenses or costs?</label>
-                    <textarea id="b4_q12" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["spent to run", "bills", "spending", "making and selling"]], "feedback": "Acceptable: Money spent to run the business, bills/spending, or costs of making and selling products."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q12. What are expenses or costs?</label>
+                    <textarea id="b4_q12" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["spent to run", "bills", "spending", "making and selling"]], "feedback": "Hint: What do we call the money going out to pay bills and run the business?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q12" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q12')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">13. What is gross profit?</label>
-                    <textarea id="b4_q13" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["revenue minus cost of sales", "money left", "after deducting the direct cost"]], "feedback": "Acceptable: Revenue minus cost of sales, or money left from sales after deducting direct costs."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q13. What is gross profit?</label>
+                    <textarea id="b4_q13" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["revenue minus cost of sales", "money left", "after deducting the direct cost"]], "feedback": "Hint: What type of profit is calculated by taking the revenue and only subtracting the direct cost of sales?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q13" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q13')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">14. How do you calculate gross profit?</label>
-                    <textarea id="b4_q14" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["revenue", "sales income"], ["minus", "less", " - ", "-"], ["cost of sales", "direct cost"]], "feedback": "Acceptable: Revenue minus cost of sales."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q14. How do you calculate gross profit?</label>
+                    <textarea id="b4_q14" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["revenue", "sales income"], ["minus", "less", " - ", "-"], ["cost of sales", "direct cost"]], "feedback": "Hint: What two numbers do you subtract from each other to get gross profit?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q14" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q14')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">15. What is net profit?</label>
-                    <textarea id="b4_q15" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["after all", "expenses have been deducted", "final profit", "rent, wages"]], "feedback": "Acceptable: What is left after all business expenses have been deducted, or the final profit."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q15. What is net profit?</label>
+                    <textarea id="b4_q15" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["after all", "expenses have been deducted", "final profit", "rent, wages"]], "feedback": "Hint: What do we call the final profit figure after *every single* business expense has been deducted?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q15" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q15')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">16. How do you calculate net profit in a simple income statement?</label>
-                    <textarea id="b4_q16" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["gross profit minus other expenses", "revenue minus all relevant costs"]], "feedback": "Acceptable: Gross profit minus other expenses, or revenue minus all relevant costs."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q16. How do you calculate net profit in a simple income statement?</label>
+                    <textarea id="b4_q16" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["gross profit minus other expenses", "revenue minus all relevant costs"]], "feedback": "Hint: How do you find the final profit? Think about subtracting all other expenses from the gross profit."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q16" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q16')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">17. What is a loss?</label>
-                    <textarea id="b4_q17" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["costs are greater than revenue", "spends more than it earns"]], "feedback": "Acceptable: When costs are greater than revenue, or when it spends more than it earns from sales."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q17. What is a loss?</label>
+                    <textarea id="b4_q17" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["costs are greater than revenue", "spends more than it earns"]], "feedback": "Hint: What happens when the money going out is greater than the money coming in?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q17" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q17')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">18. A business has revenue of £4,000 and cost of sales of £1,500. Calculate gross profit.</label>
-                    <input type="text" id="b4_q18" class="auto-input b4-input" data-rubric='{"keywords": [["2500", "£2500", "2,500", "£2,500"]], "feedback": "£2,500."}' placeholder="Type answer here...">
+                    <label class="question-label">Q18. A business has revenue of £4,000 and cost of sales of £1,500. Calculate gross profit.</label>
+                    <input type="text" id="b4_q18" class="auto-input b4-input" data-rubric='{"keywords": [["2500", "£2500", "2,500", "£2,500"]], "feedback": "Hint: Subtract £1,500 from £4,000. Include the currency symbol."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q18" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q18')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">19. A business has gross profit of £3,000 and other expenses of £1,200. Calculate net profit.</label>
-                    <input type="text" id="b4_q19" class="auto-input b4-input" data-rubric='{"keywords": [["1800", "£1800", "1,800", "£1,800"]], "feedback": "£1,800."}' placeholder="Type answer here...">
+                    <label class="question-label">Q19. A business has gross profit of £3,000 and other expenses of £1,200. Calculate net profit.</label>
+                    <input type="text" id="b4_q19" class="auto-input b4-input" data-rubric='{"keywords": [["1800", "£1800", "1,800", "£1,800"]], "feedback": "Hint: Subtract £1,200 from £3,000. Include the currency symbol."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q19" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q19')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">20. A business has revenue of £2,000 and total costs of £2,400. Has it made a profit or a loss?</label>
-                    <textarea id="b4_q20" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["loss", "400", "£400", "higher than"]], "feedback": "Acceptable: A £400 loss (costs are £400 higher than revenue)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q20. A business has revenue of £2,000 and total costs of £2,400. Has it made a profit or a loss?</label>
+                    <textarea id="b4_q20" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["loss", "400", "£400", "higher than"]], "feedback": "Hint: If the costs are £400 higher than the revenue, what is the result?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q20" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q20')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 3: Statement of financial position</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">21. What is an asset?</label>
-                    <textarea id="b4_q21" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["owns", "controls", "value", "equipment", "stock", "money", "vehicle"]], "feedback": "Acceptable: Something the business owns/controls that has value (e.g. equipment, stock, cash)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q21. What is an asset?</label>
+                    <textarea id="b4_q21" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["owns", "controls", "value", "equipment", "stock", "money", "vehicle"]], "feedback": "Hint: What do we call something of value that the business owns or controls?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q21" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q21')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">22. Give three examples of business assets.</label>
-                    <textarea id="b4_q22" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["cash", "stock", "computers", "machinery", "vehicles", "furniture", "equipment", "money owed"]], "feedback": "Acceptable: Cash, stock, computers, machinery, vehicles, furniture, equipment, or money owed to the business."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q22. Give three examples of business assets.</label>
+                    <textarea id="b4_q22" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["cash", "stock", "computers", "machinery", "vehicles", "furniture", "equipment", "money owed"]], "feedback": "Hint: Name three valuable things a business might own, like physical items or cash."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q22" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q22')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">23. What is a liability?</label>
-                    <textarea id="b4_q23" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["owes", "debt", "financial obligation", "loan", "unpaid"]], "feedback": "Acceptable: Money the business owes, a debt or financial obligation (e.g. loan, unpaid bills)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q23. What is a liability?</label>
+                    <textarea id="b4_q23" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["owes", "debt", "financial obligation", "loan", "unpaid"]], "feedback": "Hint: What do we call a financial debt or an amount of money the business owes to someone else?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q23" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q23')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">24. Give three examples of business liabilities.</label>
-                    <textarea id="b4_q24" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["bank loans", "loan", "overdrafts", "unpaid supplier", "money owed", "due for payment"]], "feedback": "Acceptable: Bank loans, overdrafts, unpaid supplier invoices, money owed to other businesses."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q24. Give three examples of business liabilities.</label>
+                    <textarea id="b4_q24" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["bank loans", "loan", "overdrafts", "unpaid supplier", "money owed", "due for payment"]], "feedback": "Hint: Name three things a business might owe money for, such as bank debts or unpaid bills."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q24" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q24')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">25. What is equity?</label>
-                    <textarea id="b4_q25" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["owner", "stake", "value left", "after liabilities", "financial interest"]], "feedback": "Acceptable: The owner'\''s stake in the business, the value left after liabilities are deducted, or their financial interest."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q25. What is equity?</label>
+                    <textarea id="b4_q25" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["owner", "stake", "value left", "after liabilities", "financial interest"]], "feedback": "Hint: What do we call the owner's share or the value left in the business after all liabilities are paid?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q25" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q25')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">26. How do you calculate net assets?</label>
-                    <textarea id="b4_q26" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["total assets"], ["minus", "subtract", "less"], ["total liabilities"]], "feedback": "Acceptable: Total assets minus total liabilities."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q26. How do you calculate net assets?</label>
+                    <textarea id="b4_q26" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["total assets"], ["minus", "subtract", "less"], ["total liabilities"]], "feedback": "Hint: What calculation involving assets and liabilities gives you the net assets?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q26" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q26')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">27. A business has assets worth £10,000 and liabilities of £4,000. Calculate net assets.</label>
-                    <input type="text" id="b4_q27" class="auto-input b4-input" data-rubric='{"keywords": [["6000", "£6000", "6,000", "£6,000"]], "feedback": "£6,000."}' placeholder="Type answer here...">
+                    <label class="question-label">Q27. A business has assets worth £10,000 and liabilities of £4,000. Calculate net assets.</label>
+                    <input type="text" id="b4_q27" class="auto-input b4-input" data-rubric='{"keywords": [["6000", "£6000", "6,000", "£6,000"]], "feedback": "Hint: Subtract £4,000 from £10,000. Include the currency symbol."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q27" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q27')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">28. What is the difference between an asset and a liability?</label>
-                    <textarea id="b4_q28" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["asset", "owns", "controls"], ["liability", "owes", "debt"]], "feedback": "An asset is something valuable the business owns, while a liability is something it owes."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q28. What is the difference between an asset and a liability?</label>
+                    <textarea id="b4_q28" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["asset", "owns", "controls"], ["liability", "owes", "debt"]], "feedback": "Hint: Contrast what a business owns versus what it owes."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q28" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q28')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">29. Why might a business own equipment?</label>
-                    <textarea id="b4_q29" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["make products", "provide services", "improve efficiency", "help employees"]], "feedback": "Acceptable: To make products, provide services, improve efficiency, or help employees do their jobs."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q29. Why might a business own equipment?</label>
+                    <textarea id="b4_q29" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["make products", "provide services", "improve efficiency", "help employees"]], "feedback": "Hint: Why do businesses need things like machinery, computers, and tools to operate?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q29" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q29')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">30. Why might a business have liabilities?</label>
-                    <textarea id="b4_q30" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["borrowed money", "bought goods on credit", "unpaid bills", "obligations"]], "feedback": "Acceptable: It has borrowed money, bought goods on credit, has unpaid bills, or other financial obligations."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q30. Why might a business have liabilities?</label>
+                    <textarea id="b4_q30" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["borrowed money", "bought goods on credit", "unpaid bills", "obligations"]], "feedback": "Hint: Why would a business owe money? Think about loans, credit, and unpaid bills."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q30" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q30')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 4: Working capital and financial position</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">31. What is working capital?</label>
-                    <textarea id="b4_q31" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["current assets minus current liabilities", "short term resources left", "after covering short term debts"]], "feedback": "Acceptable: Current assets minus current liabilities, or short-term resources left after covering short-term debts."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q31. What is working capital?</label>
+                    <textarea id="b4_q31" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["current assets minus current liabilities", "short term resources left", "after covering short term debts"]], "feedback": "Hint: What do we call the short-term funds left over when you subtract current liabilities from current assets?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q31" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q31')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">32. What are current assets?</label>
-                    <textarea id="b4_q32" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["turned into cash", "sold", "used up within a year", "cash", "stock", "owed by customers"]], "feedback": "Acceptable: Assets expected to be turned into cash/sold within a year (e.g. cash, stock, money owed by customers)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q32. What are current assets?</label>
+                    <textarea id="b4_q32" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["turned into cash", "sold", "used up within a year", "cash", "stock", "owed by customers"]], "feedback": "Hint: What do we call assets like cash or stock that will be used or turned into cash within a year?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q32" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q32')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">33. What are current liabilities?</label>
-                    <textarea id="b4_q33" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["debts due in the short term", "within a year", "supplier bills", "overdraft"]], "feedback": "Acceptable: Debts due in the short term, usually within a year (e.g. supplier bills, overdraft)."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q33. What are current liabilities?</label>
+                    <textarea id="b4_q33" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["debts due in the short term", "within a year", "supplier bills", "overdraft"]], "feedback": "Hint: What do we call debts (like supplier bills or an overdraft) that must be paid back within a year?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q33" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q33')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">34. A business has current assets of £5,000 and current liabilities of £2,000. Calculate working capital.</label>
-                    <input type="text" id="b4_q34" class="auto-input b4-input" data-rubric='{"keywords": [["3000", "£3000", "3,000", "£3,000"]], "feedback": "£3,000."}' placeholder="Type answer here...">
+                    <label class="question-label">Q34. A business has current assets of £5,000 and current liabilities of £2,000. Calculate working capital.</label>
+                    <input type="text" id="b4_q34" class="auto-input b4-input" data-rubric='{"keywords": [["3000", "£3000", "3,000", "£3,000"]], "feedback": "Hint: Subtract the current liabilities from the current assets. Include the currency symbol."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q34" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q34')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">35. Why is working capital important?</label>
-                    <textarea id="b4_q35" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["pay short term bills", "buy stock", "pay wages", "keep operating"]], "feedback": "Acceptable: It helps the business pay short-term bills, buy stock, pay wages, and keep operating."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q35. Why is working capital important?</label>
+                    <textarea id="b4_q35" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["pay short term bills", "buy stock", "pay wages", "keep operating"]], "feedback": "Hint: Why does a business need readily available cash to cover its day-to-day running?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q35" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q35')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">36. What could negative working capital mean for a business?</label>
-                    <textarea id="b4_q36" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["struggle to pay bills", "more short term debts", "than current assets", "cash flow pressure"]], "feedback": "Acceptable: It may struggle to pay bills, has more short-term debts than assets, or faces cash flow pressure."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q36. What could negative working capital mean for a business?</label>
+                    <textarea id="b4_q36" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["struggle to pay bills", "more short term debts", "than current assets", "cash flow pressure"]], "feedback": "Hint: If current debts are larger than current assets, what happens to the business's ability to pay its immediate bills?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q36" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q36')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">37. What are trade receivables, sometimes called debtors?</label>
-                    <textarea id="b4_q37" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["money customers owe", "unpaid customer invoices", "sales", "not yet been paid for"]], "feedback": "Acceptable: Money customers owe, unpaid customer invoices, or sales not yet paid for."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q37. What are trade receivables, sometimes called debtors?</label>
+                    <textarea id="b4_q37" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["money customers owe", "unpaid customer invoices", "sales", "not yet been paid for"]], "feedback": "Hint: What do you call the money owed to the business by customers who haven't paid yet?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q37" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q37')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">38. What are trade payables, sometimes called creditors?</label>
-                    <textarea id="b4_q38" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["money the business owes", "unpaid supplier invoices", "bills", "not yet been paid"]], "feedback": "Acceptable: Money the business owes suppliers, unpaid supplier invoices, or bills not yet paid."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q38. What are trade payables, sometimes called creditors?</label>
+                    <textarea id="b4_q38" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["money the business owes", "unpaid supplier invoices", "bills", "not yet been paid"]], "feedback": "Hint: What do you call the money the business owes to its suppliers for unpaid bills?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q38" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q38')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">39. Why could too much stock be a problem?</label>
-                    <textarea id="b4_q39" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["tied up", "storage costs", "outdated", "out of fashion"]], "feedback": "Acceptable: Money is tied up in unsold goods, storage costs increase, or products become outdated."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q39. Why could too much stock be a problem?</label>
+                    <textarea id="b4_q39" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["tied up", "storage costs", "outdated", "out of fashion"]], "feedback": "Hint: Why is having too many unsold items sitting in a warehouse a bad thing?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q39" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q39')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">40. Why could a business with plenty of equipment still have money problems?</label>
-                    <textarea id="b4_q40" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["not necessarily easy to turn into cash", "not enough money available", "pay its immediate bills"]], "feedback": "Acceptable: Equipment is hard to turn into cash quickly, so it might not have enough cash to pay immediate bills."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q40. Why could a business with plenty of equipment still have money problems?</label>
+                    <textarea id="b4_q40" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["not necessarily easy to turn into cash", "not enough money available", "pay its immediate bills"]], "feedback": "Hint: Can you easily use heavy machinery to pay an electricity bill today? Think about liquidity."}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q40" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q40')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 5: Using financial statements</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">41. Explain how an income statement can help an entrepreneur.</label>
-                    <textarea id="b4_q41" class="auto-input b4-input" rows="3" data-rubric='{"keywords": [["shows revenue", "costs", "profit or loss", "performing well", "spending may need to change"]], "feedback": "Acceptable: It shows revenue/costs/profit, helping the owner see if the business is performing well or needs spending changes."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q41. Explain how an income statement can help an entrepreneur.</label>
+                    <textarea id="b4_q41" class="auto-input b4-input" rows="3" data-rubric='{"keywords": [["shows revenue", "costs", "profit or loss", "performing well", "spending may need to change"]], "feedback": "Hint: How does seeing the total revenue and expenses help the owner check performance?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q41" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q41')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">42. Explain how a statement of financial position can help a business.</label>
-                    <textarea id="b4_q42" class="auto-input b4-input" rows="3" data-rubric='{"keywords": [["assets", "liabilities", "owns", "owes", "financial position"]], "feedback": "Acceptable: It shows assets and liabilities, helping the owner understand what it owns, owes, and its overall position."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q42. Explain how a statement of financial position can help a business.</label>
+                    <textarea id="b4_q42" class="auto-input b4-input" rows="3" data-rubric='{"keywords": [["assets", "liabilities", "owns", "owes", "financial position"]], "feedback": "Hint: How does seeing a snapshot of assets and liabilities help the business?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q42" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q42')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">43. Why might an investor look at a business's profit?</label>
-                    <textarea id="b4_q43" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["provide a return", "performing well", "investing seems worthwhile"]], "feedback": "Acceptable: To judge if it provides a return, see if it performs well, or decide if investing is worthwhile."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q43. Why might an investor look at a business's profit?</label>
+                    <textarea id="b4_q43" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["provide a return", "performing well", "investing seems worthwhile"]], "feedback": "Hint: Why does an investor want to make sure the business is actually making money before giving them funds?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q43" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q43')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">44. Why might a supplier check whether a business is financially stable?</label>
-                    <textarea id="b4_q44" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["likely to pay", "offer credit", "reduce the risk", "unpaid bills"]], "feedback": "Acceptable: To judge if they will pay invoices, decide to offer credit, or reduce the risk of unpaid bills."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q44. Why might a supplier check whether a business is financially stable?</label>
+                    <textarea id="b4_q44" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["likely to pay", "offer credit", "reduce the risk", "unpaid bills"]], "feedback": "Hint: Why does a supplier need to know if the business can afford to pay its bills on time?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q44" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q44')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">45. Why should a business compare financial statements from different years?</label>
-                    <textarea id="b4_q45" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["trends", "improving", "compare costs", "spot problems", "changes have worked"]], "feedback": "Acceptable: To identify trends, see if profit improves, compare costs, spot problems, or see if changes worked."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q45. Why should a business compare financial statements from different years?</label>
+                    <textarea id="b4_q45" class="auto-input b4-input" rows="2" data-rubric='{"keywords": [["trends", "improving", "compare costs", "spot problems", "changes have worked"]], "feedback": "Hint: How does looking at past data help spot trends, improvements, or problems?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q45" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q45')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">46. A business's revenue rises but its net profit falls. Explain one possible reason.</label>
-                    <textarea id="b4_q46" class="auto-input b4-input" rows="3" data-rubric='{"keywords": [["costs", "increased", "faster than revenue", "higher wages", "rent", "stock", "advertising", "less money as profit"]], "feedback": "Acceptable: Costs may have increased faster than revenue (e.g. higher wages/rent), leaving less money as profit."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q46. A business's revenue rises but its net profit falls. Explain one possible reason.</label>
+                    <textarea id="b4_q46" class="auto-input b4-input" rows="3" data-rubric='{"keywords": [["costs", "increased", "faster than revenue", "higher wages", "rent", "stock", "advertising", "less money as profit"]], "feedback": "Hint: If sales are up but profit is down, what must have happened to their expenses?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q46" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q46')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">47. A business has high assets but also high liabilities. What should the owner consider?</label>
-                    <textarea id="b4_q47" class="auto-input b4-input" rows="3" data-rubric='{"keywords": [["how much it owes", "when debts must be paid", "enough cash", "assets are easy to turn into money"]], "feedback": "Acceptable: Consider how much it owes, when debts are paid, if it has cash, and if assets are easily turned to money."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q47. A business has high assets but also high liabilities. What should the owner consider?</label>
+                    <textarea id="b4_q47" class="auto-input b4-input" rows="3" data-rubric='{"keywords": [["how much it owes", "when debts must be paid", "enough cash", "assets are easy to turn into money"]], "feedback": "Hint: If they have high debts, what do they need to ensure about their ability to turn those assets into cash?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q47" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q47')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">48. Explain why a profitable business might still struggle to pay its bills.</label>
-                    <textarea id="b4_q48" class="auto-input b4-input" rows="3" data-rubric='{"keywords": [["sales on credit", "waiting for customers to pay", "profit shown", "cash is already available"]], "feedback": "Acceptable: It may have made sales on credit and is waiting for customers to pay, so the profit isn't available in cash yet."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q48. Explain why a profitable business might still struggle to pay its bills.</label>
+                    <textarea id="b4_q48" class="auto-input b4-input" rows="3" data-rubric='{"keywords": [["sales on credit", "waiting for customers to pay", "profit shown", "cash is already available"]], "feedback": "Hint: If they sold items on credit, where is the money right now?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q48" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q48')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">49. Why is it important for financial statements to be accurate?</label>
-                    <textarea id="b4_q49" class="auto-input b4-input" rows="3" data-rubric='{"keywords": [["reliable information", "make decisions", "trustworthy figures", "hide financial problems"]], "feedback": "Acceptable: Owner needs reliable info to make decisions, lenders/investors need trustworthy figures, and errors hide problems."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q49. Why is it important for financial statements to be accurate?</label>
+                    <textarea id="b4_q49" class="auto-input b4-input" rows="3" data-rubric='{"keywords": [["reliable information", "make decisions", "trustworthy figures", "hide financial problems"]], "feedback": "Hint: What happens if managers or banks base decisions on numbers that are wrong?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q49" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q49')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">50. Explain why financial statements alone may not tell the whole story about a business.</label>
-                    <textarea id="b4_q50" class="auto-input b4-input" rows="3" data-rubric='{"keywords": [["may not explain customer satisfaction", "future demand", "competition", "every reason behind the figures"]], "feedback": "Acceptable: They don't show customer satisfaction, future demand, competition, or the reasons behind the numbers."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q50. Explain why financial statements alone may not tell the whole story about a business.</label>
+                    <textarea id="b4_q50" class="auto-input b4-input" rows="3" data-rubric='{"keywords": [["may not explain customer satisfaction", "future demand", "competition", "every reason behind the figures"]], "feedback": "Hint: Do numbers on a page show you if customers are happy or what competitors are planning?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q50" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q50')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Section 6: Challenge calculations</h3>
                 <div class="question-wrapper">
-                    <label class="question-label">51. Revenue is £8,000 and cost of sales is £3,000. Calculate gross profit.</label>
-                    <input type="text" id="b4_q51" class="auto-input b4-input" data-rubric='{"keywords": [["5000", "£5000", "5,000", "£5,000"]], "feedback": "£5,000."}' placeholder="Type answer here...">
+                    <label class="question-label">Q51. Revenue is £8,000 and cost of sales is £3,000. Calculate gross profit.</label>
+                    <input type="text" id="b4_q51" class="auto-input b4-input" data-rubric='{"keywords": [["5000", "£5000", "5,000", "£5,000"]], "feedback": "Hint: Subtract £3,000 from £8,000. Include the currency symbol."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q51" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q51')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">52. Gross profit is £5,000 and other expenses are £3,200. Calculate net profit.</label>
-                    <input type="text" id="b4_q52" class="auto-input b4-input" data-rubric='{"keywords": [["1800", "£1800", "1,800", "£1,800"]], "feedback": "£1,800."}' placeholder="Type answer here...">
+                    <label class="question-label">Q52. Gross profit is £5,000 and other expenses are £3,200. Calculate net profit.</label>
+                    <input type="text" id="b4_q52" class="auto-input b4-input" data-rubric='{"keywords": [["1800", "£1800", "1,800", "£1,800"]], "feedback": "Hint: Subtract £3,200 from £5,000. Include the currency symbol."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q52" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q52')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">53. A business has revenue of £6,000 and total costs of £6,700. Calculate the loss.</label>
-                    <input type="text" id="b4_q53" class="auto-input b4-input" data-rubric='{"keywords": [["700", "£700", "-700"], ["loss"]], "feedback": "£700 loss."}' placeholder="Type answer here...">
+                    <label class="question-label">Q53. A business has revenue of £6,000 and total costs of £6,700. Calculate the loss.</label>
+                    <input type="text" id="b4_q53" class="auto-input b4-input" data-rubric='{"keywords": [["700", "£700", "-700"], ["loss"]], "feedback": "Hint: If costs are £6,700 and revenue is £6,000, what is the result? Mention the word '\''loss'\''."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q53" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q53')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">54. A business has assets of £15,000 and liabilities of £9,000. Calculate net assets.</label>
-                    <input type="text" id="b4_q54" class="auto-input b4-input" data-rubric='{"keywords": [["6000", "£6000", "6,000", "£6,000"]], "feedback": "£6,000."}' placeholder="Type answer here...">
+                    <label class="question-label">Q54. A business has assets of £15,000 and liabilities of £9,000. Calculate net assets.</label>
+                    <input type="text" id="b4_q54" class="auto-input b4-input" data-rubric='{"keywords": [["6000", "£6000", "6,000", "£6,000"]], "feedback": "Hint: Subtract £9,000 from £15,000. Include the currency symbol."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q54" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q54')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">55. Current assets are £7,500 and current liabilities are £5,000. Calculate working capital.</label>
-                    <input type="text" id="b4_q55" class="auto-input b4-input" data-rubric='{"keywords": [["2500", "£2500", "2,500", "£2,500"]], "feedback": "£2,500."}' placeholder="Type answer here...">
+                    <label class="question-label">Q55. Current assets are £7,500 and current liabilities are £5,000. Calculate working capital.</label>
+                    <input type="text" id="b4_q55" class="auto-input b4-input" data-rubric='{"keywords": [["2500", "£2500", "2,500", "£2,500"]], "feedback": "Hint: Subtract £5,000 from £7,500. Include the currency symbol."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q55" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q55')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">56. A business's net profit increases from £1,000 to £1,600. By how much has it increased?</label>
-                    <input type="text" id="b4_q56" class="auto-input b4-input" data-rubric='{"keywords": [["600", "£600"]], "feedback": "£600."}' placeholder="Type answer here...">
+                    <label class="question-label">Q56. A business's net profit increases from £1,000 to £1,600. By how much has it increased?</label>
+                    <input type="text" id="b4_q56" class="auto-input b4-input" data-rubric='{"keywords": [["600", "£600"]], "feedback": "Hint: What is the difference between £1,000 and £1,600?"}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q56" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q56')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">57. A business has current assets of £2,000 and current liabilities of £3,500. Calculate working capital.</label>
-                    <input type="text" id="b4_q57" class="auto-input b4-input" data-rubric='{"keywords": [["1500", "£1500", "1,500", "£1,500", "-1500"], ["negative"]], "feedback": "-£1,500 (meaning negative working capital)."}' placeholder="Type answer here...">
+                    <label class="question-label">Q57. A business has current assets of £2,000 and current liabilities of £3,500. Calculate working capital.</label>
+                    <input type="text" id="b4_q57" class="auto-input b4-input" data-rubric='{"keywords": [["1500", "£1500", "1,500", "£1,500", "-1500"], ["negative"]], "feedback": "Hint: Subtract £3,500 from £2,000. It will be a negative number."}' placeholder="Type answer here...">
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q57" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q57')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">58. Explain why an increase in gross profit does not always mean net profit will increase.</label>
-                    <textarea id="b4_q58" class="auto-input b4-input" rows="3" data-rubric='{"keywords": [["other expenses", "risen", "more than the increase", "final profit could fall"]], "feedback": "Acceptable: Other expenses may have risen by more than the gross profit increase, so final profit could still fall."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q58. Explain why an increase in gross profit does not always mean net profit will increase.</label>
+                    <textarea id="b4_q58" class="auto-input b4-input" rows="3" data-rubric='{"keywords": [["other expenses", "risen", "more than the increase", "final profit could fall"]], "feedback": "Hint: Even if gross profit goes up, what might have happened to the '\''other expenses'\''?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q58" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q58')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">59. A business owes suppliers £2,000 and customers owe it £3,000. Does that automatically mean it has £1,000 available in cash? Explain.</label>
-                    <textarea id="b4_q59" class="auto-input b4-input" rows="3" data-rubric='{"keywords": [["no", "waiting for customers to pay", "cannot necessarily use", "immediately"]], "feedback": "Acceptable: No. It may still be waiting for customers to pay, so it can't use that money immediately."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q59. A business owes suppliers £2,000 and customers owe it £3,000. Does that automatically mean it has £1,000 available in cash? Explain.</label>
+                    <textarea id="b4_q59" class="auto-input b4-input" rows="3" data-rubric='{"keywords": [["no", "waiting for customers to pay", "cannot necessarily use", "immediately"]], "feedback": "Hint: Just because a customer owes you money, does that mean the cash is in your bank account right now?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q59" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q59')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-wrapper">
-                    <label class="question-label">60. A business owner wants to buy new equipment. Which financial information could help them decide whether they can afford it?</label>
-                    <textarea id="b4_q60" class="auto-input b4-input" rows="3" data-rubric='{"keywords": [["cash", "working capital", "current liabilities", "profit", "expected future costs", "revenue", "finance repayments"]], "feedback": "Acceptable: Available cash, working capital, current liabilities, profit, or expected future costs/revenue."}' placeholder="Type answer here..."></textarea>
+                    <label class="question-label">Q60. A business owner wants to buy new equipment. Which financial information could help them decide whether they can afford it?</label>
+                    <textarea id="b4_q60" class="auto-input b4-input" rows="3" data-rubric='{"keywords": [["cash", "working capital", "current liabilities", "profit", "expected future costs", "revenue", "finance repayments"]], "feedback": "Hint: What figures show if they have enough cash right now, like working capital or available cash?"}' placeholder="Type answer here..."></textarea>
                     <div class="feedback-msg"></div>
                     <div style="text-align: right;"><button id="override-b4_q60" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('b4_q60')">👨‍🏫 Override Score</button></div>
                 </div>
 
-                <button class="btn-submit no-print" onclick="checkAnswers('b4-input')">Check Answers</button>
+                <button class="btn-submit no-print" onclick="checkAnswers('b4-input')">✅ Check Answers</button>
             </div>
         </main>
     </div>
+    
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf" onclick="downloadPDF()">📄 Download Revision</button>
-        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+        <button class="btn-reset no-print" onclick="clearData()">Reset Page</button>
     </div>
 
     <!-- SECURE PASSWORD MODAL -->
@@ -468,45 +473,184 @@
     <footer>&copy; 2026 Delta Serlby Park - Enterprise Department</footer>
 
     <script>
-        function saveProgress() {
-            var inputs = document.querySelectorAll('.auto-input');
-            var dataToSave = {};
-            for (var i = 0; i < inputs.length; i++) { dataToSave['input_' + i] = inputs[i].value; dataToSave['class_' + i] = inputs[i].className; }
-            try { localStorage.setItem('enterpriseB4Memory_Smart_v2', JSON.stringify(dataToSave)); } catch (e) {}
+        // --- FIREBASE INITIALIZATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
-        function loadProgress() {
-            var saved = localStorage.getItem('enterpriseB4Memory_Smart_v2');
-            if (saved) {
-                var data = JSON.parse(saved);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "enterprise-b4-financial";
+
+        /* --- MARKBOOK BUILDER FOR TEACHER DASHBOARD --- */
+        function buildMarkbookData() {
+            const items = [];
+            const inputs = document.querySelectorAll('.auto-input');
+            
+            inputs.forEach((input, i) => {
+                const wrapper = input.closest('.question-wrapper');
+                const labelEl = wrapper ? wrapper.querySelector('.question-label') : null;
+                const labelText = labelEl ? labelEl.innerText.trim() : `Question ${i + 1}`;
+                
+                let status = 'neutral';
+                if (input.classList.contains('correct') || input.classList.contains('teacher-locked')) {
+                    status = 'correct';
+                } else if (input.classList.contains('incorrect')) {
+                    status = 'incorrect';
+                }
+
+                items.push({
+                    index: i,
+                    label: labelText,
+                    value: input.value.trim(),
+                    status: status
+                });
+            });
+
+            // Calculate total correct answers
+            const correctCount = document.querySelectorAll('.auto-input.correct, .auto-input.teacher-locked').length;
+            const gradableInputs = document.querySelectorAll('.b4-input');
+            const totalGradable = gradableInputs.length;
+
+            return {
+                items: items,
+                scoreText: `Score: ${correctCount} / ${totalGradable}`
+            };
+        }
+
+        /* --- CLOUD AUTO-SAVE & AUTO-LOAD --- */
+        let saveTimer;
+        function saveProgressToCloud(immediate = false) {
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                const structured = buildMarkbookData();
+                const payload = {
+                    pageTitle: document.title || "B4: Financial Statements",
+                    lastUpdated: Date.now(),
+                    scoreText: structured.scoreText,
+                    items: structured.items
+                };
+
+                // Also store inputs explicitly for local legacy support fallback
                 var inputs = document.querySelectorAll('.auto-input');
                 for (var i = 0; i < inputs.length; i++) {
-                    if (data['input_' + i]) {
-                        inputs[i].value = data['input_' + i];
-                        if (data['class_' + i]) {
-                            inputs[i].className = data['class_' + i];
-                            if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect')) {
-                                var btnId = "override-" + inputs[i].id;
-                                var btn = document.getElementById(btnId);
-                                if (btn) btn.classList.remove('hidden');
+                    payload['input_' + i] = inputs[i].value;
+                    payload['class_' + i] = inputs[i].className;
+                }
+
+                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
+                  .set(payload, { merge: true })
+                  .catch(err => console.error("Cloud sync error:", err));
+            }, immediate ? 50 : 800);
+        }
+
+        function applySavedData(data) {
+            if (!data) return;
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                var savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined) {
+                    inputs[i].value = savedVal;
+                    if (data['class_' + i]) {
+                        inputs[i].className = data['class_' + i];
+                        if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect') || inputs[i].classList.contains('teacher-locked')) {
+                            var btnId = "override-" + inputs[i].id;
+                            var btn = document.getElementById(btnId);
+                            if (btn) btn.classList.remove('hidden');
+                            
+                            // Restore feedback visually if teacher-locked
+                            var feedbackDiv = inputs[i].nextElementSibling;
+                            if (inputs[i].classList.contains('teacher-locked') && feedbackDiv) {
+                                if (inputs[i].classList.contains('correct')) {
+                                    feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; 
+                                    feedbackDiv.style.color = "#006100"; 
+                                    feedbackDiv.style.display = "block";
+                                } else {
+                                    feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; 
+                                    feedbackDiv.style.color = "#b71c1c"; 
+                                    feedbackDiv.style.display = "block";
+                                }
                             }
                         }
-                        if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                            inputs[i].style.height = 'auto'; inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                        }
+                    }
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto'; 
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
                     }
                 }
             }
         }
+
+        // --- LOAD DATA FROM FIREBASE ON START ---
+        auth.onAuthStateChanged(async (user) => {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    // Try to clean up local storage from legacy version
+                    try { localStorage.removeItem('enterpriseB4Memory_Smart_v2'); } catch (e) {}
+
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud data:", err);
+                }
+            } else if (!isTeacher) {
+                alert("Please log in on the home page first!");
+                window.location.href = "index.html";
+            }
+        });
+
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('auto-input')) {
-                saveProgress();
+                saveProgressToCloud(false);
                 if (e.target.tagName.toLowerCase() === 'textarea') {
-                    e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';
+                    e.target.style.height = 'auto'; 
+                    e.target.style.height = e.target.scrollHeight + 'px';
                 }
             }
         });
-        function clearData() { if (confirm("Clear all work?")) { localStorage.removeItem('enterpriseB4Memory_Smart_v2'); window.location.reload(); } }
-        window.onload = loadProgress;
+
+        // --- RESET / CLEAR DATA FROM FIREBASE CLOUD ---
+        async function clearData() { 
+            if (confirm("Clear all work on this page?")) { 
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
+                    } catch (e) {}
+                }
+                window.location.reload(); 
+            } 
+        }
 
         let activeQuestionId = null;
         function openVerifyModal(qId) {
@@ -536,7 +680,7 @@
                     if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
                 }
                 closeVerifyModal();
-                saveProgress();
+                saveProgressToCloud(true);
             } else {
                 document.getElementById('modal-error-msg').style.display = 'block';
             }
@@ -557,21 +701,21 @@
                     continue; 
                 }
 
-                var studentAnswer = inputElement.value.toLowerCase().replace(/[^a-z0-9\s\+\-\/\*\=\%]/g, " ").replace(/\s+/g, " ").trim();
+                // IMPROVED SANITIZATION: Kept the £ sign, $, ., and , so exact values can be matched
+                var studentAnswer = inputElement.value.toLowerCase().replace(/[^a-z0-9\s\+\-\/\*\=\%£\$\.,]/g, " ").replace(/\s+/g, " ").trim();
                 var rubricStr = inputElement.getAttribute('data-rubric');
                 if(!rubricStr) continue;
+                
                 var rubric;
                 try { rubric = JSON.parse(rubricStr); } catch (error) { continue; }
                 
                 var keywordGroups = rubric.keywords; 
                 inputElement.classList.remove('correct', 'incorrect');
-                if (studentAnswer === "") { if(feedbackDiv) feedbackDiv.style.display = 'none'; continue; }
                 
-                var wordCount = studentAnswer.split(" ").length;
-                if (!keywordGroups || keywordGroups.length === 0) {
-                    inputElement.classList.add('correct');
-                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Answer recorded."; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
-                    continue;
+                // Ignore blank fields
+                if (studentAnswer === "") { 
+                    if(feedbackDiv) feedbackDiv.style.display = 'none'; 
+                    continue; 
                 }
                 
                 var conceptsFound = 0;
@@ -580,21 +724,27 @@
                     var matched = false;
                     for(var s = 0; s < terms.length; s++) {
                         var term = terms[s].toLowerCase().trim();
-                        if (term.length >= 3) { if (studentAnswer.includes(term)) { matched = true; break; } }
-                        else { var regex = new RegExp("\\b" + term + "\\b"); if (regex.test(studentAnswer)) { matched = true; break; } }
+                        
+                        // IMPROVED MATCHING LOGIC
+                        if (term.length <= 2 && term.match(/^[a-z0-9]+$/i)) {
+                            // If it's a very short text word (like "x" or "no"), use a word boundary so "no" doesn't match inside "not"
+                            var regex = new RegExp("\\b" + term + "\\b", "i");
+                            if (regex.test(studentAnswer)) { matched = true; break; }
+                        } else {
+                            // For everything else (longer words, numbers, phrases, math symbols, currency), a simple includes check works best
+                            if (studentAnswer.includes(term)) { matched = true; break; }
+                        }
                     }
                     if(matched) conceptsFound++;
                 }
                 
                 var score = conceptsFound / keywordGroups.length;
-                var isPassed = false;
-                if (keywordGroups.length > 1) { isPassed = (score === 1); }
-                else { isPassed = (score >= 1 || (wordCount >= 4)); }
+                var isPassed = (score === 1);
                 
                 if(feedbackDiv) {
                     if (isPassed) {
                         inputElement.classList.add('correct');
-                        feedbackDiv.innerHTML = "✅ Correct! All required concepts covered.";
+                        feedbackDiv.innerHTML = "✅ Correct! " + rubric.feedback;
                         feedbackDiv.style.color = "#006100";
                         feedbackDiv.style.display = "block";
                     } else if (keywordGroups.length > 1 && score >= 0.5) {
@@ -610,34 +760,7 @@
                     }
                 }
             }
-            saveProgress();
-        }
-
-        function downloadPDF() {
-            var hide = document.querySelectorAll('.no-print');
-            for(var b=0; b<hide.length; b++) hide[b].style.display = 'none';
-            document.getElementById('action-buttons').style.display = 'none';
-
-            var textAreas = document.querySelectorAll('textarea');
-            for (var j = 0; j < textAreas.length; j++) {
-                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
-            }
-
-            var element = document.getElementById('pdf-content');
-            var opt = { 
-                margin: 0.3, 
-                filename: 'B4_Financial_Statements.pdf', 
-                image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, 
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
-
-            html2pdf().set(opt).from(element).save().then(function() {
-                for(var b=0; b<hide.length; b++) hide[b].style.display = 'block';
-                document.getElementById('action-buttons').style.display = 'flex';
-                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
-            });
+            saveProgressToCloud(true);
         }
     </script>
 </body>
