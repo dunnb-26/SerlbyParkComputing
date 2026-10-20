@@ -3,57 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Binary to Denary - Lesson</title>
+    <title>Binary to Denary - Year 8 Computing</title>
     <link rel="stylesheet" href="style.css">
-    
-    <!-- Firebase SDKs -->
+
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
         :root {
-            --navy: #1B1464; 
+            --navy: #1B1464;
             --yellow: #F7931D;
             --maroon: #822433;
             --bg-color: #f4f6f8;
             --text-color: #333;
         }
 
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            margin: 0; 
-            padding: 0; 
-            background-color: var(--bg-color); 
-            color: var(--text-color); 
+        * {
+            box-sizing: border-box;
         }
 
-        /* 3-Column Grid Header */
-        header { 
-            background-color: var(--navy); 
-            color: white; 
-            padding: 20px; 
-            display: grid; 
-            grid-template-columns: 1fr auto 1fr; 
-            align-items: center; 
-            border-bottom: 6px solid var(--maroon); 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: var(--bg-color);
+            color: var(--text-color);
         }
 
-        .header-left { display: flex; justify-content: flex-start; }
-        .header-center { text-align: center; }
-        .header-right { display: flex; justify-content: flex-end; align-items: center; }
-
-        header img { 
-            height: 80px; 
-            background-color: white; 
-            border-radius: 8px; 
-            padding: 5px; 
+        header {
+            background: var(--navy);
+            color: white;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 6px solid var(--maroon);
         }
 
-        header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; }
+        .header-left {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .header-center {
+            text-align: center;
+        }
+
+        .header-right {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        header img {
+            height: 80px;
+            max-width: 100%;
+            object-fit: contain;
+            background: white;
+            border-radius: 8px;
+            padding: 5px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: 1px;
+        }
 
         .back-btn {
-            background-color: var(--yellow);
+            display: inline-block;
+            background: var(--yellow);
             color: var(--navy);
             text-decoration: none;
             padding: 10px 20px;
@@ -61,688 +82,1134 @@
             font-weight: bold;
             transition: transform 0.2s;
         }
-        .back-btn:hover { transform: scale(1.05); }
 
-        .task-container { max-width: 1050px; margin: 30px auto; padding: 20px; }
-        
-        .task-card { 
-            background: white; 
-            border-radius: 8px; 
-            padding: 25px; 
-            margin-bottom: 30px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-            page-break-inside: avoid; 
+        .back-btn:hover {
+            transform: scale(1.05);
         }
 
-        .task-prep { border-top: 6px solid #607d8b; } 
-        .task-prep h2 { color: #607d8b; margin-top: 0; }
+        .task-container {
+            max-width: 1050px;
+            margin: 30px auto;
+            padding: 20px;
+        }
 
-        .task-plenary { border-top: 6px solid #673ab7; } 
-        .task-plenary h2 { color: #673ab7; margin-top: 0; }
+        .task-card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            page-break-inside: avoid;
+        }
 
-        .task-maroon { border-top: 6px solid var(--maroon); } 
-        .task-maroon h2 { color: var(--maroon); margin-top: 0; }
+        .task-card h2 {
+            margin-top: 0;
+        }
+
+        .task-prep { border-top: 6px solid #607d8b; }
+        .task-prep h2 { color: #607d8b; }
+
+        .task-plenary { border-top: 6px solid #673ab7; }
+        .task-plenary h2 { color: #673ab7; }
+
+        .task-maroon { border-top: 6px solid var(--maroon); }
+        .task-maroon h2 { color: var(--maroon); }
         .task-maroon .instruction-box { border-left: 4px solid var(--maroon); }
 
-        .task-amber { border-top: 6px solid var(--yellow); } 
-        .task-amber h2 { color: var(--yellow); margin-top: 0; }
+        .task-amber { border-top: 6px solid var(--yellow); }
+        .task-amber h2 { color: #b76a00; }
         .task-amber .instruction-box { border-left: 4px solid var(--yellow); }
 
-        .task-green { border-top: 6px solid #008f39; } 
-        .task-green h2 { color: #008f39; margin-top: 0; }
+        .task-green { border-top: 6px solid #008f39; }
+        .task-green h2 { color: #008f39; }
         .task-green .instruction-box { border-left: 4px solid #008f39; }
 
-        .task-navy { border-top: 6px solid var(--navy); } 
-        .task-navy h2 { color: var(--navy); margin-top: 0; }
+        .task-navy { border-top: 6px solid var(--navy); }
+        .task-navy h2 { color: var(--navy); }
         .task-navy .instruction-box { border-left: 4px solid var(--navy); }
 
-        .instruction-box { 
-            background-color: #f8f9fa; 
-            padding: 15px; 
-            border-radius: 0 4px 4px 0; 
-            font-size: 16px; 
-            line-height: 1.5; 
-            margin-bottom: 25px; 
-            text-align: center; 
+        .instruction-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 0 4px 4px 0;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+            text-align: center;
         }
 
-        .question-row { margin-bottom: 20px; }
-        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: var(--text-color); font-weight: bold; }
-        
-        .auto-input { 
-            width: 100%; 
-            padding: 12px; 
-            font-size: 16px; 
-            border: 2px solid #ccc; 
-            border-radius: 4px; 
-            transition: all 0.3s ease; 
-            box-sizing: border-box; 
-            background-color: white; 
-            font-family: inherit; 
+        .question-row {
+            display: block;
+            width: 100%;
+            margin-bottom: 22px;
         }
-        .auto-input:focus { outline: none; border-color: #666; }
-        textarea.auto-input { resize: vertical; min-height: 80px; }
-        
+
+        .question-label {
+            display: block;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            font-weight: bold;
+        }
+
+        .auto-input {
+            display: block;
+            width: 100%;
+            min-width: 0;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            transition: border-color 0.2s, background-color 0.2s;
+            background: white;
+            font-family: inherit;
+        }
+
+        .auto-input:focus {
+            outline: none;
+            border-color: var(--navy);
+        }
+
+        textarea.auto-input {
+            resize: vertical;
+            min-height: 85px;
+            line-height: 1.5;
+        }
+
         .inline-input {
-            width: 140px;
             display: inline-block;
+            width: 125px;
+            max-width: 100%;
+            padding: 7px;
             margin: 0 5px;
-            padding: 6px;
             text-align: center;
             font-weight: bold;
+            vertical-align: middle;
         }
 
-        .correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100 !important; font-weight: bold; }
-        .incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c !important; font-weight: bold; }
-        
-        .feedback-msg {
-            font-size: 14px;
-            margin-top: 8px;
+        .question-label .inline-input {
+            margin-bottom: 5px;
+        }
+
+        .correct {
+            border-color: #008f39 !important;
+            background-color: #e8f5e9 !important;
+            color: #006100 !important;
             font-weight: bold;
+        }
+
+        .incorrect {
+            border-color: #d32f2f !important;
+            background-color: #ffebee !important;
+            color: #b71c1c !important;
+            font-weight: bold;
+        }
+
+        .feedback-msg {
             display: none;
-            background-color: #f1f1f1;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-top: 8px;
             padding: 10px;
+            background: #f1f1f1;
             border-radius: 4px;
             border-left: 4px solid #607d8b;
+            font-weight: bold;
         }
 
-        .teacher-override-btn { 
-            background-color: #607d8b; 
-            color: white; 
-            border: none; 
-            padding: 5px 10px; 
-            border-radius: 4px; 
-            font-size: 12px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            margin-top: 5px; 
+        .teacher-override-btn {
+            background: #607d8b;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 6px;
         }
-        .teacher-override-btn:hover { background-color: #455a64; }
-        .hidden { display: none !important; }
 
-        /* Modal Overlay */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; border-top: 6px solid var(--navy); }
-        .modal-input { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; text-align: center; }
-        .modal-btn-row { display: flex; gap: 10px; }
-        .modal-btn-confirm { flex: 1; background-color: var(--navy); color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        .modal-btn-cancel { flex: 1; background-color: #ccc; color: #333; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
-
-        .btn-submit { 
-            background-color: var(--navy); 
-            color: white; 
-            border: none; 
-            padding: 12px 20px; 
-            border-radius: 4px; 
-            font-size: 16px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            margin-top: 15px; 
-            display: block; 
-            width: 100%; 
-            max-width: 200px;
-            transition: background-color 0.2s; 
+        .teacher-override-btn:hover {
+            background: #455a64;
         }
-        .btn-submit:hover { background-color: #152960; }
-        
-        .btn-reset { 
-            background-color: #d32f2f; 
-            color: white; 
-            border: none; 
-            padding: 12px 25px; 
-            border-radius: 4px; 
-            font-size: 16px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            transition: background-color 0.2s; 
-            display: block; 
-            text-align: center; 
-            width: 100%; 
-            max-width: 180px; 
+
+        .hidden {
+            display: none !important;
+        }
+
+        .btn-submit {
+            display: block;
+            width: 100%;
+            max-width: 220px;
+            background: var(--navy);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .btn-submit:hover {
+            background: #152960;
+        }
+
+        .btn-reset {
+            display: block;
+            width: 100%;
+            max-width: 180px;
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
             margin: 20px auto;
         }
-        .btn-reset:hover { background-color: #b71c1c; }
 
-        footer { text-align: center; padding: 25px; color: #666; margin-top: 50px; border-top: 1px solid #ddd; background-color: white; }
-        
+        .btn-reset:hover {
+            background: #b71c1c;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 15px;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 340px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-align: center;
+            border-top: 6px solid var(--navy);
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .modal-btn-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-btn-confirm,
+        .modal-btn-cancel {
+            flex: 1;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-btn-confirm {
+            background: var(--navy);
+            color: white;
+        }
+
+        .modal-btn-cancel {
+            background: #ccc;
+            color: #333;
+        }
+
+        .modal-error {
+            color: #d32f2f;
+            font-size: 14px;
+            margin-bottom: 5px;
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #666;
+            margin-top: 50px;
+            border-top: 1px solid #ddd;
+            background: white;
+        }
+
+        /* Preparation formatting fixes */
+        .task-prep .question-row {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .task-prep .question-label {
+            width: 100%;
+            margin: 0;
+        }
+
+        .task-prep .prep-input {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            margin: 0;
+        }
+
+        .task-prep textarea.prep-input {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        .task-prep h3 {
+            color: #444;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 8px;
+            margin-top: 30px;
+            margin-bottom: 18px;
+        }
+
         .place-value-table {
             width: 100%;
             border-collapse: collapse;
             margin: 15px 0;
             text-align: center;
         }
-        .place-value-table th, .place-value-table td {
+
+        .place-value-table th,
+        .place-value-table td {
             border: 1px solid #ccc;
             padding: 8px;
         }
+
         .place-value-table th {
-            background-color: #1B1464;
+            background: var(--navy);
             color: white;
         }
-    </style>
-</head>
-<body>
-    <div id="pdf-content">
-        <header>
-            <div class="header-left">
-                <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
-            </div>
-            <div class="header-center">
-                <h1>Binary to Denary Revision</h1>
-            </div>
-            <div class="header-right">
-                <a href="computing-hub.html" class="back-btn no-print">&larr; Back to Hub</a>
-            </div>
-        </header>
 
-        <main class="task-container">
+        @media (max-width: 700px) {
+            header {
+                grid-template-columns: 1fr;
+                justify-items: center;
+                text-align: center;
+            }
 
-            <!-- PREPARATION -->
-            <div class="task-card task-prep">
-                <h2>Lesson Preparation & Notes</h2>
-                <div class="instruction-box center-text">Define your 4 key lesson words and write your notes below.</div>
-                
-                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">4 Key Words</h3>
-                <div class="question-row">
-                    <label class="question-label">Binary</label>
-                    <input type="text" class="auto-input prep-input" data-label="Key Word: Binary" placeholder="Type definition here...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">Denary</label>
-                    <input type="text" class="auto-input prep-input" data-label="Key Word: Denary" placeholder="Type definition here...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">Convert</label>
-                    <input type="text" class="auto-input prep-input" data-label="Key Word: Convert" placeholder="Type definition here...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">Bit</label>
-                    <input type="text" class="auto-input prep-input" data-label="Key Word: Bit" placeholder="Type definition here...">
-                </div>
+            .header-left,
+            .header-center,
+            .header-right {
+                justify-content: center;
+            }
 
-                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Lesson Notes</h3>
-                <div class="question-row" style="margin-bottom: 0;">
-                    <textarea class="auto-input prep-input" data-label="Lesson Notes" rows="4" placeholder="Write any extra revision notes here..."></textarea>
-                </div>
+            header h1 {
+                font-size: 23px;
+            }
 
-                <table class="place-value-table" style="margin-top: 25px;">
-                    <caption><b>Reference: 8-Bit Place Value Table</b></caption>
-                    <tr>
-                        <th>128</th>
-                        <th>64</th>
-                        <th>32</th>
-                        <th>16</th>
-                        <th>8</th>
-                        <th>4</th>
-                        <th>2</th>
-                        <th>1</th>
-                    </tr>
-                </table>
-            </div>
+            header img {
+                height: 65px;
+            }
 
-            <!-- RED TASK: GAP FILLS -->
-            <div class="task-card task-maroon">
-                <h2>Red Task: Gap Fills & Place Values</h2>
-                <div class="instruction-box">
-                    Fill in the missing words and numbers to complete the statements about binary and denary numbers.
-                </div>
+            .task-container {
+                padding: 12px;
+                margin: 15px auto;
+            }
 
-                <div class="question-row">
-                    <label class="question-label">1. Computers use <b>binary</b> because they are made of billions of tiny switches that can only be on (1) or off (0). This is a base-<input type="text" id="red_q1" class="auto-input red-input inline-input binary-input" data-label="Red Task Q1 (Base)" data-rubric='{"keywords": [["2", "two"]], "feedback": "Hint: How many digits does binary use (0 and 1)?"}' placeholder="..."> number system.</label>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-red_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('red_q1')">👨‍🏫 Override Score</button></div>
-                </div>
+            .task-card {
+                padding: 18px;
+            }
 
-                <div class="question-row">
-                    <label class="question-label">2. Human beings use the <b>denary</b> (decimal) number system, which is base-<input type="text" id="red_q2" class="auto-input red-input inline-input binary-input" data-label="Red Task Q2 (Denary Base)" data-rubric='{"keywords": [["10", "ten"]], "feedback": "Hint: How many digits does our everyday number system use (0 through 9)?"}' placeholder="...">.</label>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-red_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('red_q2')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">3. In a binary place value table, each column doubles as you move from right to left. Starting from the right (1), the next three place values are 2, 4, and <input type="text" id="red_q3" class="auto-input red-input inline-input binary-input" data-label="Red Task Q3 (Next Place Value)" data-rubric='{"keywords": [["8", "eight"]], "feedback": "Hint: What comes after 4 when doubling?"}' placeholder="...">.</label>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-red_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('red_q3')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">4. A single 0 or 1 in binary is known as a <input type="text" id="red_q4" class="auto-input red-input inline-input binary-input" data-label="Red Task Q4 (Bit)" data-rubric='{"keywords": [["bit"]], "feedback": "Hint: Short for 'binary digit'."}' placeholder="...">.</label>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-red_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('red_q4')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <button class="btn-submit no-print" onclick="checkAnswers('red-input')">Check Answers</button>
-            </div>
-
-            <!-- AMBER TASK: 4-BIT CONVERSIONS -->
-            <div class="task-card task-amber">
-                <h2>Amber Task: 4-Bit Binary to Denary</h2>
-                <div class="instruction-box">
-                    Convert each 4-bit binary number into its denary equivalent. Use columns: <b>8 | 4 | 2 | 1</b>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">1. Convert <b>0001</b> to denary:</label>
-                    <input type="text" id="amber_q1" class="auto-input amber-input binary-input" data-label="Amber Task Q1 (0001)" data-rubric='{"keywords": [["1"]], "feedback": "Hint: Only the 1s column has a 1."}' placeholder="Type denary number...">
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-amber_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('amber_q1')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">2. Convert <b>0101</b> to denary:</label>
-                    <input type="text" id="amber_q2" class="auto-input amber-input binary-input" data-label="Amber Task Q2 (0101)" data-rubric='{"keywords": [["5"]], "feedback": "Hint: Add the values where there is a 1 (4 + 1)."}' placeholder="Type denary number...">
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-amber_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('amber_q2')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">3. Convert <b>1010</b> to denary:</label>
-                    <input type="text" id="amber_q3" class="auto-input amber-input binary-input" data-label="Amber Task Q3 (1010)" data-rubric='{"keywords": [["10"]], "feedback": "Hint: Add the values where there is a 1 (8 + 2)."}' placeholder="Type denary number...">
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-amber_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('amber_q3')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">4. Convert <b>1111</b> to denary:</label>
-                    <input type="text" id="amber_q4" class="auto-input amber-input binary-input" data-label="Amber Task Q4 (1111)" data-rubric='{"keywords": [["15"]], "feedback": "Hint: All columns are active (8 + 4 + 2 + 1)."}' placeholder="Type denary number...">
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-amber_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('amber_q4')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <button class="btn-submit no-print" onclick="checkAnswers('amber-input')">Check Answers</button>
-            </div>
-
-            <!-- GREEN TASK: 8-BIT CONVERSIONS -->
-            <div class="task-card task-green">
-                <h2>Green Task: 8-Bit Binary to Denary</h2>
-                <div class="instruction-box">
-                    Convert each 8-bit binary number into its denary equivalent. Use columns: <b>128 | 64 | 32 | 16 | 8 | 4 | 2 | 1</b>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">1. Convert <b>00001010</b> to denary:</label>
-                    <input type="text" id="green_q1" class="auto-input green-input binary-input" data-label="Green Task Q1 (00001010)" data-rubric='{"keywords": [["10"]], "feedback": "Hint: Active columns are 8 and 2."}' placeholder="Type denary number...">
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-green_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('green_q1')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">2. Convert <b>01010101</b> to denary:</label>
-                    <input type="text" id="green_q2" class="auto-input green-input binary-input" data-label="Green Task Q2 (01010101)" data-rubric='{"keywords": [["85"]], "feedback": "Hint: Active columns are 64 + 16 + 4 + 1."}' placeholder="Type denary number...">
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-green_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('green_q2')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">3. Convert <b>10000001</b> to denary:</label>
-                    <input type="text" id="green_q3" class="auto-input green-input binary-input" data-label="Green Task Q3 (10000001)" data-rubric='{"keywords": [["129"]], "feedback": "Hint: Active columns are 128 and 1."}' placeholder="Type denary number...">
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-green_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('green_q3')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">4. Convert <b>11111111</b> to denary:</label>
-                    <input type="text" id="green_q4" class="auto-input green-input binary-input" data-label="Green Task Q4 (11111111)" data-rubric='{"keywords": [["255"]], "feedback": "Hint: All 8 bits are 1. This represents the maximum value for a standard byte."}' placeholder="Type denary number...">
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-green_q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('green_q4')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <button class="btn-submit no-print" onclick="checkAnswers('green-input')">Check Answers</button>
-            </div>
-
-            <!-- BLUE TASK: CHALLENGE & REASONING -->
-            <div class="task-card task-navy">
-                <h2>Blue Task: Challenge & Reasoning</h2>
-                <div class="instruction-box">
-                    Answer the more difficult reasoning questions below. Explain your workings where necessary.
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">1. What is the highest denary number that can be represented using a standard 8-bit binary number?</label>
-                    <input type="text" id="blue_q1" class="auto-input blue-input binary-input" data-label="Blue Task Q1 (Highest 8-bit)" data-rubric='{"keywords": [["255"]], "feedback": "Hint: Think about 11111111."}' placeholder="Type denary number...">
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-blue_q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('blue_q1')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">2. If you add 1 to the 8-bit binary number <b>11111111</b>, what happens in a standard 8-bit register?</label>
-                    <textarea id="blue_q2" class="auto-input blue-input binary-input" rows="2" data-rubric='{"keywords": [["overflow", "zero", "0", "exceeds", "too big", "extra bit"]], "feedback": "Hint: An 8-bit register cannot hold a 9th bit. What happens to the value?"}' placeholder="Explain your answer..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-blue_q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('blue_q2')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">3. Explain why computers store everything (text, images, sound) as binary numbers rather than denary numbers.</label>
-                    <textarea id="blue_q3" class="auto-input blue-input binary-input" rows="2" data-rubric='{"keywords": [["switches", "electronic", "reliable", "on and off", "voltage", "signals"]], "feedback": "Hint: Think about hardware, electrical circuits, and reliability of two states (on/off)."}' placeholder="Explain your answer..."></textarea>
-                    <div class="feedback-msg"></div>
-                    <div style="text-align: right;"><button id="override-blue_q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('blue_q3')">👨‍🏫 Override Score</button></div>
-                </div>
-
-                <button class="btn-submit no-print" onclick="checkAnswers('blue-input')">Check Answers</button>
-            </div>
-
-            <!-- PLENARY -->
-            <div class="task-card task-plenary">
-                <h2>Lesson Plenary</h2>
-                <h3 style="color: #444; margin-bottom: 15px;">My 3 Key Takeaways</h3>
-                
-                <div class="question-row">
-                    <label class="question-label">1.</label>
-                    <input type="text" class="auto-input plenary-input" data-label="Plenary Takeaway 1" style="max-width: 100%;" placeholder="Type first takeaway here...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">2.</label>
-                    <input type="text" class="auto-input plenary-input" data-label="Plenary Takeaway 2" style="max-width: 100%;" placeholder="Type second takeaway here...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">3.</label>
-                    <input type="text" class="auto-input plenary-input" data-label="Plenary Takeaway 3" style="max-width: 100%;" placeholder="Type third takeaway here...">
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-    <!-- RESET ACTION BUTTON -->
-    <div id="action-buttons">
-        <button class="btn-reset no-print" onclick="clearData()">Reset Page</button>
-    </div>
-
-    <!-- TEACHER OVERRIDE MODAL -->
-    <div class="modal-overlay" id="verify-modal">
-        <div class="modal-content">
-            <h3>Teacher Verification</h3>
-            <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
-            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter PIN">
-            <div class="modal-btn-row">
-                <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
-                <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
-            </div>
-        </div>
-    </div>
-
-    <footer>&copy; 2026 Delta Serlby Park - Computing Department</footer>
-
-    <script>
-        // --- FIREBASE INITIALIZATION ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
-            authDomain: "serlby-park-computing.firebaseapp.com",
-            projectId: "serlby-park-computing",
-            storageBucket: "serlby-park-computing.firebasestorage.app",
-            messagingSenderId: "648533806051",
-            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
-            measurementId: "G-HDNYEE11WV"
-        };
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        const LESSON_ID = "y8-binary-to-denary";
-
-        /* --- MARKBOOK BUILDER FOR TEACHER DASHBOARD --- */
-        function buildMarkbookData() {
-            const items = [];
-            const inputs = document.querySelectorAll('.auto-input');
-            
-            inputs.forEach((input, i) => {
-                const wrapper = input.closest('.question-wrapper');
-                const labelEl = wrapper ? wrapper.querySelector('.question-label') : null;
-                let labelText = input.getAttribute('data-label') || (labelEl ? labelEl.innerText.trim() : `Question ${i + 1}`);
-                
-                let status = 'neutral';
-                if (input.classList.contains('correct') || input.classList.contains('teacher-locked')) {
-                    status = 'correct';
-                } else if (input.classList.contains('incorrect')) {
-                    status = 'incorrect';
-                }
-
-                items.push({
-                    index: i,
-                    label: labelText,
-                    value: input.value.trim(),
-                    status: status
-                });
-            });
-
-            const correctCount = document.querySelectorAll('.auto-input.correct, .auto-input.teacher-locked').length;
-            const gradableInputs = document.querySelectorAll('.binary-input');
-            const totalGradable = gradableInputs.length;
-
-            return {
-                items: items,
-                scoreText: `Score: ${correctCount} / ${totalGradable}`
-            };
-        }
-
-        /* --- CLOUD AUTO-SAVE & AUTO-LOAD (Firebase Only) --- */
-        let saveTimer;
-        function saveProgressToCloud(immediate = false) {
-            const user = auth.currentUser;
-            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
-
-            clearTimeout(saveTimer);
-            saveTimer = setTimeout(() => {
-                const structured = buildMarkbookData();
-                const payload = {
-                    pageTitle: document.title || "Binary to Denary Revision",
-                    lastUpdated: Date.now(),
-                    scoreText: structured.scoreText,
-                    items: structured.items
-                };
-
-                var inputs = document.querySelectorAll('.auto-input');
-                for (var i = 0; i < inputs.length; i++) {
-                    payload['input_' + i] = inputs[i].value;
-                    payload['class_' + i] = inputs[i].className;
-                }
-
-                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
-                  .set(payload, { merge: true })
-                  .catch(err => console.error("Cloud sync error:", err));
-            }, immediate ? 50 : 800);
-        }
-
-        function applySavedData(data) {
-            if (!data) return;
-            var inputs = document.querySelectorAll('.auto-input');
-            for (var i = 0; i < inputs.length; i++) {
-                var savedVal = data['input_' + i] !== undefined
-                    ? data['input_' + i]
-                    : (data.items && data.items[i] ? data.items[i].value : undefined);
-
-                if (savedVal !== undefined) {
-                    inputs[i].value = savedVal;
-                    if (data['class_' + i]) {
-                        inputs[i].className = data['class_' + i];
-                        if (inputs[i].classList.contains('correct') || inputs[i].classList.contains('incorrect') || inputs[i].classList.contains('teacher-locked')) {
-                            var btnId = "override-" + inputs[i].id;
-                            var btn = document.getElementById(btnId);
-                            if (btn) btn.classList.remove('hidden');
-                            
-                            var questionRow = inputs[i].closest('.question-wrapper');
-                            var feedbackDiv = questionRow ? questionRow.querySelector('.feedback-msg') : inputs[i].nextElementSibling;
-                            if (inputs[i].classList.contains('teacher-locked') && feedbackDiv) {
-                                if (inputs[i].classList.contains('correct')) {
-                                    feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; 
-                                    feedbackDiv.style.color = "#006100"; 
-                                    feedbackDiv.style.display = "block";
-                                } else {
-                                    feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; 
-                                    feedbackDiv.style.color = "#b71c1c"; 
-                                    feedbackDiv.style.display = "block";
-                                }
-                            }
-                        }
-                    }
-                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                        inputs[i].style.height = 'auto'; 
-                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                    }
-                }
+            .inline-input {
+                width: 100px;
             }
         }
 
-        auth.onAuthStateChanged(async (user) => {
-            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
-            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+        @media print {
+            .no-print,
+            .teacher-override-btn,
+            .btn-submit,
+            .btn-reset,
+            .modal-overlay {
+                display: none !important;
+            }
 
-            if (isTeacher && inspectedUid) {
-                try {
-                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
-                    if (doc.exists) applySavedData(doc.data());
-                } catch (err) {
-                    console.error("Error loading inspected student data:", err);
+            body {
+                background: white;
+            }
+
+            .task-card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                margin-bottom: 15px;
+            }
+
+            .auto-input {
+                border: 1px solid #999;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div id="pdf-content">
+
+    <header>
+        <div class="header-left">
+            <a href="index.html">
+                <img src="logo.jpg" alt="Delta Serlby Park Logo">
+            </a>
+        </div>
+
+        <div class="header-center">
+            <h1>Binary to Denary Revision</h1>
+        </div>
+
+        <div class="header-right">
+            <a href="computing-hub.html" class="back-btn no-print">
+                &larr; Back to Hub
+            </a>
+        </div>
+    </header>
+
+    <main class="task-container">
+
+        <!-- PREPARATION -->
+        <section class="task-card task-prep">
+            <h2>Lesson Preparation &amp; Notes</h2>
+
+            <div class="instruction-box">
+                Define your 4 key lesson words and write your notes below.
+            </div>
+
+            <h3>4 Key Words</h3>
+
+            <div class="question-row">
+                <label class="question-label" for="prep_binary">Binary</label>
+                <input id="prep_binary" type="text" class="auto-input prep-input"
+                       data-label="Key Word: Binary"
+                       placeholder="Type definition here...">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="prep_denary">Denary</label>
+                <input id="prep_denary" type="text" class="auto-input prep-input"
+                       data-label="Key Word: Denary"
+                       placeholder="Type definition here...">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="prep_convert">Convert</label>
+                <input id="prep_convert" type="text" class="auto-input prep-input"
+                       data-label="Key Word: Convert"
+                       placeholder="Type definition here...">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="prep_bit">Bit</label>
+                <input id="prep_bit" type="text" class="auto-input prep-input"
+                       data-label="Key Word: Bit"
+                       placeholder="Type definition here...">
+            </div>
+
+            <h3>Lesson Notes</h3>
+
+            <div class="question-row">
+                <label class="question-label" for="prep_notes">
+                    My lesson notes
+                </label>
+                <textarea id="prep_notes" class="auto-input prep-input"
+                          data-label="Lesson Notes" rows="5"
+                          placeholder="Write any extra revision notes here..."></textarea>
+            </div>
+        </section>
+
+        <!-- RED TASK -->
+        <section class="task-card task-maroon">
+            <h2>Red Task: Gap Fills &amp; Place Values</h2>
+
+            <div class="instruction-box">
+                Fill in the missing words and numbers to complete the statements about binary and denary numbers.
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="red_q1">
+                    1. Computers use <b>binary</b> because they are made of billions of tiny switches that can only be on (1) or off (0). This is a base
+                    <input id="red_q1" type="text"
+                           class="auto-input red-input inline-input binary-input"
+                           data-label="Red Task Q1 (Base)"
+                           data-rubric='{"keywords":[["2","two"]],"feedback":"Hint: How many digits does binary use (0 and 1)?"}'>
+                    number system.
+                </label>
+                <div class="feedback-msg"></div>
+                <button class="teacher-override-btn no-print hidden"
+                        id="override-red_q1"
+                        onclick="openVerifyModal('red_q1')">Teacher Override</button>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="red_q2">
+                    2. Human beings use the <b>denary</b> (decimal) number system, which is base
+                    <input id="red_q2" type="text"
+                           class="auto-input red-input inline-input binary-input"
+                           data-label="Red Task Q2 (Denary Base)"
+                           data-rubric='{"keywords":[["10","ten"]],"feedback":"Hint: How many digits does our everyday number system use (0 through 9)?"}'>.
+                </label>
+                <div class="feedback-msg"></div>
+                <button class="teacher-override-btn no-print hidden"
+                        id="override-red_q2"
+                        onclick="openVerifyModal('red_q2')">Teacher Override</button>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="red_q3">
+                    3. In a binary place value table, each column doubles as you move from right to left. Starting from the right (1), the next three place values are 2, 4, and
+                    <input id="red_q3" type="text"
+                           class="auto-input red-input inline-input binary-input"
+                           data-label="Red Task Q3 (Next Place Value)"
+                           data-rubric='{"keywords":[["8","eight"]],"feedback":"Hint: What comes after 4 when doubling?"}'>.
+                </label>
+                <div class="feedback-msg"></div>
+                <button class="teacher-override-btn no-print hidden"
+                        id="override-red_q3"
+                        onclick="openVerifyModal('red_q3')">Teacher Override</button>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="red_q4">
+                    4. A single 0 or 1 in binary is known as a
+                    <input id="red_q4" type="text"
+                           class="auto-input red-input inline-input binary-input"
+                           data-label="Red Task Q4 (Bit)"
+                           data-rubric='{"keywords":[["bit"]],"feedback":"Hint: It is short for binary digit."}'>.
+                </label>
+                <div class="feedback-msg"></div>
+                <button class="teacher-override-btn no-print hidden"
+                        id="override-red_q4"
+                        onclick="openVerifyModal('red_q4')">Teacher Override</button>
+            </div>
+
+            <button class="btn-submit no-print" onclick="checkAnswers('red-input')">
+                Check Answers
+            </button>
+        </section>
+
+        <!-- AMBER TASK -->
+        <section class="task-card task-amber">
+            <h2>Amber Task: 4-Bit Binary to Denary</h2>
+
+            <div class="instruction-box">
+                Convert each 4-bit binary number into its denary equivalent.
+                Use columns: <b>8 | 4 | 2 | 1</b>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="amber_q1">1. Convert 0001 to denary:</label>
+                <input id="amber_q1" class="auto-input amber-input binary-input"
+                       data-label="Amber Task Q1 (0001)"
+                       data-rubric='{"keywords":[["1"]],"feedback":"Hint: Only the 1s column has a 1."}'>
+                <div class="feedback-msg"></div>
+                <button id="override-amber_q1" class="teacher-override-btn no-print hidden"
+                        onclick="openVerifyModal('amber_q1')">Teacher Override</button>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="amber_q2">2. Convert 0101 to denary:</label>
+                <input id="amber_q2" class="auto-input amber-input binary-input"
+                       data-label="Amber Task Q2 (0101)"
+                       data-rubric='{"keywords":[["5"]],"feedback":"Hint: Add the values where there is a 1 (4 + 1)."}'>
+                <div class="feedback-msg"></div>
+                <button id="override-amber_q2" class="teacher-override-btn no-print hidden"
+                        onclick="openVerifyModal('amber_q2')">Teacher Override</button>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="amber_q3">3. Convert 1010 to denary:</label>
+                <input id="amber_q3" class="auto-input amber-input binary-input"
+                       data-label="Amber Task Q3 (1010)"
+                       data-rubric='{"keywords":[["10"]],"feedback":"Hint: Add the values where there is a 1 (8 + 2)."}'>
+                <div class="feedback-msg"></div>
+                <button id="override-amber_q3" class="teacher-override-btn no-print hidden"
+                        onclick="openVerifyModal('amber_q3')">Teacher Override</button>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="amber_q4">4. Convert 1111 to denary:</label>
+                <input id="amber_q4" class="auto-input amber-input binary-input"
+                       data-label="Amber Task Q4 (1111)"
+                       data-rubric='{"keywords":[["15"]],"feedback":"Hint: All columns are active (8 + 4 + 2 + 1)."}'>
+                <div class="feedback-msg"></div>
+                <button id="override-amber_q4" class="teacher-override-btn no-print hidden"
+                        onclick="openVerifyModal('amber_q4')">Teacher Override</button>
+            </div>
+
+            <button class="btn-submit no-print" onclick="checkAnswers('amber-input')">
+                Check Answers
+            </button>
+        </section>
+
+        <!-- GREEN TASK -->
+        <section class="task-card task-green">
+            <h2>Green Task: 8-Bit Binary to Denary</h2>
+
+            <div class="instruction-box">
+                Convert each 8-bit binary number into its denary equivalent.
+                Use columns: <b>128 | 64 | 32 | 16 | 8 | 4 | 2 | 1</b>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="green_q1">1. Convert 00001010 to denary:</label>
+                <input id="green_q1" class="auto-input green-input binary-input"
+                       data-label="Green Task Q1 (00001010)"
+                       data-rubric='{"keywords":[["10"]],"feedback":"Hint: Active columns are 8 and 2."}'>
+                <div class="feedback-msg"></div>
+                <button id="override-green_q1" class="teacher-override-btn no-print hidden"
+                        onclick="openVerifyModal('green_q1')">Teacher Override</button>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="green_q2">2. Convert 01010101 to denary:</label>
+                <input id="green_q2" class="auto-input green-input binary-input"
+                       data-label="Green Task Q2 (01010101)"
+                       data-rubric='{"keywords":[["85"]],"feedback":"Hint: Active columns are 64 + 16 + 4 + 1."}'>
+                <div class="feedback-msg"></div>
+                <button id="override-green_q2" class="teacher-override-btn no-print hidden"
+                        onclick="openVerifyModal('green_q2')">Teacher Override</button>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="green_q3">3. Convert 10000001 to denary:</label>
+                <input id="green_q3" class="auto-input green-input binary-input"
+                       data-label="Green Task Q3 (10000001)"
+                       data-rubric='{"keywords":[["129"]],"feedback":"Hint: Active columns are 128 and 1."}'>
+                <div class="feedback-msg"></div>
+                <button id="override-green_q3" class="teacher-override-btn no-print hidden"
+                        onclick="openVerifyModal('green_q3')">Teacher Override</button>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="green_q4">4. Convert 11111111 to denary:</label>
+                <input id="green_q4" class="auto-input green-input binary-input"
+                       data-label="Green Task Q4 (11111111)"
+                       data-rubric='{"keywords":[["255"]],"feedback":"Hint: All 8 bits are 1. This is the maximum value for a standard byte."}'>
+                <div class="feedback-msg"></div>
+                <button id="override-green_q4" class="teacher-override-btn no-print hidden"
+                        onclick="openVerifyModal('green_q4')">Teacher Override</button>
+            </div>
+
+            <button class="btn-submit no-print" onclick="checkAnswers('green-input')">
+                Check Answers
+            </button>
+        </section>
+
+        <!-- BLUE TASK -->
+        <section class="task-card task-navy">
+            <h2>Blue Task: Challenge &amp; Reasoning</h2>
+
+            <div class="instruction-box">
+                Answer the more difficult reasoning questions below. Explain your workings where necessary.
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="blue_q1">
+                    1. What is the highest denary number that can be represented using a standard 8-bit binary number?
+                </label>
+                <input id="blue_q1" class="auto-input blue-input binary-input"
+                       data-label="Blue Task Q1 (Highest 8-bit)"
+                       data-rubric='{"keywords":[["255"]],"feedback":"Hint: Think about 11111111."}'>
+                <div class="feedback-msg"></div>
+                <button id="override-blue_q1" class="teacher-override-btn no-print hidden"
+                        onclick="openVerifyModal('blue_q1')">Teacher Override</button>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="blue_q2">
+                    2. If you add 1 to the 8-bit binary number 11111111, what happens in a standard 8-bit register?
+                </label>
+                <textarea id="blue_q2" class="auto-input blue-input binary-input" rows="3"
+                          data-label="Blue Task Q2 (Overflow)"
+                          data-rubric='{"keywords":[["overflow","overflows"],["0","zero"],["9th bit","extra bit","carry bit","carry"]],"feedback":"Hint: The result exceeds the maximum value. Think about overflow, the stored value and the extra carry bit."}'
+                          placeholder="Explain your answer..."></textarea>
+                <div class="feedback-msg"></div>
+                <button id="override-blue_q2" class="teacher-override-btn no-print hidden"
+                        onclick="openVerifyModal('blue_q2')">Teacher Override</button>
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="blue_q3">
+                    3. Explain why computers store everything (text, images, sound) as binary numbers rather than denary numbers.
+                </label>
+                <textarea id="blue_q3" class="auto-input blue-input binary-input" rows="3"
+                          data-label="Blue Task Q3 (Why Binary)"
+                          data-rubric='{"keywords":[["switches","electronic circuits","electrical circuits","transistors"],["on and off","on or off","two states","two values","0 and 1"],["reliable","reliability","less prone to errors","distinguish states"]],"feedback":"Hint: Explain how electronic circuits use two states and why this makes data storage reliable."}'
+                          placeholder="Explain your answer..."></textarea>
+                <div class="feedback-msg"></div>
+                <button id="override-blue_q3" class="teacher-override-btn no-print hidden"
+                        onclick="openVerifyModal('blue_q3')">Teacher Override</button>
+            </div>
+
+            <button class="btn-submit no-print" onclick="checkAnswers('blue-input')">
+                Check Answers
+            </button>
+        </section>
+
+        <!-- PLENARY -->
+        <section class="task-card task-plenary">
+            <h2>Lesson Plenary</h2>
+            <h3 style="color:#444; margin-bottom:15px;">My 3 Key Takeaways</h3>
+
+            <div class="question-row">
+                <label class="question-label" for="plenary_1">1.</label>
+                <input id="plenary_1" class="auto-input plenary-input"
+                       data-label="Plenary Takeaway 1"
+                       placeholder="Type first takeaway here...">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="plenary_2">2.</label>
+                <input id="plenary_2" class="auto-input plenary-input"
+                       data-label="Plenary Takeaway 2"
+                       placeholder="Type second takeaway here...">
+            </div>
+
+            <div class="question-row">
+                <label class="question-label" for="plenary_3">3.</label>
+                <input id="plenary_3" class="auto-input plenary-input"
+                       data-label="Plenary Takeaway 3"
+                       placeholder="Type third takeaway here...">
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<div id="action-buttons">
+    <button class="btn-reset no-print" onclick="clearData()">Reset Page</button>
+</div>
+
+<!-- TEACHER OVERRIDE MODAL -->
+<div class="modal-overlay" id="verify-modal">
+    <div class="modal-content">
+        <h3>Teacher Verification</h3>
+        <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
+        <input type="password" id="teacher-password-input"
+               class="modal-input" placeholder="Enter PIN">
+        <div class="modal-btn-row">
+            <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
+            <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
+        </div>
+    </div>
+</div>
+
+<footer>&copy; 2026 Delta Serlby Park - Computing Department</footer>
+
+<script>
+    // FIREBASE INITIALIZATION
+    const firebaseConfig = {
+        apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+        authDomain: "serlby-park-computing.firebaseapp.com",
+        projectId: "serlby-park-computing",
+        storageBucket: "serlby-park-computing.firebasestorage.app",
+        messagingSenderId: "648533806051",
+        appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+        measurementId: "G-HDNYEE11WV"
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const LESSON_ID = "y8-binary-to-denary";
+
+    // MARKBOOK DATA
+    function buildMarkbookData() {
+        const items = [];
+        const inputs = document.querySelectorAll('.auto-input');
+
+        inputs.forEach(function(input, i) {
+            const row = input.closest('.question-row');
+            const label = input.getAttribute('data-label') ||
+                (row && row.querySelector('.question-label')
+                    ? row.querySelector('.question-label').innerText.trim()
+                    : 'Question ' + (i + 1));
+
+            let status = 'neutral';
+
+            if (input.classList.contains('correct') ||
+                input.classList.contains('teacher-locked')) {
+                status = 'correct';
+            } else if (input.classList.contains('incorrect')) {
+                status = 'incorrect';
+            }
+
+            items.push({
+                index: i,
+                label: label,
+                value: input.value.trim(),
+                status: status
+            });
+        });
+
+        const correctCount = document.querySelectorAll(
+            '.auto-input.correct, .auto-input.teacher-locked'
+        ).length;
+
+        const totalGradable = document.querySelectorAll('.binary-input').length;
+
+        return {
+            items: items,
+            scoreText: 'Score: ' + correctCount + ' / ' + totalGradable
+        };
+    }
+
+    // CLOUD AUTO-SAVE
+    let saveTimer;
+
+    function saveProgressToCloud(immediate = false) {
+        const user = auth.currentUser;
+
+        if (!user || sessionStorage.getItem('teacherMode') === 'true') {
+            return;
+        }
+
+        clearTimeout(saveTimer);
+
+        saveTimer = setTimeout(async function() {
+            const structured = buildMarkbookData();
+
+            const payload = {
+                pageTitle: document.title || 'Binary to Denary Revision',
+                lastUpdated: Date.now(),
+                scoreText: structured.scoreText,
+                items: structured.items
+            };
+
+            const inputs = document.querySelectorAll('.auto-input');
+
+            inputs.forEach(function(input, i) {
+                payload['input_' + i] = input.value;
+                payload['class_' + i] = input.className;
+            });
+
+            try {
+                await db.collection('users')
+                    .doc(user.uid)
+                    .collection('lessons')
+                    .doc(LESSON_ID)
+                    .set(payload, { merge: true });
+            } catch (error) {
+                console.error('Cloud sync error:', error);
+            }
+        }, immediate ? 50 : 800);
+    }
+
+    // RESTORE SAVED ANSWERS AND FEEDBACK
+    function applySavedData(data) {
+        if (!data) return;
+
+        const inputs = document.querySelectorAll('.auto-input');
+
+        inputs.forEach(function(input, i) {
+            const savedValue = data['input_' + i] !== undefined
+                ? data['input_' + i]
+                : (data.items && data.items[i]
+                    ? data.items[i].value
+                    : undefined);
+
+            if (savedValue === undefined) return;
+
+            input.value = savedValue;
+
+            if (data['class_' + i]) {
+                input.className = data['class_' + i];
+            }
+
+            const row = input.closest('.question-row');
+            const feedback = row ? row.querySelector('.feedback-msg') : null;
+            const overrideBtn = document.getElementById('override-' + input.id);
+
+            if (overrideBtn &&
+                (input.classList.contains('correct') ||
+                 input.classList.contains('incorrect') ||
+                 input.classList.contains('teacher-locked'))) {
+                overrideBtn.classList.remove('hidden');
+            }
+
+            if (feedback && input.classList.contains('teacher-locked')) {
+                feedback.textContent = input.classList.contains('correct')
+                    ? 'Correct! Teacher approved override.'
+                    : 'Marked incorrect by teacher override.';
+
+                feedback.style.color = input.classList.contains('correct')
+                    ? '#006100'
+                    : '#b71c1c';
+
+                feedback.style.display = 'block';
+            }
+
+            if (input.tagName.toLowerCase() === 'textarea') {
+                input.style.height = 'auto';
+                input.style.height = input.scrollHeight + 'px';
+            }
+        });
+    }
+
+    // AUTHENTICATION AND CLOUD LOAD
+    auth.onAuthStateChanged(async function(user) {
+        const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+        const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+        if (isTeacher && inspectedUid) {
+            try {
+                const doc = await db.collection('users')
+                    .doc(inspectedUid)
+                    .collection('lessons')
+                    .doc(LESSON_ID)
+                    .get();
+
+                if (doc.exists) applySavedData(doc.data());
+            } catch (error) {
+                console.error('Error loading inspected student data:', error);
+            }
+            return;
+        }
+
+        if (user) {
+            try {
+                const doc = await db.collection('users')
+                    .doc(user.uid)
+                    .collection('lessons')
+                    .doc(LESSON_ID)
+                    .get();
+
+                if (doc.exists) {
+                    applySavedData(doc.data());
+                }
+            } catch (error) {
+                console.error('Error loading cloud data:', error);
+            }
+        } else if (!isTeacher) {
+            alert('Please log in on the home page first!');
+            window.location.href = 'index.html';
+        }
+    });
+
+    // INPUT EVENTS AND AUTO-RESIZING
+    document.addEventListener('input', function(event) {
+        const input = event.target;
+
+        if (!input.classList.contains('auto-input')) return;
+
+        saveProgressToCloud(false);
+
+        if (input.tagName.toLowerCase() === 'textarea') {
+            input.style.height = 'auto';
+            input.style.height = input.scrollHeight + 'px';
+        }
+    });
+
+    // RESET PAGE AND CLOUD DATA
+    async function clearData() {
+        if (!confirm('Clear all work on this page? This will delete your saved answers for this lesson.')) {
+            return;
+        }
+
+        const user = auth.currentUser;
+
+        if (user && sessionStorage.getItem('teacherMode') !== 'true') {
+            try {
+                await db.collection('users')
+                    .doc(user.uid)
+                    .collection('lessons')
+                    .doc(LESSON_ID)
+                    .delete();
+            } catch (error) {
+                console.error('Error clearing cloud data:', error);
+                alert('Your saved data could not be deleted. Please try again.');
+                return;
+            }
+        }
+
+        window.location.reload();
+    }
+
+    // TEACHER OVERRIDE
+    let activeQuestionId = null;
+
+    function openVerifyModal(questionId) {
+        activeQuestionId = questionId;
+
+        document.getElementById('teacher-password-input').value = '';
+        document.getElementById('modal-error-msg').style.display = 'none';
+        document.getElementById('verify-modal').style.display = 'flex';
+        document.getElementById('teacher-password-input').focus();
+    }
+
+    function closeVerifyModal() {
+        document.getElementById('verify-modal').style.display = 'none';
+        activeQuestionId = null;
+    }
+
+    function submitVerify() {
+        const password = document.getElementById('teacher-password-input').value;
+
+        if (password !== '2525') {
+            document.getElementById('modal-error-msg').style.display = 'block';
+            return;
+        }
+
+        const input = document.getElementById(activeQuestionId);
+
+        if (!input) {
+            closeVerifyModal();
+            return;
+        }
+
+        const row = input.closest('.question-row');
+        const feedback = row ? row.querySelector('.feedback-msg') : null;
+
+        input.classList.add('teacher-locked');
+
+        if (input.classList.contains('correct')) {
+            input.classList.remove('correct');
+            input.classList.add('incorrect');
+
+            if (feedback) {
+                feedback.textContent = 'Marked incorrect by teacher override.';
+                feedback.style.color = '#b71c1c';
+                feedback.style.display = 'block';
+            }
+        } else {
+            input.classList.remove('incorrect');
+            input.classList.add('correct');
+
+            if (feedback) {
+                feedback.textContent = 'Correct! Teacher approved override.';
+                feedback.style.color = '#006100';
+                feedback.style.display = 'block';
+            }
+        }
+
+        closeVerifyModal();
+        saveProgressToCloud(true);
+    }
+
+    document.getElementById('teacher-password-input')
+        .addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') submitVerify();
+        });
+
+    // ANSWER MARKING: STRICTLY CORRECT OR INCORRECT
+    function checkAnswers(groupClass) {
+        const inputs = document.querySelectorAll('.' + groupClass);
+
+        inputs.forEach(function(input) {
+            const row = input.closest('.question-row');
+            const feedback = row ? row.querySelector('.feedback-msg') : null;
+            const overrideBtn = document.getElementById('override-' + input.id);
+
+            if (overrideBtn) {
+                overrideBtn.classList.remove('hidden');
+            }
+
+            // Do not overwrite a teacher's decision.
+            if (input.classList.contains('teacher-locked')) {
+                return;
+            }
+
+            const answer = input.value
+                .toLowerCase()
+                .replace(/[^a-z0-9\s]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+
+            let rubric;
+
+            try {
+                rubric = JSON.parse(input.getAttribute('data-rubric') || '{}');
+            } catch (error) {
+                console.error('Invalid rubric:', input.id, error);
+                return;
+            }
+
+            input.classList.remove('correct', 'incorrect');
+
+            if (!answer) {
+                if (feedback) {
+                    feedback.textContent = 'Please enter an answer first.';
+                    feedback.style.color = '#b71c1c';
+                    feedback.style.display = 'block';
                 }
                 return;
             }
 
-            if (user) {
-                try {
-                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
-                    if (doc.exists) {
-                        applySavedData(doc.data());
-                    }
-                } catch (err) {
-                    console.error("Error loading cloud data:", err);
-                }
-            } else if (!isTeacher) {
-                alert("Please log in on the home page first!");
-                window.location.href = "index.html";
-            }
-        });
+            const keywordGroups = rubric.keywords || [];
 
-        document.addEventListener('input', function(e) {
-            if (e.target.classList.contains('auto-input')) {
-                saveProgressToCloud(false);
-                if (e.target.tagName.toLowerCase() === 'textarea') {
-                    e.target.style.height = 'auto'; 
-                    e.target.style.height = e.target.scrollHeight + 'px';
-                }
-            }
-        });
+            // Every keyword group must match.
+            // Alternatives inside a group are accepted.
+            const isCorrect = keywordGroups.length > 0 &&
+                keywordGroups.every(function(group) {
+                    return group.some(function(term) {
+                        const keyword = String(term)
+                            .toLowerCase()
+                            .replace(/[^a-z0-9\s]/g, ' ')
+                            .replace(/\s+/g, ' ')
+                            .trim();
 
-        async function clearData() { 
-            if (confirm("Clear all work on this page?")) { 
-                const user = auth.currentUser;
-                if (user) {
-                    try {
-                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
-                    } catch (e) {}
-                }
-                window.location.reload(); 
-            } 
-        }
+                        if (!keyword) return false;
 
-        let activeQuestionId = null;
-        function openVerifyModal(qId) {
-            activeQuestionId = qId;
-            document.getElementById('teacher-password-input').value = '';
-            document.getElementById('modal-error-msg').style.display = 'none';
-            document.getElementById('verify-modal').style.display = 'flex';
-            document.getElementById('teacher-password-input').focus();
-        }
-        function closeVerifyModal() {
-            document.getElementById('verify-modal').style.display = 'none';
-            activeQuestionId = null;
-        }
-        function submitVerify() {
-            var pass = document.getElementById('teacher-password-input').value;
-            if (pass === '2525') {
-                var inputEl = document.getElementById(activeQuestionId);
-                var questionRow = inputEl.closest('.question-wrapper');
-                var feedbackDiv = questionRow ? questionRow.querySelector('.feedback-msg') : inputEl.nextElementSibling;
-                inputEl.classList.add('teacher-locked');
-                if (inputEl.classList.contains('correct')) {
-                    inputEl.classList.remove('correct');
-                    inputEl.classList.add('incorrect');
-                    if(feedbackDiv) { feedbackDiv.innerHTML = "❌ Marked incorrect by teacher override."; feedbackDiv.style.color = "#b71c1c"; feedbackDiv.style.display = "block"; }
-                } else {
-                    inputEl.classList.remove('incorrect');
-                    inputEl.classList.add('correct');
-                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Correct! (Teacher Approved Override)"; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
+                        const escaped = keyword.replace(
+                            /[.*+?^${}()|[\]\\]/g,
+                            '\\$&'
+                        );
+
+                        const pattern = new RegExp(
+                            '(^|\\s)' + escaped + '(?=\\s|$)'
+                        );
+
+                        return pattern.test(answer);
+                    });
+                });
+
+            if (isCorrect) {
+                input.classList.add('correct');
+
+                if (feedback) {
+                    feedback.textContent = 'Correct! Your answer matches the marking criteria.';
+                    feedback.style.color = '#006100';
+                    feedback.style.borderLeftColor = '#008f39';
+                    feedback.style.display = 'block';
                 }
-                closeVerifyModal();
-                saveProgressToCloud(true);
             } else {
-                document.getElementById('modal-error-msg').style.display = 'block';
+                input.classList.add('incorrect');
+
+                if (feedback) {
+                    feedback.textContent = 'Not quite. ' +
+                        (rubric.feedback || 'Check your answer and try again.');
+
+                    feedback.style.color = '#b71c1c';
+                    feedback.style.borderLeftColor = '#d32f2f';
+                    feedback.style.display = 'block';
+                }
             }
-        }
-        document.getElementById('teacher-password-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') submitVerify();
         });
 
-        function checkAnswers(groupClass) {
-            var inputs = document.querySelectorAll('.' + groupClass);
-            for (var i = 0; i < inputs.length; i++) {
-                var inputElement = inputs[i];
-                var questionRow = inputElement.closest('.question-wrapper');
-                var feedbackDiv = questionRow ? questionRow.querySelector('.feedback-msg') : inputElement.nextElementSibling;
-                var overrideBtn = document.getElementById("override-" + inputElement.id);
-                if (overrideBtn) overrideBtn.classList.remove('hidden');
+        saveProgressToCloud(true);
+    }
+</script>
 
-                if (inputElement.classList.contains('teacher-locked')) {
-                    continue; 
-                }
-
-                var studentAnswer = inputElement.value.toLowerCase().replace(/[^a-z0-9\s\+\-\/\*\=\%]/g, " ").replace(/\s+/g, " ").trim();
-                var rubricStr = inputElement.getAttribute('data-rubric');
-                if(!rubricStr) continue;
-                var rubric;
-                try { rubric = JSON.parse(rubricStr); } catch (error) { continue; }
-                
-                var keywordGroups = rubric.keywords; 
-                inputElement.classList.remove('correct', 'incorrect');
-                if (studentAnswer === "") { if(feedbackDiv) feedbackDiv.style.display = 'none'; continue; }
-                
-                var wordCount = studentAnswer.split(" ").length;
-                if (!keywordGroups || keywordGroups.length === 0) {
-                    inputElement.classList.add('correct');
-                    if(feedbackDiv) { feedbackDiv.innerHTML = "✅ Answer recorded."; feedbackDiv.style.color = "#006100"; feedbackDiv.style.display = "block"; }
-                    continue;
-                }
-                
-                var conceptsFound = 0;
-                for(var k = 0; k < keywordGroups.length; k++) {
-                    var terms = keywordGroups[k];
-                    var matched = false;
-                    for(var s = 0; s < terms.length; s++) {
-                        var term = terms[s].toLowerCase().trim();
-                        if (term.length >= 3) { if (studentAnswer.includes(term)) { matched = true; break; } }
-                        else { var regex = new RegExp("\\b" + term + "\\b"); if (regex.test(studentAnswer)) { matched = true; break; } }
-                    }
-                    if(matched) conceptsFound++;
-                }
-                
-                var score = conceptsFound / keywordGroups.length;
-                var isPassed = false;
-                if (keywordGroups.length > 1) { isPassed = (score === 1); }
-                else { isPassed = (score >= 1 || (wordCount >= 2)); }
-                
-                if(feedbackDiv) {
-                    if (isPassed) {
-                        inputElement.classList.add('correct');
-                        feedbackDiv.innerHTML = "✅ Correct! All required concepts covered.";
-                        feedbackDiv.style.color = "#006100";
-                        feedbackDiv.style.display = "block";
-                    } else if (keywordGroups.length > 1 && score >= 0.5) {
-                        inputElement.classList.add('incorrect');
-                        feedbackDiv.innerHTML = "⚠️ Partial credit (" + conceptsFound + "/" + keywordGroups.length + " concepts). " + rubric.feedback;
-                        feedbackDiv.style.color = "#b27a00";
-                        feedbackDiv.style.display = "block";
-                    } else {
-                        inputElement.classList.add('incorrect');
-                        feedbackDiv.innerHTML = "❌ Not quite. " + rubric.feedback;
-                        feedbackDiv.style.color = "#b71c1c";
-                        feedbackDiv.style.display = "block";
-                    }
-                }
-            }
-            saveProgressToCloud(true);
-        }
-    </script>
 </body>
 </html>
