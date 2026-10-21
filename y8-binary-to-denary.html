@@ -721,9 +721,8 @@
 
             <div class="question-row">
                 <label class="question-label">3. Explain why computers store text, images and sound as binary rather than denary.</label>
-                <textarea class="auto-input navy-input" rows="3" data-answers='["switches", "electronic", "reliable", "on and off", "voltage", "signals", "transistors", "two states", "2 states", "on & off"]' placeholder="Explain your answer..."></textarea>
+                <textarea id="blue_q3" class="auto-input navy-input" rows="3" data-answers='["switches", "electronic", "on and off", "transistors", "two states", "reliable"]' placeholder="Explain your answer..."></textarea>            
             </div>
-
             <button type="button" class="btn-submit no-print" onclick="checkAnswers('navy-input')">Check Answers</button>
         </section>
 
@@ -1019,7 +1018,7 @@
        ANSWER CHECKING
        ========================================================= */
 
-    function checkAnswers(groupClass, triggerSync = true) {
+   function checkAnswers(groupClass, triggerSync = true) {
         var inputs = document.getElementsByClassName(groupClass);
         
         for (var i = 0; i < inputs.length; i++) {
@@ -1031,8 +1030,9 @@
             var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers'));
             var isCorrect = false;
             
+            // Check if the student's sentence includes ANY of the accepted keywords/phrases
             for (var j = 0; j < acceptedAnswers.length; j++) {
-                if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
+                if (studentAnswer.includes(acceptedAnswers[j].toLowerCase())) {
                     isCorrect = true;
                     break;
                 }
@@ -1050,7 +1050,7 @@
         }
 
         if (triggerSync) {
-            saveProgressToCloud(true);
+            saveProgress(true);
         }
     }
 </script>
