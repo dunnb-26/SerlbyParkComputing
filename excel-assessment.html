@@ -12,6 +12,61 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
+        :root {
+            /* Delta Serlby Park Color Scheme */
+            --navy: #1B1464; 
+            --yellow: #F7931D;
+            --maroon: #822433;
+            --bg-color: #f4f6f8;
+            --text-color: #333;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+        }
+
+        header { 
+            background-color: var(--navy); 
+            color: white; 
+            padding: 20px; 
+            display: grid; 
+            grid-template-columns: 1fr auto 1fr; 
+            align-items: center; 
+            border-bottom: 6px solid var(--maroon); 
+        }
+
+        .header-left { display: flex; justify-content: flex-start; }
+        .header-center { text-align: center; }
+        .header-right { display: flex; justify-content: flex-end; align-items: center; gap: 12px; }
+
+        header img { 
+            width: 250px; 
+            height: auto; 
+            background-color: white; 
+            border-radius: 8px; 
+            padding: 5px; 
+        }
+
+        header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; }
+
+        .back-btn { background-color: var(--yellow); color: var(--navy); text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; transition: transform 0.2s; }
+        .back-btn:hover { transform: scale(1.05); }
+
+        /* Save Status Pill */
+        #save-status-pill {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
         /* Scoreboard Banner */
         .scoreboard {
             max-width: 1450px;
@@ -56,18 +111,6 @@
             font-weight: bold;
         }
         .btn-clear-scores:hover { background-color: #b71c1c; }
-
-        /* Save Status Pill */
-        #save-status-pill {
-            background-color: rgba(255, 255, 255, 0.15);
-            color: #fff;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            margin-right: 15px;
-        }
 
         /* 3-Column Layout */
         .ide-container {
@@ -287,16 +330,16 @@
     </style>
 </head>
 <body>
-    <header style="background-color: var(--navy); padding: 20px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; border-bottom: 6px solid var(--maroon);">
+    <header>
         <div class="header-left">
-            <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo" style="height: 80px; background-color: white; border-radius: 8px; padding: 5px;"></a>
+            <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
         </div>
         <div class="header-center">
-            <h1 style="color: white; margin: 0; font-size: 28px; letter-spacing: 1px;">Assessment</h1>
+            <h1>Assessment</h1>
         </div>
-        <div class="header-right" style="display: flex; justify-content: flex-end; align-items: center;">
+        <div class="header-right">
             <span id="save-status-pill">💾 Local Mode</span>
-            <a href="spreadsheets.html" style="background-color: var(--yellow); color: var(--navy); text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold;">&larr; Back to Curriculum</a>
+            <a href="spreadsheets.html" class="back-btn">&larr; Back to Curriculum</a>
         </div>
     </header>
 
@@ -366,16 +409,11 @@
             measurementId: "G-HDNYEE11WV"
         };
 
-        let auth = null;
-        let db = null;
-
-        if (typeof firebase !== 'undefined') {
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-            }
-            auth = firebase.auth();
-            db = firebase.firestore();
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
         function buildStructuredMarkbookItems() {
             const items = [];
@@ -398,10 +436,9 @@
 
         let cloudSyncTimer;
         function syncWorkToCloud(immediate = false) {
-            if (!auth || !db || !auth.currentUser) return;
-            if (sessionStorage.getItem('teacherMode') === 'true' && sessionStorage.getItem('inspectStudentUid')) return;
-
             const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
             const statusPill = document.getElementById('save-status-pill');
             if (statusPill) statusPill.innerText = "⏳ Saving...";
 
@@ -427,8 +464,8 @@
                 db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
                   .set(payload, { merge: true })
                   .then(() => { if (statusPill) statusPill.innerText = "☁️ Saved to Cloud"; })
-                  .catch(err => { if (statusPill) statusPill.innerText = "⚠️ Local Backup Only"; });
-            }, immediate ? 50 : 600);
+                  .catch(err => { console.error("Cloud save error:", err); if (statusPill) statusPill.innerText = "⚠️ Error Saving"; });
+            }, immediate ? 50 : 800);
         }
 
         function applySavedData(data) {
@@ -436,64 +473,50 @@
                 taskData = data.taskData;
             }
             if (data && data.scores) {
-                document.getElementById("score-t1").innerText = data.scores.t1 || "0";
-                document.getElementById("score-t2").innerText = data.scores.t2 || "0";
-                document.getElementById("score-t3").innerText = data.scores.t3 || "0";
-                document.getElementById("score-t4").innerText = data.scores.t4 || "0";
-                document.getElementById("total-score").innerText = data.scores.total || "0";
+                if(document.getElementById("score-t1")) document.getElementById("score-t1").innerText = data.scores.t1 || "0";
+                if(document.getElementById("score-t2")) document.getElementById("score-t2").innerText = data.scores.t2 || "0";
+                if(document.getElementById("score-t3")) document.getElementById("score-t3").innerText = data.scores.t3 || "0";
+                if(document.getElementById("score-t4")) document.getElementById("score-t4").innerText = data.scores.t4 || "0";
+                if(document.getElementById("total-score")) document.getElementById("total-score").innerText = data.scores.total || "0";
             }
             switchTask();
         }
 
-        function loadProgress() {
-            try {
-                var savedData = localStorage.getItem('excel_taskData');
-                var scores = {
-                    t1: localStorage.getItem('excel_score_t1'),
-                    t2: localStorage.getItem('excel_score_t2'),
-                    t3: localStorage.getItem('excel_score_t3'),
-                    t4: localStorage.getItem('excel_score_t4'),
-                    total: localStorage.getItem('excel_total')
-                };
-                if (savedData) {
-                    applySavedData({ taskData: JSON.parse(savedData), scores: scores });
+        auth.onAuthStateChanged(async function(user) {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+            const statusPill = document.getElementById('save-status-pill');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                    if (statusPill) statusPill.innerText = "👨‍🏫 Viewing Student";
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
                 }
-            } catch (e) { }
+                return;
+            }
 
-            if (auth && db) {
-                auth.onAuthStateChanged(async (user) => {
-                    const statusPill = document.getElementById('save-status-pill');
-                    const inspectedUid = sessionStorage.getItem('inspectStudentUid');
-                    const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
-
-                    if (isTeacher && inspectedUid) {
-                        try {
-                            const doc = await db.collection('users').doc(inspectedUid).collection('lessons').doc(LESSON_ID).get();
-                            if (doc.exists) applySavedData(doc.data());
-                            if (statusPill) statusPill.innerText = "👨‍🏫 Viewing: " + sessionStorage.getItem('inspectStudentName');
-                        } catch(e) {}
-                        return;
-                    }
-
-                    if (!user) {
-                        if (statusPill) statusPill.innerText = "💾 Local Mode (Not Logged In)";
-                        return;
-                    }
-
+            if (user) {
+                try {
                     if (statusPill) statusPill.innerText = "☁️ Cloud Sync Active";
-                    try {
-                        const doc = await db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).get();
-                        if (doc.exists) {
-                            applySavedData(doc.data());
-                        } else {
-                            syncWorkToCloud(true);
-                        }
-                    } catch(e) {}
-                });
+
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    } else {
+                        switchTask();
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud work:", err);
+                    switchTask();
+                }
             } else {
+                if (statusPill) statusPill.innerText = "💾 Local Mode";
                 switchTask();
             }
-        }
+        });
 
         /* ==========================================================================
            2. EXCEL SPREADSHEET LOGIC & RENDERING
@@ -698,7 +721,6 @@
         function updateScore(taskKey, points) {
             var scoreEl = document.getElementById('score-' + taskKey);
             if (scoreEl) scoreEl.innerText = points;
-            try { localStorage.setItem('excel_score_' + taskKey, points); } catch(e) {}
             
             var p1 = parseInt(document.getElementById("score-t1").innerText) || 0;
             var p2 = parseInt(document.getElementById("score-t2").innerText) || 0;
@@ -708,29 +730,19 @@
             var total = p1 + p2 + p3 + p4;
             var totalEl = document.getElementById("total-score");
             if (totalEl) totalEl.innerText = total;
-            try { localStorage.setItem('excel_total', total); } catch(e) {}
         }
 
         async function clearScores() {
-            if (confirm("Are you sure you want to clear all scores for this student?")) {
-                try {
-                    var tasks = ['t1', 't2', 't3', 't4'];
-                    for(var i=0; i<tasks.length; i++) {
-                        localStorage.removeItem('excel_score_' + tasks[i]);
-                        document.getElementById('score-' + tasks[i]).innerText = "0";
+            if (confirm("Are you sure you want to clear all your answers?")) {
+                const user = auth.currentUser;
+                if (user && sessionStorage.getItem('teacherMode') !== 'true') {
+                    try {
+                        await db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).delete();
+                    } catch(e) {
+                        console.error("Error clearing cloud data:", e);
                     }
-                    localStorage.removeItem('excel_total');
-                    localStorage.removeItem('excel_taskData');
-                    document.getElementById("total-score").innerText = "0";
-                    
-                    taskData = JSON.parse(JSON.stringify(defaultTaskData));
-
-                    if (auth && db && auth.currentUser && !(sessionStorage.getItem('teacherMode') === 'true' && sessionStorage.getItem('inspectStudentUid'))) {
-                        await db.collection('users').doc(auth.currentUser.uid).collection('lessons').doc(LESSON_ID).delete();
-                    }
-                } catch(e) { }
-                switchTask(); 
-                alert("Scores and typed answers have been reset.");
+                }
+                window.location.reload();
             }
         }
 
@@ -990,8 +1002,6 @@
                 }
             }
             
-            try { localStorage.setItem('excel_taskData', JSON.stringify(taskData)); } catch(e){}
-            
             var totalCells = cells.length; 
             var earnedMarks = correct; 
             updateScore(currentTask, earnedMarks);
@@ -1022,13 +1032,9 @@
             syncWorkToCloud(false);
         }
 
+        // Initialize default view safely before Auth returns
         window.onload = function() {
-            try {
-                loadProgress();
-            } catch (e) {
-                var panel = document.getElementById("instruction-panel");
-                if (panel) panel.innerHTML = "<h3 style='color:red;'>Startup Error</h3><p>" + e.message + "</p>";
-            }
+            switchTask();
         };
     </script>
 </body>
