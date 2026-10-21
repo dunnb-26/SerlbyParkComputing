@@ -997,63 +997,139 @@
 
         const LESSON_ID = "y8-binary-addition";
 
-        /* --- 2. HELPER FOR TEACHER MARKBOOK LABELS --- */
-        function findLabelForInput(el, index) {
-            const row = el.closest('.question-row');
-            if (row) {
-                const lbl = row.querySelector('.question-label');
-                if (lbl && lbl.innerText.trim()) {
-                    return lbl.innerText.replace(/\s+/g, ' ').trim();
+        /* --- 2. KEYBOARD NAVIGATION (Left/Right Arrows for Math Grids) --- */
+        document.addEventListener('keydown', function(e) {
+            if(e.target.classList.contains('bit-box') || e.target.classList.contains('carry-box')) {
+                var td = e.target.parentElement;
+                if(e.key === 'ArrowLeft') {
+                    var prev = td.previousElementSibling || e.target.previousElementSibling;
+                    if(prev) {
+                        var input = prev.tagName === 'INPUT' ? prev : prev.querySelector('input');
+                        if(input) input.focus();
+                    }
+                } else if (e.key === 'ArrowRight') {
+                    var next = td.nextElementSibling || e.target.nextElementSibling;
+                    if(next) {
+                        var input = next.tagName === 'INPUT' ? next : next.querySelector('input');
+                        if(input) input.focus();
+                    }
                 }
             }
-            if (el.placeholder) return el.placeholder;
-            return 'Question ' + (index + 1);
+        });
+
+        /* --- 3. MARKBOOK SUMMARY BUILDER (Groups Math Grids & Rubrics) --- */
+        function buildMarkbookItems() {
+            const items = [];
+            let correctCount = 0;
+            let totalGradable = 0;
+
+            // 1. Preparation Key Words & Notes
+            const prepInputs = document.querySelectorAll('.task-prep .auto-input');
+            prepInputs.forEach((el) => {
+                const row = el.closest('.question-row');
+                const lbl = el.getAttribute('data-label') || (row && row.querySelector('.question-label') ? row.querySelector('.question-label').innerText.trim() : 'Lesson Notes');
+                items.push({
+                    label: lbl,
+                    value: el.value.trim(),
+                    status: 'neutral'
+                });
+            });
+
+            // 2. Red Task (Text/Rubric Inputs)
+            const redInputs = document.querySelectorAll('.red-input');
+            redInputs.forEach((el, idx) => {
+                totalGradable++;
+                let status = 'neutral';
+                if (el.classList.contains('input-correct')) {
+                    status = 'correct';
+                    correctCount++;
+                } else if (el.classList.contains('input-incorrect')) {
+                    status = 'incorrect';
+                }
+                items.push({
+                    label: el.getAttribute('data-label') || `Red Task Q${idx + 1}`,
+                    value: el.value.trim(),
+                    status: status
+                });
+            });
+
+            // 3. Amber, Green, and Blue Math Grids (Grouped into single sums)
+            const groupSections = [
+                { selector: '.amber-input.math-sum', prefix: 'Amber Task Q' },
+                { selector: '.green-input.math-sum', prefix: 'Green Task Q' },
+                { selector: '.blue-input.math-sum', prefix: 'Blue Task Q' }
+            ];
+
+            groupSections.forEach(sec => {
+                const groups = document.querySelectorAll(sec.selector);
+                groups.forEach((group, idx) => {
+                    totalGradable++;
+                    const bitInputs = Array.from(group.querySelectorAll('.bit-box'));
+                    const carryInputs = Array.from(group.querySelectorAll('.carry-box'));
+                    const hasTypedBit = bitInputs.some(inp => inp.value.trim() !== '');
+
+                    let valStr = '';
+                    let status = 'neutral';
+
+                    if (hasTypedBit) {
+                        const bitStr = bitInputs.map(inp => inp.value.trim() === '' ? '0' : inp.value.trim()).join('');
+                        valStr = bitStr;
+                        if (carryInputs.length > 0) {
+                            const carryStr = carryInputs.map(inp => inp.value.trim() === '' ? '0' : inp.value.trim()).join('');
+                            valStr += ` (Carries: ${carryStr})`;
+                        }
+
+                        if (bitInputs[0].classList.contains('input-correct')) {
+                            status = 'correct';
+                            correctCount++;
+                        } else if (bitInputs[0].classList.contains('input-incorrect')) {
+                            status = 'incorrect';
+                        }
+                    }
+
+                    items.push({
+                        label: group.getAttribute('data-label') || `${sec.prefix}${idx + 1}`,
+                        value: valStr,
+                        status: status
+                    });
+                });
+            });
+
+            // 4. Plenary Takeaways
+            const plenaryInputs = document.querySelectorAll('.task-plenary .auto-input');
+            plenaryInputs.forEach((el, idx) => {
+                items.push({
+                    label: el.getAttribute('data-label') || `Plenary Takeaway ${idx + 1}`,
+                    value: el.value.trim(),
+                    status: 'neutral'
+                });
+            });
+
+            return {
+                items: items,
+                scoreText: `Score: ${correctCount} / ${totalGradable}`
+            };
         }
 
-        /* --- 3. FIREBASE AUTO-SAVE LOGIC --- */
+        /* --- 4. FIREBASE AUTO-SAVE & AUTO-LOAD LOGIC --- */
         let saveTimer;
         function saveProgress(immediate = false) {
             const user = auth.currentUser;
             if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
 
             var inputs = document.querySelectorAll('.auto-input');
+            const summary = buildMarkbookItems();
+
             var dataToSave = {
                 pageTitle: document.title || LESSON_ID,
                 lastUpdated: Date.now(),
-                items: []
+                items: summary.items,
+                scoreText: summary.scoreText
             };
 
-            var correctCount = 0;
-            var totalGradable = 0;
-
             for (var i = 0; i < inputs.length; i++) {
-                var el = inputs[i];
-                var cls = el.className || '';
-                var status = 'neutral';
-
-                if (el.hasAttribute('data-answers')) {
-                    totalGradable++;
-                    if (cls.includes('input-correct')) {
-                        status = 'correct';
-                        correctCount++;
-                    } else if (cls.includes('input-incorrect')) {
-                        status = 'incorrect';
-                    }
-                }
-
-                dataToSave['input_' + i] = el.value;
-                dataToSave['class_' + i] = cls;
-
-                dataToSave.items.push({
-                    index: i,
-                    label: findLabelForInput(el, i),
-                    value: el.value,
-                    status: status
-                });
-            }
-
-            if (totalGradable > 0) {
-                dataToSave.scoreText = "Score: " + correctCount + " / " + totalGradable;
+                dataToSave['input_' + i] = inputs[i].value;
+                dataToSave['class_' + i] = inputs[i].className || '';
             }
 
             clearTimeout(saveTimer);
@@ -1064,8 +1140,8 @@
             }, immediate ? 50 : 800);
         }
 
-        /* --- 4. FIREBASE AUTO-LOAD LOGIC --- */
         function applySavedData(data) {
+            if (!data) return;
             var inputs = document.querySelectorAll('.auto-input');
             for (var i = 0; i < inputs.length; i++) {
                 var savedVal = data['input_' + i] !== undefined
@@ -1074,6 +1150,9 @@
 
                 if (savedVal !== undefined) {
                     inputs[i].value = savedVal;
+                    if (data['class_' + i]) {
+                        inputs[i].className = data['class_' + i];
+                    }
                     if (inputs[i].tagName.toLowerCase() === 'textarea') {
                         inputs[i].style.height = 'auto';
                         inputs[i].style.height = inputs[i].scrollHeight + 'px';
@@ -1085,63 +1164,8 @@
             checkTextAnswers('red-input', false);
             checkAnswers('amber-input', false);
             checkAnswers('green-input', false);
-            checkAnswers('navy-input', false);
+            checkAnswers('blue-input', false); // Fixed from 'navy-input' to 'blue-input'
         }
-
-        auth.onAuthStateChanged(async function(user) {
-            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
-            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
-
-            if (isTeacher && inspectedUid) {
-                try {
-                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
-                    if (doc.exists) applySavedData(doc.data());
-                } catch (err) {
-                    console.error("Error loading inspected student data:", err);
-                }
-                return;
-            }
-
-            if (user) {
-                try {
-                    // Clean up any legacy local storage on shared school PCs
-                    try { localStorage.removeItem('y8binaryAdditionMemory'); } catch (e) {}
-
-                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
-                    if (doc.exists) {
-                        applySavedData(doc.data());
-                    }
-                } catch (err) {
-                    console.error("Error loading cloud work:", err);
-                }
-            }
-        });
-
-        document.addEventListener('input', function(e) {
-            if (e.target.classList.contains('auto-input')) {
-                saveProgress(false);
-                if (e.target.tagName.toLowerCase() === 'textarea') {
-                    e.target.style.height = 'auto';
-                    e.target.style.height = e.target.scrollHeight + 'px';
-                }
-            }
-        });
-
-        async function clearData() {
-            if (confirm("Are you sure you want to clear all your work on this page?")) {
-                try { localStorage.removeItem('y8binaryAdditionMemory'); } catch (e) {}
-                const user = auth.currentUser;
-                if (user) {
-                    try {
-                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
-                    } catch (err) {
-                        console.error("Error clearing cloud data:", err);
-                    }
-                }
-                window.location.reload();
-            }
-        }
-
         /* --- 5. BATCH-MARKING TEXT INPUT LOGIC --- */
       function checkAnswers(taskClass, triggerSync = true) {
             var groups = document.querySelectorAll('.' + taskClass);
