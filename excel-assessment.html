@@ -58,7 +58,8 @@
 
         /* Scoreboard Banner */
         .scoreboard {
-            max-width: 1450px;
+            width: 96%;
+            max-width: 1600px;
             margin: 20px auto 0 auto;
             padding: 15px 25px;
             background: white;
@@ -101,16 +102,23 @@
             font-weight: bold;
         }
         .btn-clear-scores:hover { background-color: #b71c1c; }
-/* 3-Column Layout */
-.ide-container {
-    display: grid;
-    grid-template-columns: 1fr 2.5fr 1fr;
-    gap: 20px;
-    width: 98%;
-    max-width: 1800px;
-    margin: 25px auto;
-    box-sizing: border-box;
-}
+
+        /* Main Container */
+        main {
+            display: block; /* Removed flex to stop shrink-wrapping */
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .ide-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Top row split 50/50 */
+            gap: 20px;
+            width: 96%;
+            max-width: 1600px;
+            margin: 20px auto;
+            box-sizing: border-box;
+        }
 
         .ide-panel {
             background: white;
@@ -122,18 +130,19 @@
             flex-direction: column;
         }
 
-@media (max-width: 98%) {
-    .ide-container {
-        grid-template-columns: 1fr;
-    }
-}
-        
-        /* INCREASED HEIGHT FOR EXCEL PANEL */
         .editor-panel { 
+            grid-column: 1 / -1; /* Forces the spreadsheet to span both columns */
             border-top-color: #217346; 
-            min-height: 600px; 
+            min-height: 500px; 
         } 
+        
         .output-panel { border-top-color: var(--maroon); }
+
+        @media (max-width: 900px) {
+            .ide-container {
+                grid-template-columns: 1fr;
+            }
+        }
 
         .ide-panel h3 {
             margin-top: 0;
@@ -155,13 +164,13 @@
         #instruction-panel {
             background-color: #f8f9fa;
             border-left: 4px solid var(--navy);
-            margin-bottom: 15px;
+            padding: 12px;
             border-radius: 0 4px 4px 0;
             font-family: inherit;
-            font-size: 13.5px;
+            font-size: 14.5px;
             color: #333;
             flex-grow: 1;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         /* CUSTOM EXCEL UI STYLES */
@@ -206,14 +215,14 @@
             overflow-y: auto;
             background-color: white;
             border: 1px solid #c0c0c0;
-            flex-grow: 1; /* Stretches the container to fill the 600px height */
+            flex-grow: 1; /* Stretches the container to fill the height */
         }
 
         .excel-table {
             border-collapse: collapse;
             width: 100%;
             font-family: Calibri, Arial, sans-serif;
-            font-size: 14px;
+            font-size: 15px;
             background-color: white;
             user-select: none;
         }
@@ -226,14 +235,14 @@
             white-space: nowrap;
         }
         
-        .static-cell { padding: 6px !important; }
+        .static-cell { padding: 8px !important; }
 
         .excel-table thead th {
             background-color: #f3f3f3;
             text-align: center;
             color: #666;
             font-weight: normal;
-            padding: 4px;
+            padding: 6px;
         }
 
         .excel-table .row-header {
@@ -242,7 +251,7 @@
             text-align: center;
             color: #666;
             font-weight: normal;
-            padding: 4px;
+            padding: 6px;
         }
 
         .excel-table .header-cell {
@@ -262,9 +271,9 @@
             height: 100%;
             box-sizing: border-box;
             border: 2px solid transparent;
-            padding: 6px;
+            padding: 8px;
             font-family: inherit;
-            font-size: 14px;
+            font-size: 15px;
             outline: none;
             background-color: transparent;
             cursor: cell;
@@ -280,13 +289,13 @@
         /* EXCEL DRAG-TO-FILL HANDLE STYLES */
         .fill-handle {
             display: none;
-            width: 6px;
-            height: 6px;
+            width: 8px;
+            height: 8px;
             background-color: #217346;
             border: 1px solid white;
             position: absolute;
-            bottom: -3px;
-            right: -3px;
+            bottom: -4px;
+            right: -4px;
             cursor: crosshair;
             z-index: 10;
         }
@@ -313,17 +322,18 @@
             color: var(--navy);
             font-size: 14px;
             line-height: 1.5;
+            flex-grow: 1;
         }
         
         .progress-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px;
+            font-size: 14px;
             text-align: center;
             margin-bottom: 15px;
         }
         .progress-table th { background-color: #1e3a8a; color: white; padding: 8px; }
-        .progress-table td { padding: 12px 8px; font-weight: bold; font-size: 16px; border: 1px solid #ddd; }
+        .progress-table td { padding: 12px 8px; font-weight: bold; font-size: 18px; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
@@ -352,6 +362,8 @@
 
     <main>
         <div class="ide-container">
+            
+            <!-- TOP LEFT: INSTRUCTIONS -->
             <div class="ide-panel">
                 <h3>1. Instructions</h3>
                 <select id="task-selector" onchange="switchTask()">
@@ -363,8 +375,16 @@
                 <div id="instruction-panel"></div>
             </div>
 
+            <!-- TOP RIGHT: PROGRESS -->
+            <div class="ide-panel output-panel">
+                <h3 style="color: var(--maroon);">2. Section Progress</h3>
+                <p style="font-size: 13px; color: #666; margin-top: 0;">Your answers are evaluated instantly.</p>
+                <div id="feedback" class="feedback-box">Loading progress...</div>
+            </div>
+
+            <!-- BOTTOM: SPREADSHEET (Full Width) -->
             <div class="ide-panel editor-panel">
-                <h3 style="color: #217346;">2. Live Spreadsheet Editor</h3>
+                <h3 style="color: #217346;">3. Live Spreadsheet Editor</h3>
                 <p style="font-size: 13px; color: #666; margin-top: 0; margin-bottom: 5px;">
                     <span style="background:#c6efce; color:#006100; padding:2px 6px; border-radius:3px; font-weight:bold;">Green</span> = Correct Formula &nbsp;|&nbsp; 
                     <span style="background:#ffc7ce; color:#9c0006; padding:2px 6px; border-radius:3px; font-weight:bold;">Red</span> = Incorrect/Typed Answer <br>
@@ -379,11 +399,6 @@
                 <div id="spreadsheet-container"></div>
             </div>
 
-            <div class="ide-panel output-panel">
-                <h3 style="color: var(--maroon);">3. Section Progress</h3>
-                <p style="font-size: 13px; color: #666; margin-top: 0;">Your answers are evaluated instantly.</p>
-                <div id="feedback" class="feedback-box">Loading progress...</div>
-            </div>
         </div>
     </main>
     
@@ -741,9 +756,7 @@
                 if (auth && auth.currentUser && sessionStorage.getItem('teacherMode') !== 'true') {
                     try {
                         await db.collection('users').doc(auth.currentUser.uid).collection('lessons').doc(LESSON_ID).delete();
-                    } catch(e) {
-                        console.error("Error clearing cloud data:", e);
-                    }
+                    } catch(e) { }
                 }
                 window.location.reload();
             }
@@ -1034,11 +1047,6 @@
 
             syncWorkToCloud(false);
         }
-
-        // Initialize default view safely before Auth returns
-        window.onload = function() {
-            switchTask();
-        };
     </script>
 </body>
 </html>
