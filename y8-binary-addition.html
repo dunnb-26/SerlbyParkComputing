@@ -995,140 +995,22 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        const LESSON_ID = "binary-addition-shifts";
+        const LESSON_ID = "binary-conversions";
 
-        /* --- 2. KEYBOARD NAVIGATION (Left/Right Arrows for Math Grids) --- */
-        document.addEventListener('keydown', function(e) {
-            if(e.target.classList.contains('bit-box') || e.target.classList.contains('carry-box')) {
-                var td = e.target.parentElement;
-                if(e.key === 'ArrowLeft') {
-                    var prev = td.previousElementSibling || e.target.previousElementSibling;
-                    if(prev) {
-                        var input = prev.tagName === 'INPUT' ? prev : prev.querySelector('input');
-                        if(input) input.focus();
-                    }
-                } else if (e.key === 'ArrowRight') {
-                    var next = td.nextElementSibling || e.target.nextElementSibling;
-                    if(next) {
-                        var input = next.tagName === 'INPUT' ? next : next.querySelector('input');
-                        if(input) input.focus();
-                    }
+        /* --- 2. HELPER FOR TEACHER MARKBOOK LABELS --- */
+        function findLabelForInput(el, index) {
+            const row = el.closest('.question-row');
+            if (row) {
+                const lbl = row.querySelector('.question-label');
+                if (lbl && lbl.innerText.trim()) {
+                    return lbl.innerText.replace(/\s+/g, ' ').trim();
                 }
             }
-        });
-
-        /* --- 3. MARKBOOK SUMMARY BUILDER --- */
-        function buildMarkbookItems() {
-            const items = [];
-            let correctCount = 0;
-            let totalGradable = 0;
-
-            // 1. Preparation Key Words & Notes
-            const prepInputs = document.querySelectorAll('.task-prep .auto-input');
-            prepInputs.forEach((el, idx) => {
-                const row = el.closest('.question-row');
-                const lbl = row && row.querySelector('.question-label') ? row.querySelector('.question-label').innerText.trim() : 'Lesson Notes';
-                items.push({
-                    label: `Prep: ${lbl}`,
-                    value: el.value.trim(),
-                    status: 'neutral'
-                });
-            });
-
-            // 2. Red, Amber, and Green Bit-Box Groups
-            const groupSections = [
-                { selector: '.red-input', prefix: 'Red Task Q' },
-                { selector: '.amber-input', prefix: 'Amber Task Q' },
-                { selector: '.green-input', prefix: 'Green Task Q' }
-            ];
-
-            groupSections.forEach(sec => {
-                const groups = document.querySelectorAll(sec.selector);
-                groups.forEach((group, idx) => {
-                    totalGradable++;
-                    const bitInputs = Array.from(group.querySelectorAll('.bit-box'));
-                    const carryInputs = Array.from(group.querySelectorAll('.carry-box'));
-                    const hasTypedBit = bitInputs.some(inp => inp.value.trim() !== '');
-
-                    let valStr = '';
-                    let status = 'neutral';
-
-                    if (hasTypedBit) {
-                        const bitStr = bitInputs.map(inp => inp.value.trim() === '' ? '0' : inp.value.trim()).join('');
-                        valStr = bitStr;
-                        if (carryInputs.length > 0) {
-                            const carryStr = carryInputs.map(inp => inp.value.trim() === '' ? '0' : inp.value.trim()).join('');
-                            valStr += ` (Carries: ${carryStr})`;
-                        }
-
-                        if (bitInputs[0].classList.contains('input-correct')) {
-                            status = 'correct';
-                            correctCount++;
-                        } else if (bitInputs[0].classList.contains('input-incorrect')) {
-                            status = 'incorrect';
-                        }
-                    }
-
-                    items.push({
-                        label: `${sec.prefix}${idx + 1}`,
-                        value: valStr,
-                        status: status
-                    });
-                });
-            });
-
-            // 3. Blue Task (Identify the Shift)
-            const blueRows = document.querySelectorAll('.task-navy .question-row');
-            blueRows.forEach((row, idx) => {
-                totalGradable++;
-                const inputs = row.querySelectorAll('.blue-input');
-                const dirInput = inputs[0];
-                const placesInput = inputs[1];
-                const dirVal = dirInput ? dirInput.value.trim() : '';
-                const placesVal = placesInput ? placesInput.value.trim() : '';
-
-                let valStr = '';
-                if (dirVal || placesVal) {
-                    valStr = `Direction: ${dirVal || '?'} | Places: ${placesVal || '?'}`;
-                }
-
-                let status = 'neutral';
-                if (dirInput && placesInput && (dirVal !== '' || placesVal !== '')) {
-                    const dirCorrect = dirInput.classList.contains('input-correct');
-                    const placesCorrect = placesInput.classList.contains('input-correct');
-                    const anyIncorrect = dirInput.classList.contains('input-incorrect') || placesInput.classList.contains('input-incorrect');
-                    if (dirCorrect && placesCorrect) {
-                        status = 'correct';
-                        correctCount++;
-                    } else if (anyIncorrect) {
-                        status = 'incorrect';
-                    }
-                }
-
-                items.push({
-                    label: `Blue Task Q${idx + 1}`,
-                    value: valStr,
-                    status: status
-                });
-            });
-
-            // 4. Plenary Takeaways
-            const plenaryInputs = document.querySelectorAll('.task-plenary .auto-input');
-            plenaryInputs.forEach((el, idx) => {
-                items.push({
-                    label: `Plenary Takeaway ${idx + 1}`,
-                    value: el.value.trim(),
-                    status: 'neutral'
-                });
-            });
-
-            return {
-                items: items,
-                scoreText: `Score: ${correctCount} / ${totalGradable}`
-            };
+            if (el.placeholder) return el.placeholder;
+            return 'Question ' + (index + 1);
         }
 
-        /* --- 4. FIREBASE AUTO-SAVE & AUTO-LOAD LOGIC --- */
+        /* --- 3. FIREBASE AUTO-SAVE LOGIC --- */
         let saveTimer;
         function saveProgress(immediate = false) {
             const user = auth.currentUser;
@@ -1136,17 +1018,43 @@
 
             var inputs = document.querySelectorAll('.auto-input');
             var dataToSave = {
-                pageTitle: document.title || "Binary Addition & Shifts - Lesson",
-                lastUpdated: Date.now()
+                pageTitle: document.title || LESSON_ID,
+                lastUpdated: Date.now(),
+                items: []
             };
 
+            var correctCount = 0;
+            var totalGradable = 0;
+
             for (var i = 0; i < inputs.length; i++) {
-                dataToSave['input_' + i] = inputs[i].value;
+                var el = inputs[i];
+                var cls = el.className || '';
+                var status = 'neutral';
+
+                if (el.hasAttribute('data-answers')) {
+                    totalGradable++;
+                    if (cls.includes('input-correct')) {
+                        status = 'correct';
+                        correctCount++;
+                    } else if (cls.includes('input-incorrect')) {
+                        status = 'incorrect';
+                    }
+                }
+
+                dataToSave['input_' + i] = el.value;
+                dataToSave['class_' + i] = cls;
+
+                dataToSave.items.push({
+                    index: i,
+                    label: findLabelForInput(el, i),
+                    value: el.value,
+                    status: status
+                });
             }
 
-            const summary = buildMarkbookItems();
-            dataToSave.items = summary.items;
-            dataToSave.scoreText = summary.scoreText;
+            if (totalGradable > 0) {
+                dataToSave.scoreText = "Score: " + correctCount + " / " + totalGradable;
+            }
 
             clearTimeout(saveTimer);
             saveTimer = setTimeout(function() {
@@ -1156,23 +1064,28 @@
             }, immediate ? 50 : 800);
         }
 
+        /* --- 4. FIREBASE AUTO-LOAD LOGIC --- */
         function applySavedData(data) {
-            if (!data) return;
             var inputs = document.querySelectorAll('.auto-input');
             for (var i = 0; i < inputs.length; i++) {
-                if (data['input_' + i] !== undefined) {
-                    inputs[i].value = data['input_' + i];
+                var savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined) {
+                    inputs[i].value = savedVal;
                     if (inputs[i].tagName.toLowerCase() === 'textarea') {
                         inputs[i].style.height = 'auto';
                         inputs[i].style.height = inputs[i].scrollHeight + 'px';
                     }
                 }
             }
-            // Auto-mark previously saved  without triggering a redundant save
-checkTextAnswers('red-input', false);
-checkAnswers('amber-input', false);
-checkAnswers('green-input', false);
-checkAnswers('blue-input', false);
+
+            // Re-mark previously saved answers without triggering a redundant save
+            checkTextAnswers('red-input', false);
+            checkAnswers('amber-input', false);
+            checkAnswers('green-input', false);
+            checkAnswers('navy-input', false);
         }
 
         auth.onAuthStateChanged(async function(user) {
@@ -1191,7 +1104,8 @@ checkAnswers('blue-input', false);
 
             if (user) {
                 try {
-                    try { localStorage.removeItem('binaryPerBitMemory'); } catch (e) {}
+                    // Clean up any legacy local storage on shared school PCs
+                    try { localStorage.removeItem('binaryConversionsMemory'); } catch (e) {}
 
                     const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
                     if (doc.exists) {
@@ -1215,7 +1129,7 @@ checkAnswers('blue-input', false);
 
         async function clearData() {
             if (confirm("Are you sure you want to clear all your work on this page?")) {
-                try { localStorage.removeItem('binaryPerBitMemory'); } catch(e) {}
+                try { localStorage.removeItem('binaryConversionsMemory'); } catch (e) {}
                 const user = auth.currentUser;
                 if (user) {
                     try {
@@ -1228,55 +1142,40 @@ checkAnswers('blue-input', false);
             }
         }
 
-        /* --- 5. BATCH-MARKING PER-BIT AND CARRY LOGIC (Red, Amber, Green) --- */
-        function checkAnswers(taskClass, triggerSync = true) {
-            var groups = document.querySelectorAll('.' + taskClass);
-            groups.forEach(function(group) {
+        /* --- 5. BATCH-MARKING TEXT INPUT LOGIC --- */
+        function checkAnswers(groupClass, triggerSync = true) {
+            var inputs = document.getElementsByClassName(groupClass);
+            
+            for (var i = 0; i < inputs.length; i++) {
+                var inputElement = inputs[i];
+                var studentAnswer = inputElement.value.toLowerCase().trim();
+                var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers'));
                 
-                // 1. Grade the Main Answer Bits
-                var bitInputs = group.querySelectorAll('.bit-box');
-                var hasTypedBit = Array.from(bitInputs).some(inp => inp.value.trim() !== '');
+                var isCorrect = false;
                 
-                if (hasTypedBit) {
-                    var studentBinaryString = Array.from(bitInputs).map(inp => inp.value.trim() === '' ? '0' : inp.value.trim()).join('');
-                    var studentDecimal = parseInt(studentBinaryString, 2);
-                    
-                    var acceptedAnswers = JSON.parse(group.getAttribute('data-answers'));
-                    var acceptedDecimal = parseInt(acceptedAnswers[0], 2);
-                    
-                    var isCorrect = (studentDecimal === acceptedDecimal);
-
-                    bitInputs.forEach(function(inp) {
-                        inp.classList.remove('input-correct', 'input-incorrect');
-                        inp.classList.add(isCorrect ? 'input-correct' : 'input-incorrect');
-                    });
-
-                    // 2. Grade the Carry Bits Box-by-Box (Only if they exist)
-                    var carryInputs = group.querySelectorAll('.carry-box');
-                    if (carryInputs.length > 0) {
-                        var expectedCarries = JSON.parse(group.getAttribute('data-carries'))[0];
-                        
-                        carryInputs.forEach(function(inp, index) {
-                            var studentCarryVal = inp.value.trim() === '' ? '0' : inp.value.trim();
-                            var expectedCarryVal = expectedCarries[index];
-
-                            inp.classList.remove('input-correct', 'input-incorrect');
-                            if (studentCarryVal === expectedCarryVal) {
-                                inp.classList.add('input-correct');
-                            } else {
-                                inp.classList.add('input-incorrect');
-                            }
-                        });
+                for (var j = 0; j < acceptedAnswers.length; j++) {
+                    if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
+                        isCorrect = true;
+                        break;
                     }
                 }
-            });
+
+                inputElement.classList.remove('input-correct', 'input-incorrect');
+
+                if (studentAnswer !== "") {
+                    if (isCorrect) {
+                        inputElement.classList.add('input-correct');
+                    } else {
+                        inputElement.classList.add('input-incorrect');
+                    }
+                }
+            }
 
             if (triggerSync) {
                 saveProgress(true);
             }
         }
-     
-/* CHECK TEXT BASED ANSWERS*/     
+     /* CHECK TEXT BASED ANSWERS*/     
 function checkTextAnswers(groupClass, triggerSync = true) {
         var inputs = document.querySelectorAll('.' + groupClass);
         
