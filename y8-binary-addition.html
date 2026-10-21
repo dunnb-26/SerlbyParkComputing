@@ -1143,38 +1143,53 @@
         }
 
         /* --- 5. BATCH-MARKING TEXT INPUT LOGIC --- */
-        function checkAnswers(groupClass, triggerSync = true) {
-            var inputs = document.getElementsByClassName(groupClass);
-            
-            for (var i = 0; i < inputs.length; i++) {
-                var inputElement = inputs[i];
-                var studentAnswer = inputElement.value.toLowerCase().trim();
-                var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers'));
+      function checkAnswers(taskClass, triggerSync = true) {
+            var groups = document.querySelectorAll('.' + taskClass);
+            groups.forEach(function(group) {
                 
-                var isCorrect = false;
+                // 1. Grade the Main Answer Bits
+                var bitInputs = group.querySelectorAll('.bit-box');
+                var hasTypedBit = Array.from(bitInputs).some(inp => inp.value.trim() !== '');
                 
-                for (var j = 0; j < acceptedAnswers.length; j++) {
-                    if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
-                        isCorrect = true;
-                        break;
+                if (hasTypedBit) {
+                    var studentBinaryString = Array.from(bitInputs).map(inp => inp.value.trim() === '' ? '0' : inp.value.trim()).join('');
+                    var studentDecimal = parseInt(studentBinaryString, 2);
+                    
+                    var acceptedAnswers = JSON.parse(group.getAttribute('data-answers'));
+                    var acceptedDecimal = parseInt(acceptedAnswers[0], 2);
+                    
+                    var isCorrect = (studentDecimal === acceptedDecimal);
+
+                    bitInputs.forEach(function(inp) {
+                        inp.classList.remove('input-correct', 'input-incorrect');
+                        inp.classList.add(isCorrect ? 'input-correct' : 'input-incorrect');
+                    });
+
+                    // 2. Grade the Carry Bits Box-by-Box (Only if they exist)
+                    var carryInputs = group.querySelectorAll('.carry-box');
+                    if (carryInputs.length > 0) {
+                        var expectedCarries = JSON.parse(group.getAttribute('data-carries'))[0];
+                        
+                        carryInputs.forEach(function(inp, index) {
+                            var studentCarryVal = inp.value.trim() === '' ? '0' : inp.value.trim();
+                            var expectedCarryVal = expectedCarries[index];
+
+                            inp.classList.remove('input-correct', 'input-incorrect');
+                            if (studentCarryVal === expectedCarryVal) {
+                                inp.classList.add('input-correct');
+                            } else {
+                                inp.classList.add('input-incorrect');
+                            }
+                        });
                     }
                 }
-
-                inputElement.classList.remove('input-correct', 'input-incorrect');
-
-                if (studentAnswer !== "") {
-                    if (isCorrect) {
-                        inputElement.classList.add('input-correct');
-                    } else {
-                        inputElement.classList.add('input-incorrect');
-                    }
-                }
-            }
+            });
 
             if (triggerSync) {
                 saveProgress(true);
             }
         }
+     
      /* CHECK TEXT BASED ANSWERS*/     
 function checkTextAnswers(groupClass, triggerSync = true) {
         var inputs = document.querySelectorAll('.' + groupClass);
