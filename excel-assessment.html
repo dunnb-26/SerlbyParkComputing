@@ -324,7 +324,7 @@
             <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
         </div>
         <div class="header-center">
-            <h1>Excel Assessment</h1>
+            <h1>Assessment</h1>
         </div>
         <div class="header-right">
             <a href="spreadsheets.html" class="back-btn">&larr; Back to Curriculum</a>
@@ -397,11 +397,28 @@
             measurementId: "G-HDNYEE11WV"
         };
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
+        // SAFETY WRAPPER: Catch CORS script blocks so the page doesn't crash
+        window.onerror = function(msg, url, line) {
+            if (msg.includes('Script error')) return false; // Ignore blocked CDN errors
+            var panel = document.getElementById("instruction-panel");
+            if (panel) panel.innerHTML = "<h3 style='color:red;'>Startup Alert</h3><p>An error occurred: " + msg + "</p>";
+            return false;
+        };
+
+        let auth = null;
+        let db = null;
+
+        try {
+            if (typeof firebase !== 'undefined') {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                auth = firebase.auth();
+                db = firebase.firestore();
+            }
+        } catch(e) {
+            console.warn("Firebase blocked by network. Running locally.");
         }
-        const auth = firebase.auth();
-        const db = firebase.firestore();
 
         function buildStructuredMarkbookItems() {
             const items = [];
@@ -416,16 +433,13 @@
             items.push({ label: "Task 3 (School Club)", value: p3 + " / 11", status: p3 === 11 ? 'correct' : (p3 > 0 ? 'neutral' : 'incorrect') });
             items.push({ label: "Task 4 (Charity Cafe)", value: p4 + " / 8", status: p4 === 8 ? 'correct' : (p4 > 0 ? 'neutral' : 'incorrect') });
 
-            return {
-                items: items,
-                scoreText: `Score: ${total} / 32`
-            };
+            return { items: items, scoreText: `Score: ${total} / 32` };
         }
 
         let cloudSyncTimer;
         function syncWorkToCloud(immediate = false) {
-            const user = auth.currentUser;
-            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+            if (!auth || !db || !auth.currentUser) return;
+            if (sessionStorage.getItem('teacherMode') === 'true') return;
 
             clearTimeout(cloudSyncTimer);
             cloudSyncTimer = setTimeout(() => {
@@ -446,16 +460,13 @@
                     }
                 };
 
-                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
-                  .set(payload, { merge: true })
-                  .catch(err => console.error("Cloud save error:", err));
+                db.collection('users').doc(auth.currentUser.uid).collection('lessons').doc(LESSON_ID)
+                  .set(payload, { merge: true }).catch(err => console.error(err));
             }, immediate ? 50 : 800);
         }
 
         function applySavedData(data) {
-            if (data && data.taskData) {
-                taskData = data.taskData;
-            }
+            if (data && data.taskData) taskData = data.taskData;
             if (data && data.scores) {
                 if(document.getElementById("score-t1")) document.getElementById("score-t1").innerText = data.scores.t1 || "0";
                 if(document.getElementById("score-t2")) document.getElementById("score-t2").innerText = data.scores.t2 || "0";
@@ -463,48 +474,42 @@
                 if(document.getElementById("score-t4")) document.getElementById("score-t4").innerText = data.scores.t4 || "0";
                 if(document.getElementById("total-score")) document.getElementById("total-score").innerText = data.scores.total || "0";
             }
+        }
+
+        let initialLoadDone = false;
+        function initApp() {
+            if (initialLoadDone) return;
+            initialLoadDone = true;
             switchTask();
         }
 
-        auth.onAuthStateChanged(async function(user) {
-            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
-            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+        if (auth) {
+            auth.onAuthStateChanged(async function(user) {
+                const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+                const inspectedUid = sessionStorage.getItem('inspectStudentUid');
 
-            if (isTeacher && inspectedUid) {
-                try {
-                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
-                    if (doc.exists) applySavedData(doc.data());
-                } catch (err) {
-                    console.error("Error loading inspected student data:", err);
+                if (isTeacher && inspectedUid) {
+                    try {
+                        const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                        if (doc.exists) applySavedData(doc.data());
+                    } catch (err) {}
+                } else if (user) {
+                    try {
+                        const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                        if (doc.exists) applySavedData(doc.data());
+                    } catch (err) {}
                 }
-                return;
-            }
+                initApp();
+            });
+        }
 
-            if (user) {
-                try {
-                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
-                    if (doc.exists) {
-                        applySavedData(doc.data());
-                    } else {
-                        switchTask();
-                    }
-                } catch (err) {
-                    console.error("Error loading cloud work:", err);
-                    switchTask();
-                }
-            } else {
-                switchTask();
-            }
-        });
+        window.onload = function() {
+            if (!auth) initApp(); // Force load if Firebase is blocked
+        };
 
         /* ==========================================================================
            2. EXCEL SPREADSHEET LOGIC & RENDERING
            ========================================================================== */
-        window.onerror = function(msg, url, line) {
-            var panel = document.getElementById("instruction-panel");
-            if (panel) panel.innerHTML = "<h3 style='color:red;'>Startup Alert</h3><p>An error blocked the page from loading: " + msg + "</p>";
-            return false;
-        };
 
         var currentTask = "t1";
         var activeCell = null; 
@@ -713,13 +718,10 @@
 
         async function clearScores() {
             if (confirm("Are you sure you want to clear all your answers?")) {
-                const user = auth.currentUser;
-                if (user && sessionStorage.getItem('teacherMode') !== 'true') {
+                if (auth && auth.currentUser && sessionStorage.getItem('teacherMode') !== 'true') {
                     try {
-                        await db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).delete();
-                    } catch(e) {
-                        console.error("Error clearing cloud data:", e);
-                    }
+                        await db.collection('users').doc(auth.currentUser.uid).collection('lessons').doc(LESSON_ID).delete();
+                    } catch(e) { }
                 }
                 window.location.reload();
             }
@@ -1010,11 +1012,6 @@
 
             syncWorkToCloud(false);
         }
-
-        // Initialize default view safely before Auth returns
-        window.onload = function() {
-            switchTask();
-        };
     </script>
 </body>
 </html>
