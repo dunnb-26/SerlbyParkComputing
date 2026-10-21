@@ -342,7 +342,7 @@
                 <div class="feedback-msg"></div>
             </div>
 
-            <button type="button" class="btn-submit no-print" onclick="checkAnswers('red-input')">Check Answers</button>
+            <button type="button" class="btn-submit no-print" onclick="checkTextAnswers('red-input')">Check Answers</button>
         </section>
 
         <!-- AMBER TASK: 4-BIT MATH -->
@@ -1276,24 +1276,77 @@
             }
         }
 
-        /* --- 6. TEXT-MARKING LOGIC (For the Blue Reverse Engineering Task) --- */
-        function checkTextAnswers(className, triggerSync = true) {
-            var inputs = document.querySelectorAll('.' + className);
-            inputs.forEach(function(inp) {
-                var studentAnswer = inp.value.replace(/\s+/g, '').toLowerCase(); 
-                if(studentAnswer === '') return;
-                
-                var acceptedAnswers = JSON.parse(inp.getAttribute('data-answers'));
-                var isCorrect = acceptedAnswers.some(ans => studentAnswer === ans.toLowerCase());
-                
-                inp.classList.remove('input-correct', 'input-incorrect');
-                inp.classList.add(isCorrect ? 'input-correct' : 'input-incorrect');
-            });
+     
+/* CHECK TEXT BASED ANSWERS*/     
+function checkTextAnswers(groupClass, triggerSync = true) {
+        var inputs = document.querySelectorAll('.' + groupClass);
+        
+        inputs.forEach(function(inputElement) {
+            var studentAnswer = inputElement.value.toLowerCase().trim();
+            inputElement.classList.remove('input-correct', 'input-incorrect', 'correct', 'incorrect');
 
-            if (triggerSync) {
+            if (studentAnswer === "") return;
+
+            var isCorrect = false;
+
+            // Option A: Check against standard data-answers attribute (JSON array)
+            if (inputElement.hasAttribute('data-answers')) {
+                try {
+                    var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers'));
+                    for (var j = 0; j < acceptedAnswers.length; j++) {
+                        if (studentAnswer === acceptedAnswers[j].toLowerCase().trim()) {
+                            isCorrect = true;
+                            break;
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error parsing data-answers:", e);
+                }
+            } 
+            // Option B: Check against data-rubric keyword structure if used
+            else if (inputElement.hasAttribute('data-rubric')) {
+                try {
+                    var rubric = JSON.parse(inputElement.getAttribute('data-rubric'));
+                    var keywordGroups = rubric.keywords;
+                    var conceptsFound = 0;
+
+                    for (var k = 0; k < keywordGroups.length; k++) {
+                        var terms = keywordGroups[k];
+                        var matched = false;
+                        for (var s = 0; s < terms.length; s++) {
+                            var term = terms[s].toLowerCase().trim();
+                            if (studentAnswer.includes(term)) {
+                                matched = true;
+                                break;
+                            }
+                        }
+                        if (matched) conceptsFound++;
+                    }
+                    if (keywordGroups.length > 0 && conceptsFound >= keywordGroups.length) {
+                        isCorrect = true;
+                    }
+                } catch (e) {
+                    console.error("Error parsing data-rubric:", e);
+                }
+            }
+
+            // Apply styling based on evaluation result
+            if (isCorrect) {
+                inputElement.classList.add('input-correct');
+            } else {
+                inputElement.classList.add('input-incorrect');
+            }
+        });
+
+        // Trigger cloud synchronization if enabled
+        if (triggerSync) {
+            if (typeof saveProgress === 'function') {
                 saveProgress(true);
+            } else if (typeof saveProgressToCloud === 'function') {
+                saveProgressToCloud(true);
             }
         }
+    }
     </script>
 </body>
 </html>
