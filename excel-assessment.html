@@ -58,7 +58,7 @@
 
         /* Scoreboard Banner */
         .scoreboard {
-            max-width: 1450px;
+            max-width: 96%; /* Widened to fill the screen */
             margin: 20px auto 0 auto;
             padding: 15px 25px;
             background: white;
@@ -111,11 +111,11 @@
 
         .ide-container {
             display: grid;
-            /* INCREASED MIDDLE COLUMN: 1fr side panels, 2.5fr middle panel */
+            /* 3-Column Layout with extra width for the middle panel */
             grid-template-columns: minmax(0, 1fr) minmax(0, 2.5fr) minmax(0, 1fr);
             gap: 20px;
             width: 100%;
-            max-width: 1800px;
+            max-width: 96%; /* Widened to fill the screen */
             margin: 20px auto;
             padding: 0 20px;
             box-sizing: border-box;
@@ -342,7 +342,7 @@
             <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
         </div>
         <div class="header-center">
-            <h1>Assessment</h1>
+            <h1>Excel Assessment</h1>
         </div>
         <div class="header-right">
             <a href="spreadsheets.html" class="back-btn">&larr; Back to Curriculum</a>
@@ -415,15 +415,27 @@
             measurementId: "G-HDNYEE11WV"
         };
 
+        // SAFETY WRAPPER
+        window.onerror = function(msg, url, line) {
+            if (msg.includes('Script error')) return false;
+            var panel = document.getElementById("instruction-panel");
+            if (panel) panel.innerHTML = "<h3 style='color:red;'>Startup Alert</h3><p>An error occurred: " + msg + "</p>";
+            return false;
+        };
+
         let auth = null;
         let db = null;
 
-        if (typeof firebase !== 'undefined') {
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
+        try {
+            if (typeof firebase !== 'undefined') {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                auth = firebase.auth();
+                db = firebase.firestore();
             }
-            auth = firebase.auth();
-            db = firebase.firestore();
+        } catch(e) {
+            console.warn("Firebase blocked by network. Running locally.");
         }
 
         function buildStructuredMarkbookItems() {
@@ -459,6 +471,7 @@
                     lastUpdated: Date.now(),
                     scoreText: structured.scoreText,
                     items: structured.items,
+                    // FIREBASE FIX: Convert to flat string to bypass Firestore array block
                     taskData: JSON.stringify(taskData),
                     score: document.getElementById("total-score").innerText,
                     scores: {
@@ -479,9 +492,7 @@
             if (data && data.taskData) {
                 try {
                     taskData = typeof data.taskData === 'string' ? JSON.parse(data.taskData) : data.taskData;
-                } catch(e) {
-                    console.error("Error unpacking task data");
-                }
+                } catch(e) {}
             }
             if (data && data.scores) {
                 if(document.getElementById("score-t1")) document.getElementById("score-t1").innerText = data.scores.t1 || "0";
@@ -521,7 +532,7 @@
         }
 
         window.onload = function() {
-            if (!auth) initApp(); 
+            if (!auth) initApp();
         };
 
         /* ==========================================================================
