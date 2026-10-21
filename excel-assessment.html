@@ -101,42 +101,47 @@
         }
         .btn-clear-scores:hover { background-color: #b71c1c; }
 
-       /* 3-Column Layout */
-main {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    box-sizing: border-box;
-}
+        /* 3-Column Layout */
+        main {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            box-sizing: border-box;
+        }
 
-.ide-container {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1fr);
-    gap: 20px;
-    width: 100%;
-    max-width: 2450px;
-    margin: 20px auto;
-    padding: 0 20px;
-    box-sizing: border-box;
-}
+        .ide-container {
+            display: grid;
+            /* INCREASED MIDDLE COLUMN: 1fr side panels, 2.5fr middle panel */
+            grid-template-columns: minmax(0, 1fr) minmax(0, 2.5fr) minmax(0, 1fr);
+            gap: 20px;
+            width: 100%;
+            max-width: 1800px;
+            margin: 20px auto;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
 
-.ide-panel {
-    background: white;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    border-top: 5px solid var(--navy);
-    display: flex;
-    flex-direction: column;
-}
+        .ide-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-top: 5px solid var(--navy);
+            display: flex;
+            flex-direction: column;
+        }
 
-@media (max-width: 1100px) {
-    .ide-container {
-        grid-template-columns: 1fr;
-    }
-}
+        @media (max-width: 1100px) {
+            .ide-container {
+                grid-template-columns: 1fr;
+            }
+        }
         
-        .editor-panel { border-top-color: #217346; } /* Excel Green */
+        /* INCREASED HEIGHT FOR EXCEL PANEL */
+        .editor-panel { 
+            border-top-color: #217346; 
+            min-height: 600px; 
+        } 
         .output-panel { border-top-color: var(--maroon); }
 
         .ide-panel h3 {
@@ -208,8 +213,10 @@ main {
         #spreadsheet-container {
             width: 100%;
             overflow-x: auto;
+            overflow-y: auto;
             background-color: white;
             border: 1px solid #c0c0c0;
+            flex-grow: 1; /* Stretches the container to fill the 600px height */
         }
 
         .excel-table {
@@ -335,7 +342,7 @@ main {
             <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
         </div>
         <div class="header-center">
-            <h1>Excel Assessment</h1>
+            <h1>Assessment</h1>
         </div>
         <div class="header-right">
             <a href="spreadsheets.html" class="back-btn">&larr; Back to Curriculum</a>
@@ -408,11 +415,16 @@ main {
             measurementId: "G-HDNYEE11WV"
         };
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
+        let auth = null;
+        let db = null;
+
+        if (typeof firebase !== 'undefined') {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            auth = firebase.auth();
+            db = firebase.firestore();
         }
-        const auth = firebase.auth();
-        const db = firebase.firestore();
 
         function buildStructuredMarkbookItems() {
             const items = [];
@@ -435,8 +447,8 @@ main {
 
         let cloudSyncTimer;
         function syncWorkToCloud(immediate = false) {
-            const user = auth.currentUser;
-            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+            if (!auth || !db || !auth.currentUser) return;
+            if (sessionStorage.getItem('teacherMode') === 'true') return;
 
             clearTimeout(cloudSyncTimer);
             cloudSyncTimer = setTimeout(() => {
@@ -447,8 +459,6 @@ main {
                     lastUpdated: Date.now(),
                     scoreText: structured.scoreText,
                     items: structured.items,
-                    // FIREBASE FIX: Arrays of arrays are strictly blocked by Firestore.
-                    // Converting the grid to a flat string bypasses the restriction instantly.
                     taskData: JSON.stringify(taskData),
                     score: document.getElementById("total-score").innerText,
                     scores: {
@@ -460,16 +470,14 @@ main {
                     }
                 };
 
-                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
-                  .set(payload, { merge: true })
-                  .catch(err => console.error("Cloud save error:", err));
+                db.collection('users').doc(auth.currentUser.uid).collection('lessons').doc(LESSON_ID)
+                  .set(payload, { merge: true }).catch(err => console.error(err));
             }, immediate ? 50 : 800);
         }
 
         function applySavedData(data) {
             if (data && data.taskData) {
                 try {
-                    // Unpack the text string back into a grid array
                     taskData = typeof data.taskData === 'string' ? JSON.parse(data.taskData) : data.taskData;
                 } catch(e) {
                     console.error("Error unpacking task data");
@@ -485,36 +493,36 @@ main {
             switchTask();
         }
 
-        auth.onAuthStateChanged(async function(user) {
-            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
-            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+        let initialLoadDone = false;
+        function initApp() {
+            if (initialLoadDone) return;
+            initialLoadDone = true;
+            switchTask();
+        }
 
-            if (isTeacher && inspectedUid) {
-                try {
-                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
-                    if (doc.exists) applySavedData(doc.data());
-                } catch (err) {
-                    console.error("Error loading inspected student data:", err);
-                }
-                return;
-            }
+        if (auth) {
+            auth.onAuthStateChanged(async function(user) {
+                const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+                const inspectedUid = sessionStorage.getItem('inspectStudentUid');
 
-            if (user) {
-                try {
-                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
-                    if (doc.exists) {
-                        applySavedData(doc.data());
-                    } else {
-                        switchTask();
-                    }
-                } catch (err) {
-                    console.error("Error loading cloud work:", err);
-                    switchTask();
+                if (isTeacher && inspectedUid) {
+                    try {
+                        const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                        if (doc.exists) applySavedData(doc.data());
+                    } catch (err) {}
+                } else if (user) {
+                    try {
+                        const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                        if (doc.exists) applySavedData(doc.data());
+                    } catch (err) {}
                 }
-            } else {
-                switchTask();
-            }
-        });
+                initApp();
+            });
+        }
+
+        window.onload = function() {
+            if (!auth) initApp(); 
+        };
 
         /* ==========================================================================
            2. EXCEL SPREADSHEET LOGIC & RENDERING
@@ -727,13 +735,10 @@ main {
 
         async function clearScores() {
             if (confirm("Are you sure you want to clear all your answers?")) {
-                const user = auth.currentUser;
-                if (user && sessionStorage.getItem('teacherMode') !== 'true') {
+                if (auth && auth.currentUser && sessionStorage.getItem('teacherMode') !== 'true') {
                     try {
-                        await db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).delete();
-                    } catch(e) {
-                        console.error("Error clearing cloud data:", e);
-                    }
+                        await db.collection('users').doc(auth.currentUser.uid).collection('lessons').doc(LESSON_ID).delete();
+                    } catch(e) { }
                 }
                 window.location.reload();
             }
@@ -1024,11 +1029,6 @@ main {
 
             syncWorkToCloud(false);
         }
-
-        // Initialize default view safely before Auth returns
-        window.onload = function() {
-            switchTask();
-        };
     </script>
 </body>
 </html>
