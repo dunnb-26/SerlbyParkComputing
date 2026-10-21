@@ -1166,6 +1166,57 @@
             checkAnswers('green-input', false);
             checkAnswers('blue-input', false); // Fixed from 'navy-input' to 'blue-input'
         }
+     // PASTE THIS RIGHT AFTER applySavedData(data) { ... }
+
+        auth.onAuthStateChanged(async function(user) {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud work:", err);
+                }
+            }
+        });
+
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                saveProgress(false);
+                if (e.target.tagName.toLowerCase() === 'textarea') {
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                }
+            }
+        });
+
+        async function clearData() {
+            if (confirm("Are you sure you want to clear all your work on this page?")) {
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
+                    } catch (err) {
+                        console.error("Error clearing cloud data:", err);
+                    }
+                }
+                window.location.reload();
+            }
+        }
         /* --- 5. BATCH-MARKING TEXT INPUT LOGIC --- */
       function checkAnswers(taskClass, triggerSync = true) {
             var groups = document.querySelectorAll('.' + taskClass);
