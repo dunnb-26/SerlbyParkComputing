@@ -2,14 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Firebase Student Bulk Importer</title>
+    <title>Firebase Student Importer</title>
     <style>
         body { font-family: Arial, sans-serif; background: #f4f6f8; padding: 40px; }
-        .card { background: white; max-width: 600px; margin: 0 auto; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-top: 6px solid #1e3a8a; }
-        input[type="file"] { margin: 20px 0; display: block; font-size: 16px; }
-        button { background: #dfaa2b; color: #1e3a8a; border: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .card { background: white; max-width: 600px; margin: 0 auto 30px auto; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-top: 6px solid #1e3a8a; }
+        input[type="file"], input[type="text"], input[type="password"] { width: 100%; padding: 10px; margin: 10px 0 20px 0; display: block; font-size: 16px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #dfaa2b; color: #1e3a8a; border: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; width: 100%; }
         button:hover { background: #c99722; }
-        #log { background: #000; color: #4af626; padding: 15px; border-radius: 4px; height: 300px; overflow-y: auto; font-family: monospace; margin-top: 20px; font-size: 13px; }
+        .divider { margin: 30px 0; border: 0; border-top: 1px solid #eee; }
+        #log { background: #000; color: #4af626; padding: 15px; border-radius: 4px; height: 250px; overflow-y: auto; font-family: monospace; margin-top: 20px; font-size: 13px; }
+        label { font-weight: bold; font-size: 14px; color: #333; }
     </style>
 
     <!-- Firebase SDKs -->
@@ -19,13 +21,35 @@
 </head>
 <body>
     <div class="card">
-        <h2 style="color: #1e3a8a; margin-top:0;">Student Bulk Importer</h2>
-        <p>Select your <strong>students.csv</strong> file below to automatically register all students into your Firebase database.</p>
+        <h2 style="color: #1e3a8a; margin-top:0;">Student Account Importer</h2>
+        
+        <!-- SINGLE STUDENT IMPORT SECTION -->
+        <h3 style="color: #1e3a8a; margin-bottom: 5px;">Add Single Student</h3>
+        <label for="singleUsername">Username (e.g. jsmith)</label>
+        <input type="text" id="singleUsername" placeholder="Enter username...">
+
+        <label for="singleFullName">Full Name</label>
+        <input type="text" id="singleFullName" placeholder="Enter full name...">
+
+        <label for="singleClass">Class Name</label>
+        <input type="text" id="singleClass" placeholder="Enter class name...">
+
+        <label for="singlePassword">Password / PIN</label>
+        <input type="password" id="singlePassword" placeholder="Enter password...">
+
+        <button onclick="addSingleStudent()">Register Single Student</button>
+
+        <hr class="divider">
+
+        <!-- BULK CSV IMPORT SECTION -->
+        <h3 style="color: #1e3a8a; margin-bottom: 5px;">Bulk Import from CSV</h3>
+        <p style="margin-top: 5px; font-size: 14px; color: #666;">Select your <strong>students.csv</strong> file below to automatically register multiple students.</p>
         
         <input type="file" id="csvFile" accept=".csv">
         <button onclick="startImport()">Start Bulk Import</button>
 
-        <div id="log">Awaiting CSV file...</div>
+        <!-- LOG BOX -->
+        <div id="log">Awaiting action...</div>
     </div>
 
     <script>
@@ -39,7 +63,10 @@
             measurementId: "G-HDNYEE11WV"
         };
 
-        firebase.initializeApp(firebaseConfig);
+        // Initialize Firebase if not already initialized
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         const auth = firebase.auth();
         const db = firebase.firestore();
 
@@ -49,6 +76,49 @@
             logBox.scrollTop = logBox.scrollHeight;
         }
 
+        // --- SINGLE STUDENT REGISTRATION FUNCTION ---
+        async function addSingleStudent() {
+            const username = document.getElementById('singleUsername').value.trim().toLowerCase();
+            const fullName = document.getElementById('singleFullName').value.trim();
+            const className = document.getElementById('singleClass').value.trim();
+            const password = document.getElementById('singlePassword').value.trim();
+
+            if (!username || !fullName || !className || !password) {
+                alert("Please fill in all fields for the single student import.");
+                return;
+            }
+
+            let email = username + "@deltaschool.local";
+
+            try {
+                logMessage(`Attempting to register single student: ${fullName}...`);
+                
+                // 1. Create user in Firebase Auth
+                let userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                let uid = userCredential.user.uid;
+
+                // 2. Save profile in Firestore users collection
+                await db.collection('users').doc(uid).set({
+                    username: username,
+                    fullName: fullName,
+                    className: className,
+                    createdAt: Date.now()
+                });
+
+                logMessage(`✅ Successfully registered single student: ${fullName} (${className})`);
+                
+                // Clear form fields after success
+                document.getElementById('singleUsername').value = '';
+                document.getElementById('singleFullName').value = '';
+                document.getElementById('singleClass').value = '';
+                document.getElementById('singlePassword').value = '';
+
+            } catch (err) {
+                logMessage(`❌ Error registering ${username}: ${err.message}`);
+            }
+        }
+
+        // --- BULK CSV IMPORT FUNCTION ---
         async function startImport() {
             const fileInput = document.getElementById('csvFile');
             if (fileInput.files.length === 0) {
@@ -63,8 +133,7 @@
                 const text = e.target.result;
                 const rows = text.split('\n');
                 
-                document.getElementById('log.innerHTML = ""');
-                logMessage(`Found ${rows.length - 1} rows in CSV. Starting import...`);
+                logMessage(`Found ${rows.length - 1} rows in CSV. Starting bulk import...`);
 
                 // Loop through CSV rows (skipping header row 0)
                 for (let i = 1; i < rows.length; i++) {
