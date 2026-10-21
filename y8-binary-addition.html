@@ -1325,33 +1325,36 @@
     /* =========================================================
        MARKBOOK SUMMARY
        ========================================================= */
-
-    function buildMarkbookData() {
+function buildMarkbookData() {
         const items = [];
-        const inputs = document.querySelectorAll('.auto-input');
+        // Target only actual main question inputs (excluding prep and plenary)
+        const gradableInputs = document.querySelectorAll('.red-input, .amber-input, .green-input, .navy-input, .math-sum');
         
-        inputs.forEach((input, i) => {
-            const wrapper = input.closest('.question-row') || input.closest('.question-wrapper') || input.closest('.math-sum');
+        gradableInputs.forEach((input, i) => {
+            const wrapper = input.closest('.question-row') || input.closest('.math-sum');
             const labelEl = wrapper ? wrapper.querySelector('.question-label, .sum-number') : null;
             let labelText = input.getAttribute('data-label') || (labelEl ? labelEl.innerText.trim() : `Question ${i + 1}`);
             
             let status = 'neutral';
-            if (input.classList.contains('correct') || input.classList.contains('teacher-locked') || input.classList.contains('input-correct')) {
+            // Check correctness based on classes
+            const targetInput = input.classList.contains('math-sum') ? input.querySelector('.bit-box') : input;
+            
+            if (targetInput && (targetInput.classList.contains('correct') || targetInput.classList.contains('teacher-locked') || targetInput.classList.contains('input-correct'))) {
                 status = 'correct';
-            } else if (input.classList.contains('incorrect') || input.classList.contains('input-incorrect')) {
+            } else if (targetInput && (targetInput.classList.contains('incorrect') || targetInput.classList.contains('input-incorrect'))) {
                 status = 'incorrect';
             }
 
             items.push({
                 index: i,
                 label: labelText,
-                value: input.value.trim(),
+                value: input.value ? input.value.trim() : 'Math Grid Task',
                 status: status
             });
         });
 
-        const correctCount = document.querySelectorAll('.auto-input.correct, .auto-input.input-correct, .auto-input.teacher-locked').length;
-        const gradableInputs = document.querySelectorAll('.binary-input, .bit-box, .carry-box');
+        // Count how many are marked correct
+        const correctCount = items.filter(item => item.status === 'correct').length;
         const totalGradable = gradableInputs.length;
 
         return {
