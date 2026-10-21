@@ -56,17 +56,6 @@
         .back-btn { background-color: var(--yellow); color: var(--navy); text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; transition: transform 0.2s; }
         .back-btn:hover { transform: scale(1.05); }
 
-        /* Save Status Pill */
-        #save-status-pill {
-            background-color: rgba(255, 255, 255, 0.15);
-            color: #fff;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
         /* Scoreboard Banner */
         .scoreboard {
             max-width: 1450px;
@@ -335,10 +324,9 @@
             <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
         </div>
         <div class="header-center">
-            <h1>Assessment</h1>
+            <h1>Excel Assessment</h1>
         </div>
         <div class="header-right">
-            <span id="save-status-pill">💾 Local Mode</span>
             <a href="spreadsheets.html" class="back-btn">&larr; Back to Curriculum</a>
         </div>
     </header>
@@ -439,9 +427,6 @@
             const user = auth.currentUser;
             if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
 
-            const statusPill = document.getElementById('save-status-pill');
-            if (statusPill) statusPill.innerText = "⏳ Saving...";
-
             clearTimeout(cloudSyncTimer);
             cloudSyncTimer = setTimeout(() => {
                 const structured = buildStructuredMarkbookItems();
@@ -463,8 +448,7 @@
 
                 db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
                   .set(payload, { merge: true })
-                  .then(() => { if (statusPill) statusPill.innerText = "☁️ Saved to Cloud"; })
-                  .catch(err => { console.error("Cloud save error:", err); if (statusPill) statusPill.innerText = "⚠️ Error Saving"; });
+                  .catch(err => console.error("Cloud save error:", err));
             }, immediate ? 50 : 800);
         }
 
@@ -485,13 +469,11 @@
         auth.onAuthStateChanged(async function(user) {
             const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
             const inspectedUid = sessionStorage.getItem('inspectStudentUid');
-            const statusPill = document.getElementById('save-status-pill');
 
             if (isTeacher && inspectedUid) {
                 try {
                     const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
                     if (doc.exists) applySavedData(doc.data());
-                    if (statusPill) statusPill.innerText = "👨‍🏫 Viewing Student";
                 } catch (err) {
                     console.error("Error loading inspected student data:", err);
                 }
@@ -500,8 +482,6 @@
 
             if (user) {
                 try {
-                    if (statusPill) statusPill.innerText = "☁️ Cloud Sync Active";
-
                     const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
                     if (doc.exists) {
                         applySavedData(doc.data());
@@ -513,7 +493,6 @@
                     switchTask();
                 }
             } else {
-                if (statusPill) statusPill.innerText = "💾 Local Mode";
                 switchTask();
             }
         });
