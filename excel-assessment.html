@@ -58,7 +58,7 @@
 
         /* Scoreboard Banner */
         .scoreboard {
-            max-width: 96%; /* Widened to fill the screen */
+            max-width: 98%;
             margin: 20px auto 0 auto;
             padding: 15px 25px;
             background: white;
@@ -72,6 +72,7 @@
             color: var(--navy);
             gap: 15px;
             flex-wrap: wrap;
+            box-sizing: border-box;
         }
         .score-item {
             text-align: center;
@@ -102,22 +103,12 @@
         .btn-clear-scores:hover { background-color: #b71c1c; }
 
         /* 3-Column Layout */
-        main {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            box-sizing: border-box;
-        }
-
         .ide-container {
             display: grid;
-            /* 3-Column Layout with extra width for the middle panel */
-            grid-template-columns: minmax(0, 1fr) minmax(0, 2.5fr) minmax(0, 1fr);
+            grid-template-columns: 1fr 2.5fr 1fr;
             gap: 20px;
-            width: 100%;
-            max-width: 96%; /* Widened to fill the screen */
+            max-width: 98%;
             margin: 20px auto;
-            padding: 0 20px;
             box-sizing: border-box;
         }
 
@@ -492,7 +483,9 @@
             if (data && data.taskData) {
                 try {
                     taskData = typeof data.taskData === 'string' ? JSON.parse(data.taskData) : data.taskData;
-                } catch(e) {}
+                } catch(e) {
+                    console.error("Error unpacking task data");
+                }
             }
             if (data && data.scores) {
                 if(document.getElementById("score-t1")) document.getElementById("score-t1").innerText = data.scores.t1 || "0";
@@ -532,7 +525,7 @@
         }
 
         window.onload = function() {
-            if (!auth) initApp();
+            if (!auth) initApp(); 
         };
 
         /* ==========================================================================
@@ -749,7 +742,9 @@
                 if (auth && auth.currentUser && sessionStorage.getItem('teacherMode') !== 'true') {
                     try {
                         await db.collection('users').doc(auth.currentUser.uid).collection('lessons').doc(LESSON_ID).delete();
-                    } catch(e) { }
+                    } catch(e) {
+                        console.error("Error clearing cloud data:", e);
+                    }
                 }
                 window.location.reload();
             }
@@ -1040,6 +1035,11 @@
 
             syncWorkToCloud(false);
         }
+
+        // Initialize default view safely before Auth returns
+        window.onload = function() {
+            switchTask();
+        };
     </script>
 </body>
 </html>
