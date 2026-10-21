@@ -6,7 +6,7 @@
     <title>Lesson 4 - Assessment</title>
     <link rel="stylesheet" href="style.css">
     
-    <!-- Firebase SDKs -->
+    <!-- Firebase SDKs for Teacher Cloud Markbook -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -20,6 +20,50 @@
     <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
 
     <style>
+        :root {
+            /* Delta Serlby Park Color Scheme */
+            --navy: #1B1464; 
+            --yellow: #F7931D;
+            --maroon: #822433;
+            --bg-color: #f4f6f8;
+            --text-color: #333;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+        }
+
+        header { 
+            background-color: var(--navy); 
+            color: white; 
+            padding: 20px; 
+            display: grid; 
+            grid-template-columns: 1fr auto 1fr; 
+            align-items: center; 
+            border-bottom: 6px solid var(--maroon); 
+        }
+
+        .header-left { display: flex; justify-content: flex-start; }
+        .header-center { text-align: center; }
+        .header-right { display: flex; justify-content: flex-end; align-items: center; gap: 12px; }
+
+        header img { 
+            width: 250px; 
+            height: auto; 
+            background-color: white; 
+            border-radius: 8px; 
+            padding: 5px; 
+        }
+
+        header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; }
+
+        .back-btn { background-color: var(--yellow); color: var(--navy); text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; transition: transform 0.2s; }
+        .back-btn:hover { transform: scale(1.05); }
+
         /* Scoreboard Banner */
         .scoreboard {
             max-width: 1450px;
@@ -52,18 +96,6 @@
             gap: 10px;
             align-items: center;
         }
-        .btn-ms-form {
-            background-color: #0078d4; /* Microsoft Blue */
-            color: white;
-            text-decoration: none;
-            padding: 8px 14px;
-            border-radius: 4px;
-            font-size: 0.85em;
-            font-weight: bold;
-            display: inline-block;
-            transition: background-color 0.2s;
-        }
-        .btn-ms-form:hover { background-color: #106ebe; }
 
         .btn-clear-scores {
             background-color: #d32f2f;
@@ -77,18 +109,25 @@
         }
         .btn-clear-scores:hover { background-color: #b71c1c; }
 
-        /* 3-Column Layout */
+        /* 2-Column IDE Layout */
         .ide-container {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: 1fr 2.2fr;
             gap: 20px;
             max-width: 1450px;
             margin: 20px auto;
             padding: 0 20px;
+            align-items: start;
         }
 
         @media (max-width: 1100px) {
             .ide-container { grid-template-columns: 1fr; }
+        }
+
+        .side-panel-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         .ide-panel {
@@ -126,7 +165,6 @@
             background-color: #f8f9fa;
             border-left: 4px solid var(--navy);
             padding: 12px;
-            margin-bottom: 15px;
             border-radius: 0 4px 4px 0;
             font-family: inherit;
             font-size: 13.5px;
@@ -190,7 +228,7 @@
 
         /* CodeMirror Editor Customization */
         .CodeMirror {
-            height: 420px !important;
+            height: 500px !important;
             border-radius: 5px;
             font-family: 'Courier New', Courier, monospace;
             font-size: 14px;
@@ -198,7 +236,7 @@
 
         #output {
             width: 100%;
-            height: 350px;
+            height: 250px;
             background-color: #000000;
             color: #4af626;
             font-family: 'Courier New', Courier, monospace;
@@ -267,47 +305,47 @@
         <div class="score-item">Task 4: <span id="score-t4">0</span>/5</div>
         <div class="score-item" style="color: var(--maroon);">TOTAL SCORE: <span id="total-score" style="color: var(--maroon);">0</span>/20</div>
         <div class="scoreboard-actions">
-            <button class="btn-ms-form" onclick="submitPythonScore()" style="border: none; cursor: pointer; font-family: inherit;">📋 Submit Scores</button>
             <button class="btn-clear-scores" onclick="clearScores()">Reset Progress</button>
         </div>
     </div>
 
     <main>
         <div class="ide-container">
-            <!-- COLUMN 1: Task Selection & Instructions / Block Bank -->
-            <div class="ide-panel">
-                <h3>1. Instructions</h3>
-                
-                <select id="task-selector" onchange="switchTask()">
-                    <option value="t1">Task 1 (Sequence Blocks)</option>
-                    <option value="t2">Task 2 (Cinema Snack Bar)</option>
-                    <option value="t3">Task 3 (Arcade Score Checker)</option>
-                    <option value="t4">Task 4 (Canteen Queue Processor)</option>
-                </select>
+            <!-- Left Side: Instructions and Progress Feedback -->
+            <div class="side-panel-wrapper">
+                <div class="ide-panel">
+                    <h3>1. Instructions</h3>
+                    
+                    <select id="task-selector" onchange="switchTask()">
+                        <option value="t1">Task 1 (Sequence Blocks)</option>
+                        <option value="t2">Task 2 (Cinema Snack Bar)</option>
+                        <option value="t3">Task 3 (Arcade Score Checker)</option>
+                        <option value="t4">Task 4 (Canteen Queue Processor)</option>
+                    </select>
 
-                <div id="instruction-panel"></div>
+                    <div id="instruction-panel"></div>
+                </div>
+
+                <div class="ide-panel output-panel">
+                    <h3 style="color: var(--maroon);">2. Terminal Output</h3>
+                    <p style="font-size: 13px; color: #666; margin-top: 0;">View program feedback and results:</p>
+                    
+                    <div id="output"></div>
+                    
+                    <div id="feedback" class="feedback-box">
+                        Awaiting code execution...
+                    </div>
+                </div>
             </div>
 
-            <!-- COLUMN 2: Interactive Code Editor -->
+            <!-- Right Side: The Main Live Editor -->
             <div class="ide-panel editor-panel">
-                <h3 style="color: #007acc;">2. Code Editor</h3>
+                <h3 style="color: #007acc;">3. Code Editor</h3>
                 <p style="font-size: 13px; color: #666; margin-top: 0;">Write or assemble your Python solution below:</p>
                 
                 <textarea id="python-code"></textarea>
                 
                 <button class="btn-run" onclick="runPython()">▶ Run Code & Mark</button>
-            </div>
-
-            <!-- COLUMN 3: Terminal Output & Feedback -->
-            <div class="ide-panel output-panel">
-                <h3 style="color: var(--maroon);">3. Terminal Output</h3>
-                <p style="font-size: 13px; color: #666; margin-top: 0;">View program feedback and results:</p>
-                
-                <div id="output"></div>
-                
-                <div id="feedback" class="feedback-box">
-                    Awaiting code execution...
-                </div>
             </div>
         </div>
     </main>
@@ -323,8 +361,9 @@
     <script>
         // GLOBAL ERROR CATCHER - Prevents the page from going fully blank if blocked
         window.onerror = function(msg, url, line) {
+            if (msg.includes('Script error')) return false; // Ignore blocked CDN errors
             var panel = document.getElementById("instruction-panel");
-            if (panel) panel.innerHTML = "<h3 style='color:#d32f2f;'>⚠️ Network Alert</h3><p>Your school filter is blocking an external script.</p><p>" + msg + "</p>";
+            if (panel) panel.innerHTML = "<h3 style='color:#d32f2f;'>⚠️ Network Alert</h3><p>An error occurred:</p><p>" + msg + "</p>";
             return false;
         };
 
@@ -339,11 +378,20 @@
             measurementId: "G-HDNYEE11WV"
         };
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
+        let auth = null;
+        let db = null;
+
+        try {
+            if (typeof firebase !== 'undefined') {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                auth = firebase.auth();
+                db = firebase.firestore();
+            }
+        } catch(e) {
+            console.warn("Firebase blocked by network. Running locally.");
         }
-        const auth = firebase.auth();
-        const db = firebase.firestore();
 
         const LESSON_ID = "y9-python-assessment";
 
@@ -378,8 +426,8 @@
 
         function syncWorkToCloud(immediate = false) {
             if (isApplyingCloudData) return;
-            const user = auth.currentUser;
-            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+            if (!auth || !db || !auth.currentUser) return;
+            if (sessionStorage.getItem('teacherMode') === 'true') return;
 
             if (editor) {
                 taskCodes[currentTask] = editor.getValue();
@@ -426,12 +474,13 @@
                     score_t3: s3,
                     score_t4: s4,
                     total_score: total,
-                    taskCodes: taskCodes,
-                    currentBlocks: currentBlocks,
+                    // FIREBASE FIX: Stringify complex arrays/objects
+                    taskCodes: JSON.stringify(taskCodes),
+                    currentBlocks: JSON.stringify(currentBlocks),
                     items: items
                 };
 
-                db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
+                db.collection("users").doc(auth.currentUser.uid).collection("lessons").doc(LESSON_ID)
                   .set(payload, { merge: true })
                   .catch(err => console.error("Cloud save error:", err));
             }, immediate ? 50 : 800);
@@ -448,10 +497,12 @@
             if (data.total_score !== undefined) document.getElementById("total-score").innerText = data.total_score;
 
             if (data.taskCodes) {
-                taskCodes = Object.assign({}, defaultTaskCodes, data.taskCodes);
+                try { taskCodes = typeof data.taskCodes === 'string' ? JSON.parse(data.taskCodes) : data.taskCodes; } catch(e){}
+                // Ensure defaults exist if fields were missing
+                taskCodes = Object.assign({}, defaultTaskCodes, taskCodes);
             }
-            if (Array.isArray(data.currentBlocks)) {
-                currentBlocks = data.currentBlocks;
+            if (data.currentBlocks) {
+                try { currentBlocks = typeof data.currentBlocks === 'string' ? JSON.parse(data.currentBlocks) : data.currentBlocks; } catch(e){}
             }
 
             if (currentTask === "t1") {
@@ -464,39 +515,93 @@
             isApplyingCloudData = false;
         }
 
-        auth.onAuthStateChanged(async function(user) {
-            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
-            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+        let initialLoadDone = false;
+        function initApp() {
+            if (initialLoadDone) return;
+            initialLoadDone = true;
 
-            if (isTeacher && inspectedUid) {
-                try {
-                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
-                    if (doc.exists) applySavedData(doc.data());
-                } catch (err) {
-                    console.error("Error loading inspected student data:", err);
-                }
-                return;
-            }
+            // Initialize CodeMirror safely
+            try {
+                editor = CodeMirror.fromTextArea(document.getElementById("python-code"), {
+                    mode: "python",
+                    theme: "dracula",
+                    lineNumbers: true,
+                    indentUnit: 4,
+                    matchBrackets: true
+                });
+                
+                editor.addKeyMap({ "Insert": function(cm) { return false; } });
 
-            if (user) {
-                try {
-                    // Clean up shared-PC local storage so scores never leak between students
-                    try {
-                        ['t1', 't2', 't3', 't4'].forEach(taskKey => {
-                            localStorage.removeItem('delta_python_score_' + taskKey);
-                        });
-                        localStorage.removeItem('delta_python_total');
-                    } catch (e) {}
-
-                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
-                    if (doc.exists) {
-                        applySavedData(doc.data());
+                editor.on("change", function() {
+                    if (!isApplyingCloudData) {
+                        taskCodes[currentTask] = editor.getValue();
+                        syncWorkToCloud(false);
                     }
-                } catch (err) {
-                    console.error("Error loading cloud work:", err);
-                }
+                });
+                
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Insert' || e.keyCode === 45) {
+                        e.preventDefault();
+                    }
+                });
+            } catch (err) {
+                console.log("Network blocked CodeMirror. Downgrading to standard text box.");
+                let fallbackTxt = document.getElementById("python-code");
+                fallbackTxt.style.display = "block";
+                fallbackTxt.style.width = "100%";
+                fallbackTxt.style.height = "500px";
+                fallbackTxt.style.backgroundColor = "#1a1a24";
+                fallbackTxt.style.color = "#e0e0e0";
+                fallbackTxt.style.fontFamily = "'Courier New', Courier, monospace";
+                fallbackTxt.style.padding = "10px";
+                fallbackTxt.style.border = "none";
+                fallbackTxt.style.boxSizing = "border-box";
+                fallbackTxt.style.borderRadius = "5px";
+
+                fallbackTxt.addEventListener("input", function() {
+                    if (!isApplyingCloudData) {
+                        taskCodes[currentTask] = fallbackTxt.value;
+                        syncWorkToCloud(false);
+                    }
+                });
+                
+                editor = {
+                    getValue: function() { return fallbackTxt.value; },
+                    setValue: function(val) { fallbackTxt.value = val; },
+                    focus: function() { fallbackTxt.focus(); }
+                };
             }
-        });
+
+            switchTask();
+        }
+
+        if (auth) {
+            auth.onAuthStateChanged(async function(user) {
+                const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+                const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+                if (isTeacher && inspectedUid) {
+                    try {
+                        const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                        if (doc.exists) applySavedData(doc.data());
+                    } catch (err) {}
+                    initApp();
+                    return;
+                }
+
+                if (user) {
+                    try {
+                        const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                        if (doc.exists) applySavedData(doc.data());
+                    } catch (err) {}
+                }
+                initApp();
+            });
+        }
+
+        window.onload = function() {
+            if (!auth) initApp();
+        };
 
         /* --- 3. IDE & ASSESSMENT LOGIC --- */
         function switchTask() {
@@ -571,9 +676,10 @@
                 var cursor = doc.getCursor();
                 doc.replaceRange(codeText + "\n", cursor);
                 editor.focus();
-            } else {
-                let fallbackTxt = document.getElementById("python-code");
-                fallbackTxt.value += codeText + "\n";
+            } else if (editor) {
+                let currentVal = editor.getValue();
+                editor.setValue(currentVal + codeText + "\n");
+                editor.focus();
             }
             syncWorkToCloud(false);
         }
@@ -586,79 +692,15 @@
             syncWorkToCloud(false);
         }
 
-        window.onload = function() {
-            try {
-                editor = CodeMirror.fromTextArea(document.getElementById("python-code"), {
-                    mode: "python",
-                    theme: "dracula",
-                    lineNumbers: true,
-                    indentUnit: 4,
-                    matchBrackets: true
-                });
-                
-                editor.addKeyMap({
-                    "Insert": function(cm) { return false; } 
-                });
-
-                editor.on("change", function() {
-                    if (!isApplyingCloudData) {
-                        taskCodes[currentTask] = editor.getValue();
-                        syncWorkToCloud(false);
-                    }
-                });
-                
-                document.addEventListener('keydown', function(e) {
-                    if (e.key === 'Insert' || e.keyCode === 45) {
-                        e.preventDefault();
-                    }
-                });
-            } catch (err) {
-                console.log("Network blocked CodeMirror. Downgrading to standard text box.");
-                let fallbackTxt = document.getElementById("python-code");
-                fallbackTxt.style.display = "block";
-                fallbackTxt.style.width = "100%";
-                fallbackTxt.style.height = "420px";
-                fallbackTxt.style.backgroundColor = "#1a1a24";
-                fallbackTxt.style.color = "#e0e0e0";
-                fallbackTxt.style.fontFamily = "'Courier New', Courier, monospace";
-                fallbackTxt.style.padding = "10px";
-                fallbackTxt.style.border = "none";
-                fallbackTxt.style.boxSizing = "border-box";
-                fallbackTxt.style.borderRadius = "5px";
-
-                fallbackTxt.addEventListener("input", function() {
-                    if (!isApplyingCloudData) {
-                        taskCodes[currentTask] = fallbackTxt.value;
-                        syncWorkToCloud(false);
-                    }
-                });
-                
-                editor = {
-                    getValue: function() { return fallbackTxt.value; },
-                    setValue: function(val) { fallbackTxt.value = val; },
-                    focus: function() { fallbackTxt.focus(); }
-                };
-            }
-
-            currentBlocks = JSON.parse(JSON.stringify(originalBlocks));
-            switchTask();
-        };
-
         async function clearScores() {
             if (confirm("Are you sure you want to clear all scores and code for this student?")) {
                 ['t1', 't2', 't3', 't4'].forEach(taskKey => {
                     document.getElementById(`score-${taskKey}`).innerText = "0";
                 });
                 document.getElementById("total-score").innerText = "0";
-                try {
-                    ['t1', 't2', 't3', 't4'].forEach(taskKey => {
-                        localStorage.removeItem('delta_python_score_' + taskKey);
-                    });
-                    localStorage.removeItem('delta_python_total');
-                } catch (error) {}
 
-                const user = auth.currentUser;
-                if (user) {
+                const user = auth ? auth.currentUser : null;
+                if (user && sessionStorage.getItem('teacherMode') !== 'true') {
                     try {
                         await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
                     } catch (err) {
@@ -667,30 +709,6 @@
                 }
                 window.location.reload();
             }
-        }
-        
-        // --- Routes ALL 5 scores directly to MS Forms ---
-        function submitPythonScore() {
-            // 1. Grab all individual scores and the total score
-            let t1 = document.getElementById("score-t1").innerText;
-            let t2 = document.getElementById("score-t2").innerText;
-            let t3 = document.getElementById("score-t3").innerText;
-            let t4 = document.getElementById("score-t4").innerText;
-            let total = document.getElementById("total-score").innerText;
-            
-            // 2. Your exact MS Forms pre-filled link
-            let baseURL = "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=j748wq_ohEugfnLJq2pPrXHeO4X_wMtHn71GRrSbmu1UM1hHR0s1ODE1NFBXNURJV05JTFZTWVhRTy4u&r6712cc69cad24d39b9f48f0c7639cb20=T1_SCORE&r95012b132091443c9595687ce93ba936=T2_SCORE&ra5d1f26f310e4aaa9ab1846fbd30bd8d=T3_SCORE&r3031e1de654a4f6797fe8848eff32fbd=T4_SCORE&r8b17e36373814edcabfa0f4f804e5296=TOTAL_SCORE"; 
-            
-            // 3. Inject all 5 scores into the URL
-            let finalURL = baseURL
-                .replace("T1_SCORE", t1)
-                .replace("T2_SCORE", t2)
-                .replace("T3_SCORE", t3)
-                .replace("T4_SCORE", t4)
-                .replace("TOTAL_SCORE", total);
-            
-            // 4. Open the customized form for the student
-            window.open(finalURL, "_blank");
         }
 
         function builtinRead(x) {
