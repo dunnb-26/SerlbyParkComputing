@@ -759,300 +759,202 @@
 </footer>
 
 <script>
-    /* =========================================================
-       FIREBASE INITIALISATION
-       ========================================================= */
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
-        authDomain: "serlby-park-computing.firebaseapp.com",
-        projectId: "serlby-park-computing",
-        storageBucket: "serlby-park-computing.firebasestorage.app",
-        messagingSenderId: "648533806051",
-        appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
-        measurementId: "G-HDNYEE11WV"
-    };
-
-    let auth = null;
-    let db = null;
-
-    try {
-        if (typeof firebase !== 'undefined') {
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-            }
-            auth = firebase.auth();
-            db = firebase.firestore();
-        }
-    } catch (e) {
-        console.warn("Firebase blocked by network. Running locally.");
-    }
-
-    const LESSON_ID = "y8-binary-to-denary";
-
-    /* =========================================================
-       MARKBOOK SUMMARY
-       ========================================================= */
-
-    function buildMarkbookData() {
-        const items = [];
-        const inputs = document.querySelectorAll('.auto-input');
-        
-        inputs.forEach((input, i) => {
-            const wrapper = input.closest('.question-row') || input.closest('.question-wrapper');
-            const labelEl = wrapper ? wrapper.querySelector('.question-label') : null;
-            let labelText = input.getAttribute('data-label') || (labelEl ? labelEl.innerText.trim() : `Question ${i + 1}`);
-            
-            let status = 'neutral';
-            if (input.classList.contains('correct') || input.classList.contains('teacher-locked') || input.classList.contains('input-correct')) {
-                status = 'correct';
-            } else if (input.classList.contains('incorrect') || input.classList.contains('input-incorrect')) {
-                status = 'incorrect';
-            }
-
-            items.push({
-                index: i,
-                label: labelText,
-                value: input.value.trim(),
-                status: status
-            });
-        });
-
-        const correctCount = document.querySelectorAll('.auto-input.correct, .auto-input.input-correct, .auto-input.teacher-locked').length;
-        const gradableInputs = document.querySelectorAll('.red-input, .amber-input, .green-input, .navy-input');
-        const totalGradable = gradableInputs.length;
-
-        return {
-            items: items,
-            scoreText: `Score: ${correctCount} / ${totalGradable}`
+        /* --- 1. FIREBASE CONFIGURATION & INITIALIZATION --- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
         };
-    }
 
-    /* =========================================================
-       CLOUD SAVING
-       ========================================================= */
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
-    let saveTimer;
+        const LESSON_ID = "y7-binary-to-denary";
 
-    function saveProgressToCloud(immediate = false) {
-        if (!auth || !db) return;
-        const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
-        const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+        /* --- 2. HELPER FOR TEACHER MARKBOOK LABELS --- */
+        function findLabelForInput(el, index) {
+            const row = el.closest('.question-row');
+            if (row) {
+                const lbl = row.querySelector('.question-label');
+                if (lbl && lbl.innerText.trim()) {
+                    return lbl.innerText.replace(/\s+/g, ' ').trim();
+                }
+            }
+            if (el.placeholder) return el.placeholder;
+            return 'Question ' + (index + 1);
+        }
 
-        if (isTeacher && inspectedUid) return;
+        /* --- 3. FIREBASE AUTO-SAVE LOGIC --- */
+        let saveTimer;
+        function saveProgress(immediate = false) {
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
 
-        const user = auth.currentUser;
-        if (!user) return;
-
-        clearTimeout(saveTimer);
-
-        saveTimer = setTimeout(async function() {
-            const inputs = document.querySelectorAll('.auto-input');
-            const structured = buildMarkbookData();
-
-            const payload = {
-                pageTitle: 'Lesson 2 - Binary to Denary',
+            var inputs = document.querySelectorAll('.auto-input');
+            var dataToSave = {
+                pageTitle: document.title || LESSON_ID,
                 lastUpdated: Date.now(),
-                scoreText: structured.scoreText,
-                items: structured.items
+                items: []
             };
 
-            inputs.forEach(function(input, i) {
-                payload['input_' + i] = input.value;
-                payload['class_' + i] = input.className;
-            });
+            var correctCount = 0;
+            var totalGradable = 0;
 
-            try {
-                await db.collection('users')
-                    .doc(user.uid)
-                    .collection('lessons')
-                    .doc(LESSON_ID)
-                    .set(payload, { merge: true });
-            } catch (error) {
-                console.error('Cloud save error:', error);
-            }
-        }, immediate ? 50 : 800);
-    }
+            for (var i = 0; i < inputs.length; i++) {
+                var el = inputs[i];
+                var cls = el.className || '';
+                var status = 'neutral';
 
-    /* =========================================================
-       RESTORE SAVED ANSWERS
-       ========================================================= */
+                if (el.hasAttribute('data-answers')) {
+                    totalGradable++;
+                    if (cls.includes('input-correct')) {
+                        status = 'correct';
+                        correctCount++;
+                    } else if (cls.includes('input-incorrect')) {
+                        status = 'incorrect';
+                    }
+                }
 
-    function applySavedData(data) {
-        if (!data) return;
+                dataToSave['input_' + i] = el.value;
+                dataToSave['class_' + i] = cls;
 
-        const inputs = document.querySelectorAll('.auto-input');
-
-        inputs.forEach(function(input, i) {
-            const savedValue = data['input_' + i] !== undefined
-                ? data['input_' + i]
-                : (data.items && data.items[i]
-                    ? data.items[i].value
-                    : undefined);
-
-            if (savedValue === undefined) return;
-
-            input.value = savedValue;
-
-            if (data['class_' + i]) {
-                input.className = data['class_' + i];
+                dataToSave.items.push({
+                    index: i,
+                    label: findLabelForInput(el, i),
+                    value: el.value,
+                    status: status
+                });
             }
 
-            if (input.tagName.toLowerCase() === 'textarea') {
-                input.style.height = 'auto';
-                input.style.height = input.scrollHeight + 'px';
+            if (totalGradable > 0) {
+                dataToSave.scoreText = "Score: " + correctCount + " / " + totalGradable;
             }
-        });
 
-        checkAnswers('red-input', false);
-        checkAnswers('amber-input', false);
-        checkAnswers('green-input', false);
-        checkAnswers('navy-input', false);
-    }
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(function() {
+                db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
+                  .set(dataToSave, { merge: true })
+                  .catch(function(err) { console.error("Cloud save error:", err); });
+            }, immediate ? 50 : 800);
+        }
 
-    /* =========================================================
-       AUTHENTICATION AND LOADING
-       ========================================================= */
+        /* --- 4. FIREBASE AUTO-LOAD LOGIC --- */
+        function applySavedData(data) {
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                var savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
 
-    if (auth) {
+                if (savedVal !== undefined) {
+                    inputs[i].value = savedVal;
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto';
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
+                    }
+                }
+            }
+
+            // Re-mark previously saved answers without triggering a redundant save
+            checkAnswers('red-input', false);
+            checkAnswers('amber-input', false);
+            checkAnswers('green-input', false);
+            checkAnswers('navy-input', false);
+        }
+
         auth.onAuthStateChanged(async function(user) {
             const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
             const inspectedUid = sessionStorage.getItem('inspectStudentUid');
 
             if (isTeacher && inspectedUid) {
                 try {
-                    const doc = await db.collection('users')
-                        .doc(inspectedUid)
-                        .collection('lessons')
-                        .doc(LESSON_ID)
-                        .get();
+                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
 
+            if (user) {
+                try {
+                    try { localStorage.removeItem('y8binarytodenaryMemory'); } catch (e) {}
+
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
                     if (doc.exists) {
                         applySavedData(doc.data());
                     }
-                } catch (error) {
-                    console.error('Error loading inspected student work:', error);
+                } catch (err) {
+                    console.error("Error loading cloud work:", err);
                 }
-                return;
-            }
-
-            if (!user) {
-                if (!isTeacher) {
-                    alert('Please log in on the home page first!');
-                    window.location.href = 'index.html';
-                }
-                return;
-            }
-
-            try {
-                const doc = await db.collection('users')
-                    .doc(user.uid)
-                    .collection('lessons')
-                    .doc(LESSON_ID)
-                    .get();
-
-                if (doc.exists) {
-                    applySavedData(doc.data());
-                } else {
-                    saveProgressToCloud(true);
-                }
-            } catch (error) {
-                console.error('Error loading cloud work:', error);
             }
         });
-    }
 
-    /* =========================================================
-       INPUT EVENTS AND TEXTAREA RESIZING
-       ========================================================= */
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                saveProgress(false);
+                if (e.target.tagName.toLowerCase() === 'textarea') {
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                }
+            }
+        });
 
-    document.addEventListener('input', function(event) {
-        const input = event.target;
-
-        if (!input.classList.contains('auto-input')) return;
-
-        saveProgressToCloud(false);
-
-        if (input.tagName.toLowerCase() === 'textarea') {
-            input.style.height = 'auto';
-            input.style.height = input.scrollHeight + 'px';
-        }
-    });
-
-    /* =========================================================
-       RESET PAGE
-       ========================================================= */
-
-    async function clearData() {
-        if (!confirm('Are you sure you want to clear everything on this page? This will delete your saved answers for this lesson.')) {
-            return;
-        }
-
-        const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
-
-        if (isTeacher && sessionStorage.getItem('inspectStudentUid')) {
-            alert('Reset is disabled while viewing a student account.');
-            return;
-        }
-
-        const user = auth ? auth.currentUser : null;
-
-        if (user && db) {
-            try {
-                await db.collection('users')
-                    .doc(user.uid)
-                    .collection('lessons')
-                    .doc(LESSON_ID)
-                    .delete();
-            } catch (error) {
-                console.error('Error deleting saved work:', error);
-                alert('Your saved data could not be deleted. Please try again.');
-                return;
+        async function clearData() {
+            if (confirm("Are you sure you want to clear all your work on this page?")) {
+                try { localStorage.removeItem('y8binarytodenaryMemory'); } catch (e) {}
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
+                    } catch (err) {
+                        console.error("Error clearing cloud data:", err);
+                    }
+                }
+                window.location.reload();
             }
         }
 
-        window.location.reload();
-    }
+        /* --- 5. BATCH-MARKING TEXT INPUT LOGIC --- */
+        function checkAnswers(groupClass, triggerSync = true) {
+            var inputs = document.getElementsByClassName(groupClass);
+            
+            for (var i = 0; i < inputs.length; i++) {
+                var inputElement = inputs[i];
+                var studentAnswer = inputElement.value.toLowerCase().trim();
+                var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers'));
+                
+                var isCorrect = false;
+                
+                for (var j = 0; j < acceptedAnswers.length; j++) {
+                    if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
+                        isCorrect = true;
+                        break;
+                    }
+                }
 
-    /* =========================================================
-       ANSWER CHECKING
-       ========================================================= */
+                inputElement.classList.remove('input-correct', 'input-incorrect');
 
-   function checkAnswers(groupClass, triggerSync = true) {
-        var inputs = document.getElementsByClassName(groupClass);
-        
-        for (var i = 0; i < inputs.length; i++) {
-            var inputElement = inputs[i];
-            var studentAnswer = inputElement.value.toLowerCase().trim();
-            
-            if (!inputElement.hasAttribute('data-answers')) continue;
-            
-            var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers'));
-            var isCorrect = false;
-            
-            // Check if the student's sentence includes ANY of the accepted keywords/phrases
-            for (var j = 0; j < acceptedAnswers.length; j++) {
-                if (studentAnswer.includes(acceptedAnswers[j].toLowerCase())) {
-                    isCorrect = true;
-                    break;
+                if (studentAnswer !== "") {
+                    if (isCorrect) {
+                        inputElement.classList.add('input-correct');
+                    } else {
+                        inputElement.classList.add('input-incorrect');
+                    }
                 }
             }
 
-            inputElement.classList.remove('input-correct', 'input-incorrect');
-
-            if (studentAnswer !== "") {
-                if (isCorrect) {
-                    inputElement.classList.add('input-correct');
-                } else {
-                    inputElement.classList.add('input-incorrect');
-                }
+            if (triggerSync) {
+                saveProgress(true);
             }
         }
-
-        if (triggerSync) {
-            saveProgress(true);
-        }
-    }
-</script>
+    </script>
 </body>
 </html>
