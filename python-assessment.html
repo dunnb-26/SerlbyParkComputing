@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lesson 4 - Assessment</title>
-    <link rel="stylesheet" href="style.css">
     
     <!-- Firebase SDKs for Teacher Cloud Markbook -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -109,25 +108,18 @@
         }
         .btn-clear-scores:hover { background-color: #b71c1c; }
 
-        /* 2-Column IDE Layout */
+        /* 3-Column Layout for Simulator */
         .ide-container {
             display: grid;
-            grid-template-columns: 1fr 2.2fr;
+            grid-template-columns: 1fr 1.5fr 1fr;
             gap: 20px;
             max-width: 1450px;
             margin: 20px auto;
             padding: 0 20px;
-            align-items: start;
         }
 
         @media (max-width: 1100px) {
             .ide-container { grid-template-columns: 1fr; }
-        }
-
-        .side-panel-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
         }
 
         .ide-panel {
@@ -228,7 +220,7 @@
 
         /* CodeMirror Editor Customization */
         .CodeMirror {
-            height: 500px !important;
+            height: 420px !important;
             border-radius: 5px;
             font-family: 'Courier New', Courier, monospace;
             font-size: 14px;
@@ -236,7 +228,7 @@
 
         #output {
             width: 100%;
-            height: 250px;
+            height: 350px;
             background-color: #000000;
             color: #4af626;
             font-family: 'Courier New', Courier, monospace;
@@ -310,43 +302,45 @@
     </div>
 
     <main>
+        <!-- 3-Column Layout -->
         <div class="ide-container">
-            <!-- Left Side: Instructions and Progress Feedback -->
-            <div class="side-panel-wrapper">
-                <div class="ide-panel">
-                    <h3>1. Instructions</h3>
-                    
-                    <select id="task-selector" onchange="switchTask()">
-                        <option value="t1">Task 1 (Sequence Blocks)</option>
-                        <option value="t2">Task 2 (Cinema Snack Bar)</option>
-                        <option value="t3">Task 3 (Arcade Score Checker)</option>
-                        <option value="t4">Task 4 (Canteen Queue Processor)</option>
-                    </select>
+            
+            <!-- COLUMN 1: Task Selection & Instructions / Block Bank -->
+            <div class="ide-panel">
+                <h3>1. Instructions</h3>
+                
+                <select id="task-selector" onchange="switchTask()">
+                    <option value="t1">Task 1 (Sequence Blocks)</option>
+                    <option value="t2">Task 2 (Cinema Snack Bar)</option>
+                    <option value="t3">Task 3 (Arcade Score Checker)</option>
+                    <option value="t4">Task 4 (Canteen Queue Processor)</option>
+                </select>
 
-                    <div id="instruction-panel"></div>
-                </div>
-
-                <div class="ide-panel output-panel">
-                    <h3 style="color: var(--maroon);">2. Terminal Output</h3>
-                    <p style="font-size: 13px; color: #666; margin-top: 0;">View program feedback and results:</p>
-                    
-                    <div id="output"></div>
-                    
-                    <div id="feedback" class="feedback-box">
-                        Awaiting code execution...
-                    </div>
-                </div>
+                <div id="instruction-panel"></div>
             </div>
 
-            <!-- Right Side: The Main Live Editor -->
+            <!-- COLUMN 2: Interactive Code Editor -->
             <div class="ide-panel editor-panel">
-                <h3 style="color: #007acc;">3. Code Editor</h3>
+                <h3 style="color: #007acc;">2. Code Editor</h3>
                 <p style="font-size: 13px; color: #666; margin-top: 0;">Write or assemble your Python solution below:</p>
                 
                 <textarea id="python-code"></textarea>
                 
                 <button class="btn-run" onclick="runPython()">▶ Run Code & Mark</button>
             </div>
+
+            <!-- COLUMN 3: Terminal Output & Feedback -->
+            <div class="ide-panel output-panel">
+                <h3 style="color: var(--maroon);">3. Terminal Output</h3>
+                <p style="font-size: 13px; color: #666; margin-top: 0;">View program feedback and results:</p>
+                
+                <div id="output"></div>
+                
+                <div id="feedback" class="feedback-box">
+                    Awaiting code execution...
+                </div>
+            </div>
+            
         </div>
     </main>
     
@@ -474,7 +468,6 @@
                     score_t3: s3,
                     score_t4: s4,
                     total_score: total,
-                    // FIREBASE FIX: Stringify complex arrays/objects
                     taskCodes: JSON.stringify(taskCodes),
                     currentBlocks: JSON.stringify(currentBlocks),
                     items: items
@@ -498,7 +491,6 @@
 
             if (data.taskCodes) {
                 try { taskCodes = typeof data.taskCodes === 'string' ? JSON.parse(data.taskCodes) : data.taskCodes; } catch(e){}
-                // Ensure defaults exist if fields were missing
                 taskCodes = Object.assign({}, defaultTaskCodes, taskCodes);
             }
             if (data.currentBlocks) {
@@ -549,7 +541,7 @@
                 let fallbackTxt = document.getElementById("python-code");
                 fallbackTxt.style.display = "block";
                 fallbackTxt.style.width = "100%";
-                fallbackTxt.style.height = "500px";
+                fallbackTxt.style.height = "420px";
                 fallbackTxt.style.backgroundColor = "#1a1a24";
                 fallbackTxt.style.color = "#e0e0e0";
                 fallbackTxt.style.fontFamily = "'Courier New', Courier, monospace";
