@@ -3,115 +3,265 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Account Importer</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Add Student Accounts</title>
     
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background: #f4f6f8; 
-            margin: 0;
-            padding: 0;
-            color: #333; 
+        :root {
+            /* Delta Serlby Park Color Scheme */
+            --navy: #1B1464; 
+            --yellow: #F7931D;
+            --maroon: #822433;
+            --bg-color: #f4f6f8;
+            --text-color: #333;
+            --btn-gold: #e2a829;
         }
 
-        /* Standard Header Override */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+        }
+
         header { 
-            background-color: #1B1464; 
+            background-color: var(--navy); 
             color: white; 
             padding: 20px; 
             display: grid; 
             grid-template-columns: 1fr auto 1fr; 
             align-items: center; 
-            border-bottom: 6px solid #822433; 
+            border-bottom: 6px solid var(--maroon); 
         }
+
         .header-left { display: flex; justify-content: flex-start; }
         .header-center { text-align: center; }
         .header-right { display: flex; justify-content: flex-end; align-items: center; }
-        header img { height: 80px; max-width: 100%; background-color: white; border-radius: 8px; padding: 5px; }
-        header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; color: white; }
-        .back-btn { 
-            background-color: #F7931D; 
-            color: #1B1464; 
-            text-decoration: none; 
-            padding: 10px 20px; 
-            border-radius: 6px; 
-            font-weight: bold; 
-            transition: transform 0.2s; 
-            white-space: nowrap; 
-        }
-        .back-btn:hover { transform: scale(1.03); }
 
-        /* Main Container Card */
-        .card { 
-            background: white; 
-            max-width: 700px; 
-            margin: 40px auto; 
-            padding: 35px; 
+        header img { 
+            height: 80px; 
+            background-color: white; 
             border-radius: 8px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08); 
-            border-top: 6px solid #1e3a8a; 
+            padding: 5px;
+        }
+
+        header h1 { 
+            margin: 0; 
+            font-size: 28px; 
+            letter-spacing: 1px;
+        }
+        
+        .task-plenary { border-top: 6px solid #673ab7; } 
+        .task-plenary h2 { color: #673ab7; margin-top: 0; }
+        
+        .back-btn {
+            background-color: var(--yellow);
+            color: var(--navy);
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .back-btn:hover { transform: scale(1.05); }
+
+        /* Scoreboard Banner */
+        .scoreboard {
+            max-width: 1450px;
+            margin: 20px auto 0 auto;
+            padding: 15px 25px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 5px solid var(--maroon);
+            font-weight: bold;
+            color: var(--navy);
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .score-item { text-align: center; font-size: 0.95em; }
+        .score-item span {
+            display: block;
+            font-size: 1.2em;
+            color: #666;
+            margin-top: 5px;
+        }
+        .status-started { color: #388e3c !important; font-weight: bold; }
+
+        /* Task Card Styling for Prep Section */
+        .task-card { 
+            background: white; 
+            border-radius: 8px; 
+            padding: 25px; 
+            margin: 30px auto 20px auto; 
+            max-width: 900px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            page-break-inside: avoid; 
             box-sizing: border-box;
         }
+        .task-prep { border-top: 6px solid #607d8b; } 
+        .task-prep h2 { color: #607d8b; margin-top: 0; }
 
-        input[type="file"], input[type="text"], input[type="password"], select { 
-            width: 100%; 
-            padding: 12px; 
-            margin: 10px 0 20px 0; 
-            display: block; 
-            font-size: 16px; 
-            box-sizing: border-box; 
-            border: 1px solid #ccc; 
-            border-radius: 4px; 
-            font-weight: bold; 
-            background: white; 
+        /* Inputs & Textareas */
+        .question-row { margin-bottom: 20px; }
+        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
+        .auto-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; transition: all 0.3s ease; box-sizing: border-box; background-color: white; font-family: inherit; }
+        .auto-input:focus { outline: none; border-color: #666; }
+        textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; }
+
+        /* 3-Column Layout for Simulator */
+        .ide-container {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1fr;
+            gap: 20px;
+            max-width: 1450px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        @media (max-width: 1100px) {
+            .ide-container { grid-template-columns: 1fr; }
+        }
+
+        .ide-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-top: 5px solid var(--navy);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .editor-panel { border-top-color: #217346; align-items: center; } 
+        .output-panel { border-top-color: var(--maroon); }
+
+        .ide-panel h3 {
+            margin-top: 0;
+            color: var(--navy);
+            text-transform: uppercase;
+            font-size: 1.1em;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
             font-family: inherit;
         }
 
-        button { 
-            background: #dfaa2b; 
-            color: #1e3a8a; 
-            border: none; 
-            padding: 14px 25px; 
-            border-radius: 6px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            font-size: 16px; 
-            width: 100%; 
-            transition: background 0.2s;
+        #instruction-panel {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--navy);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 4px 4px 0;
+            font-family: inherit;
+            font-size: 14px;
+            color: #333;
+            flex-grow: 1;
+            line-height: 1.6;
         }
-        button:hover { background: #c99722; }
 
-        .divider { margin: 35px 0; border: 0; border-top: 1px solid #eee; }
+        /* Excel-Style Pixel Grid */
+        #spreadsheet-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 5px;
+        }
+
+        .excel-table {
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .excel-table td {
+            border: 1px solid #d0d7e5;
+            padding: 0;
+            width: 42px;
+            height: 42px;
+            position: relative;
+        }
+
+        .pixel-input {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            border: 2px solid transparent;
+            text-align: center;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            /* Graph paper pattern for unattempted cells */
+            background-color: #fafafa;
+            background-image: linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px), 
+                              linear-gradient(0deg, rgba(0,0,0,0.06) 1px, transparent 1px);
+            background-size: 10px 10px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .pixel-input:focus {
+            border: 2px solid #217346;
+            background-color: rgba(255,255,255,0.95) !important;
+            background-image: none !important;
+            color: #000 !important;
+            text-shadow: none !important;
+        }
+
+        .pixel-input.valid {
+            color: transparent;
+            background-image: none !important;
+        }
+
+        /* Color Legend Area */
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px 12px;
+            margin-top: 10px;
+        }
         
-        #log { 
-            background: #000; 
-            color: #4af626; 
-            padding: 15px; 
-            border-radius: 6px; 
-            height: 250px; 
-            overflow-y: auto; 
-            font-family: monospace; 
-            margin-top: 20px; 
-            font-size: 13px; 
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            color: #333;
+            font-weight: bold;
+            background: #f8f9fa;
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #eee;
         }
 
-        label { font-weight: bold; font-size: 14px; color: #333; }
-
-        footer { 
-            text-align: center; 
-            padding: 25px; 
-            color: #666; 
-            margin-top: 50px; 
-            border-top: 1px solid #ddd; 
-            background-color: white; 
+        .color-box {
+            width: 18px;
+            height: 18px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            margin-right: 8px;
         }
+
+        /* Buttons */
+        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
+        .btn-pdf:hover { background-color: #124d2d; }
+        
+        footer { text-align: center; padding: 25px; color: #666; margin-top: 50px; border-top: 1px solid #ddd; background-color: white; }
     </style>
-
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
@@ -121,7 +271,7 @@
             <a href="index.html"><img src="logo.jpg" alt="Logo"></a>
         </div>
         <div class="header-center">
-            <h1>Student Account Importer</h1>
+            <h1>Add Student Accounts</h1>
         </div>
         <div class="header-right">
             <a href="javascript:history.back()" class="back-btn">&larr; Back to Dashboard</a>
