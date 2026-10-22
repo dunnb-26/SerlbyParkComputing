@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Y9 HT2: Demonstrate & Connect</title>
+    <title>Y9 HT2 - Demonstrate & Connect</title>
     <link rel="stylesheet" href="style.css">
-
+    
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-    <style>
+    <!-- HTML to PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+ <style>
         .task-container {
             max-width: 900px;
             margin: 0 auto 40px auto;
@@ -72,7 +75,7 @@
             min-height: 80px;
         }
         
-        /* Locked answer styling: keeps red spelling underlines visible while preventing edits */
+        /* Locked answer styling: keeps red underlines visible while preventing edits */
         textarea.spellcheck-locked {
             background-color: #fafafa;
             color: #333;
@@ -133,7 +136,7 @@
         }
         .btn-reset:hover { background-color: #b71c1c; }
 
-        /* Spelling Practice Area */
+        /*  Practice Area */
         .spag-practice-box {
             background-color: #fff3e0;
             border: 2px solid #f57c00;
@@ -333,64 +336,76 @@
     </style>
 </head>
 <body>
-
-    <header>
+     <header>
         <div class="header-left">
             <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
         </div>
         <div class="header-center">
-            <h1>Y9 HT2: Demonstrate & Connect</h1>
+            <h1>Year 9 - Half Term 2 - D&C</h1>
         </div>
         <div class="header-right">
-            <a href="curriculum.html" class="back-btn">&larr; Back to Unit</a>
+            <a href="javascript:history.back()" class="back-btn">&larr; Back to Unit</a>
         </div>
     </header>
 
-    <main class="task-container">
+    <main>
+        <div class="task-container" id="pdf-content">
+            
+            <!-- STAGE 1: DEMONSTRATE TASK -->
+            <div id="demonstrate-stage" class="task-card">
+                <div class="task-title">Part 1: Demonstrate</div>
+                <div class="instruction-box">
+                    Write full sentences to answer the 5 questions below. Browser spellcheck will underline any errors in red as you type. When you click "Mark My Work", your score and table will appear below. Your progress is automatically saved.
+                </div>
 
-        <!-- STAGE 1: DEMONSTRATE (Initial Knowledge Check) -->
-        <div class="task-card" style="border-top: 6px solid #1B1464;">
-            <div class="task-title">Part 1: Demonstrate</div>
-            <div class="instruction-box">
-                Answer the 5 questions below using full sentences. When you are finished, click <strong>Mark My Work</strong>. Your score will unlock your next challenge.
-            </div>
+                <div class="question-group">
+                    <label>1. Convert the 2-digit Hexadecimal code <code>2F</code> into a Denary (decimal) number:</label>
+                    <textarea id="q1" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <div style="text-align: right;">
+                        <button id="override-q1" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('q1')">👨‍🏫 Override Score</button>
+                    </div>
+                </div>
+                <div class="question-group">
+                    <label>2. Explain the difference between a White Hat hacker and a Black Hat hacker:</label>
+                    <textarea id="q2" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <div style="text-align: right;">
+                        <button id="override-q2" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('q2')">👨‍🏫 Override Score</button>
+                    </div>
+                </div>
+                <div class="question-group">
+                    <label>3. Describe how a 'blagging' attack works in Cyber Security:</label>
+                    <textarea id="q3" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <div style="text-align: right;">
+                        <button id="override-q3" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('q3')">👨‍🏫 Override Score</button>
+                    </div>
+                </div>
+                <div class="question-group">
+                    <label>4. Explain what happens during a DDoS attack to take a website offline:</label>
+                    <textarea id="q4" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <div style="text-align: right;">
+                        <button id="override-q4" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('q4')">👨‍🏫 Override Score</button>
+                    </div>
+                </div>
+                <div class="question-group">
+                    <label>5. Describe the main difference between a computer virus and a computer worm:</label>
+                    <textarea id="q5" spellcheck="true" class="persist-input" placeholder="Type your detailed answer here..."></textarea>
+                    <div style="text-align: right;">
+                        <button id="override-q5" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('q5')">👨‍🏫 Override Score</button>
+                    </div>
+                </div>
 
-            <div class="question-group">
-                <label>1. Convert the 2-digit Hexadecimal code <code>2F</code> into a Denary (decimal) number:</label>
-                <textarea id="q1" spellcheck="false" placeholder="Type your calculation and answer here..."></textarea>
-            </div>
-            
-            <div class="question-group">
-                <label>2. Explain the difference between a White Hat hacker and a Black Hat hacker:</label>
-                <textarea id="q2" spellcheck="false" placeholder="Type your detailed answer here..."></textarea>
-            </div>
-            
-            <div class="question-group">
-                <label>3. Describe how a 'blagging' attack works in Cyber Security:</label>
-                <textarea id="q3" spellcheck="false" placeholder="Type your detailed answer here..."></textarea>
-            </div>
-            
-            <div class="question-group">
-                <label>4. Explain what happens during a DDoS attack to take a website offline:</label>
-                <textarea id="q4" spellcheck="false" placeholder="Type your detailed answer here..."></textarea>
-            </div>
-            
-            <div class="question-group">
-                <label>5. Describe the main difference between a computer virus and a computer worm:</label>
-                <textarea id="q5" spellcheck="false" placeholder="Type your detailed answer here..."></textarea>
-            </div>
-
-      <div class="btn-row" id="stage1-buttons">
+                <div class="btn-row" id="stage1-buttons">
                     <button class="btn-mark no-print" onclick="markStage1()">✅ Mark My Work</button>
                 </div>
-            
-            <div id="score-display" class="hidden"></div>
-        </div>
-<!-- LESSON 2: SPELLING PRACTICE BOX (Initially Hidden) -->
+
+                <div id="score-display" class="hidden"></div>
+            </div>
+
+            <!-- LESSON 2:  PRACTICE BOX (Initially Hidden) -->
             <div id="spag-section" class="task-card hidden" style="border-top-color: #f57c00;">
-                <div class="task-title" style="color: #e65100;">Spelling Corrections & Practice</div>
+                <div class="task-title" style="color: #e65100;"> Corrections & Practice</div>
                 <div class="instruction-box">
-                    Look at any words in your Demonstrate answers above that have red underlines. Type each misspelled word in the first column, and practice spelling it correctly **3 times** across the next three columns. If you had no spelling mistakes, you can remove the rows using the ❌ button.
+                    Look at any words in your Demonstrate answers above that have red underlines. Type each misspelled word in the first column, and practice it correctly **3 times** across the next three columns. If you had no mistakes, you can remove the rows using the ❌ button.
                 </div>
                 
                 <div class="spag-practice-box">
@@ -407,134 +422,689 @@
                     <button class="btn-add-word no-print" onclick="addPracticeRow()">+ Add Another Word</button>
                 </div>
             </div>
-        <!-- STAGE 2: CONNECT TASKS (Initially Hidden) -->
-        
-        <div id="task-red" class="task-card red-task hidden">
-            <div class="task-title">Part 2: Connect - RED TASK (Consolidation)</div>
-            <div class="instruction-box">
-                Let's review the basics. Complete the task below to connect what we have learned this half term.
+
+            <!-- STAGE 2: CONNECT TASKS (Initially Hidden) -->
+            <div id="task-red" class="task-card red-task hidden">
+                <div class="task-title">Part 2: Connect - RED TASK (Consolidation) 
+                    <span class="verified-badge badge-correct">✅ Teacher Verified: Correct</span>
+                    <span class="verified-badge badge-incorrect">❌ Teacher Verified: Incorrect</span>
+                </div>
+                <div class="instruction-box">
+                    Review the basics. Complete the task below after finishing your spelling practice above.
+                </div>
+                <div class="question-group">
+                    <label>List 2 types of malware and 2 types of hackers we have learned about:</label>
+                    <textarea id="connect-red" class="persist-input" placeholder="Type your answer here..."></textarea>
+                </div>
+                
+                <!-- Feedback Display -->
+                <div id="feedback-red" class="teacher-feedback-display hidden"></div>
+
+                <div style="text-align: right; gap: 10px; display: flex; justify-content: flex-end;">
+                    <button class="teacher-verify-btn no-print" style="background-color: #388e3c;" onclick="openVerifyModal('red-correct')">✅ Correct</button>
+                    <button class="teacher-verify-btn no-print" style="background-color: #d32f2f;" onclick="openVerifyModal('red-incorrect')">❌ Incorrect</button>
+                </div>
             </div>
-            <div class="question-group">
-                <label>List 2 types of malware and 2 types of hackers we have learned about:</label>
-                <textarea class="auto-save-task" placeholder="Type your list here..."></textarea>
+
+            <div id="task-amber" class="task-card amber-task hidden">
+                <div class="task-title">Part 2: Connect - AMBER TASK (Application) 
+                    <span class="verified-badge badge-correct">✅ Teacher Verified: Correct</span>
+                    <span class="verified-badge badge-incorrect">❌ Teacher Verified: Incorrect</span>
+                </div>
+                <div class="instruction-box">
+                    Great effort! Connect your knowledge. Complete the task below after finishing your spelling practice above.
+                </div>
+                <div class="question-group">
+                    <label>Explain how an attacker might use social engineering (like a fake email or name generator) to gain access to a school network:</label>
+                    <textarea id="connect-amber" class="persist-input" placeholder="Type your explanation here..."></textarea>
+                </div>
+                
+                <!-- Feedback Display -->
+                <div id="feedback-amber" class="teacher-feedback-display hidden"></div>
+
+                <div style="text-align: right; gap: 10px; display: flex; justify-content: flex-end;">
+                    <button class="teacher-verify-btn no-print" style="background-color: #388e3c;" onclick="openVerifyModal('amber-correct')">✅ Correct</button>
+                    <button class="teacher-verify-btn no-print" style="background-color: #d32f2f;" onclick="openVerifyModal('amber-incorrect')">❌ Incorrect</button>
+                </div>
             </div>
+
+            <div id="task-green" class="task-card green-task hidden">
+                <div class="task-title">Part 2: Connect - GREEN TASK (Challenge) 
+                    <span class="verified-badge badge-correct">✅ Teacher Verified: Correct</span>
+                    <span class="verified-badge badge-incorrect">❌ Teacher Verified: Incorrect</span>
+                </div>
+                <div class="instruction-box">
+                    Perfect score! Challenge task complete. Complete the task below after finishing your spelling practice above.
+                </div>
+                <div class="question-group">
+                    <label>Analyze why humans are often considered the "weakest link" in cyber security, and explain how the Computer Misuse Act tries to prevent hacking.</label>
+                    <textarea id="connect-green" class="persist-input" rows="5" placeholder="Type your analysis here..."></textarea>
+                </div>
+                
+                <!-- Feedback Display -->
+                <div id="feedback-green" class="teacher-feedback-display hidden"></div>
+
+                <div style="text-align: right; gap: 10px; display: flex; justify-content: flex-end;">
+                    <button class="teacher-verify-btn no-print" style="background-color: #388e3c;" onclick="openVerifyModal('green-correct')">✅ Correct</button>
+                    <button class="teacher-verify-btn no-print" style="background-color: #d32f2f;" onclick="openVerifyModal('green-incorrect')">❌ Incorrect</button>
+                </div>
+            </div>
+
         </div>
 
-        <div id="task-amber" class="task-card amber-task hidden">
-            <div class="task-title">Part 2: Connect - AMBER TASK (Application)</div>
-            <div class="instruction-box">
-                Great effort! Now let's connect your knowledge to a real-world scenario.
-            </div>
-            <div class="question-group">
-                <label>Explain how an attacker might use social engineering (like a fake email or name generator) to gain access to a school network:</label>
-                <textarea class="auto-save-task" placeholder="Type your explanation here..."></textarea>
-            </div>
+        <!-- UNIVERSAL ACTION BUTTONS (PDF & RESET - Hidden until marked) -->
+        <div class="action-row hidden" id="action-buttons">
+            <button class="btn-reset" onclick="clearData()">Reset Page</button>
         </div>
-
-        <div id="task-green" class="task-card green-task hidden">
-            <div class="task-title">Part 2: Connect - GREEN TASK (Extension)</div>
-            <div class="instruction-box">
-                Excellent knowledge! Time for the ultimate challenge.
-            </div>
-            <div class="question-group">
-                <label>Analyze why humans are often considered the "weakest link" in cyber security, and explain how the Computer Misuse Act tries to prevent hacking.</label>
-                <textarea class="auto-save-task" rows="5" placeholder="Type your analysis here..."></textarea>
-            </div>
-        </div>
-
     </main>
 
+    <!-- SECURE PASSWORD & FEEDBACK MODAL -->
+    <div class="modal-overlay" id="verify-modal">
+        <div class="modal-content">
+            <h3>Teacher Verification</h3>
+            <div class="modal-error" id="modal-error-msg">Incorrect Passcode</div>
+            <input type="password" id="teacher-password-input" class="modal-input" placeholder="Enter Passcode">
+            
+            <textarea id="teacher-feedback-input" class="modal-input hidden" placeholder="Optional Feedback for student..." style="resize: vertical; min-height: 120px; font-family: inherit; margin-top: 5px;"></textarea>
+            
+            <div class="modal-btn-row">
+                <button class="modal-btn-cancel" onclick="closeVerifyModal()">Cancel</button>
+                <button class="modal-btn-confirm" onclick="submitVerify()">Verify</button>
+            </div>
+        </div>
+    </div>
+    
     <footer>
         &copy; 2026 Delta Serlby Park - Computing & Business Department
     </footer>
 
     <script>
-        /* --- D&C MARKING LOGIC --- */
-        function markStage1() {
-            let score = 0;
+        /* --- 1. FIREBASE CONFIGURATION & INITIALIZATION --- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // UNIQUE LESSON ID
+        const LESSON_ID = "y9-ht2-cyber-dnc";
+
+        // Y9 HT2 Specific Keywords for Marking
+        const qKeywords = {
+            1: ['47', 'forty seven', 'forty-seven'],
+            2: ['ethical', 'permission', 'legal', 'illegal', 'criminal', 'steal', 'bad'],
+            3: ['story', 'fake', 'invented', 'scenario', 'pretend', 'lie'],
+            4: ['flood', 'overload', 'traffic', 'botnet', 'requests', 'crash', 'offline'],
+            5: ['host', 'open', 'file', 'replicate', 'spread', 'network', 'itself']
+        };
+
+        // Model Answers for Automatic Feedback
+        const modelAnswers = {
+            'red': "Here is the correct answer to help you:\n\nTypes of hackers include White Hat, Black Hat, and Grey Hat. Types of malware include Viruses, Worms, and Trojans.",
+            'amber': "Here is the correct answer to help you:\n\nAn attacker could send a phishing email pretending to be the school IT team to steal a password, or use a 'name generator' quiz to trick students into answering their security questions.",
+            'green': "Here is the correct answer to help you:\n\nHumans are the weakest link because they can be tricked by social engineering (like clicking bad links), no matter how strong the firewall is. The Computer Misuse Act tries to prevent this by making unauthorized access illegal."
+        };
+
+        function checkSentenceAnswer(inputId, keywords) {
+            const inputElement = document.getElementById(inputId);
+            const studentAnswer = inputElement.value.toLowerCase().trim();
             
-            // Q1: Hexadecimal 2F to Denary = 47 (2*16 = 32, + 15 = 47)
-            let q1 = document.getElementById('q1');
-            let a1 = q1.value.toLowerCase();
-            q1.classList.remove('feedback-correct', 'feedback-incorrect');
-            if(a1.includes('47') || a1.includes('forty seven') || a1.includes('forty-seven')) {
-                q1.classList.add('feedback-correct');
-                score++;
-            } else if (a1.trim() !== '') {
-                q1.classList.add('feedback-incorrect');
+            if (studentAnswer === "") {
+                inputElement.classList.add('incorrect');
+                inputElement.classList.remove('correct');
+                return 0;
             }
 
-            // Q2: White Hat vs Black Hat
-            let q2 = document.getElementById('q2');
-            let a2 = q2.value.toLowerCase();
-            q2.classList.remove('feedback-correct', 'feedback-incorrect');
-            if((a2.includes('ethical') || a2.includes('permission') || a2.includes('legal')) && (a2.includes('illegal') || a2.includes('criminal') || a2.includes('steal') || a2.includes('bad'))) {
-                q2.classList.add('feedback-correct');
-                score++;
-            } else if (a2.trim() !== '') {
-                q2.classList.add('feedback-incorrect');
+            // Requires at least one keyword match to be correct
+            let isCorrect = keywords.some(keyword => studentAnswer.includes(keyword.toLowerCase()));
+
+            // Additional strict check for Q2 & Q5 to ensure both sides of comparison are mentioned
+            if (inputId === 'q2') {
+                isCorrect = (studentAnswer.includes('ethical') || studentAnswer.includes('permission')) && 
+                            (studentAnswer.includes('illegal') || studentAnswer.includes('criminal') || studentAnswer.includes('steal'));
+            }
+            if (inputId === 'q5') {
+                isCorrect = (studentAnswer.includes('host') || studentAnswer.includes('file')) && 
+                            (studentAnswer.includes('spread') || studentAnswer.includes('replicate') || studentAnswer.includes('network'));
             }
 
-            // Q3: Blagging
-            let q3 = document.getElementById('q3');
-            let a3 = q3.value.toLowerCase();
-            q3.classList.remove('feedback-correct', 'feedback-incorrect');
-            if(a3.includes('story') || a3.includes('fake') || a3.includes('invented') || a3.includes('scenario') || a3.includes('pretend')) {
-                q3.classList.add('feedback-correct');
-                score++;
-            } else if (a3.trim() !== '') {
-                q3.classList.add('feedback-incorrect');
+            if (isCorrect) {
+                inputElement.classList.add('correct');
+                inputElement.classList.remove('incorrect');
+            } else {
+                inputElement.classList.add('incorrect');
+                inputElement.classList.remove('correct');
             }
+        }
 
-            // Q4: DDoS
-            let q4 = document.getElementById('q4');
-            let a4 = q4.value.toLowerCase();
-            q4.classList.remove('feedback-correct', 'feedback-incorrect');
-            if(a4.includes('flood') || a4.includes('overload') || a4.includes('traffic') || a4.includes('botnet') || a4.includes('requests')) {
-                q4.classList.add('feedback-correct');
-                score++;
-            } else if (a4.trim() !== '') {
-                q4.classList.add('feedback-incorrect');
-            }
+        function addPracticeRow(word1 = '', word2 = '', word3 = '', word4 = '', triggerSave = true) {
+            const container = document.getElementById('practice-rows-container');
+            const row = document.createElement('div');
+            row.className = 'practice-row';
+            row.innerHTML = `
+                <input type="text" class="spag-input" value="${word1}" placeholder="Word...">
+                <input type="text" class="spag-input" value="${word2}" placeholder="Attempt 1...">
+                <input type="text" class="spag-input" value="${word3}" placeholder="Attempt 2...">
+                <input type="text" class="spag-input" value="${word4}" placeholder="Attempt 3...">
+                <button type="button" class="btn-remove-row no-print" onclick="removePracticeRow(this)" title="Remove row">❌</button>
+            `;
+            container.appendChild(row);
 
-            // Q5: Virus vs Worm
-            let q5 = document.getElementById('q5');
-            let a5 = q5.value.toLowerCase();
-            q5.classList.remove('feedback-correct', 'feedback-incorrect');
-            if((a5.includes('host') || a5.includes('open') || a5.includes('file')) && (a5.includes('replicate') || a5.includes('spread') || a5.includes('network') || a5.includes('itself'))) {
-                q5.classList.add('feedback-correct');
-                score++;
-            } else if (a5.trim() !== '') {
-                q5.classList.add('feedback-incorrect');
-            }
+            row.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', () => saveToCloud(false));
+            });
+            if (triggerSave) saveToCloud(false);
+        }
 
-            // Display Score & Reveal Differentiated Task
-            let display = document.getElementById('score-display');
-            display.classList.remove('hidden', 'score-red', 'score-amber', 'score-green');
+        function removePracticeRow(button) {
+            const row = button.parentElement;
+            row.remove();
+            saveToCloud(false);
+        }
+
+        function lockSpellcheckTextarea(textarea) {
+            if (!textarea || textarea.dataset.spellcheckLocked === 'true') return;
+
+            textarea.dataset.spellcheckLocked = 'true';
+            textarea.classList.add('spellcheck-locked');
             
+            textarea.readOnly = false;
+
+            textarea.addEventListener('beforeinput', function(e) { e.preventDefault(); });
+            textarea.addEventListener('paste', function(e) { e.preventDefault(); });
+            textarea.addEventListener('cut', function(e) { e.preventDefault(); });
+            textarea.addEventListener('drop', function(e) { e.preventDefault(); });
+            textarea.addEventListener('keydown', function(e) {
+                const allowed = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown', 'Tab', 'Escape'];
+                const editingKey = e.key.length === 1 || ['Backspace', 'Delete', 'Enter'].includes(e.key);
+
+                if (editingKey && !allowed.includes(e.key) && !(e.ctrlKey || e.metaKey) && !e.altKey) {
+                    e.preventDefault();
+                }
+
+                if ((e.ctrlKey || e.metaKey) && ['v', 'x', 'z', 'y', 'a'].includes(e.key.toLowerCase())) {
+                    e.preventDefault();
+                }
+            });
+        }
+
+        function recalculateScore() {
+            let newScore = 0;
+            for (let i = 1; i <= 5; i++) {
+                if (document.getElementById('q' + i).classList.contains('correct')) {
+                    newScore++;
+                }
+            }
+
+            const scoreDisplay = document.getElementById('score-display');
+            scoreDisplay.classList.remove('hidden');
+            scoreDisplay.innerText = `You scored ${newScore} out of 5!`;
+
+            // Hide all task cards initially
             document.getElementById('task-red').classList.add('hidden');
             document.getElementById('task-amber').classList.add('hidden');
             document.getElementById('task-green').classList.add('hidden');
 
-            display.innerHTML = `You scored ${score} out of 5!`;
-
-            if(score <= 2) {
-                display.classList.add('score-red');
+            // Reveal appropriate task card based on dynamic score
+            if (newScore <= 2) {
+                scoreDisplay.style.backgroundColor = "#ffebee";
+                scoreDisplay.style.color = "#d32f2f";
                 document.getElementById('task-red').classList.remove('hidden');
-            } else if(score <= 4) {
-                display.classList.add('score-amber');
+            } else if (newScore >= 3 && newScore <= 4) {
+                scoreDisplay.style.backgroundColor = "#fff3e0";
+                scoreDisplay.style.color = "#ef6c00";
                 document.getElementById('task-amber').classList.remove('hidden');
-            } else {
-                display.classList.add('score-green');
+            } else if (newScore === 5) {
+                scoreDisplay.style.backgroundColor = "#e8f5e9";
+                scoreDisplay.style.color = "#2e7d32";
                 document.getElementById('task-green').classList.remove('hidden');
+            }
+
+            document.getElementById('action-buttons').classList.remove('hidden');
+        }
+
+        function markStage1() {
+            // Apply grading logic
+            checkSentenceAnswer('q1', qKeywords[1]);
+            checkSentenceAnswer('q2', qKeywords[2]);
+            checkSentenceAnswer('q3', qKeywords[3]);
+            checkSentenceAnswer('q4', qKeywords[4]);
+            checkSentenceAnswer('q5', qKeywords[5]);
+
+            // Lock text areas and show override buttons
+            for (let i = 1; i <= 5; i++) {
+                lockSpellcheckTextarea(document.getElementById('q' + i));
+                document.getElementById('override-q' + i).classList.remove('hidden');
+            }
+            document.getElementById('stage1-buttons').style.display = 'none';
+
+            // Reveal spelling section
+            document.getElementById('spag-section').classList.remove('hidden');
+            if (document.getElementById('practice-rows-container').children.length === 0) {
+                addPracticeRow('', '', '', '', false);
+            }
+
+            recalculateScore();
+            saveToCloud(true);
+        }
+
+        // --- TEACHER VERIFICATION & OVERRIDE MODAL LOGIC ---
+        let activeLevel = null;
+        function openVerifyModal(level) {
+            activeLevel = level;
+            document.getElementById('teacher-password-input').value = '';
+            document.getElementById('modal-error-msg').style.display = 'none';
+            
+            const feedbackInput = document.getElementById('teacher-feedback-input');
+
+            // Set automatic feedback based on task status
+            if (level.includes('-correct') || level.includes('-incorrect')) {
+                const [taskLevel, status] = level.split('-');
+                
+                if (status === 'correct') {
+                    feedbackInput.value = "Well done! Great work.";
+                } else {
+                    feedbackInput.value = modelAnswers[taskLevel];
+                }
+                
+                feedbackInput.classList.remove('hidden');
+            } else {
+                feedbackInput.value = '';
+                feedbackInput.classList.add('hidden');
+            }
+
+            document.getElementById('verify-modal').style.display = 'flex';
+            document.getElementById('teacher-password-input').focus();
+        }
+
+        function closeVerifyModal() {
+            document.getElementById('verify-modal').style.display = 'none';
+            activeLevel = null;
+        }
+
+        function submitVerify() {
+            const pass = document.getElementById('teacher-password-input').value;
+            if (pass === '2525') {
+                if (activeLevel.includes('-correct') || activeLevel.includes('-incorrect')) {
+                    // Connect Task Logic
+                    const [level, status] = activeLevel.split('-');
+                    const textarea = document.getElementById('connect-' + level);
+                    const taskCard = document.getElementById('task-' + level);
+                    const feedbackDiv = document.getElementById('feedback-' + level);
+                    const feedbackText = document.getElementById('teacher-feedback-input').value.trim();
+
+                    if (status === 'correct') {
+                        textarea.classList.add('correct');
+                        textarea.classList.remove('incorrect');
+                        taskCard.classList.add('teacher-verified-correct');
+                        taskCard.classList.remove('teacher-verified-incorrect');
+                    } else {
+                        textarea.classList.add('incorrect');
+                        textarea.classList.remove('correct');
+                        taskCard.classList.add('teacher-verified-incorrect');
+                        taskCard.classList.remove('teacher-verified-correct');
+                    }
+                    
+                    // Display Teacher Feedback if provided
+                    if (feedbackText) {
+                        feedbackDiv.innerHTML = "<strong>👨‍🏫 Teacher Feedback:</strong><br><br>" + feedbackText.replace(/\n/g, '<br>');
+                        feedbackDiv.classList.remove('hidden');
+                    } else {
+                        feedbackDiv.classList.add('hidden');
+                        feedbackDiv.innerHTML = "";
+                    }
+
+                } else if (activeLevel.startsWith('q')) {
+                    // Question Override Logic (Toggles correct/incorrect)
+                    let el = document.getElementById(activeLevel);
+                    if (el.classList.contains('incorrect')) {
+                        el.classList.remove('incorrect');
+                        el.classList.add('correct');
+                    } else {
+                        el.classList.remove('correct');
+                        el.classList.add('incorrect');
+                    }
+                    recalculateScore(); // Instantly adjusts the score and the Connect task below
+                }
+                closeVerifyModal();
+                saveToCloud(true);
+            } else {
+                document.getElementById('modal-error-msg').style.display = 'block';
             }
         }
 
-        /* --- PLACEHOLDER FOR SPAG CHECK --- */
-        function runSpagCheck() {
-            alert("SPaG Check complete. Please review your sentences for capital letters, full stops, and correct spellings before clicking 'Mark My Work'.");
-        }
-    </script>
+        // Allow pressing Enter from either the password or feedback box
+        document.getElementById('teacher-password-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') submitVerify();
+        });
+        
+        document.getElementById('teacher-feedback-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                submitVerify();
+            }
+        });
 
+        // --- FIREBASE CLOUD AUTO-SAVE & AUTO-LOAD ---
+        function findLabelForInput(el, index) {
+            const group = el.closest('.question-group');
+            if (group) {
+                const lbl = group.querySelector('label');
+                if (lbl && lbl.innerText.trim()) {
+                    return lbl.innerText.replace(/\s+/g, ' ').trim();
+                }
+            }
+            return 'Question ' + index;
+        }
+
+        function buildMarkbookData() {
+            const items = [];
+            let correctCount = 0;
+            let isMarked = document.getElementById('q1').dataset.spellcheckLocked === 'true';
+
+            for (let i = 1; i <= 5; i++) {
+                const el = document.getElementById('q' + i);
+                let status = 'neutral';
+                if (el.classList.contains('correct')) {
+                    status = 'correct';
+                    correctCount++;
+                } else if (el.classList.contains('incorrect')) {
+                    status = 'incorrect';
+                }
+                items.push({
+                    index: i - 1,
+                    label: findLabelForInput(el, i),
+                    value: el.value.trim(),
+                    status: status
+                });
+            }
+
+            // Include Spelling Practice words if any are typed
+            const spagWords = [];
+            document.querySelectorAll('.practice-row').forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                const w0 = inputs[0].value.trim();
+                if (w0) {
+                    spagWords.push(`${w0} -> ${inputs[1].value.trim()}, ${inputs[2].value.trim()}, ${inputs[3].value.trim()}`);
+                }
+            });
+            if (spagWords.length > 0) {
+                items.push({
+                    label: "Spelling Practice",
+                    value: spagWords.join('\n'),
+                    status: 'neutral'
+                });
+            }
+
+            // Include Connect Tasks
+            ['red', 'amber', 'green'].forEach(level => {
+                const card = document.getElementById('task-' + level);
+                const textarea = document.getElementById('connect-' + level);
+                const isCorrect = card.classList.contains('teacher-verified-correct');
+                const isIncorrect = card.classList.contains('teacher-verified-incorrect');
+
+                if (!card.classList.contains('hidden') || textarea.value.trim() !== '' || isCorrect || isIncorrect) {
+                    let status = 'neutral';
+                    if (isCorrect) status = 'correct';
+                    else if (isIncorrect) status = 'incorrect';
+
+                    items.push({
+                        label: `Part 2: Connect - ${level.toUpperCase()} Task`,
+                        value: textarea.value.trim(),
+                        status: status
+                    });
+                }
+            });
+
+            return {
+                items: items,
+                scoreText: isMarked ? `Score: ${correctCount} / 5` : "In Progress"
+            };
+        }
+
+        let saveTimer;
+        function saveToCloud(immediate = false) {
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                const structured = buildMarkbookData();
+                const data = {
+                    pageTitle: document.title || "Y9 HT2 - Demonstrate & Connect (Cyber)",
+                    lastUpdated: Date.now(),
+                    scoreText: structured.scoreText,
+                    items: structured.items,
+
+                    q1: document.getElementById('q1').value,
+                    q2: document.getElementById('q2').value,
+                    q3: document.getElementById('q3').value,
+                    q4: document.getElementById('q4').value,
+                    q5: document.getElementById('q5').value,
+                    q1_class: document.getElementById('q1').className,
+                    q2_class: document.getElementById('q2').className,
+                    q3_class: document.getElementById('q3').className,
+                    q4_class: document.getElementById('q4').className,
+                    q5_class: document.getElementById('q5').className,
+                    q1_locked: document.getElementById('q1').dataset.spellcheckLocked === 'true',
+                    buttons_hidden: document.getElementById('stage1-buttons').style.display === 'none',
+                    actions_hidden: document.getElementById('action-buttons').classList.contains('hidden'),
+                    spag_hidden: document.getElementById('spag-section').classList.contains('hidden'),
+                    
+                    red_verified: document.getElementById('task-red').classList.contains('teacher-verified-correct'),
+                    amber_verified: document.getElementById('task-amber').classList.contains('teacher-verified-correct'),
+                    green_verified: document.getElementById('task-green').classList.contains('teacher-verified-correct'),
+                    
+                    task_red_status: document.getElementById('task-red').classList.contains('teacher-verified-incorrect') ? 'incorrect' : (document.getElementById('task-red').classList.contains('teacher-verified-correct') ? 'correct' : ''),
+                    task_amber_status: document.getElementById('task-amber').classList.contains('teacher-verified-incorrect') ? 'incorrect' : (document.getElementById('task-amber').classList.contains('teacher-verified-correct') ? 'correct' : ''),
+                    task_green_status: document.getElementById('task-green').classList.contains('teacher-verified-incorrect') ? 'incorrect' : (document.getElementById('task-green').classList.contains('teacher-verified-correct') ? 'correct' : ''),
+                    
+                    connectRed: document.getElementById('connect-red').value,
+                    connectRed_class: document.getElementById('connect-red').className,
+                    connectAmber: document.getElementById('connect-amber').value,
+                    connectAmber_class: document.getElementById('connect-amber').className,
+                    connectGreen: document.getElementById('connect-green').value,
+                    connectGreen_class: document.getElementById('connect-green').className,
+                    
+                    feedbackRed: document.getElementById('feedback-red').innerHTML,
+                    feedbackRed_hidden: document.getElementById('feedback-red').classList.contains('hidden'),
+                    feedbackAmber: document.getElementById('feedback-amber').innerHTML,
+                    feedbackAmber_hidden: document.getElementById('feedback-amber').classList.contains('hidden'),
+                    feedbackGreen: document.getElementById('feedback-green').innerHTML,
+                    feedbackGreen_hidden: document.getElementById('feedback-green').classList.contains('hidden'),
+                    
+                    spagRows: []
+                };
+
+                document.querySelectorAll('.practice-row').forEach(row => {
+                    const inputs = row.querySelectorAll('input');
+                    data.spagRows.push({
+                        w0: inputs[0].value,
+                        w1: inputs[1].value,
+                        w2: inputs[2].value,
+                        w3: inputs[3].value
+                    });
+                });
+
+                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
+                  .set(data, { merge: true })
+                  .catch(err => console.error("Cloud save error:", err));
+            }, immediate ? 50 : 600);
+        }
+
+        function applySavedData(data) {
+            if (!data) return;
+
+            document.getElementById('q1').value = data.q1 || '';
+            document.getElementById('q2').value = data.q2 || '';
+            document.getElementById('q3').value = data.q3 || '';
+            document.getElementById('q4').value = data.q4 || '';
+            document.getElementById('q5').value = data.q5 || '';
+
+            if (data.q1_class) document.getElementById('q1').className = data.q1_class;
+            if (data.q2_class) document.getElementById('q2').className = data.q2_class;
+            if (data.q3_class) document.getElementById('q3').className = data.q3_class;
+            if (data.q4_class) document.getElementById('q4').className = data.q4_class;
+            if (data.q5_class) document.getElementById('q5').className = data.q5_class;
+
+            if (data.q1_locked) {
+                for (let i = 1; i <= 5; i++) {
+                    lockSpellcheckTextarea(document.getElementById('q' + i));
+                    document.getElementById('override-q' + i).classList.remove('hidden');
+                }
+            }
+
+            if (data.buttons_hidden) {
+                document.getElementById('stage1-buttons').style.display = 'none';
+            }
+
+            if (data.actions_hidden === false) {
+                document.getElementById('action-buttons').classList.remove('hidden');
+            }
+
+            if (!data.spag_hidden) {
+                document.getElementById('spag-section').classList.remove('hidden');
+            }
+
+            if (data.task_red_status === 'correct') document.getElementById('task-red').classList.add('teacher-verified-correct');
+            if (data.task_red_status === 'incorrect') document.getElementById('task-red').classList.add('teacher-verified-incorrect');
+            
+            if (data.task_amber_status === 'correct') document.getElementById('task-amber').classList.add('teacher-verified-correct');
+            if (data.task_amber_status === 'incorrect') document.getElementById('task-amber').classList.add('teacher-verified-incorrect');
+            
+            if (data.task_green_status === 'correct') document.getElementById('task-green').classList.add('teacher-verified-correct');
+            if (data.task_green_status === 'incorrect') document.getElementById('task-green').classList.add('teacher-verified-incorrect');
+
+            document.getElementById('connect-red').value = data.connectRed || '';
+            if (data.connectRed_class) document.getElementById('connect-red').className = data.connectRed_class;
+            
+            document.getElementById('connect-amber').value = data.connectAmber || '';
+            if (data.connectAmber_class) document.getElementById('connect-amber').className = data.connectAmber_class;
+            
+            document.getElementById('connect-green').value = data.connectGreen || '';
+            if (data.connectGreen_class) document.getElementById('connect-green').className = data.connectGreen_class;
+
+            if (data.feedbackRed) document.getElementById('feedback-red').innerHTML = data.feedbackRed;
+            if (data.feedbackRed_hidden === false) document.getElementById('feedback-red').classList.remove('hidden');
+
+            if (data.feedbackAmber) document.getElementById('feedback-amber').innerHTML = data.feedbackAmber;
+            if (data.feedbackAmber_hidden === false) document.getElementById('feedback-amber').classList.remove('hidden');
+
+            if (data.feedbackGreen) document.getElementById('feedback-green').innerHTML = data.feedbackGreen;
+            if (data.feedbackGreen_hidden === false) document.getElementById('feedback-green').classList.remove('hidden');
+
+            const container = document.getElementById('practice-rows-container');
+            container.innerHTML = '';
+            if (data.spagRows && data.spagRows.length > 0) {
+                data.spagRows.forEach(row => {
+                    addPracticeRow(row.w0, row.w1, row.w2, row.w3, false);
+                });
+            } else {
+                addPracticeRow('', '', '', '', false);
+            }
+
+            if (data.q1_locked) {
+                recalculateScore();
+            }
+        }
+
+        auth.onAuthStateChanged(async function(user) {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection('users').doc(inspectedUid).collection('lessons').doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    const doc = await db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud work:", err);
+                }
+            }
+        });
+
+        // --- BULLETPROOF PDF GENERATION LOGIC ---
+        function downloadPDF() {
+            var buttonsToHide = document.querySelectorAll('.no-print');
+            for(var b = 0; b < buttonsToHide.length; b++) buttonsToHide[b].style.display = 'none';
+            document.getElementById('action-buttons').style.display = 'none';
+
+            var textInputs = document.querySelectorAll('input[type="text"]');
+            for (var i = 0; i < textInputs.length; i++) {
+                textInputs[i].setAttribute('value', textInputs[i].value);
+            }
+
+            var textAreas = document.querySelectorAll('textarea');
+            for (var j = 0; j < textAreas.length; j++) {
+                textAreas[j].innerHTML = textAreas[j].value;
+                textAreas[j].style.height = textAreas[j].scrollHeight + "px"; 
+            }
+
+            var element = document.getElementById('pdf-content');
+
+            var opt = {
+                margin:       0.3,
+                filename:     'Y9_HT2_Cyber_Demonstrate_Connect.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            html2pdf().set(opt).from(element).save().then(function() {
+                for(var b = 0; b < buttonsToHide.length; b++) buttonsToHide[b].style.display = 'block';
+                document.getElementById('action-buttons').style.display = 'flex';
+                for (var k = 0; k < textAreas.length; k++) { textAreas[k].style.height = ""; }
+            });
+        }
+
+        async function clearData() {
+            if (confirm("Are you sure you want to clear all your work on this page?")) {
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).delete();
+                    } catch (err) {
+                        console.error("Error clearing cloud data:", err);
+                    }
+                }
+                window.location.reload();
+            }
+        }
+
+        window.onload = function() {
+            if (document.getElementById('practice-rows-container').children.length === 0) {
+                addPracticeRow('', '', '', '', false);
+            }
+
+            document.querySelectorAll('.persist-input').forEach(el => {
+                el.addEventListener('input', () => saveToCloud(false));
+            });
+
+            document.querySelectorAll('.spag-input').forEach(el => {
+                el.addEventListener('input', () => saveToCloud(false));
+            });
+        };
+    </script>
 </body>
 </html>
