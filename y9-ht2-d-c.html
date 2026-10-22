@@ -12,54 +12,324 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
-        .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
-        
-        .task-card { 
-            background: white; 
-            border-radius: 8px; 
-            padding: 25px; 
-            margin-bottom: 30px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+        .task-container {
+            max-width: 900px;
+            margin: 0 auto 40px auto;
+            padding: 20px;
+        }
+        .task-card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            border-top: 6px solid #1e3a8a;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
         }
         
-        .task-title { font-size: 20px; font-weight: bold; margin-bottom: 15px; color: #1B1464; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        /* RAG Task Colors */
+        .red-task { border-top-color: #d32f2f; }
+        .amber-task { border-top-color: #f57c00; }
+        .green-task { border-top-color: #388e3c; }
         
-        .instruction-box { background-color: #f8f9fa; padding: 15px; border-left: 4px solid #1B1464; margin-bottom: 20px; }
-        
-        .question-group { margin-bottom: 20px; }
-        .question-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #333; }
-        .question-group textarea { width: 100%; min-height: 80px; padding: 12px; border: 2px solid #ccc; border-radius: 4px; font-family: inherit; font-size: 14px; box-sizing: border-box; resize: vertical; }
-        .question-group textarea:focus { outline: none; border-color: #666; }
+        .task-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #1e3a8a;
+        }
+        .red-task .task-title { color: #d32f2f; }
+        .amber-task .task-title { color: #f57c00; }
+        .green-task .task-title { color: #388e3c; }
 
+        .instruction-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #dfaa2b;
+            padding: 15px;
+            margin-bottom: 25px;
+            color: #555;
+            font-style: italic;
+        }
+
+        .question-group {
+            margin-bottom: 20px;
+        }
+        .question-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .question-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 16px;
+            box-sizing: border-box;
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        /* Locked answer styling: keeps red spelling underlines visible while preventing edits */
+        textarea.spellcheck-locked {
+            background-color: #fafafa;
+            color: #333;
+            cursor: default;
+        }
+
+        /* Action Buttons */
+        .btn-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .btn-mark {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: #dfaa2b;
+            color: #1e3a8a;
+            transition: background-color 0.2s;
+        }
+        .btn-mark:hover { background-color: #c99722; }
+
+        /* Universal Action Buttons Area (Reset) */
+        .action-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 40px auto;
+        }
+        .btn-pdf {
+            background-color: #217346;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-pdf:hover { background-color: #124d2d; }
+
+        .btn-reset {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-reset:hover { background-color: #b71c1c; }
+
+        /* Spelling Practice Area */
+        .spag-practice-box {
+            background-color: #fff3e0;
+            border: 2px solid #f57c00;
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+        .practice-header {
+            font-weight: bold;
+            color: #e65100;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 40px;
+            gap: 10px;
+            text-align: center;
+        }
+        .practice-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 40px;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .practice-row input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.95em;
+            width: 100%;
+            box-sizing: border-box;
+            background: white;
+        }
+        .btn-remove-row {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            height: 38px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-remove-row:hover { background-color: #b71c1c; }
+
+        .btn-add-word {
+            background-color: #607d8b;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-add-word:hover { background-color: #455a64; }
+
+        /* Teacher Verification & Override Styles */
+        .teacher-verify-btn {
+            background-color: #607d8b;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .teacher-verify-btn:hover { background-color: #455a64; }
+
+        .teacher-override-btn {
+            background-color: #9e9e9e;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        .teacher-override-btn:hover { background-color: #757575; }
+
+        /* Teacher Feedback Display */
+        .teacher-feedback-display {
+            background-color: #f8f9fa;
+            border-left: 4px solid #607d8b;
+            padding: 12px 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+            color: #333;
+            font-size: 0.95em;
+        }
+        .teacher-verified-correct .teacher-feedback-display {
+            background-color: #fff;
+            border-left-color: #388e3c;
+        }
+        .teacher-verified-incorrect .teacher-feedback-display {
+            background-color: #fff;
+            border-left-color: #d32f2f;
+        }
+
+        /* CORRECT & INCORRECT DYNAMIC STATUS STYLING */
+        .teacher-verified-correct {
+            border-top-color: #388e3c !important;
+            background-color: #e8f5e9 !important;
+        }
+        .teacher-verified-correct .task-title { color: #388e3c !important; }
+        .teacher-verified-correct .instruction-box { border-left-color: #388e3c !important; }
+
+        .teacher-verified-incorrect {
+            border-top-color: #d32f2f !important;
+            background-color: #ffebee !important;
+        }
+        .teacher-verified-incorrect .task-title { color: #d32f2f !important; }
+        .teacher-verified-incorrect .instruction-box { border-left-color: #d32f2f !important; }
+
+        .verified-badge { font-size: 0.8em; margin-left: 10px; display: none; vertical-align: middle; }
+        .teacher-verified-correct .badge-correct { display: inline-block; color: #388e3c; }
+        .teacher-verified-incorrect .badge-incorrect { display: inline-block; color: #d32f2f; }
+
+        /* Secure Password Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 350px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-align: center;
+            border-top: 6px solid #1e3a8a;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        .modal-btn-row {
+            display: flex;
+            gap: 10px;
+        }
+        .modal-btn-confirm {
+            flex: 1;
+            background-color: #1e3a8a;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .modal-btn-cancel {
+            flex: 1;
+            background-color: #ccc;
+            color: #333;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .modal-error {
+            color: #d32f2f;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            display: none;
+        }
+
+        /* Marking Colors & Utility */
+        .correct { border-color: #388e3c !important; background-color: #e8f5e9 !important; }
+        .incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; }
         .hidden { display: none !important; }
-        
-        .btn-row { display: flex; gap: 15px; margin-top: 20px; }
-        .btn-spag { background-color: #f39c12; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; }
-        .btn-spag:hover { background-color: #d68910; }
-        .btn-mark { background-color: #27ae60; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; }
-        .btn-mark:hover { background-color: #219150; }
-        
-        /* Task Colors */
-        .red-task { border-top: 6px solid #e74c3c; }
-        .red-task .task-title { color: #e74c3c; border-bottom-color: #fadbd8; }
-        .red-task .instruction-box { border-left-color: #e74c3c; }
-        
-        .amber-task { border-top: 6px solid #f39c12; }
-        .amber-task .task-title { color: #f39c12; border-bottom-color: #fcf3cf; }
-        .amber-task .instruction-box { border-left-color: #f39c12; }
-        
-        .green-task { border-top: 6px solid #27ae60; }
-        .green-task .task-title { color: #27ae60; border-bottom-color: #d5f5e3; }
-        .green-task .instruction-box { border-left-color: #27ae60; }
 
-        #score-display { padding: 15px; margin-top: 20px; border-radius: 4px; font-weight: bold; text-align: center; font-size: 18px; }
-        .score-red { background-color: #fadbd8; color: #c0392b; border: 1px solid #e74c3c; }
-        .score-amber { background-color: #fcf3cf; color: #d68910; border: 1px solid #f1c40f; }
-        .score-green { background-color: #d5f5e3; color: #27ae60; border: 1px solid #2ecc71; }
-        
-        /* Auto Mark Feedback styling */
-        .feedback-correct { border-color: #27ae60 !important; background-color: #eafaf1; }
-        .feedback-incorrect { border-color: #e74c3c !important; background-color: #fdedec; }
+        #score-display {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+        }
     </style>
 </head>
 <body>
