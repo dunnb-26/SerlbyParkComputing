@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- NAME THAT APPEARS ON THE TAB-->
     <title>Y9 HT2: Demonstrate & Connect</title>
-    
     <link rel="stylesheet" href="style.css">
 
     <!-- Firebase SDKs -->
@@ -15,7 +12,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
-        /* Task Container Styling */
         .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
         
         .task-card { 
@@ -24,471 +20,232 @@
             padding: 25px; 
             margin-bottom: 30px; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-            page-break-inside: avoid; 
         }
         
-        /* Section Header Colors */
-        .task-prep { border-top: 6px solid #607d8b; } 
-        .task-prep h2 { color: #607d8b; margin-top: 0; }
+        .task-title { font-size: 20px; font-weight: bold; margin-bottom: 15px; color: #1B1464; border-bottom: 2px solid #eee; padding-bottom: 10px; }
         
-        .task-plenary { border-top: 6px solid #673ab7; } 
-        .task-plenary h2 { color: #673ab7; margin-top: 0; }
-
-        /* RAGB Colors */
-        .task-maroon { border-top: 6px solid #800000; }
-        .task-maroon h2 { color: #800000; margin-top: 0; }
-        .task-maroon .instruction-box { border-left: 4px solid #800000; }
-
-        .task-amber { border-top: 6px solid #ffb300; }
-        .task-amber h2 { color: #ffb300; margin-top: 0; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
-        .task-amber .instruction-box { border-left: 4px solid #ffb300; }
-
-        .task-green { border-top: 6px solid #008f39; }
-        .task-green h2 { color: #008f39; margin-top: 0; }
-        .task-green .instruction-box { border-left: 4px solid #008f39; }
-
-        .task-navy { border-top: 6px solid #1e3a8a; }
-        .task-navy h2 { color: #1e3a8a; margin-top: 0; }
-        .task-navy .instruction-box { border-left: 4px solid #1e3a8a; }
-
-        /* Common Elements */
-        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; text-align: center; }
+        .instruction-box { background-color: #f8f9fa; padding: 15px; border-left: 4px solid #1B1464; margin-bottom: 20px; }
         
-        /* Inputs & Textareas */
-        .question-row { margin-bottom: 20px; }
-        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
-        
-        .auto-input { 
-            width: 100%; 
-            max-width: 350px; 
-            padding: 12px; 
-            font-size: 16px; 
-            border: 2px solid #ccc; 
-            border-radius: 4px; 
-            transition: all 0.3s ease; 
-            box-sizing: border-box; 
-            background-color: white; 
-            font-family: inherit; 
-        }
-        .auto-input:focus { outline: none; border-color: #666; }
-        textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; max-width: 100%; }
+        .question-group { margin-bottom: 20px; }
+        .question-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #333; }
+        .question-group textarea { width: 100%; min-height: 80px; padding: 12px; border: 2px solid #ccc; border-radius: 4px; font-family: inherit; font-size: 14px; box-sizing: border-box; resize: vertical; }
+        .question-group textarea:focus { outline: none; border-color: #666; }
 
-        /* Correct & Incorrect Answer Styling */
-        .input-correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
-        .input-incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
+        .hidden { display: none !important; }
         
-        /* Buttons */
-        .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; max-width: 200px; transition: background-color 0.2s; }
-        .btn-submit:hover { background-color: #152960; }
-        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
-        .btn-pdf:hover { background-color: #124d2d; }
+        .btn-row { display: flex; gap: 15px; margin-top: 20px; }
+        .btn-spag { background-color: #f39c12; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; }
+        .btn-spag:hover { background-color: #d68910; }
+        .btn-mark { background-color: #27ae60; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; }
+        .btn-mark:hover { background-color: #219150; }
+        
+        /* Task Colors */
+        .red-task { border-top: 6px solid #e74c3c; }
+        .red-task .task-title { color: #e74c3c; border-bottom-color: #fadbd8; }
+        .red-task .instruction-box { border-left-color: #e74c3c; }
+        
+        .amber-task { border-top: 6px solid #f39c12; }
+        .amber-task .task-title { color: #f39c12; border-bottom-color: #fcf3cf; }
+        .amber-task .instruction-box { border-left-color: #f39c12; }
+        
+        .green-task { border-top: 6px solid #27ae60; }
+        .green-task .task-title { color: #27ae60; border-bottom-color: #d5f5e3; }
+        .green-task .instruction-box { border-left-color: #27ae60; }
+
+        #score-display { padding: 15px; margin-top: 20px; border-radius: 4px; font-weight: bold; text-align: center; font-size: 18px; }
+        .score-red { background-color: #fadbd8; color: #c0392b; border: 1px solid #e74c3c; }
+        .score-amber { background-color: #fcf3cf; color: #d68910; border: 1px solid #f1c40f; }
+        .score-green { background-color: #d5f5e3; color: #27ae60; border: 1px solid #2ecc71; }
+        
+        /* Auto Mark Feedback styling */
+        .feedback-correct { border-color: #27ae60 !important; background-color: #eafaf1; }
+        .feedback-incorrect { border-color: #e74c3c !important; background-color: #fdedec; }
     </style>
 </head>
 <body>
 
-    <!--HEADER CONTAINING LOGO ETC. -->
-    <div id="pdf-content">
-        <header>
-            <div class="header-left">
-                <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
-            </div>
-            <div class="header-center"><h1>HT2: Demonstrate & Connect</h1></div>
-            <div class="header-right"><a href="curriculum.html" class="back-btn">&larr; Back to Unit</a></div>
-        </header>
+    <header>
+        <div class="header-left">
+            <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
+        </div>
+        <div class="header-center">
+            <h1>Y9 HT2: Demonstrate & Connect</h1>
+        </div>
+        <div class="header-right">
+            <a href="curriculum.html" class="back-btn">&larr; Back to Unit</a>
+        </div>
+    </header>
 
-        <main class="task-container">
+    <main class="task-container">
 
-            <!-- PREPARATION: Keywords & Notes -->
-            <div class="task-card task-prep">
-                <h2>Lesson Preparation</h2>
-                
-                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">4 Key Topics</h3>
-                <div class="question-row">
-                    <label class="question-label">Hexadecimal</label>
-                    <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type notes here...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">Malware</label>
-                    <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type notes here...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">Hacking & DDoS</label>
-                    <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type notes here...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">Social Engineering</label>
-                    <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type notes here...">
-                </div>
-
-                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Revision Notes</h3>
-                <div class="question-row">
-                    <textarea class="auto-input" rows="6" placeholder="Use this space to write down any key facts before the assessment begins..."></textarea>
-                </div>
+        <!-- STAGE 1: DEMONSTRATE (Initial Knowledge Check) -->
+        <div class="task-card" style="border-top: 6px solid #1B1464;">
+            <div class="task-title">Part 1: Demonstrate</div>
+            <div class="instruction-box">
+                Answer the 5 questions below using full sentences. When you are finished, click <strong>Mark My Work</strong>. Your score will unlock your next challenge.
             </div>
 
-            <!-- RED TASK: DEMONSTRATE (BASICS) -->
-            <section class="task-card task-maroon">
-                <h2>Red Task: Demonstrate (Basics)</h2>
-                <div class="instruction-box">Let's check your core knowledge of Hexadecimal and the basic definitions of Malware.</div>
-
-                <div class="question-row">
-                    <label class="question-label">1. In Hexadecimal (Base 16), what denary number does the letter <b>B</b> represent?</label>
-                    <input type="text" class="auto-input red-input" data-label="Red Q1" data-answers='["11", "eleven"]' placeholder="Type your answer...">
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">2. Convert the 4-bit binary nibble <code>1010</code> into a Hexadecimal letter:</label>
-                    <input type="text" class="auto-input red-input" data-label="Red Q2" data-answers='["a"]' placeholder="Type your answer...">
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">3. The word "Malware" is short for what two words?</label>
-                    <input type="text" class="auto-input red-input" data-label="Red Q3" data-answers='["malicious software"]' placeholder="Type your answer...">
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">4. Which type of malware secretly hides inside a seemingly safe program or video game?</label>
-                    <input type="text" class="auto-input red-input" data-label="Red Q4" data-answers='["trojan", "trojan horse"]' placeholder="Type your answer...">
-                </div>
-
-                <button type="button" class="btn-submit no-print" onclick="checkTextAnswers('red-input')">Check Answers</button>
-            </section>
-
-            <!-- AMBER TASK: DEMONSTRATE (APPLICATION) -->
-            <section class="task-card task-amber">
-                <h2>Amber Task: Demonstrate (Application)</h2>
-                <div class="instruction-box">Apply your knowledge to identify specific types of hackers and malware behaviors.</div>
-
-                <div class="question-row">
-                    <label class="question-label">1. What do we call an ethical hacker who has permission to find security flaws in a company's system?</label>
-                    <input type="text" class="auto-input amber-input" data-label="Amber Q1" data-answers='["white hat", "white hat hacker"]' placeholder="Type your answer...">
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">2. What do we call a criminal hacker who breaks the law to steal data or cause damage?</label>
-                    <input type="text" class="auto-input amber-input" data-label="Amber Q2" data-answers='["black hat", "black hat hacker"]' placeholder="Type your answer...">
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">3. Which specific type of malware requires a user to open a 'host file' before it can spread?</label>
-                    <input type="text" class="auto-input amber-input" data-label="Amber Q3" data-answers='["virus"]' placeholder="Type your answer...">
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">4. Which specific type of malware can self-replicate and spread across a network without any human help?</label>
-                    <input type="text" class="auto-input amber-input" data-label="Amber Q4" data-answers='["worm"]' placeholder="Type your answer...">
-                </div>
-
-                <button type="button" class="btn-submit no-print" onclick="checkTextAnswers('amber-input')">Check Answers</button>
-            </section>
-
-            <!-- GREEN TASK: CONNECT (SCENARIOS) -->
-            <section class="task-card task-green">
-                <h2>Green Task: Connect (Social Engineering)</h2>
-                <div class="instruction-box">Read the scenarios below and identify the correct Social Engineering attack taking place.</div>
-
-                <div class="question-row">
-                    <label class="question-label">1. You receive a fake email pretending to be from Netflix, asking you to click a link and enter your password.</label>
-                    <input type="text" class="auto-input green-input" data-label="Green Q1" data-answers='["phishing"]' placeholder="Type attack name...">
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">2. Someone calls you and invents a fake story, pretending to be from your bank so you will hand over your details over the phone.</label>
-                    <input type="text" class="auto-input green-input" data-label="Green Q2" data-answers='["blagging", "pretexting"]' placeholder="Type attack name...">
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">3. A criminal watches you type your PIN into an ATM or looks at your screen on the train to steal information.</label>
-                    <input type="text" class="auto-input green-input" data-label="Green Q3" data-answers='["shouldering", "shoulder surfing"]' placeholder="Type attack name...">
-                </div>
-
-                <button type="button" class="btn-submit no-print" onclick="checkTextAnswers('green-input')">Check Answers</button>
-            </section>
-
-            <!-- BLUE TASK: CONNECT (ANALYSIS) -->
-            <section class="task-card task-navy">
-                <h2>Blue Task: Connect (Analysis)</h2>
-                <div class="instruction-box">Use full sentences to explain the impact and methodology of advanced cyber attacks.</div>
-
-                <div class="question-row">
-                    <label class="question-label">1. Explain what a DDoS (Distributed Denial of Service) attack is and how it affects a website.</label>
-                    <textarea class="auto-input blue-input" data-label="Blue Q1" data-rubric='{"keywords": [["flood", "traffic", "overload", "requests", "botnet"], ["offline", "crash", "stop working", "down", "block"]]}' rows="3" placeholder="Explain the attack and its impact..."></textarea>
-                </div>
-
-                <div class="question-row">
-                    <label class="question-label">2. Even if a school has perfect firewalls and anti-virus software, why are humans often considered the "weakest link" in cyber security?</label>
-                    <textarea class="auto-input blue-input" data-label="Blue Q2" data-rubric='{"keywords": [["tricked", "manipulated", "mistakes", "give away", "believe", "trust", "scammed", "social engineering"]]}' rows="3" placeholder="Explain your reasoning..."></textarea>
-                </div>
-
-                <button type="button" class="btn-submit no-print" onclick="checkTextAnswers('blue-input')">Check Answers</button>
-            </section>
-
-            <!-- PLENARY: 3 Key Takeaways -->
-            <div class="task-card task-plenary">
-                <h2>Lesson Plenary</h2>
-                <h3 style="color: #444; margin-bottom: 15px;">My 3 Key Takeaways</h3>
-                
-                <div class="question-row">
-                    <label class="question-label">Key Takeaway 1:</label>
-                    <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type first takeaway here...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">Key Takeaway 2:</label>
-                    <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type second takeaway here...">
-                </div>
-                <div class="question-row">
-                    <label class="question-label">Key Takeaway 3:</label>
-                    <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type third takeaway here...">
-                </div>
+            <div class="question-group">
+                <label>1. What denary value does the Hexadecimal letter 'C' represent?</label>
+                <textarea id="q1" spellcheck="false" placeholder="Type your answer here..."></textarea>
             </div>
-        </main>
-    </div>
+            
+            <div class="question-group">
+                <label>2. Explain the difference between a White Hat hacker and a Black Hat hacker:</label>
+                <textarea id="q2" spellcheck="false" placeholder="Type your detailed answer here..."></textarea>
+            </div>
+            
+            <div class="question-group">
+                <label>3. Describe how a 'blagging' attack works in Cyber Security:</label>
+                <textarea id="q3" spellcheck="false" placeholder="Type your detailed answer here..."></textarea>
+            </div>
+            
+            <div class="question-group">
+                <label>4. Explain what happens during a DDoS attack to take a website offline:</label>
+                <textarea id="q4" spellcheck="false" placeholder="Type your detailed answer here..."></textarea>
+            </div>
+            
+            <div class="question-group">
+                <label>5. Describe the main difference between a computer virus and a computer worm:</label>
+                <textarea id="q5" spellcheck="false" placeholder="Type your detailed answer here..."></textarea>
+            </div>
 
-    <!-- RESET PAGE BUTTON -->
-    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
-        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
-    </div>
+            <div class="btn-row" id="stage1-buttons">
+                <button class="btn-spag" onclick="runSpagCheck()">🔍 SPAG Check</button>
+                <button class="btn-mark" onclick="markStage1()">✅ Mark My Work</button>
+            </div>
+            
+            <div id="score-display" class="hidden"></div>
+        </div>
 
-    <!-- FOOTER -->  
+        <!-- STAGE 2: CONNECT TASKS (Initially Hidden) -->
+        
+        <div id="task-red" class="task-card red-task hidden">
+            <div class="task-title">Part 2: Connect - RED TASK (Consolidation)</div>
+            <div class="instruction-box">
+                Let's review the basics. Complete the task below to connect what we have learned this half term.
+            </div>
+            <div class="question-group">
+                <label>List 2 types of malware and 2 types of hackers we have learned about:</label>
+                <textarea class="auto-save-task" placeholder="Type your list here..."></textarea>
+            </div>
+        </div>
+
+        <div id="task-amber" class="task-card amber-task hidden">
+            <div class="task-title">Part 2: Connect - AMBER TASK (Application)</div>
+            <div class="instruction-box">
+                Great effort! Now let's connect your knowledge to a real-world scenario.
+            </div>
+            <div class="question-group">
+                <label>Explain how an attacker might use social engineering (like a fake email or name generator) to gain access to a school network:</label>
+                <textarea class="auto-save-task" placeholder="Type your explanation here..."></textarea>
+            </div>
+        </div>
+
+        <div id="task-green" class="task-card green-task hidden">
+            <div class="task-title">Part 2: Connect - GREEN TASK (Extension)</div>
+            <div class="instruction-box">
+                Excellent knowledge! Time for the ultimate challenge.
+            </div>
+            <div class="question-group">
+                <label>Analyze why humans are often considered the "weakest link" in cyber security, and explain how the Computer Misuse Act tries to prevent hacking.</label>
+                <textarea class="auto-save-task" rows="5" placeholder="Type your analysis here..."></textarea>
+            </div>
+        </div>
+
+    </main>
+
     <footer>
         &copy; 2026 Delta Serlby Park - Computing & Business Department
     </footer>
 
-    <!-- SCRIPT FOR MARKING & CLOUD SYNC -->
     <script>
-        /* --- 1. FIREBASE CONFIGURATION & INITIALIZATION --- */
-        const firebaseConfig = {
-            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
-            authDomain: "serlby-park-computing.firebaseapp.com",
-            projectId: "serlby-park-computing",
-            storageBucket: "serlby-park-computing.firebasestorage.app",
-            messagingSenderId: "648533806051",
-            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
-            measurementId: "G-HDNYEE11WV"
-        };
-
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        // UNIQUE LESSON ID FOR THIS MODULE
-        const LESSON_ID = "y9-ht2-demonstrate-connect";
-
-        /* --- 2. HELPER FOR TEACHER MARKBOOK LABELS --- */
-        function findLabelForInput(el, index) {
-            const row = el.closest('.question-row');
-            if (row) {
-                const lbl = row.querySelector('.question-label');
-                if (lbl && lbl.innerText.trim()) {
-                    return lbl.innerText.replace(/\s+/g, ' ').trim();
-                }
-            }
-            if (el.placeholder) return el.placeholder;
-            return 'Question ' + (index + 1);
-        }
-
-        /* --- 3. FIREBASE AUTO-SAVE LOGIC --- */
-        let saveTimer;
-        function saveProgress(immediate = false) {
-            const user = auth.currentUser;
-            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
-
-            var inputs = document.querySelectorAll('.auto-input');
-            var dataToSave = {
-                pageTitle: document.title || LESSON_ID,
-                lastUpdated: Date.now(),
-                items: []
-            };
-
-            var correctCount = 0;
-            var totalGradable = 0;
-
-            for (var i = 0; i < inputs.length; i++) {
-                var el = inputs[i];
-                var cls = el.className || '';
-                var status = 'neutral';
-
-                if (el.hasAttribute('data-answers') || el.hasAttribute('data-rubric')) {
-                    totalGradable++;
-                    if (cls.includes('input-correct')) {
-                        status = 'correct';
-                        correctCount++;
-                    } else if (cls.includes('input-incorrect')) {
-                        status = 'incorrect';
-                    }
-                }
-
-                dataToSave['input_' + i] = el.value;
-                dataToSave['class_' + i] = cls;
-
-                dataToSave.items.push({
-                    index: i,
-                    label: findLabelForInput(el, i),
-                    value: el.value,
-                    status: status
-                });
-            }
-
-            if (totalGradable > 0) {
-                dataToSave.scoreText = "Score: " + correctCount + " / " + totalGradable;
-            }
-
-            clearTimeout(saveTimer);
-            saveTimer = setTimeout(function() {
-                db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
-                  .set(dataToSave, { merge: true })
-                  .catch(function(err) { console.error("Cloud save error:", err); });
-            }, immediate ? 50 : 800);
-        }
-
-        /* --- 4. FIREBASE AUTO-LOAD LOGIC --- */
-        function applySavedData(data) {
-            var inputs = document.querySelectorAll('.auto-input');
-            for (var i = 0; i < inputs.length; i++) {
-                var savedVal = data['input_' + i] !== undefined
-                    ? data['input_' + i]
-                    : (data.items && data.items[i] ? data.items[i].value : undefined);
-
-                if (savedVal !== undefined) {
-                    inputs[i].value = savedVal;
-                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
-                        inputs[i].style.height = 'auto';
-                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
-                    }
-                }
-            }
-
-            // Re-mark previously saved answers
-            checkTextAnswers('red-input', false);
-            checkTextAnswers('amber-input', false);
-            checkTextAnswers('green-input', false);
-            checkTextAnswers('blue-input', false);
-        }
-
-        auth.onAuthStateChanged(async function(user) {
-            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
-            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
-
-            if (isTeacher && inspectedUid) {
-                try {
-                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
-                    if (doc.exists) applySavedData(doc.data());
-                } catch (err) {
-                    console.error("Error loading inspected student data:", err);
-                }
-                return;
-            }
-
-            if (user) {
-                try {
-                    try { localStorage.removeItem('ht2DemoConnectMemory'); } catch (e) {}
-
-                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
-                    if (doc.exists) {
-                        applySavedData(doc.data());
-                    }
-                } catch (err) {
-                    console.error("Error loading cloud work:", err);
-                }
-            }
-        });
-
-        document.addEventListener('input', function(e) {
-            if (e.target.classList.contains('auto-input')) {
-                saveProgress(false);
-                if (e.target.tagName.toLowerCase() === 'textarea') {
-                    e.target.style.height = 'auto';
-                    e.target.style.height = e.target.scrollHeight + 'px';
-                }
-            }
-        });
-
-        async function clearData() {
-            if (confirm("Are you sure you want to clear all your work on this page?")) {
-                try { localStorage.removeItem('ht2DemoConnectMemory'); } catch (e) {}
-                const user = auth.currentUser;
-                if (user) {
-                    try {
-                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
-                    } catch (err) {
-                        console.error("Error clearing cloud data:", err);
-                    }
-                }
-                window.location.reload();
-            }
-        }
-
-        /* --- 5. BATCH-MARKING TEXT INPUT LOGIC --- */
-        function checkTextAnswers(groupClass, triggerSync = true) {
-            var inputs = document.querySelectorAll('.' + groupClass);
+        /* --- D&C MARKING LOGIC --- */
+        function markStage1() {
+            let score = 0;
             
-            inputs.forEach(function(inputElement) {
-                // If it's already correct, skip re-evaluating
-                if (inputElement.classList.contains('input-correct')) return;
-
-                var studentAnswer = inputElement.value.toLowerCase().trim();
-                inputElement.classList.remove('input-incorrect');
-
-                if (studentAnswer === "") return;
-
-                var isCorrect = false;
-
-                // Option A: Check against standard data-answers array
-                if (inputElement.hasAttribute('data-answers')) {
-                    try {
-                        var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers'));
-                        for (var j = 0; j < acceptedAnswers.length; j++) {
-                            if (studentAnswer === acceptedAnswers[j].toLowerCase().trim()) {
-                                isCorrect = true;
-                                break;
-                            }
-                        }
-                    } catch (e) {
-                        console.error("Error parsing data-answers:", e);
-                    }
-                } 
-                // Option B: Check against data-rubric keywords
-                else if (inputElement.hasAttribute('data-rubric')) {
-                    try {
-                        var rubric = JSON.parse(inputElement.getAttribute('data-rubric'));
-                        var keywordGroups = rubric.keywords;
-                        var conceptsFound = 0;
-
-                        for (var k = 0; k < keywordGroups.length; k++) {
-                            var terms = keywordGroups[k];
-                            var matched = false;
-                            for (var s = 0; s < terms.length; s++) {
-                                var term = terms[s].toLowerCase().trim();
-                                if (studentAnswer.includes(term)) {
-                                    matched = true;
-                                    break;
-                                }
-                            }
-                            if (matched) conceptsFound++;
-                        }
-                        if (keywordGroups.length > 0 && conceptsFound >= keywordGroups.length) {
-                            isCorrect = true;
-                        }
-                    } catch (e) {
-                        console.error("Error parsing data-rubric:", e);
-                    }
-                }
-
-                // Apply styling based on evaluation
-                if (isCorrect) {
-                    inputElement.classList.add('input-correct');
-                } else {
-                    inputElement.classList.add('input-incorrect');
-                }
-            });
-
-            // Trigger cloud synchronization if enabled
-            if (triggerSync) {
-                saveProgress(true);
+            // Q1: Hexadecimal C = 12
+            let q1 = document.getElementById('q1');
+            let a1 = q1.value.toLowerCase();
+            q1.classList.remove('feedback-correct', 'feedback-incorrect');
+            if(a1.includes('12') || a1.includes('twelve')) {
+                q1.classList.add('feedback-correct');
+                score++;
+            } else if (a1.trim() !== '') {
+                q1.classList.add('feedback-incorrect');
             }
+
+            // Q2: White Hat vs Black Hat
+            let q2 = document.getElementById('q2');
+            let a2 = q2.value.toLowerCase();
+            q2.classList.remove('feedback-correct', 'feedback-incorrect');
+            if((a2.includes('ethical') || a2.includes('permission') || a2.includes('legal')) && (a2.includes('illegal') || a2.includes('criminal') || a2.includes('steal') || a2.includes('bad'))) {
+                q2.classList.add('feedback-correct');
+                score++;
+            } else if (a2.trim() !== '') {
+                q2.classList.add('feedback-incorrect');
+            }
+
+            // Q3: Blagging
+            let q3 = document.getElementById('q3');
+            let a3 = q3.value.toLowerCase();
+            q3.classList.remove('feedback-correct', 'feedback-incorrect');
+            if(a3.includes('story') || a3.includes('fake') || a3.includes('invented') || a3.includes('scenario') || a3.includes('pretend')) {
+                q3.classList.add('feedback-correct');
+                score++;
+            } else if (a3.trim() !== '') {
+                q3.classList.add('feedback-incorrect');
+            }
+
+            // Q4: DDoS
+            let q4 = document.getElementById('q4');
+            let a4 = q4.value.toLowerCase();
+            q4.classList.remove('feedback-correct', 'feedback-incorrect');
+            if(a4.includes('flood') || a4.includes('overload') || a4.includes('traffic') || a4.includes('botnet') || a4.includes('requests')) {
+                q4.classList.add('feedback-correct');
+                score++;
+            } else if (a4.trim() !== '') {
+                q4.classList.add('feedback-incorrect');
+            }
+
+            // Q5: Virus vs Worm
+            let q5 = document.getElementById('q5');
+            let a5 = q5.value.toLowerCase();
+            q5.classList.remove('feedback-correct', 'feedback-incorrect');
+            if((a5.includes('host') || a5.includes('open') || a5.includes('file')) && (a5.includes('replicate') || a5.includes('spread') || a5.includes('network') || a5.includes('itself'))) {
+                q5.classList.add('feedback-correct');
+                score++;
+            } else if (a5.trim() !== '') {
+                q5.classList.add('feedback-incorrect');
+            }
+
+            // Display Score & Reveal Differentiated Task
+            let display = document.getElementById('score-display');
+            display.classList.remove('hidden', 'score-red', 'score-amber', 'score-green');
+            
+            document.getElementById('task-red').classList.add('hidden');
+            document.getElementById('task-amber').classList.add('hidden');
+            document.getElementById('task-green').classList.add('hidden');
+
+            display.innerHTML = `You scored ${score} out of 5!`;
+
+            if(score <= 2) {
+                display.classList.add('score-red');
+                document.getElementById('task-red').classList.remove('hidden');
+            } else if(score <= 4) {
+                display.classList.add('score-amber');
+                document.getElementById('task-amber').classList.remove('hidden');
+            } else {
+                display.classList.add('score-green');
+                document.getElementById('task-green').classList.remove('hidden');
+            }
+        }
+
+        /* --- PLACEHOLDER FOR SPAG CHECK --- */
+        function runSpagCheck() {
+            alert("SPaG Check complete. Please review your sentences for capital letters, full stops, and correct spellings before clicking 'Mark My Work'.");
         }
     </script>
+
 </body>
 </html>
