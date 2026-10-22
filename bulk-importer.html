@@ -2,16 +2,110 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Firebase Student Importer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Account Importer</title>
+    <link rel="stylesheet" href="style.css">
+    
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f6f8; padding: 40px; }
-        .card { background: white; max-width: 600px; margin: 0 auto 30px auto; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-top: 6px solid #1e3a8a; }
-        input[type="file"], input[type="text"], input[type="password"] { width: 100%; padding: 10px; margin: 10px 0 20px 0; display: block; font-size: 16px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        button { background: #dfaa2b; color: #1e3a8a; border: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; width: 100%; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #f4f6f8; 
+            margin: 0;
+            padding: 0;
+            color: #333; 
+        }
+
+        /* Standard Header Override */
+        header { 
+            background-color: #1B1464; 
+            color: white; 
+            padding: 20px; 
+            display: grid; 
+            grid-template-columns: 1fr auto 1fr; 
+            align-items: center; 
+            border-bottom: 6px solid #822433; 
+        }
+        .header-left { display: flex; justify-content: flex-start; }
+        .header-center { text-align: center; }
+        .header-right { display: flex; justify-content: flex-end; align-items: center; }
+        header img { height: 80px; max-width: 100%; background-color: white; border-radius: 8px; padding: 5px; }
+        header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; color: white; }
+        .back-btn { 
+            background-color: #F7931D; 
+            color: #1B1464; 
+            text-decoration: none; 
+            padding: 10px 20px; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            transition: transform 0.2s; 
+            white-space: nowrap; 
+        }
+        .back-btn:hover { transform: scale(1.03); }
+
+        /* Main Container Card */
+        .card { 
+            background: white; 
+            max-width: 700px; 
+            margin: 40px auto; 
+            padding: 35px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08); 
+            border-top: 6px solid #1e3a8a; 
+            box-sizing: border-box;
+        }
+
+        input[type="file"], input[type="text"], input[type="password"], select { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 10px 0 20px 0; 
+            display: block; 
+            font-size: 16px; 
+            box-sizing: border-box; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+            font-weight: bold; 
+            background: white; 
+            font-family: inherit;
+        }
+
+        button { 
+            background: #dfaa2b; 
+            color: #1e3a8a; 
+            border: none; 
+            padding: 14px 25px; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: 16px; 
+            width: 100%; 
+            transition: background 0.2s;
+        }
         button:hover { background: #c99722; }
-        .divider { margin: 30px 0; border: 0; border-top: 1px solid #eee; }
-        #log { background: #000; color: #4af626; padding: 15px; border-radius: 4px; height: 250px; overflow-y: auto; font-family: monospace; margin-top: 20px; font-size: 13px; }
+
+        .divider { margin: 35px 0; border: 0; border-top: 1px solid #eee; }
+        
+        #log { 
+            background: #000; 
+            color: #4af626; 
+            padding: 15px; 
+            border-radius: 6px; 
+            height: 250px; 
+            overflow-y: auto; 
+            font-family: monospace; 
+            margin-top: 20px; 
+            font-size: 13px; 
+        }
+
         label { font-weight: bold; font-size: 14px; color: #333; }
+
+        footer { 
+            text-align: center; 
+            padding: 25px; 
+            color: #666; 
+            margin-top: 50px; 
+            border-top: 1px solid #ddd; 
+            background-color: white; 
+        }
     </style>
 
     <!-- Firebase SDKs -->
@@ -20,11 +114,27 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <a href="index.html"><img src="logo.jpg" alt="Logo"></a>
+        </div>
+        <div class="header-center">
+            <h1>Student Account Importer</h1>
+        </div>
+        <div class="header-right">
+            <a href="javascript:history.back()" class="back-btn">&larr; Back to Dashboard</a>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
     <div class="card">
-        <h2 style="color: #1e3a8a; margin-top:0;">Student Account Importer</h2>
+        <h2 style="color: #1e3a8a; margin-top:0;">Register Student Accounts</h2>
         
         <!-- SINGLE STUDENT IMPORT SECTION -->
         <h3 style="color: #1e3a8a; margin-bottom: 5px;">Add Single Student</h3>
+        
         <label for="singleUsername">Username (e.g. jsmith)</label>
         <input type="text" id="singleUsername" placeholder="Enter username...">
 
@@ -32,7 +142,34 @@
         <input type="text" id="singleFullName" placeholder="Enter full name...">
 
         <label for="singleClass">Class Name</label>
-        <input type="text" id="singleClass" placeholder="Enter class name...">
+        <select id="singleClass">
+            <option value="" disabled selected>Select a class...</option>
+            <optgroup label="Year 7">
+                <option value="7x1">7x1</option>
+                <option value="7x2">7x2</option>
+                <option value="7y1">7y1</option>
+                <option value="7y2">7y2</option>
+            </optgroup>
+            <optgroup label="Year 8">
+                <option value="8x1">8x1</option>
+                <option value="8x2">8x2</option>
+                <option value="8y1">8y1</option>
+                <option value="8y2">8y2</option>
+            </optgroup>
+            <optgroup label="Year 9">
+                <option value="9x1">9x1</option>
+                <option value="9x2">9x2</option>
+                <option value="9y1">9y1</option>
+                <option value="9y2">9y2</option>
+            </optgroup>
+            <optgroup label="GCSE Options">
+                <option value="10aEnt1">10aEnt1 (Enterprise)</option>
+                <option value="11aEnt1">11aEnt1 (Enterprise)</option>
+                <option value="10bCim1">10bCim1 (iMedia)</option>
+                <option value="11bCim1">11bCim1 (iMedia)</option>
+            </optgroup>
+            <option value="Unassigned">Unassigned</option>
+        </select>
 
         <label for="singlePassword">Password / PIN</label>
         <input type="password" id="singlePassword" placeholder="Enter password...">
@@ -52,6 +189,11 @@
         <div id="log">Awaiting action...</div>
     </div>
 
+    <!-- FOOTER -->
+    <footer>
+        &copy; 2026 Delta Serlby Park - Computing & Business Department
+    </footer>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
@@ -63,7 +205,6 @@
             measurementId: "G-HDNYEE11WV"
         };
 
-        // Initialize Firebase if not already initialized
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
@@ -80,11 +221,11 @@
         async function addSingleStudent() {
             const username = document.getElementById('singleUsername').value.trim().toLowerCase();
             const fullName = document.getElementById('singleFullName').value.trim();
-            const className = document.getElementById('singleClass').value.trim();
+            const className = document.getElementById('singleClass').value;
             const password = document.getElementById('singlePassword').value.trim();
 
             if (!username || !fullName || !className || !password) {
-                alert("Please fill in all fields for the single student import.");
+                alert("Please fill in all fields (including selecting a class) for the single student import.");
                 return;
             }
 
@@ -93,11 +234,9 @@
             try {
                 logMessage(`Attempting to register single student: ${fullName}...`);
                 
-                // 1. Create user in Firebase Auth
                 let userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 let uid = userCredential.user.uid;
 
-                // 2. Save profile in Firestore users collection
                 await db.collection('users').doc(uid).set({
                     username: username,
                     fullName: fullName,
@@ -107,10 +246,9 @@
 
                 logMessage(`✅ Successfully registered single student: ${fullName} (${className})`);
                 
-                // Clear form fields after success
                 document.getElementById('singleUsername').value = '';
                 document.getElementById('singleFullName').value = '';
-                document.getElementById('singleClass').value = '';
+                document.getElementById('singleClass').selectedIndex = 0;
                 document.getElementById('singlePassword').value = '';
 
             } catch (err) {
@@ -135,7 +273,6 @@
                 
                 logMessage(`Found ${rows.length - 1} rows in CSV. Starting bulk import...`);
 
-                // Loop through CSV rows (skipping header row 0)
                 for (let i = 1; i < rows.length; i++) {
                     let row = rows[i].trim();
                     if (!row) continue;
@@ -150,11 +287,9 @@
                     let email = username + "@deltaschool.local";
 
                     try {
-                        // 1. Create user in Firebase Auth
                         let userCredential = await auth.createUserWithEmailAndPassword(email, pin);
                         let uid = userCredential.user.uid;
 
-                        // 2. Save profile in Firestore users collection
                         await db.collection('users').doc(uid).set({
                             username: username,
                             fullName: fullName,
