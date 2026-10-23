@@ -86,7 +86,7 @@
         let allStudents = [];
         let loggedInUserClass = null;
 
-        // 1. Check who is logged in first
+        // 1. Check who is logged in
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 try {
@@ -94,15 +94,15 @@
                     if (userDoc.exists) {
                         const userData = userDoc.data();
                         
-                        // If they have a class assigned, we treat them as a student
+                        // If they have a class assigned, treat as student
                         if (userData.className && userData.className !== "Unassigned") {
                             loggedInUserClass = userData.className;
                             
-                            // Hide the dropdown menu and teacher button
+                            // Hide dropdown and teacher button
                             document.getElementById('class-filter').style.display = 'none';
                             document.getElementById('back-btn').style.display = 'none';
                             
-                            // Personalize the title
+                            // Personalize title
                             document.getElementById('board-title').innerText = `🏆 ${loggedInUserClass} Leaderboard`;
                         }
                     }
@@ -110,7 +110,6 @@
                     console.error("Auth check error:", e);
                 }
             }
-            // Once we know who they are, load the scores
             fetchStudents();
         });
 
@@ -129,7 +128,6 @@
                     });
                 });
                 
-                // If a student is logged in, auto-select their class
                 if (loggedInUserClass) {
                     document.getElementById('class-filter').value = loggedInUserClass;
                     renderLeaderboard();
@@ -144,7 +142,7 @@
             }
         }
 
-        // 3. Calculate scores
+        // 3. Calculate scores and split subjects
         async function renderLeaderboard() {
             const classFilter = document.getElementById('class-filter').value;
             const contentDiv = document.getElementById('leaderboard-content');
@@ -169,13 +167,32 @@
 
                     lessonsSnap.forEach(doc => {
                         const lessonData = doc.data();
-                        let pts = 0;
-                        if (lessonData.scoreText) {
-                            const match = String(lessonData.scoreText).match(/\d+/);
-                            if (match) pts = parseInt(match[0], 10);
+                        
+                        // doc.id is your file name
+                        const lessonName = (doc.id + " " + (lessonData.pageTitle || "")).toLowerCase();
+                        
+                        // Determine which board we are viewing
+                        const isEnterpriseBoard = classFilter.toLowerCase().includes('ent');
+                        const isImediaBoard = classFilter.toLowerCase().includes('cim') || classFilter.toLowerCase().includes('imedia');
+                        
+                        let shouldCountThisLesson = false;
+
+                        if (isEnterpriseBoard && (lessonName.includes('ent') || lessonName.includes('enterprise'))) {
+                            shouldCountThisLesson = true;
+                        } else if (isImediaBoard && (lessonName.includes('cim') || lessonName.includes('imedia'))) {
+                            shouldCountThisLesson = true;
+                        } else if (!isEnterpriseBoard && !isImediaBoard) {
+                            shouldCountThisLesson = true; // Fallback for KS3 or general classes
                         }
-                        totalScore += pts;
+
+                        if (shouldCountThisLesson && lessonData.scoreText) {
+                            const match = String(lessonData.scoreText).match(/\d+/);
+                            if (match) {
+                                totalScore += parseInt(match[0], 10);
+                            }
+                        }
                     });
+                    
                     student.calculatedScore = totalScore;
                     return student;
                 });
