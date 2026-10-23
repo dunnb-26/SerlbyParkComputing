@@ -180,9 +180,9 @@
 
         let allStudents = [];
 
-        // Fetch all students on page load
+        // Fetch all students on page load (just their names and classes)
         async function fetchStudents() {
-            document.getElementById('loading-message').innerText = "Loading student data...";
+            document.getElementById('loading-message').innerText = "Loading student roster...";
             try {
                 const snapshot = await db.collection('users').get();
                 allStudents = [];
@@ -191,12 +191,10 @@
                     allStudents.push({
                         uid: doc.id,
                         fullName: data.fullName || data.username || 'Unnamed Student',
-                        className: data.className || 'Unassigned',
-                        score: data.score || 0  // Assumes score is saved on the user document
+                        className: data.className || 'Unassigned'
                     });
                 });
                 
-                // If a class is already selected, re-render automatically
                 if (document.getElementById('class-filter').value) {
                     renderLeaderboard();
                 } else {
@@ -208,39 +206,85 @@
             }
         }
 
-        function renderLeaderboard() {
+        // Calculate scores and build the leaderboard
+        async function renderLeaderboard() {
             const classFilter = document.getElementById('class-filter').value;
             const contentDiv = document.getElementById('leaderboard-content');
 
             if (!classFilter) return;
 
-            // Filter by class and sort by score descending
+            contentDiv.innerHTML = `<div id="loading-message">Calculating live scores for ${classFilter}...</div>`;
+
+            // Filter by selected class
             let classStudents = allStudents.filter(student => {
                 const studentClasses = String(student.className || "").toLowerCase();
                 return studentClasses.includes(classFilter.toLowerCase());
             });
-
-            classStudents.sort((a, b) => b.score - a.score);
 
             if (classStudents.length === 0) {
                 contentDiv.innerHTML = `<div id="loading-message">No students found in ${classFilter}.</div>`;
                 return;
             }
 
-            let html = '';
-            classStudents.forEach((student, index) => {
-                html += `
-                    <div class="leaderboard-row">
-                        <div>
-                            <span class="rank-circle">${index + 1}</span>
-                            <span>${escapeHtml(student.fullName)}</span>
-                        </div>
-                        <span class="score-badge">${student.score} pts</span>
-                    </div>
-                `;
-            });
+            try {
+                // Fetch and sum up the scores from each student's "lessons" subcollection
+                const scorePromises = classStudents.map(async (student) => {
+                    const lessonsSnap = await db.collection('users').doc(student.uid).collection('lessons').get();
+                    let totalScore = 0;
 
-            contentDiv.innerHTML = html;
+                    lessonsSnap.forEach(doc => {
+                        const lessonData = doc.data();
+                        
+                        // Parse the score depending on how it's saved in your database
+                        let pts = 0;
+                        if (typeof lessonData.score === 'number') {
+                            pts = lessonData.score;
+                        } else if (lessonData.scoreText) {
+                            // If saved as a badge string like "15 pts" or "10/10", extract the first number
+                            const match = lessonData.scoreText.match(/^(\d+)/);
+                            if (match) pts = parseInt(match[1]);
+                        }
+                        totalScore += pts;
+                    });
+
+                    student.calculatedScore = totalScore;
+                    return student;
+                });
+
+                // Wait for all the math to finish
+                await Promise.all(scorePromises);
+
+                // Sort students by their new calculated score (highest first)
+                classStudents.sort((a, b) => b.calculatedScore - a.calculatedScore);
+
+                // Build the HTML
+                let html = '';
+                classStudents.forEach((student, index) => {
+                    
+                    // Don't show students who haven't scored any points yet
+                    if (student.calculatedScore > 0) {
+                        html += `
+                            <div class="leaderboard-row">
+                                <div>
+                                    <span class="rank-circle">${index + 1}</span>
+                                    <span>${escapeHtml(student.fullName)}</span>
+                                </div>
+                                <span class="score-badge">${student.calculatedScore} pts</span>
+                            </div>
+                        `;
+                    }
+                });
+
+                if (html === '') {
+                    contentDiv.innerHTML = `<div id="loading-message">No points scored yet in ${classFilter}.</div>`;
+                } else {
+                    contentDiv.innerHTML = html;
+                }
+
+            } catch (err) {
+                console.error("Error calculating scores:", err);
+                contentDiv.innerHTML = `<div id="loading-message">Error calculating scores. Please try again.</div>`;
+            }
         }
 
         function escapeHtml(str) {
