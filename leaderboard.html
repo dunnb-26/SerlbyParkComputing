@@ -180,7 +180,7 @@
 
         let allStudents = [];
 
-        // Fetch all students on page load (just their names and classes)
+        // Fetch all students on page load
         async function fetchStudents() {
             document.getElementById('loading-message').innerText = "Loading student roster...";
             try {
@@ -234,15 +234,14 @@
 
                     lessonsSnap.forEach(doc => {
                         const lessonData = doc.data();
-                        
-                        // Parse the score depending on how it's saved in your database
                         let pts = 0;
-                        if (typeof lessonData.score === 'number') {
-                            pts = lessonData.score;
-                        } else if (lessonData.scoreText) {
-                            // If saved as a badge string like "15 pts" or "10/10", extract the first number
-                            const match = lessonData.scoreText.match(/^(\d+)/);
-                            if (match) pts = parseInt(match[1]);
+                        
+                        if (lessonData.scoreText) {
+                            // Grabs the first number from formats like "Score: 15 / 40"
+                            const match = String(lessonData.scoreText).match(/\d+/);
+                            if (match) {
+                                pts = parseInt(match[0], 10);
+                            }
                         }
                         totalScore += pts;
                     });
@@ -251,7 +250,7 @@
                     return student;
                 });
 
-                // Wait for all the math to finish
+                // Wait for all calculations to finish
                 await Promise.all(scorePromises);
 
                 // Sort students by their new calculated score (highest first)
@@ -260,8 +259,7 @@
                 // Build the HTML
                 let html = '';
                 classStudents.forEach((student, index) => {
-                    
-                    // Don't show students who haven't scored any points yet
+                    // Only show students with a score greater than 0
                     if (student.calculatedScore > 0) {
                         html += `
                             <div class="leaderboard-row">
