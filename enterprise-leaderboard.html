@@ -15,7 +15,9 @@
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f8; margin: 0; }
         .container { max-width: 800px; margin: 40px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #1e3a8a; }
-        select { width: 100%; padding: 12px; font-size: 1.1em; margin-bottom: 30px; border: 2px solid #cbd5e1; border-radius: 6px; font-weight: bold; color: #1e3a8a; }
+        select { width: 100%; padding: 12px; font-size: 1.1em; border: 2px solid #cbd5e1; border-radius: 6px; font-weight: bold; color: #1e3a8a; background: white; }
+        .filter-container { display: flex; gap: 15px; margin-bottom: 30px; }
+        @media (max-width: 600px) { .filter-container { flex-direction: column; } }
         .leaderboard-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; font-size: 1.2em; }
         .leaderboard-row:nth-child(1) { background: #fff8e1; font-weight: bold; font-size: 1.4em; }
         .leaderboard-row:nth-child(2) { background: #f8f9fa; font-weight: bold; font-size: 1.3em; }
@@ -38,23 +40,31 @@
         </div>
         
         <div class="header-center">
-            <h1>Enterprise Leaderboard</h1></h1>
+            <h1>Enterprise Leaderboard</h1>
         </div>
         
         <div class="header-right" style="display: flex; gap: 12px; align-items: center;">
-    <a href="javascript:history.back()" class="back-btn">&larr; Back to Revision</a>
-    <button class="btn-gold" onclick="fetchStudents()">Refresh Scores</button>
-</div>
+            <a href="javascript:history.back()" class="back-btn" style="background-color: #607d8b; color: white; padding: 8px 14px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 0.9em;">&larr; Back to Revision</a>
+            <button class="btn-gold" onclick="fetchStudents()">Refresh Scores</button>
+        </div>
     </header>
     
     <div class="container">
         <h2 id="board-title" style="color:#1e3a8a; margin-top:0; text-align:center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px;">🏆 Enterprise Leaderboard</h2>
         
-        <select id="class-filter" onchange="renderLeaderboard()">
-            <option value="ALL" selected>All Enterprise Students</option>
-            <option value="10aEnt1">10aEnt1 (Enterprise)</option>
-            <option value="11aEnt1">11aEnt1 (Enterprise)</option>
-        </select>
+        <!-- Filters Section (Class & Timeframe side-by-side) -->
+        <div class="filter-container">
+            <select id="class-filter" onchange="renderLeaderboard()">
+                <option value="ALL" selected>All Enterprise Students</option>
+                <option value="10aEnt1">10aEnt1 (Enterprise)</option>
+                <option value="11aEnt1">11aEnt1 (Enterprise)</option>
+            </select>
+
+            <select id="timeframe-filter" onchange="renderLeaderboard()">
+                <option value="ALL" selected>🏆 All-Time Leaderboard</option>
+                <option value="WEEK">📅 This Week (Last 7 Days)</option>
+            </select>
+        </div>
 
         <div id="leaderboard-content">
             <div id="loading-message">Authenticating user...</div>
@@ -100,11 +110,14 @@
 
         async function renderLeaderboard() {
             const classFilter = document.getElementById('class-filter').value;
+            const timeframe = document.getElementById('timeframe-filter').value;
             const contentDiv = document.getElementById('leaderboard-content');
             if (!classFilter) return;
 
-            let titleText = classFilter === "ALL" ? "Global Enterprise" : classFilter;
-            document.getElementById('board-title').innerText = `🏆 ${titleText} Leaderboard`;
+            let titleClassText = classFilter === "ALL" ? "Global Enterprise" : classFilter;
+            let titleTimeText = timeframe === "WEEK" ? " (This Week)" : "";
+            document.getElementById('board-title').innerText = `🏆 ${titleClassText} Leaderboard${titleTimeText}`;
+            
             contentDiv.innerHTML = `<div id="loading-message">Calculating live scores...</div>`;
 
             // Filter down to just Enterprise students
@@ -122,12 +135,22 @@
             }
 
             try {
+                // Calculate timestamp for 7 days ago if "WEEK" is selected
+                const oneWeekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+
                 const scorePromises = classStudents.map(async (student) => {
                     const lessonsSnap = await db.collection('users').doc(student.uid).collection('lessons').get();
                     let totalScore = 0;
 
                     lessonsSnap.forEach(doc => {
                         const lessonData = doc.data();
+                        
+                        // If Weekly filter is active, skip updates older than 7 days
+                        if (timeframe === "WEEK") {
+                            const lessonTime = lessonData.lastUpdated || 0;
+                            if (lessonTime < oneWeekAgo) return; 
+                        }
+                        
                         const docId = doc.id.toLowerCase();
                         const pageTitle = String(lessonData.pageTitle || "").toLowerCase();
                         
@@ -162,7 +185,7 @@
                         </div>`;
                 });
 
-                contentDiv.innerHTML = html === '' ? `<div id="loading-message">No points scored yet.</div>` : html;
+                contentDiv.innerHTML = html === '' ? `<div id="loading-message">No points scored for this timeframe.</div>` : html;
             } catch (err) {
                 console.error("Error calculating scores:", err);
                 contentDiv.innerHTML = `<div id="loading-message">Error calculating scores. Please try again.</div>`;
