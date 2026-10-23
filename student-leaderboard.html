@@ -1,4 +1,72 @@
-<script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard</title>
+    
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Firebase SDKs (Added Auth) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f8; margin: 0; }
+        .container { max-width: 800px; margin: 40px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 6px solid #1e3a8a; }
+        select { width: 100%; padding: 12px; font-size: 1.1em; margin-bottom: 30px; border: 2px solid #cbd5e1; border-radius: 6px; font-weight: bold; color: #1e3a8a; }
+        .leaderboard-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; font-size: 1.2em; }
+        .leaderboard-row:nth-child(1) { background: #fff8e1; font-weight: bold; font-size: 1.4em; }
+        .leaderboard-row:nth-child(2) { background: #f8f9fa; font-weight: bold; font-size: 1.3em; }
+        .leaderboard-row:nth-child(3) { background: #f8f9fa; font-weight: bold; font-size: 1.25em; }
+        .rank-circle { background: #1e3a8a; color: white; width: 35px; height: 35px; display: inline-flex; justify-content: center; align-items: center; border-radius: 50%; margin-right: 15px; font-size: 0.9em; font-weight: bold; }
+        .leaderboard-row:nth-child(1) .rank-circle { background: #dfaa2b; color: #1e3a8a; }
+        .leaderboard-row:nth-child(2) .rank-circle { background: #94a3b8; }
+        .leaderboard-row:nth-child(3) .rank-circle { background: #b45309; }
+        .score-badge { color: #dfaa2b; font-weight: bold; background: #1e3a8a; padding: 6px 12px; border-radius: 20px; }
+        #loading-message { text-align: center; color: #64748b; font-size: 1.2em; margin-top: 20px; }
+        .btn-gold { background: #dfaa2b; color: #1e3a8a; border: none; padding: 8px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.2s; text-decoration: none; display: inline-block; }
+        .btn-gold:hover { background: #c99722; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <a href="index.html"><img src="logo.jpg" alt="Logo"></a>
+        </div>
+        <div class="header-center">
+            <h1>Leaderboard</h1>
+        </div>
+        <div class="header-right" style="display: flex; gap: 10px; align-items: center;">
+            <a href="index.html" id="back-btn" class="back-btn" style="background-color: #607d8b; color: white; padding: 8px 14px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 0.9em;">🔙 Back</a>
+            <button class="btn-gold" onclick="fetchStudents()">Refresh Scores</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2 id="board-title" style="color:#1e3a8a; margin-top:0; text-align:center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px;">🏆 Global Leaderboard</h2>
+        
+        <select id="class-filter" onchange="renderLeaderboard()">
+            <option value="ALL" selected>All Classes (Global Leaderboard)</option>
+            <optgroup label="Year 7"><option value="7x1">7x1</option><option value="7x2">7x2</option><option value="7y1">7y1</option><option value="7y2">7y2</option></optgroup>
+            <optgroup label="Year 8"><option value="8x1">8x1</option><option value="8x2">8x2</option><option value="8y1">8y1</option><option value="8y2">8y2</option></optgroup>
+            <optgroup label="Year 9"><option value="9x1">9x1</option><option value="9x2">9x2</option><option value="9y1">9y1</option><option value="9y2">9y2</option></optgroup>
+            <optgroup label="GCSE Options">
+                <option value="10aEnt1">10aEnt1 (Enterprise)</option>
+                <option value="11aEnt1">11aEnt1 (Enterprise)</option>
+                <option value="10bCim1">10bCim1 (iMedia)</option>
+                <option value="11bCim1">11bCim1 (iMedia)</option>
+            </optgroup>
+        </select>
+
+        <div id="leaderboard-content">
+            <div id="loading-message">Authenticating user...</div>
+        </div>
+    </div>
+
+    <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
             authDomain: "serlby-park-computing.firebaseapp.com",
@@ -16,32 +84,9 @@
         const auth = firebase.auth();
 
         let allStudents = [];
-        let loggedInUserClass = null;
 
         // 1. Check who is logged in
         auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                try {
-                    const userDoc = await db.collection('users').doc(user.uid).get();
-                    if (userDoc.exists) {
-                        const userData = userDoc.data();
-                        
-                        // If they have a class assigned, treat as student
-                        if (userData.className && userData.className !== "Unassigned") {
-                            loggedInUserClass = userData.className;
-                            
-                            // Hide dropdown and teacher button
-                            document.getElementById('class-filter').style.display = 'none';
-                            document.getElementById('back-btn').style.display = 'none';
-                            
-                            // Personalize title
-                            document.getElementById('board-title').innerText = `🏆 ${loggedInUserClass} Leaderboard`;
-                        }
-                    }
-                } catch (e) {
-                    console.error("Auth check error:", e);
-                }
-            }
             fetchStudents();
         });
 
@@ -60,14 +105,9 @@
                     });
                 });
                 
-                if (loggedInUserClass) {
-                    document.getElementById('class-filter').value = loggedInUserClass;
-                    renderLeaderboard();
-                } else if (document.getElementById('class-filter').value) {
-                    renderLeaderboard();
-                } else {
-                    document.getElementById('loading-message').innerText = "Select a class above to load scores.";
-                }
+                // Render immediately defaults to ALL
+                renderLeaderboard();
+                
             } catch (err) {
                 console.error('Error fetching students:', err);
                 document.getElementById('loading-message').innerText = "Error loading data. Check console.";
@@ -80,15 +120,21 @@
             const contentDiv = document.getElementById('leaderboard-content');
 
             if (!classFilter) return;
-            contentDiv.innerHTML = `<div id="loading-message">Calculating live scores for ${classFilter}...</div>`;
+            
+            // Personalize Title
+            let titleText = classFilter === "ALL" ? "Global" : classFilter;
+            document.getElementById('board-title').innerText = `🏆 ${titleText} Leaderboard`;
+
+            contentDiv.innerHTML = `<div id="loading-message">Calculating live scores...</div>`;
 
             let classStudents = allStudents.filter(student => {
+                if (classFilter === "ALL") return true;
                 const studentClasses = String(student.className || "").toLowerCase();
                 return studentClasses.includes(classFilter.toLowerCase());
             });
 
             if (classStudents.length === 0) {
-                contentDiv.innerHTML = `<div id="loading-message">No students found in ${classFilter}.</div>`;
+                contentDiv.innerHTML = `<div id="loading-message">No students found.</div>`;
                 return;
             }
 
@@ -109,7 +155,9 @@
                         
                         let shouldCountThisLesson = false;
 
-                        if (isEnterpriseBoard && (lessonName.includes('ent') || lessonName.includes('enterprise'))) {
+                        if (classFilter === "ALL") {
+                            shouldCountThisLesson = true;
+                        } else if (isEnterpriseBoard && (lessonName.includes('ent') || lessonName.includes('enterprise'))) {
                             shouldCountThisLesson = true;
                         } else if (isImediaBoard && (lessonName.includes('cim') || lessonName.includes('imedia'))) {
                             shouldCountThisLesson = true;
@@ -130,25 +178,27 @@
                 });
 
                 await Promise.all(scorePromises);
+                
+                // Only show students who actually have points, then sort them highest to lowest
+                classStudents = classStudents.filter(s => s.calculatedScore > 0);
                 classStudents.sort((a, b) => b.calculatedScore - a.calculatedScore);
 
                 let html = '';
                 classStudents.forEach((student, index) => {
-                    if (student.calculatedScore > 0) {
-                        html += `
-                            <div class="leaderboard-row">
-                                <div>
-                                    <span class="rank-circle">${index + 1}</span>
-                                    <span>${escapeHtml(student.fullName)}</span>
-                                </div>
-                                <span class="score-badge">${student.calculatedScore} pts</span>
+                    html += `
+                        <div class="leaderboard-row">
+                            <div>
+                                <span class="rank-circle">${index + 1}</span>
+                                <span>${escapeHtml(student.fullName)}</span>
+                                ${classFilter === "ALL" ? `<span style="font-size:0.75em; color:#666; margin-left:10px;">(${escapeHtml(student.className)})</span>` : ''}
                             </div>
-                        `;
-                    }
+                            <span class="score-badge">${student.calculatedScore} pts</span>
+                        </div>
+                    `;
                 });
 
                 if (html === '') {
-                    contentDiv.innerHTML = `<div id="loading-message">No points scored yet in ${classFilter}.</div>`;
+                    contentDiv.innerHTML = `<div id="loading-message">No points scored yet.</div>`;
                 } else {
                     contentDiv.innerHTML = html;
                 }
@@ -160,3 +210,5 @@
 
         function escapeHtml(str) { return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
     </script>
+</body>
+</html>
