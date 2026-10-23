@@ -5,40 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class Leaderboards - Cloud Markbook</title>
     
+    <!-- Link to your existing stylesheet to keep the header exact -->
+    <link rel="stylesheet" href="style.css">
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
+        /* Additional styles specific to the leaderboard */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #f4f6f8;
             margin: 0;
         }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            background: white;
-            border-bottom: 2px solid #eee;
-        }
-        .header-center h1 {
-            margin: 0;
-            color: #1e3a8a;
-            font-size: 1.5em;
-        }
-        .btn-gold {
-            background: #dfaa2b;
-            color: #1e3a8a;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 0.9em;
-        }
+
         .container {
             max-width: 800px;
             margin: 40px auto;
@@ -46,8 +27,9 @@
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            border-top: 6px solid #dfaa2b;
+            border-top: 6px solid #1e3a8a;
         }
+
         select {
             width: 100%;
             padding: 12px;
@@ -58,6 +40,7 @@
             font-weight: bold;
             color: #1e3a8a;
         }
+
         .leaderboard-row {
             display: flex;
             justify-content: space-between;
@@ -66,6 +49,7 @@
             border-bottom: 1px solid #eee;
             font-size: 1.2em;
         }
+
         .leaderboard-row:nth-child(1) { background: #fff8e1; font-weight: bold; font-size: 1.4em; }
         .leaderboard-row:nth-child(2) { background: #f8f9fa; font-weight: bold; font-size: 1.3em; }
         .leaderboard-row:nth-child(3) { background: #f8f9fa; font-weight: bold; font-size: 1.25em; }
@@ -83,6 +67,7 @@
             font-size: 0.9em;
             font-weight: bold;
         }
+
         .leaderboard-row:nth-child(1) .rank-circle { background: #dfaa2b; color: #1e3a8a; }
         .leaderboard-row:nth-child(2) .rank-circle { background: #94a3b8; }
         .leaderboard-row:nth-child(3) .rank-circle { background: #b45309; }
@@ -94,26 +79,55 @@
             padding: 6px 12px;
             border-radius: 20px;
         }
+
         #loading-message {
             text-align: center;
             color: #64748b;
             font-size: 1.2em;
             margin-top: 20px;
         }
+        
+        .btn-gold {
+            background: #dfaa2b;
+            color: #1e3a8a;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-gold:hover { background: #c99722; }
     </style>
 </head>
 <body>
 
+    <!-- EXACT HEADER FROM DASHBOARD -->
     <header>
         <div class="header-left">
-            <h2 style="margin:0; color:#1e3a8a;">🏆 Class Leaderboards</h2>
+            <a href="index.html">
+                <img src="logo.jpg" alt="Logo">
+            </a>
         </div>
-        <div class="header-right">
-            <a href="index.html" class="btn-gold" style="background-color: #607d8b; color: white;">🔙 Back to Dashboard</a>
+
+        <div class="header-center">
+            <h1>Teacher Cloud Markbook</h1>
+        </div>
+
+        <div class="header-right" style="display: flex; gap: 10px; align-items: center;">
+            <a href="index.html" class="back-btn" style="background-color: #607d8b; color: white; padding: 8px 14px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 0.9em;">🔙 Back to Markbook</a>
+            <button class="btn-gold" onclick="fetchStudents()">
+                Refresh Scores
+            </button>
         </div>
     </header>
 
     <div class="container">
+        <h2 style="color:#1e3a8a; margin-top:0; text-align:center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px;">🏆 Class Leaderboards</h2>
+        
         <select id="class-filter" onchange="renderLeaderboard()">
             <option value="" disabled selected>Select a class to view leaderboard...</option>
             <optgroup label="Year 7">
@@ -181,7 +195,13 @@
                         score: data.score || 0  // Assumes score is saved on the user document
                     });
                 });
-                document.getElementById('loading-message').innerText = "Select a class above to load scores.";
+                
+                // If a class is already selected, re-render automatically
+                if (document.getElementById('class-filter').value) {
+                    renderLeaderboard();
+                } else {
+                    document.getElementById('loading-message').innerText = "Select a class above to load scores.";
+                }
             } catch (err) {
                 console.error('Error fetching students:', err);
                 document.getElementById('loading-message').innerText = "Error loading data. Check console.";
