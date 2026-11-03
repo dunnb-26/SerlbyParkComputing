@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R093 Revision Flashcards - Creative iMedia</title>
+    <style>
+        /* Master Template Layout Overrides */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f4f6f8; 
+            color: #333; 
+        }
+        header { 
+            background-color: #1B1464; /* Delta Navy */
+            color: white; 
+            padding: 20px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            border-bottom: 6px solid #822433; /* Delta Maroon */
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-left img { 
+            height: 80px; 
+            background-color: white; 
+            border-radius: 8px; 
+            padding: 5px;
+        }
+        .header-center {
+            text-align: center;
+            flex-grow: 1;
+        }
+        .header-center h1 {
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: 1px;
+        }
+        .header-right .back-btn {
+            background-color: #dfaa2b; /* Delta Gold */
+            color: #1B1464;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        .header-right .back-btn:hover {
+            background-color: #c99722;
+        }
+        
+        .flashcard-container {
+            padding: 40px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .topic-section {
+            margin-bottom: 60px;
+        }
+        .topic-section h2 {
+            color: #1B1464;
+            text-align: left;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #822433;
+            padding-bottom: 10px;
+            font-size: 2em;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .flip-card {
+            background-color: transparent;
+            width: 100%;
+            height: 240px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 8px;
+        }
+        .flip-card-front {
+            background-color: white;
+            color: #1B1464;
+            border-top: 6px solid #822433;
+        }
+        .flip-card-front .hint-text {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 15px;
+            font-weight: normal;
+        }
+        .flip-card-front h3 {
+            margin: 0;
+            font-size: 1.1em;
+            line-height: 1.4;
+        }
+        .flip-card-back {
+            background-color: #1B1464;
+            color: white;
+            transform: rotateY(180deg);
+            border-top: 6px solid #dfaa2b;
+            overflow-y: auto;
+        }
+        .flip-card-back p {
+            margin: 0;
+            font-size: 1.05em;
+            line-height: 1.5;
+        }
+        footer { 
+            text-align: center; 
+            padding: 25px; 
+            color: #666; 
+            margin-top: 50px; 
+            border-top: 1px solid #ddd; 
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <img src="logo.jpg" alt="Delta Logo">
+        </div>
+        <div class="header-center">
+            <h1>R093 Complete Flashcards (1.1 to 4.2.4)</h1>
+            <p style="margin: 5px 0 0 0; color: #e0e0e0;">Creative iMedia Revision</p>
+        </div>
+        <div class="header-right">
+            <a href="javascript:history.back()" class="back-btn">&larr; Back</a>
+        </div>
+    </header>
+
+    <main class="flashcard-container" id="flashcards-root"></main>
+
+    <footer>
+        &copy; 2026 Delta Serlby Park - Computing Department
+    </footer>
+
+    <script>
+        const flashcardData = [
+            {
+                topic: "1.1 Media industry sectors and products",
+                qas: [
+                    ["Give four examples of traditional media sectors.", "Film, television, radio, and print publishing.[cite: 1]"],
+                    ["What is new media?", "Media using digital technology, internet-accessed media, or websites/games/apps.[cite: 1]"],
+                    ["Give four examples of new media sectors.", "Computer games, interactive media, internet-based media, digital publishing.[cite: 1]"],
+                    ["What is the difference between traditional media and new media?", "Traditional uses physical/broadcast forms (TV, print) while new media uses digital/internet technology and allows interaction.[cite: 1]"],
+                    ["What does the film sector produce?", "Films, movies, feature films, animated films, or films for streaming/cinemas.[cite: 1]"],
+                    ["What does the television sector produce?", "TV programmes, news broadcasts, documentaries, drama, reality, or entertainment shows.[cite: 1]"],
+                    ["What does the radio sector produce?", "Radio programmes, news, music, talk shows, or podcasts made for radio.[cite: 1]"],
+                    ["What does the print publishing sector produce?", "Newspapers, magazines, printed books, comics, or leaflets.[cite: 1]"],
+                    ["Which sector would produce a printed newspaper?", "Print publishing.[cite: 1]"],
+                    ["What is a media product?", "Something created to communicate with an audience (e.g. film, game, website).[cite: 1]"],
+                    ["What is a video product?", "Moving images, footage, a film, or online video.[cite: 1]"],
+                    ["What is an audio product?", "Media that uses sound (e.g. podcast, radio programme).[cite: 1]"],
+                    ["What is a music product?", "A song, recorded music, or a soundtrack.[cite: 1]"],
+                    ["What is animation?", "Creating the appearance of movement using images/models.[cite: 1]"],
+                    ["Which sector might create a television advert?", "Television or advertising media production.[cite: 1]"],
+                    ["Which sector might create a social media video?", "Internet based media or social media content production.[cite: 1]"],
+                    ["Can the same media product be used by different sectors?", "Yes. The same product can be used across different sectors.[cite: 1]"],
+                    ["Give an example of the same media content being used by two different sectors.", "E.g., A film trailer shown on TV and social media, or a song played on radio and in a game.[cite: 1]"],
+                    ["A company wants to create a digital magazine. Identify two types of media product it might include.", "Text, photographs, digital graphics, video, audio, or animation.[cite: 1]"],
+                    ["Explain one advantage of releasing a media product online instead of only in a physical format.", "It reaches more people, can be updated quickly, costs less to distribute, and works on different devices.[cite: 1]"]
+                ]
+            },
+            {
+                topic: "1.2 Job roles in the media industry",
+                qas: [
+                    ["What are the three main categories of job roles in the media industry?", "Creative, technical, and senior roles.[cite: 1]"],
+                    ["What is the main purpose of creative roles?", "To come up with ideas, design how a product looks/sounds, write content, or decide how it communicates.[cite: 1]"],
+                    ["What is the main purpose of technical roles?", "To use equipment/software to create, record/edit sound/video, or build websites/games.[cite: 1]"],
+                    ["What is the main purpose of senior roles?", "To lead teams, make important decisions, organise people/resources, or oversee production.[cite: 1]"],
+                    ["Why might a media project need different job roles?", "Different tasks need different work, one person may not have time, tasks vary (writing vs filming), sharing helps it run smoothly.[cite: 1]"],
+                    ["What does an animator do?", "Creates moving images, models, animated characters, or scenes.[cite: 1]"],
+                    ["What does a content creator do?", "Creates content for online platforms, makes videos/posts, or produces material for websites/social media.[cite: 1]"],
+                    ["What does a copywriter do?", "Writes text for adverts, persuasive wording, or written content for websites/campaigns.[cite: 1]"],
+                    ["What does a graphic designer do?", "Creates visual designs, logos, posters, layouts, or uses images/text to communicate a message.[cite: 1]"],
+                    ["What does an illustrator or graphic artist do?", "Creates drawings, artwork, illustrations for books/games, or draws characters.[cite: 1]"],
+                    ["What does a campaign manager do?", "Plans/organises a campaign, coordinates people, makes sure tasks are completed.[cite: 1]"],
+                    ["What does a creative director do?", "Leads creative ideas, decides the look/feel, guides the team, checks the vision.[cite: 1]"],
+                    ["What does a director do?", "Leads the making of a film/programme, guides actors, decides how scenes are filmed.[cite: 1]"],
+                    ["What does an editor do in a senior media role?", "Oversees published content, decides what is included/removed, checks accuracy.[cite: 1]"],
+                    ["Identify one creative role and describe its responsibility.", "E.g., Graphic designer (creates designs for posters), Scriptwriter (writes dialogue).[cite: 1]"],
+                    ["Explain the difference between a camera operator and a video editor.", "A camera operator records the footage, while a video editor arranges/edits the footage.[cite: 1]"],
+                    ["Explain why a large media production may require a production manager.", "Organises schedules and equipment for many staff, controls the budget, and ensures it finishes on time.[cite: 1]"],
+                    ["A small business creates its own website. Explain why one person might act as both web designer and web developer.", "Limited budget/team. One person plans and builds it, reducing costs and making it easier to coordinate.[cite: 1]"],
+                    ["Explain why some job roles work across more than one production phase.", "Some help plan before, make changes during, or improve after. E.g., a scriptwriter may write the script then make changes during filming.[cite: 1]"],
+                    ["Explain why a media product may need different job roles during pre production, production and post production.", "Pre production plans it, production creates it, post production edits it. Different roles handle different tasks so the team works efficiently.[cite: 1]"]
+                ]
+            },
+            {
+                topic: "2.1 How style, content and layout are linked to the purpose",
+                qas: [
+                    ["What is meant by the purpose of a media product?", "The reason it was made, what it is trying to achieve, or what the creator wants the audience to do/think/learn.[cite: 1]"],
+                    ["What are the five main purposes of media products?", "Advertise/promote, educate, entertain, inform, influence.[cite: 1]"],
+                    ["What does advertise or promote mean?", "To sell a product, make people aware, or encourage people to buy.[cite: 1]"],
+                    ["What is meant by the style of a media product?", "The way it looks/sounds, the design choices (colours, images, music), or overall appearance.[cite: 1]"],
+                    ["What is meant by the content of a media product?", "What is included, the information it gives, or the message it communicates.[cite: 1]"],
+                    ["What is meant by the layout of a media product?", "Where things are placed, how text/pictures are arranged, or the organisation of elements.[cite: 1]"],
+                    ["Why must style, content and layout match the purpose of a media product?", "To make the product effective, help the audience understand the message, attract the right audience, or ensure it achieves its goal.[cite: 1]"],
+                    ["How can colour help a media product achieve its purpose?", "It catches attention, creates a mood/feeling, highlights important info, or makes it appeal to the audience.[cite: 1]"],
+                    ["Why might an advert use bright colours?", "To grab attention, make the product look exciting, or attract the target audience.[cite: 1]"],
+                    ["Why might an educational resource use contrasting colours?", "To make information easier to read, separate sections, or highlight important facts.[cite: 1]"],
+                    ["Why might a serious news website use a limited colour scheme?", "To look professional, avoid distracting readers, or keep attention focused on the news.[cite: 1]"],
+                    ["What is meant by the positioning of elements?", "Where things are placed, or how headings, images and buttons are arranged.[cite: 1]"],
+                    ["Why might the most important information be placed near the top of a poster?", "People notice it first, it attracts attention, or makes the message easy to see.[cite: 1]"],
+                    ["Why might an advert place a product image in the centre?", "To make it the main focus, draw eyes toward it, or make it clear what is being advertised.[cite: 1]"],
+                    ["Why should a website have a clear navigation menu?", "So users can find things easily, move between pages, and not get confused.[cite: 1]"],
+                    ["A company creates a poster to advertise a new energy drink. Describe two suitable design choices and explain why they would be effective.", "Must name two choices (e.g. bright colours, large image) and explain why (catches attention, shows product).[cite: 1]"],
+                    ["A school creates a website to educate students about online safety. Explain two suitable design choices.", "Must name two choices (e.g. simple language, diagrams) and explain why (easy to understand, visually clear).[cite: 1]"],
+                    ["A charity creates a campaign to influence people to donate money. Explain two ways style could support its purpose.", "Must give two choices (e.g. emotional photos, statistics) and explain (creates sympathy, shows scale of problem).[cite: 1]"],
+                    ["A news website aims to inform readers about current events. Explain two suitable design choices.", "Must give two choices (e.g. clear headlines, formal language) and explain (find stories easily, looks professional).[cite: 1]"],
+                    ["What could happen if the style does not match the purpose?", "The audience might misunderstand the message, lose interest, or fail to engage with the product as intended."]
+                ]
+            },
+            {
+                topic: "2.2 Client requirements and how they are defined",
+                qas: [
+                    ["What is client ethos?", "The clients values and beliefs, what the organisation stands for, or the image it wants to show.[cite: 1]"],
+                    ["Give an example of client ethos.", "E.g., Eco-friendly company wanting sustainable images, a charity looking caring, or a welcoming school.[cite: 1]"],
+                    ["What does content mean in a client brief?", "What needs to be included, such as text, images, a logo, contact details, prices, or information.[cite: 1]"],
+                    ["What does genre mean?", "The category or type of media product, such as horror, comedy, action, documentary, or news.[cite: 1]"],
+                    ["What is a keyword in a client brief?", "An important word or phrase telling you what is required, or a clue about what the client wants.[cite: 1]"],
+                    ["A brief says, “Create a colourful poster for children aged 7 to 10.” Identify two requirements.", "Must be a poster, should be colourful, and aimed at children aged 7 to 10.[cite: 1]"],
+                    ["A brief says, “The product must include the company logo and website address.” What type of requirement is this?", "Content, required information, or things that must be included.[cite: 1]"],
+                    ["A brief says, “Use a professional style suitable for business owners.” Identify the requirements.", "Professional style, target audience of business owners, design suiting that audience.[cite: 1]"],
+                    ["What is the difference between a requirement and an idea?", "A requirement is something the client asks for; an idea is a possible way to meet that requirement.[cite: 1]"],
+                    ["A client says the product “must include three images”. Is this optional? Explain.", "No. 'Must' means it is required, so the designer must include three images unless the client agrees otherwise.[cite: 1]"],
+                    ["How does the type of product affect planning?", "You plan differently for a poster than a video, different software/skills are needed, layout depends on product.[cite: 1]"],
+                    ["How does the purpose affect planning?", "Decides what the product needs to achieve, such as persuading people or giving information.[cite: 1]"],
+                    ["What is a commission brief?", "A client hires or pays someone to create a product, or a job is given to a designer/company.[cite: 1]"],
+                    ["What is a formal brief?", "A professional, structured brief with clearly stated requirements, often written and agreed officially.[cite: 1]"],
+                    ["What is an informal brief?", "A less structured explanation, perhaps a casual conversation, email, or quick message.[cite: 1]"],
+                    ["What is a meeting or discussion brief?", "Requirements are explained/discussed in a meeting, where client and designer can clarify details.[cite: 1]"],
+                    ["How can a commission brief differ from an informal brief?", "Commission involves being appointed/paid to do work, while informal describes how requirements are communicated.[cite: 1]"],
+                    ["Can a brief use more than one format? Explain.", "Yes, a client could discuss in a meeting and confirm in writing, or commission using a formal brief.[cite: 1]"],
+                    ["Why should a designer keep a record of decisions made in a meeting?", "To remember what was agreed, avoid arguments later, check requirements, and provide evidence of changes.[cite: 1]"],
+                    ["What is a constraint in media production?", "A limit or restriction, something you must work within, or a rule limiting your choices.[cite: 1]"]
+                ]
+            },
+            {
+                topic: "2.3 Audience demographics and segmentation",
+                qas: [
+                    ["What is a demographic?", "Information about a person or group, such as age, gender, income, education, or occupation.[cite: 1]"],
+                    ["What is a target audience?", "The specific group a media product is designed for, or the people the creator wants to attract.[cite: 1]"],
+                    ["Give three examples of audience segmentation categories.", "Age, gender, occupation, income, education, location, interests, or lifestyle.[cite: 1]"],
+                    ["Why might a media company want to know its target audience?", "So it can choose suitable images, language, colours, content and platforms, making it more appealing.[cite: 1]"],
+                    ["What is the difference between a general audience and a target audience?", "A general audience includes lots of different people, while a target audience is the specific group the product targets.[cite: 1]"],
+                    ["Can one person fit into several audience segments?", "Yes, someone could be a teenager, a student, live in a city, and enjoy gaming, fitting several groups.[cite: 1]"],
+                    ["Why is audience segmentation useful when planning a media product?", "Helps the creator make design choices suiting the intended audience instead of guessing what everyone likes.[cite: 1]"],
+                    ["What does age segmentation mean?", "Grouping people by age, such as children, teenagers, adults, or older people.[cite: 1]"],
+                    ["What is demographic segmentation?", "Grouping people by age, income, gender, job, family size, personal details, or type of people they are.[cite: 1, 2]"],
+                    ["Give two examples of demographic information.", "Age, income, gender, job, family size, student or working.[cite: 1, 2]"],
+                    ["What is geographic segmentation?", "Grouping people by where they live, targeting a particular area, town, city, region or country.[cite: 1, 2]"],
+                    ["Give an example of geographic segmentation.", "Targeting people in your local town, nearby, colder areas, or a particular city.[cite: 1, 2]"],
+                    ["How can segmentation make a media product more appealing?", "Using content and designs suited to the target group makes the product feel more relevant and interesting.[cite: 1]"],
+                    ["How can segmentation help a business save money?", "Avoids wasting advertising on uninterested people so marketing focuses on those likely to respond.[cite: 1]"],
+                    ["How can segmentation improve advertising?", "Helps choose the right message and platform (e.g. gaming sites to reach gamers).[cite: 1]"],
+                    ["How can segmentation help increase sales?", "The product/advert is more relevant to likely customers, encouraging more people to buy.[cite: 1]"],
+                    ["Why should a company avoid making assumptions about an audience?", "People in a group aren't all the same, stereotypes lead to bad designs, and research gives better understanding.[cite: 1]"],
+                    ["Why might a company use more than one segmentation category?", "Can define a more specific audience (e.g. teens in Yorkshire who game), making it more targeted.[cite: 1]"],
+                    ["A company is making a game for children aged 6 to 9. What design choices could suit the audience?", "Simple controls, clear instructions, bright colours, readable text, and friendly characters.[cite: 1]"],
+                    ["A company is making an advert for luxury watches aimed at high income adults. What choices could it make?", "Premium images, elegant fonts, sophisticated layout, high-quality photography, and focus on exclusivity.[cite: 1]"]
+                ]
+            },
+            {
+                topic: "2.4 Research methods, sources and types of data",
+                qas: [
+                    ["Name the four primary research methods in the specification.", "Focus groups, interviews, online surveys, and questionnaires.[cite: 1]"],
+                    ["Give two advantages of primary research.", "Specific to question, up to date, relevant questions, and control over info collected.[cite: 1]"],
+                    ["Give two disadvantages of primary research.", "Takes time, costs money, difficult to organise, or biased/unrepresentative answers.[cite: 1]"],
+                    ["Why might primary research be more relevant than secondary research?", "It can be designed around the exact product, audience, or question being investigated.[cite: 1]"],
+                    ["Why can primary research be expensive?", "Need to pay participants, equipment, staff, travel, or survey services.[cite: 1]"],
+                    ["Why might primary research results be biased?", "Questions may lead people, or participants might give answers they think the researcher wants to hear.[cite: 1]"],
+                    ["A student wants to find out which game genres Year 10 students prefer. Give one suitable primary research method.", "An online survey, questionnaire, interview, or focus group.[cite: 1]"],
+                    ["Explain one advantage of collecting primary research before producing a media product.", "Company can use results to make design decisions matching its intended audience.[cite: 1]"],
+                    ["Explain one disadvantage of relying only on primary research.", "May take too long or provide too few responses, missing useful wider information.[cite: 1]"],
+                    ["What is a focus group?", "A small group discussing a topic/product while a researcher asks questions and gathers opinions.[cite: 1]"],
+                    ["Give one advantage of a focus group.", "People discuss views, build on other ideas, and provide detailed feedback.[cite: 1]"],
+                    ["Give one disadvantage of a focus group.", "Difficult to organise, some people dominate, or others are influenced by group opinions.[cite: 1]"],
+                    ["Name four secondary research sources from the specification.", "Books and journals, internet sites and research, magazines and newspapers, television.[cite: 1]"],
+                    ["Give two advantages of secondary research.", "Quicker and cheaper than primary, provides lots of info, and allows comparisons with existing research.[cite: 1]"],
+                    ["Give two disadvantages of secondary research.", "May be out of date, inaccurate, biased, unreliable, or not relevant to the exact question.[cite: 1]"],
+                    ["Why might a company use secondary research before primary research?", "To learn what is already known before spending time or money collecting new info.[cite: 1]"],
+                    ["What should a researcher check before using information from a website?", "Whether it is reliable, accurate, relevant, up to date, and from a trustworthy source.[cite: 1]"],
+                    ["Why is the date of a research source important?", "Older information may no longer reflect current trends, technology, or audience preferences.[cite: 1]"],
+                    ["Explain one advantage of secondary research for a small media company.", "Can access existing info without the cost and effort of organising interviews or surveys.[cite: 1]"],
+                    ["Explain one disadvantage of using only secondary research.", "Info may not answer the exact question or reflect the company's specific target audience.[cite: 1]"]
+                ]
+            },
+            {
+                topic: "2.5 Media codes used to convey meaning and create impact",
+                qas: [
+                    ["What are media codes?", "Systems of signs and symbols used to communicate messages and convey meaning to an audience."],
+                    ["What are the three main categories of media codes?", "Technical codes, symbolic codes, and written codes."],
+                    ["What are technical codes?", "Techniques related to equipment and how a product is made, such as camera work, lighting, sound, or editing."],
+                    ["Give an example of a written code.", "A bold headline, catchy cover line, or stylized font."],
+                    ["What is a close-up shot used for?", "To show emotion, facial expressions, detail, or focus attention on a character's face."],
+                    ["What is a long shot (wide shot) used for?", "To show the location, setting, or environment around a character."],
+                    ["What effect does a low-angle shot have on a subject?", "Makes the character look powerful, dominant, strong, or threatening."],
+                    ["What effect does a high-angle shot have on a subject?", "Makes the character look vulnerable, weak, or insignificant."],
+                    ["What is meant by visual hierarchy?", "Arranging items by size/colour/position so people know what is most important to look at first."],
+                    ["What is a symbolic code?", "Codes that rely on cultural meanings, such as objects, colours, body language, or facial expressions representing an idea."],
+                    ["Give an example of a symbolic code using colour.", "Using red to symbolise danger/anger, or white to symbolise purity/peace."],
+                    ["What is typography?", "The style and appearance of printed matter; how fonts and text are arranged to convey meaning."],
+                    ["How does lighting act as a technical code?", "High-key lighting can suggest happiness or safety, while low-key lighting creates shadows, mystery, or fear."],
+                    ["What is diegetic sound?", "Sound whose source is visible on screen or implied to be present by the action (e.g. voices, footsteps)."],
+                    ["What is non-diegetic sound?", "Sound added in editing whose source is not present on screen (e.g. background music, narrator)."],
+                    ["What is framing?", "How a subject is positioned within the camera lens to draw the audience's focus."],
+                    ["What is the rule of thirds?", "Dividing an image into a 3x3 grid and placing the focal point on the intersecting lines for a balanced composition."],
+                    ["How can body language act as a symbolic code?", "A slumped posture can show sadness or defeat, while a puffed chest shows confidence."],
+                    ["What is a transition in video editing?", "The method used to move from one shot or scene to the next, such as a cut, fade, or wipe."],
+                    ["How do props serve as symbolic codes?", "An object can quickly explain a character's role (e.g. a stethoscope for a doctor, a wand for a wizard)."]
+                ]
+            },
+            {
+                topic: "3.1 Work planning",
+                qas: [
+                    ["What is a work plan?", "A structured document that outlines all tasks, timings, resources, and milestones needed to complete a project."],
+                    ["Why is a work plan important in media production?", "It ensures the project is completed on time, within budget, and meets the client's brief."],
+                    ["What is a task in a work plan?", "A specific job or action that needs to be completed as part of the project (e.g. 'record audio' or 'edit video')."],
+                    ["What is a milestone?", "A significant point or event in the project timeline, such as completing the first draft or client approval."],
+                    ["What does 'duration' mean in work planning?", "The amount of time estimated for a specific task to be completed."],
+                    ["What are resources in a work plan?", "The things needed to complete the project, including hardware, software, personnel, and facilities."],
+                    ["What is a contingency plan?", "Backup time or alternative arrangements built into the plan in case something goes wrong."],
+                    ["Why should a work plan include contingency time?", "To handle unexpected delays like equipment failure, bad weather, or staff illness without missing the final deadline."],
+                    ["What is a Gantt chart?", "A visual timeline bar chart showing the start and finish dates of elements in a project."],
+                    ["What is a production schedule?", "A detailed timetable allocating specific times, dates, locations, and personnel for production activities."],
+                    ["What is a critical path?", "The sequence of vital tasks that determine the minimum time needed to complete the entire project."],
+                    ["What happens if a task on the critical path is delayed?", "The entire project's final deadline will be delayed."],
+                    ["What are predecessor tasks?", "Tasks that must be completed before another task can begin (e.g. writing a script before filming can start)."],
+                    ["What is concurrent tasking?", "Tasks that can be worked on at the same time by different people to save project time."],
+                    ["Why is regular review of a work plan necessary?", "To check progress, adjust timelines, and ensure the project remains on track."],
+                    ["What is an asset log?", "A list keeping track of all media elements (images, audio, video) needed, their source, and copyright status."],
+                    ["How does budget influence work planning?", "It limits how much time can be spent and what resources/personnel can be hired for tasks."],
+                    ["What is a workflow?", "The sequence of industrial, administrative, or other processes through which a piece of work passes from initiation to completion."],
+                    ["Why should roles and responsibilities be defined in a work plan?", "So everyone knows exactly what they must do, avoiding duplicated work or missed tasks."],
+                    ["How does a deadline act as a constraint in work planning?", "It provides a strict end date that dictates the speed and scheduling of all preceding tasks."]
+                ]
+            },
+            {
+                topic: "3.2 Documents used to support ideas generation",
+                qas: [
+                    ["What is a mood board?", "A visual collage of images, colours, textures, and typography used to generate ideas and capture a specific feel or theme."],
+                    ["What is the main purpose of a mood board?", "To stimulate creativity, show potential colour schemes, and communicate the intended 'vibe' to a client early on."],
+                    ["What can be included on a physical mood board?", "Photographs, magazine cut-outs, fabric swatches, colour palettes, and text/fonts."],
+                    ["What is a digital mood board?", "A mood board created on a computer using software or websites, combining digital images, hex colours, and digital fonts."],
+                    ["What is a mind map?", "A diagram used to visually organize information, linking ideas around a central concept or node."],
+                    ["How is a mind map structured?", "It starts with a central idea in the middle, with branches radiating outwards to sub-topics and smaller details."],
+                    ["What is the purpose of a mind map?", "To quickly brainstorm ideas, explore different options, and see how different concepts connect logically."],
+                    ["What can be included in a mind map?", "Keywords, short phrases, colour-coded branches, and simple icons or sketches."],
+                    ["Why are mood boards useful for presenting to clients?", "They provide a quick, visual way for the client to see if the designer has understood the desired aesthetic before major work begins."],
+                    ["Why is it helpful to use keywords on a mind map rather than full sentences?", "It keeps the diagram clear, uncluttered, and quick to read at a glance."],
+                    ["What is a spider diagram?", "Very similar to a mind map, often less structured and used for rapid, unstructured brainstorming."],
+                    ["How can colour be used effectively on a mind map?", "To group similar themes together or highlight the most important branches."],
+                    ["What is the difference between a mood board and a mind map?", "A mood board focuses on visual style, emotion, and aesthetics, while a mind map focuses on logical links, structure, and text-based ideas."],
+                    ["Can a mood board include text?", "Yes, it can include specific fonts, catchphrases, or adjectives that match the theme."],
+                    ["What is a concept sketch?", "A rough, early drawing used to quickly visualise an idea for a character, product, or layout before detailed design begins."],
+                    ["Why create multiple ideas generation documents?", "To explore several different directions before committing time and budget to a final choice."],
+                    ["Who typically uses a mood board?", "Graphic designers, interior designers, fashion designers, and film directors."],
+                    ["What does 'theme' mean in relation to a mood board?", "The overarching subject or style, such as 'vintage', 'futuristic', or 'eco-friendly'."],
+                    ["How can a mood board prevent mistakes?", "By ensuring the client and designer agree on the visual style before actual production starts."],
+                    ["What is the benefit of a digital mood board over a physical one?", "It is easier to edit, share via email, and can include multimedia elements like video or audio clips."]
+                ]
+            },
+            {
+                topic: "3.3 Documents used to design and plan media products",
+                qas: [
+                    ["What is a storyboard?", "A sequence of drawings with directions, showing how a video or animation will unfold shot by shot."],
+                    ["What information is typically found on a storyboard?", "Scene sketches, timings, camera angles, lighting, sound/dialogue, and transition instructions."],
+                    ["Why are storyboards important for video production?", "They allow the crew to visualize the sequence, plan camera setups, and know exactly what to film."],
+                    ["What is a script?", "A written document detailing the dialogue, character actions, and setting for a video, audio, or animation product."],
+                    ["What does a script provide for actors?", "Their spoken lines (dialogue) and stage directions on how to act or move."],
+                    ["What is a wireframe?", "A basic structural outline (blueprint) of a web page or app interface, showing where elements will be placed."],
+                    ["What is the purpose of a wireframe?", "To plan the layout, navigation, and user experience without getting distracted by colours or graphics."],
+                    ["What is a visualisation diagram?", "A detailed sketch or digital mock-up showing what the final static graphic or print product will look like."],
+                    ["What information does a visualisation diagram include?", "Images, text layout, typography, colour schemes, and annotations explaining design choices."],
+                    ["How does a visualisation diagram differ from a mood board?", "A mood board generates a general 'feel', while a visualisation diagram shows the exact planned layout of the final product."],
+                    ["What is an asset log?", "A document tracking all media files (images, audio, video) used in a project, including their source and copyright status."],
+                    ["Why is an asset log legally important?", "It proves that the creator has checked copyright and obtained necessary permissions for all external resources."],
+                    ["What does 'annotation' mean on a design document?", "Adding explanatory notes or labels to a sketch to describe colours, fonts, or techniques that cannot be drawn."],
+                    ["Why use arrows in a storyboard?", "To indicate the direction of a character's movement or a camera pan/zoom."],
+                    ["What is a sitemap?", "A diagram showing the hierarchy and linking structure of pages within a website."],
+                    ["Why create a sitemap before building a website?", "To ensure logical navigation and that users can find all necessary information easily."],
+                    ["What is a flat plan?", "A document showing the page layout sequence for a print publication like a magazine or comic."],
+                    ["What is a prototype?", "A functional or semi-functional early version of a product (like an app) to test usability before final development."],
+                    ["Why is it important to show design documents to a client?", "To get their approval on the specific layout, script, or sequence before spending money on actual production."],
+                    ["What is a shot list?", "A checklist derived from the storyboard detailing every camera shot needed on a filming day to ensure nothing is missed."]
+                ]
+            },
+            {
+                topic: "3.4.1 Legal considerations to protect individuals",
+                qas: [
+                    ["What does privacy mean in media production?", "Keeping people's private lives, information and images protected without sharing personal things without reason."],
+                    ["Why are privacy considerations important?", "To protect people, stop unwanted attention, avoid embarrassment and respect personal lives."],
+                    ["What is meant by permission?", "Getting someone's agreement or approval to use their image, property, or information."],
+                    ["How can a media producer reduce the risk of invading privacy?", "Ask for permission, avoid intrusive recording, respect objections, and think before publishing."],
+                    ["What is defamation?", "Making or sharing a false claim about someone that damages their reputation or spreading lies."],
+                    ["What is libel?", "Defamation in a permanent or recorded form, such as writing, a printed article, or a published online post."],
+                    ["What is slander?", "Defamation through spoken words or a temporary form of communication."],
+                    ["How can a producer reduce the risk of libel and slander?", "Check claims, use reliable evidence, represent people fairly, and correct mistakes promptly."],
+                    ["What is personal data?", "Information that identifies someone or can be used to identify them directly or indirectly."],
+                    ["Give four examples of personal data.", "Name, home address, phone number, email address, date of birth, photograph, or IP address."],
+                    ["What is a data subject?", "The specific person that the personal data is about."],
+                    ["What is the UK GDPR?", "The UK General Data Protection Regulation; a law protecting how individuals' personal data is processed and kept safe."],
+                    ["What does the Data Protection Act require companies to do?", "Keep personal data secure, accurate, up-to-date, and only use it for the stated, lawful purpose."],
+                    ["What is a model release form?", "A legal document signed by a person granting permission for their image or video to be used commercially."],
+                    ["Why is a location release form needed?", "To gain legal permission from a property owner to film or photograph on their private premises."],
+                    ["What happens if a company breaches data protection laws?", "They can face massive financial fines and significant damage to their reputation."],
+                    ["Is taking a photograph of someone in a public space always an invasion of privacy?", "No, generally there is no expectation of privacy in a purely public space, but harassment must be avoided."],
+                    ["Why is it dangerous to publish unverified rumors?", "It opens the publisher up to being sued for defamation (libel) if the rumors are false and damaging."],
+                    ["What right does a data subject have regarding their data?", "The right to access it, correct it, or request it be deleted (the right to be forgotten)."],
+                    ["What is an NDA (Non-Disclosure Agreement)?", "A legal contract preventing someone from sharing confidential information or trade secrets they learn during production."]
+                ]
+            },
+            {
+                topic: "3.4.2 Intellectual property rights",
+                qas: [
+                    ["What is intellectual property (IP)?", "Something created using ideas or creativity, such as a photograph, logo, song, script, or invention."],
+                    ["Why is intellectual property important?", "It protects people's creations and helps stop others from using, copying, or profiting from them without permission."],
+                    ["What is copyright?", "A legal right automatically granting the creator of an original work exclusive rights to its use and distribution."],
+                    ["What does the Copyright, Designs and Patents Act (CDPA) do?", "It makes it illegal to copy, modify, or distribute someone else's intellectual property without permission."],
+                    ["What is a trademark?", "A legally registered symbol, word, or design representing a company or product, protecting brand identity."],
+                    ["What is a licensing fee?", "Money paid for the legal right to use someone else's copyrighted work."],
+                    ["Does every copyrighted image require payment to use it?", "No. Some images are free under particular terms, but users must still follow the specific licence conditions."],
+                    ["Why check a licence before using an image?", "To check whether the planned use is allowed, including commercial use, editing, and sharing."],
+                    ["What might a media licence restrict?", "Where the work can be used, for how long, whether it can be edited, or if it can be used commercially."],
+                    ["Why keep proof of a licence or permission?", "To legally prove you were allowed to use the material and show what conditions applied if challenged."],
+                    ["What is a Creative Commons (CC) licence?", "A public licence allowing creators to let others use their work for free, under specific stated conditions."],
+                    ["Does Creative Commons mean an image has no copyright?", "No. The creator retains copyright while allowing certain uses through the flexible CC licence."],
+                    ["What does 'attribution' (BY) mean in a Creative Commons licence?", "Giving credit to the original creator, usually by naming them and providing required source details/links."],
+                    ["What does 'Non-Commercial' (NC) mean in Creative Commons?", "The material can be used, but not for profit or to advertise a business."],
+                    ["What does 'NoDerivatives' (ND) mean in Creative Commons?", "The material can be used exactly as it is, but it cannot be altered, remixed, or edited in any way."],
+                    ["What is 'fair dealing' (or fair use)?", "A limited legal exception allowing certain uses of copyrighted work (like news reporting or teaching) without permission."],
+                    ["What is public domain?", "Creative works whose copyright has expired or been forfeited, meaning they are free for anyone to use without permission."],
+                    ["What is watermarking?", "Faintly overlaying a logo or text onto a digital image or video to deter unauthorized copying and identify ownership."],
+                    ["What happens if a media company ignores copyright law?", "They can face legal action, forced removal of the product, and severe financial penalties."],
+                    ["What is a patent?", "A form of intellectual property that gives its owner the legal right to exclude others from making or selling an invention."]
+                ]
+            },
+            {
+                topic: "3.4.3 Regulation, certification, and classification",
+                qas: [
+                    ["Give two examples of media products that may be regulated or classified.", "Television programmes and adverts, or films and video games.[cite: 1]"],
+                    ["What might happen if a media company breaks relevant rules?", "It could have to change or remove content, face a complaint or investigation, or receive a sanction.[cite: 1]"],
+                    ["Why might different types of media have different regulatory organisations?", "Different products have different risks and responsibilities, so specialist organisations deal with them.[cite: 1]"],
+                    ["What does ASA stand for?", "Advertising Standards Authority.[cite: 1]"],
+                    ["What does the ASA do?", "Regulates advertising across all media in the UK to ensure adverts are legal, decent, honest, and truthful."],
+                    ["What is regulation in the media industry?", "Rules and standards that media companies must follow, to make sure content is responsible and fair."],
+                    ["What is the purpose of media regulation?", "To protect audiences from harm, prevent misleading content, and ensure companies act responsibly."],
+                    ["What is classification?", "Giving a media product a rating or age category to show who it is suitable for."],
+                    ["What is certification?", "The official document or symbol proving a media product has been classified with a specific age rating."],
+                    ["What is the difference between regulation and classification?", "Regulation sets and enforces rules. Classification gives a product a specific category or age rating."],
+                    ["Which body classifies films and video releases in the UK?", "The BBFC (British Board of Film Classification)."],
+                    ["What are the main BBFC age ratings?", "U, PG, 12A, 12, 15, and 18."],
+                    ["Which body classifies video games in Europe/UK?", "PEGI (Pan European Game Information)."],
+                    ["What do PEGI descriptors show?", "The specific reasons for an age rating, such as bad language, violence, fear, or gambling elements."],
+                    ["Which body regulates TV and Radio broadcasting in the UK?", "Ofcom."],
+                    ["What is the 'watershed' in UK television?", "A time (9:00 PM) after which TV stations can broadcast material suitable only for adults."],
+                    ["Why are media products given age ratings?", "To help audiences and parents make informed decisions about whether the content is suitable for a particular age."],
+                    ["Why must designers consider regulation during the planning stage?", "To avoid expensive changes later, ensure the product reaches its target audience legally, and avoid bans."],
+                    ["What is the W3C (World Wide Web Consortium)?", "An international community that develops open standards and guidelines to ensure the long-term growth of the Web."],
+                    ["Summarise why regulation, certification and classification are important.", "They protect audiences from harm, ensure fair advertising, provide clear age guidance, and maintain industry standards."]
+                ]
+            },
+            {
+                topic: "3.4.4 Health and safety",
+                qas: [
+                    ["What is the difference between a hazard and a risk?", "A hazard is something that could cause harm; a risk is how likely it is to happen and how serious it could be."],
+                    ["What is a risk assessment?", "A document identifying potential hazards in a workplace or location, evaluating the risks, and stating how to control them."],
+                    ["Why must a media production company complete a risk assessment?", "It is a legal requirement under Health & Safety law to protect staff and the public from harm."],
+                    ["Give an example of a hazard when filming on location.", "Trailing power cables, uneven ground, bad weather, or working at heights."],
+                    ["How can the risk of trailing power cables be controlled?", "By taping them securely to the floor or using heavy-duty cable covers."],
+                    ["What is a hazard associated with using computers for long periods?", "Eye strain, repetitive strain injury (RSI), or backache from poor posture."],
+                    ["How can the risk of RSI be reduced for an editor?", "Using an ergonomic keyboard and mouse, taking regular breaks, and doing wrist exercises."],
+                    ["How can eye strain be prevented when editing?", "Taking regular screen breaks, adjusting monitor brightness, and using anti-glare screen filters."],
+                    ["What is ergonomics?", "The science of designing a workspace to fit the user, maximizing comfort and reducing physical strain."],
+                    ["Why is correct posture important for media office workers?", "It prevents long-term musculoskeletal problems, back pain, and fatigue."],
+                    ["What hazard do heavy studio lights pose?", "They get extremely hot (burn risk) and are heavy (crush risk if they fall)."],
+                    ["How can the risk of falling studio lights be minimized?", "Securing lights with safety chains and ensuring stands are weighted down with sandbags."],
+                    ["What is PAT testing?", "Portable Appliance Testing; a process to check electrical equipment is safe to use and prevent electric shocks."],
+                    ["What should happen if a hazard cannot be completely removed?", "Control measures must be put in place to reduce the risk to an acceptable, safe level."],
+                    ["What is a recce?", "A pre-filming visit to a location to work out camera positions, lighting, and identify potential health and safety hazards."],
+                    ["Whose responsibility is Health and Safety on a production set?", "It is the responsibility of the employer, but all employees must act safely and follow guidelines."],
+                    ["Why might high-visibility jackets be required on a filming location?", "To ensure crew members are easily seen by traffic or heavy machinery, reducing the risk of accidents."],
+                    ["What hazard is associated with loud music production or live events?", "Hearing damage or tinnitus from prolonged exposure to high decibel levels."],
+                    ["How can hearing damage be prevented in a studio?", "Wearing ear protection, taking breaks from loud noise, and monitoring audio levels carefully."],
+                    ["Why is it important to keep walkways clear on a film set?", "To prevent trips and falls, and ensure a clear escape route in case of a fire or emergency."]
+                ]
+            },
+            {
+                topic: "4.1 Distribution platforms and media to reach audiences",
+                qas: [
+                    ["What is a distribution platform?", "The technology or system used to deliver a media product to its audience, such as a website, app or DVD."],
+                    ["What is distribution in media?", "The process of getting a finished media product out to the audience so they can access, buy, or use it."],
+                    ["What is digital distribution?", "Delivering media content electronically over the internet, such as downloading a game or streaming a movie."],
+                    ["What is physical distribution?", "Delivering media on physical formats, such as printing magazines, burning DVDs, or pressing vinyl records."],
+                    ["Give an advantage of digital distribution.", "It is cheaper (no manufacturing costs), instant, reaches a global audience, and has no shipping fees."],
+                    ["Give a disadvantage of digital distribution.", "Requires an internet connection, carries a higher risk of piracy, and audiences don't own a physical copy."],
+                    ["Give an advantage of physical distribution.", "No internet is required to use the product, it can be collected, and it can be sold in high-street shops."],
+                    ["Give a disadvantage of physical distribution.", "High manufacturing and shipping costs, limited stock, and products can be physically damaged or lost."],
+                    ["What is streaming?", "Watching or listening to media continuously over the internet without needing to download the entire file first."],
+                    ["What is downloading?", "Transferring a complete media file from a server to a local device to keep and view offline."],
+                    ["How does an app store act as a distribution platform?", "It provides a centralized digital marketplace where users can search for, purchase, and download mobile games/software."],
+                    ["Why might a film be released in cinemas before streaming platforms?", "To maximize initial ticket sale revenue before making it available for home viewing (release windows)."],
+                    ["How has social media changed distribution?", "It allows creators to distribute content directly to their followers for free and rely on viral sharing to reach millions."],
+                    ["What is a kiosk or point-of-sale display?", "A physical distribution method where products (like DVDs or magazines) are displayed prominently in a shop to encourage impulse buying."],
+                    ["Why must a file format suit the chosen distribution platform?", "So the platform can actually play or display it (e.g. an MP4 for YouTube, an HTML file for a web server)."],
+                    ["How does file size affect digital distribution?", "Large files take longer to download/stream, use more bandwidth, and may buffer on slow internet connections."],
+                    ["What is a podcast platform?", "A digital distribution service specifically designed to host and syndicate episodic audio content to listeners."],
+                    ["Why do print magazines still exist despite digital distribution?", "Some audiences prefer the physical feel, high-quality print aesthetics, and the ability to read without screens."],
+                    ["What is cross-platform distribution?", "Releasing a media product across multiple different platforms (e.g. a game released on PC, Xbox, and PlayStation)."],
+                    ["How does cloud storage assist distribution?", "It allows users to access their purchased media files from any device, anywhere, by logging into an account."]
+                ]
+            },
+            {
+                topic: "4.2.1 Properties and formats of media files - Image Files",
+                qas: [
+                    ["What does DPI stand for?", "Dots per inch. It describes how many printed ink dots fit into one inch of physical space."],
+                    ["What does PPI stand for?", "Pixels per inch. It describes how many digital pixels fit into one inch of a screen display."],
+                    ["What is resolution in a digital image?", "The amount of detail an image holds, often described using pixel dimensions (e.g. 1920x1080) or pixel density."],
+                    ["What is the standard resolution for high-quality print?", "300 DPI."],
+                    ["What is the standard resolution for screen display (web)?", "72 PPI."],
+                    ["What is a raster (or bitmap) image?", "An image made up of a grid of tiny, individual coloured squares called pixels."],
+                    ["What happens if you enlarge a raster image too much?", "It loses quality, becomes blurry, and looks blocky or 'pixelated'."],
+                    ["What is a vector graphic?", "An image created using mathematical formulas, lines, and shapes rather than a grid of pixels."],
+                    ["What is the main advantage of a vector graphic?", "It can be scaled up infinitely to any size without losing any quality or becoming pixelated."],
+                    ["What type of image is a photograph?", "A raster (bitmap) image."],
+                    ["What type of image is a logo usually created as?", "A vector graphic, so it can be resized for anything from a pen to a billboard."],
+                    ["What is a JPEG (.jpg)?", "A common raster image format that uses lossy compression, ideal for photographs and web use."],
+                    ["What is a PNG?", "A raster format that uses lossless compression and supports a transparent background."],
+                    ["Why would you use a PNG instead of a JPEG for a website logo?", "Because PNGs support transparent backgrounds, allowing the website colour to show through behind the logo."],
+                    ["What is a GIF?", "A simple raster format limited to 256 colours, supporting transparency and basic short animations."],
+                    ["What is a TIFF (.tif)?", "A high-quality raster format used primarily in professional printing and desktop publishing. It creates very large files."],
+                    ["What is an SVG?", "Scalable Vector Graphics; the standard vector file format used for two-dimensional graphics on the internet."],
+                    ["What does image compression do?", "It reduces the file size of the image so it takes up less storage space and loads faster online."],
+                    ["What is bit depth (or colour depth) in an image?", "The number of bits used to indicate the colour of a single pixel. Higher bit depth allows for more colours."],
+                    ["How does image resolution affect file size?", "Higher resolution means more pixels, which results in a larger file size."]
+                ]
+            },
+            {
+                topic: "4.2.2 Properties and formats of media files - Audio Files",
+                qas: [
+                    ["What is a digital audio file?", "A computer file that stores sound or music digitally as a series of binary numbers."],
+                    ["What is sample rate?", "The number of times per second that a sound wave is measured (sampled) when converted to digital audio."],
+                    ["What unit is sample rate measured in?", "Hertz (Hz) or kilohertz (kHz)."],
+                    ["What does a sample rate of 44.1 kHz mean?", "The sound wave is measured 44,100 times every single second (CD quality)."],
+                    ["How does sample rate affect audio quality?", "A higher sample rate captures more detail and higher frequencies, improving audio quality but increasing file size."],
+                    ["What is bit depth in audio?", "The number of bits used to record the amplitude (loudness) of each individual sound sample."],
+                    ["How does bit depth affect audio quality?", "A higher bit depth gives a greater dynamic range (difference between quietest and loudest sounds) and less background noise."],
+                    ["What is an MP3?", "A very common compressed audio format that reduces file size significantly by removing sounds the human ear struggles to hear."],
+                    ["What is a WAV file?", "An uncompressed, high-quality audio format often used on Windows PCs and for professional audio editing."],
+                    ["What is an AIFF file?", "An uncompressed, high-quality audio format developed by Apple, similar to WAV."],
+                    ["Why choose MP3 over WAV for a website?", "MP3 files are highly compressed and much smaller, meaning they will load and stream much faster for the user."],
+                    ["Why choose WAV over MP3 for studio editing?", "WAV is uncompressed, so it retains full quality without any compression artifacts, making it better for professional editing."],
+                    ["What is audio bit rate?", "The amount of data processed per second in an audio file, usually measured in kilobits per second (kbps)."],
+                    ["How does bit rate affect an MP3 file?", "A higher bit rate (e.g. 320 kbps) means better sound quality but a larger file size than a lower bit rate (e.g. 128 kbps)."],
+                    ["What is a mono audio track?", "Audio that uses a single channel, meaning the exact same sound comes out of all speakers/headphones."],
+                    ["What is a stereo audio track?", "Audio that uses two channels (left and right), allowing different sounds to play in each ear to create a sense of space."],
+                    ["What is MIDI?", "Musical Instrument Digital Interface; a format that stores musical notes and instructions for synthesizers, not actual audio waves."],
+                    ["What is clipping in digital audio?", "When an audio signal is recorded too loudly and exceeds the maximum digital limit, causing harsh distortion."],
+                    ["What is a podcast format usually saved as?", "Typically an MP3, to ensure the file is small enough to download easily to mobile devices."],
+                    ["Why might background noise be a problem in an audio file?", "It lowers the professional quality and can make spoken dialogue difficult for the audience to understand."]
+                ]
+            },
+            {
+                topic: "4.2.3 Properties and formats of media files - Moving Image Files",
+                qas: [
+                    ["What is a digital video file?", "A file containing a sequence of moving images, often combined with a synchronised audio track, stored digitally."],
+                    ["What is frame rate?", "The number of individual still frames (images) displayed every second to create the illusion of movement."],
+                    ["What unit is frame rate measured in?", "Frames per second (fps)."],
+                    ["What does 30 fps mean?", "30 individual frames are displayed sequentially every single second."],
+                    ["How does a higher frame rate (e.g. 60 fps) affect video?", "It makes the motion look smoother and more lifelike, especially for fast action, but increases the file size."],
+                    ["What is video resolution?", "The number of pixels used to make up each frame of a video, usually expressed as width × height (e.g. 1920x1080)."],
+                    ["What does SD stand for?", "Standard Definition (e.g. 720x576 pixels or lower)."],
+                    ["What does HD stand for?", "High Definition (e.g. 1280x720 or 1920x1080 pixels)."],
+                    ["What does UHD stand for?", "Ultra High Definition."],
+                    ["What is commonly meant by 4K resolution?", "A UHD resolution of 3840 × 2160 pixels, offering four times the detail of standard 1080p HD."],
+                    ["What is an MP4?", "The most widely used video format online, offering excellent compression, good quality, and high compatibility across devices."],
+                    ["What is an AVI?", "An older video container format developed by Microsoft, often less compressed resulting in larger file sizes."],
+                    ["What is a MOV file?", "A video format developed by Apple for QuickTime, heavily used in professional video editing workflows."],
+                    ["What is an MKV file?", "A flexible, open-source video container that can hold multiple audio, video, and subtitle tracks in one file."],
+                    ["What is aspect ratio?", "The proportional relationship between a video's width and its height (e.g. 16:9 for widescreen TVs, 9:16 for vertical phones)."],
+                    ["How does resolution affect video file size?", "Higher resolutions contain millions more pixels per frame, drastically increasing the required storage space."],
+                    ["Why choose a lower resolution (e.g. 720p) for a mobile app video?", "It keeps the file size small, reducing buffering times and saving the user's mobile data allowance."],
+                    ["What is uncompressed video?", "Video stored with no compression applied, preserving exact sensor data, resulting in massive file sizes."],
+                    ["Why would a professional use uncompressed video?", "To preserve the absolute highest quality for complex visual effects editing and colour grading."],
+                    ["What is multimedia?", "Content that combines different types of media, such as text, images, sound, video, and animation into one product."]
+                ]
+            },
+            {
+                topic: "4.2.4 Properties and formats of media files - File compression",
+                qas: [
+                    ["What is file compression?", "A process that reduces the amount of data needed to store a file, making the file size smaller."],
+                    ["Why is file compression necessary for media products?", "Uncompressed media files are often too large to store efficiently, email, or stream over the internet without buffering."],
+                    ["What are the two main types of file compression?", "Lossy compression and Lossless compression."],
+                    ["What is lossy compression?", "A compression method that permanently deletes some data to dramatically reduce file size. Quality is slightly reduced."],
+                    ["Give an example of a lossy image format.", "JPEG."],
+                    ["Give an example of a lossy audio format.", "MP3."],
+                    ["What happens if you save a lossy file multiple times?", "The quality continues to degrade (generation loss) because more data is thrown away every time it is saved."],
+                    ["What is lossless compression?", "A compression method that reduces file size by identifying data patterns, without permanently throwing any data away. Original quality is perfectly restored."],
+                    ["Give an example of a lossless image format.", "PNG or TIFF."],
+                    ["Give an example of a lossless audio format.", "FLAC, ALAC, or WAV."],
+                    ["What is the trade-off with lossless compression?", "It retains perfect quality, but the file size remains significantly larger than lossy formats."],
+                    ["Why would a web designer choose lossy compression (JPEG)?", "To make website images load incredibly fast, improving user experience, while accepting a tiny drop in quality."],
+                    ["Why would a photographer choose lossless compression?", "To ensure their master files retain 100% of the original detail for high-end professional printing."],
+                    ["What is a ZIP file?", "A common archive format that uses lossless compression to bundle multiple files or folders into one smaller file."],
+                    ["How do you open a ZIP file?", "You must 'extract' or 'unzip' it using software to restore the files to their normal state."],
+                    ["What is a codec?", "A computer program (Coder-Decoder) that compresses data for storage/transmission and decompresses it for playback."],
+                    ["Why do streaming services like Netflix use heavy video compression?", "To transmit hours of high-definition video over the internet without overloading servers or freezing on the user's TV."],
+                    ["What is PDF compression?", "Reducing the size of a PDF document by compressing embedded images and discarding unnecessary document data."],
+                    ["How does compression affect download speeds?", "Smaller compressed files require less bandwidth, meaning they download significantly faster than uncompressed files."],
+                    ["If quality is the top priority and storage is unlimited, which compression should be used?", "Lossless compression (or no compression at all)."]
+                ]
+            }
+        ];
+
+        const container = document.getElementById('flashcards-root');
+
+        flashcardData.forEach((sectionData, index) => {
+            let section = document.createElement('div');
+            section.className = 'topic-section';
+            
+            let heading = document.createElement('h2');
+            heading.textContent = sectionData.topic;
+            section.appendChild(heading);
+
+            let grid = document.createElement('div');
+            grid.className = 'grid';
+
+            sectionData.qas.forEach(qa => {
+                let flipCard = document.createElement('div');
+                flipCard.className = 'flip-card';
+                flipCard.onclick = function() { this.classList.toggle('flipped'); };
+                
+                flipCard.innerHTML = `
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h3>${qa[0]}</h3>
+                            <div class="hint-text">Click to flip</div>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>${qa[1]}</p>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(flipCard);
+            });
+
+            section.appendChild(grid);
+            container.appendChild(section);
+        });
+    </script>
+</body>
+</html>
