@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Revision Flashcards - A1 to C5</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f4f6f8; 
+            color: #333; 
+        }
+        header { 
+            background-color: #1B1464; 
+            color: white; 
+            padding: 20px; 
+            display: grid; 
+            grid-template-columns: 1fr auto 1fr; 
+            align-items: center;
+            border-bottom: 6px solid #822433; 
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-left { display: flex; justify-content: flex-start; }
+        .header-center { text-align: center; }
+        .header-right { display: flex; justify-content: flex-end; align-items: center; }
+
+        header img { 
+            height: 80px; 
+            width: auto;
+            background-color: white; 
+            border-radius: 8px; 
+            padding: 5px; 
+        }
+        
+        .header-center h1 {
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: 1px;
+        }
+        .header-right .back-btn {
+            background-color: #F7931D;
+            color: #1B1464;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .header-right .back-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .flashcard-container {
+            padding: 40px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .topic-section {
+            margin-bottom: 60px;
+        }
+        .topic-section h2 {
+            color: #1B1464;
+            text-align: left;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #822433;
+            padding-bottom: 10px;
+            font-size: 2em;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .flip-card {
+            background-color: transparent;
+            width: 100%;
+            height: 240px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 8px;
+        }
+        .flip-card-front {
+            background-color: white;
+            color: #1B1464;
+            border-top: 6px solid #822433;
+        }
+        .flip-card-front .hint-text {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 15px;
+            font-weight: normal;
+        }
+        .flip-card-front h3 {
+            margin: 0;
+            font-size: 1.1em;
+            line-height: 1.4;
+        }
+        .flip-card-back {
+            background-color: #1B1464;
+            color: white;
+            transform: rotateY(180deg);
+            border-top: 6px solid #F7931D;
+            overflow-y: auto;
+        }
+        .flip-card-back p {
+            margin: 0;
+            font-size: 1.05em;
+            line-height: 1.5;
+        }
+        footer { 
+            text-align: center; 
+            padding: 25px; 
+            color: #666; 
+            margin-top: 50px; 
+            border-top: 1px solid #ddd; 
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <a href="index.html"><img src="logo.jpg" alt="Delta Logo"></a>
+        </div>
+        <div class="header-center">
+            <h1>Enterprise Complete Flashcards (A1 to C5)</h1>
+            <p style="margin: 5px 0 0 0; color: #e0e0e0;">BTEC Tech Award Revision</p>
+        </div>
+        <div class="header-right">
+            <a href="enterprise-revision.html" class="back-btn">&larr; Back to Unit</a>
+        </div>
+    </header>
+
+    <main class="flashcard-container" id="flashcards-root"></main>
+
+    <footer>
+        &copy; 2026 Delta Serlby Park - Business Department
+    </footer>
+
+    <script>
+        const flashcardData = [
+            {
+                topic: "SECTION A1: Targeting and segmenting the market",
+                qas: [
+                    ["What is market segmentation?", "Splitting customers into groups, dividing people into different types, or finding groups who want similar things.[cite: 1]"],
+                    ["What is a target market?", "The people a business wants to sell to, the audience trying to attract, or people most likely to buy.[cite: 1]"],
+                    ["What is B2B (Business to Business)?", "When a business sells its products or services to other businesses rather than individual consumers."],
+                    ["What is B2C (Business to Consumer)?", "When a business sells its products or services directly to individual members of the public."],
+                    ["What is a mass market?", "A very large market where products appeal to a wide range of customers with broad needs (e.g. bread, milk)."],
+                    ["What is a niche market?", "A small, specialized market for a specific product aimed at a particular group of customers with unique needs."],
+                    ["Give an advantage of targeting a mass market.", "High potential sales volume, opportunities for economies of scale, and high revenue."],
+                    ["Give a disadvantage of targeting a mass market.", "High levels of competition, need for massive advertising budgets, and lower profit margins per item."],
+                    ["Give an advantage of targeting a niche market.", "Less competition, can charge a premium price, and easier to build strong customer loyalty."],
+                    ["Give a disadvantage of targeting a niche market.", "Lower total sales volume, and highly vulnerable to shifts in customer trends."],
+                    ["What is demographic segmentation?", "Dividing a market based on characteristics like age, gender, income, education, or occupation."],
+                    ["Give an example of age segmentation.", "Creating a bright, simple video game for children aged 5-8, and a complex strategy game for adults."],
+                    ["What is geographic segmentation?", "Dividing a market based on where people live, such as by city, region, climate, or country."],
+                    ["Give an example of geographic segmentation.", "Selling thick winter coats in cold northern regions and light rain jackets in warmer southern areas."],
+                    ["What is psychographic segmentation?", "Dividing the market based on customers' lifestyles, values, interests, and personality traits."],
+                    ["What is behavioral segmentation?", "Dividing customers based on their behavior, such as brand loyalty, usage rate, or how often they buy."],
+                    ["Why do businesses segment their market?", "To better understand customer needs, tailor marketing campaigns, and increase sales efficiency."],
+                    ["What happens if a business targets the wrong market?", "They waste money on advertising, fail to make sales, and products may go unsold."],
+                    ["Can a person belong to more than one segment?", "Yes, someone can be grouped by age, income, and interests simultaneously (e.g. a high-income teenage gamer)."],
+                    ["How does segmentation save a business money?", "By ensuring advertising is only shown to people highly likely to buy, preventing wasted marketing budget."]
+                ]
+            },
+            {
+                topic: "SECTION A2: 4Ps of the marketing mix",
+                qas: [
+                    ["What are the 4Ps of the marketing mix?", "Product, Price, Place, and Promotion."],
+                    ["What does Price mean in the marketing mix?", "How much the customer pays, the cost, or the amount charged.[cite: 2]"],
+                    ["What does Place mean in the marketing mix?", "Where the product is sold or how customers get the product (e.g. online, shop).[cite: 2]"],
+                    ["What does Promotion mean in the marketing mix?", "How the business tells people, advertising, or encouraging customers to buy.[cite: 2]"],
+                    ["Why is the marketing mix important?", "Helps attract customers, sell more products, compete, or meet customer needs.[cite: 2]"],
+                    ["Why should the 4Ps work well together?", "They need to suit each other, match the target customers, and create a joined up plan.[cite: 2]"],
+                    ["What does 'Product' refer to?", "The actual good or service the business is selling to meet customer needs."],
+                    ["What is a USP (Unique Selling Point)?", "A feature or characteristic that makes a product stand out and makes it different from competitors."],
+                    ["What is price penetration?", "Setting a low initial price to enter a competitive market and quickly attract customers, before raising it later."],
+                    ["What is price skimming?", "Setting a high price for a new, unique product to maximize profit before competitors enter the market."],
+                    ["What is competitive pricing?", "Setting prices based on what rivals are charging (matching them or pricing slightly lower)."],
+                    ["What is psychological pricing?", "Setting a price that seems lower than it is to influence perception (e.g., £9.99 instead of £10.00)."],
+                    ["What is a physical distribution channel?", "Selling through traditional brick-and-mortar stores, wholesalers, or supermarkets."],
+                    ["What is an online distribution channel (e-commerce)?", "Selling products over the internet directly to customers via a website or app."],
+                    ["Give one advantage of selling directly to customers online.", "The business keeps all the profit margin without paying a middleman or retailer."],
+                    ["What is advertising?", "Paying for space or time to communicate a message about a product (e.g., TV commercials, social media ads)."],
+                    ["What is a sales promotion?", "Short-term incentives to encourage purchases, like 'Buy One Get One Free' (BOGOF) or discount codes."],
+                    ["What is public relations (PR)?", "Managing the company's image and gaining free media coverage (e.g., press releases, charity events)."],
+                    ["What is direct marketing?", "Communicating directly with target customers, usually via email newsletters, text messages, or direct mail."],
+                    ["How does the target market affect the 4Ps?", "A luxury target market requires a high-quality Product, high Price, exclusive Place, and sophisticated Promotion."]
+                ]
+            },
+            {
+                topic: "SECTION A3: Factors influencing the choice of marketing methods",
+                qas: [
+                    ["How does the size of the business influence marketing choices?", "Large businesses can afford national TV campaigns; small businesses often rely on cheap social media or local flyers."],
+                    ["How does the budget influence marketing choices?", "A high budget allows for expensive, wide-reaching methods, while a low budget restricts the business to cost-effective digital marketing."],
+                    ["Why must a business consider the target market when choosing marketing methods?", "So they use platforms their customers actually see (e.g. TikTok for teens, printed newspapers for older adults)."],
+                    ["How do competitor actions influence marketing choices?", "If a rival launches a massive ad campaign, a business may need to increase its own marketing to avoid losing market share."],
+                    ["How does the nature of the product affect the chosen Place?", "Perishable goods (like fresh food) need fast, direct distribution; digital software can be instantly downloaded worldwide."],
+                    ["How does the nature of the product affect Promotion?", "Complex technical products need detailed informative videos; everyday items just need quick, catchy visual ads."],
+                    ["What are the stages of the Product Life Cycle?", "Introduction, Growth, Maturity, Decline."],
+                    ["How does marketing differ in the Introduction stage?", "Focus is on heavy promotion and advertising to build awareness and get people to try the new product."],
+                    ["How does marketing adapt in the Growth stage?", "Focus shifts to building brand loyalty, maintaining quality, and keeping up with increasing demand."],
+                    ["How does marketing change in the Maturity stage?", "Sales peak. Marketing focuses on sales promotions, price drops, or extension strategies to fend off competitors."],
+                    ["What happens to marketing in the Decline stage?", "Marketing spending is heavily reduced. The business may lower the price to clear remaining stock."],
+                    ["What is an extension strategy?", "A marketing action taken to prolong the life of a product (e.g., updating packaging, adding new features, finding new markets)."],
+                    ["How can external economic factors influence pricing?", "During a recession, customers have less money, so a business might need to lower prices or offer discounts."],
+                    ["How can technology influence marketing methods?", "The rise of smartphones forces businesses to use mobile-friendly websites and social media rather than just print."],
+                    ["What is social media marketing?", "Using platforms like Instagram, Facebook, or TikTok to share content, run targeted ads, and engage with followers."],
+                    ["Give one advantage of social media marketing.", "It is often cheap, highly targeted using algorithms, and allows direct interaction with customers."],
+                    ["What is SEO (Search Engine Optimisation)?", "Improving a website so it ranks higher in search results, helping customers find the business naturally."],
+                    ["Why might a small bakery use local radio instead of national TV?", "National TV is too expensive and reaches people too far away to visit; local radio targets the immediate geographic area."],
+                    ["How does brand image influence the marketing mix?", "A premium brand must avoid cheap 'discount' promotions so it doesn't damage its luxury reputation."],
+                    ["What legal factors could influence marketing?", "Adverts must be truthful, cannot mislead consumers, and must follow advertising standards regulations."]
+                ]
+            },
+            {
+                topic: "SECTION A4: Trust, reputation and loyalty",
+                qas: [
+                    ["What is customer loyalty?", "When customers repeatedly buy from the same business instead of switching to competitors."],
+                    ["Why is customer loyalty important for a business?", "It guarantees regular income, and keeping existing customers is much cheaper than finding new ones."],
+                    ["What is a business reputation?", "The general opinion or perception that the public and customers have about the company."],
+                    ["How can high product quality build trust?", "Customers know the product will work as promised, so they feel confident returning to buy again."],
+                    ["How does excellent customer service improve reputation?", "Customers feel valued and supported, leading them to leave positive reviews and recommend the business."],
+                    ["What is word-of-mouth promotion?", "When satisfied customers recommend a business to their friends, family, or colleagues for free."],
+                    ["Why is word-of-mouth so effective?", "People naturally trust the opinions of their friends and family much more than paid advertising."],
+                    ["How can a business handle complaints to protect its reputation?", "By responding quickly, apologizing, and offering a fair solution (like a refund or replacement) to fix the issue."],
+                    ["What are loyalty schemes?", "Reward programs (like points cards or stamps) that give customers discounts or freebies for returning."],
+                    ["How do loyalty schemes benefit the business?", "They encourage repeat purchases and allow the business to track customer buying habits."],
+                    ["What is ethical behavior in business?", "Doing the right thing morally, such as paying fair wages, not exploiting workers, and trading honestly."],
+                    ["How can ethical behavior build trust?", "Modern consumers prefer to support companies that share their values and treat people fairly."],
+                    ["How can environmental responsibility improve reputation?", "Using sustainable packaging and reducing carbon emissions attracts eco-conscious consumers."],
+                    ["What impact do online reviews (e.g., Trustpilot, Google) have on a business?", "High ratings act as social proof to attract new buyers, while poor ratings can instantly drive customers away."],
+                    ["How can transparency build customer trust?", "Being honest about pricing, ingredients, and mistakes shows the business is not trying to trick the consumer."],
+                    ["What happens if a business breaks customer trust?", "Customers will leave, demand refunds, write negative reviews, and revenue will drop significantly."],
+                    ["Why is consistent branding important for reputation?", "It makes the business look professional, reliable, and instantly recognizable across all platforms."],
+                    ["How can social media be used to build loyalty?", "By interacting directly with customers, answering questions quickly, and building a community feeling."],
+                    ["What is the cost implication of losing reputation?", "The business must spend huge amounts of money on PR campaigns and discounts to win customers back."],
+                    ["How does a strong reputation affect pricing?", "A trusted, highly-rated business can often charge premium prices because customers are willing to pay for guaranteed quality."]
+                ]
+            },
+            {
+                topic: "SECTION B1: Financial documents",
+                qas: [
+                    ["What is a purchase order?", "A formal document sent by a buyer to a seller, requesting goods and stating quantities and agreed prices."],
+                    ["What is a delivery note?", "A document sent with shipped goods detailing what is in the boxes, which the buyer signs upon receipt."],
+                    ["What is a goods received note (GRN)?", "An internal document completed by the buyer's warehouse to confirm that all items on the delivery note arrived safely."],
+                    ["What is an invoice?", "A bill sent by the seller to the buyer, listing the goods provided, the total amount owed, and the payment deadline."],
+                    ["Who issues an invoice?", "The seller (the supplier) issues the invoice to the buyer (the customer)."],
+                    ["What is a receipt?", "A document given by the seller to the buyer as proof that payment for goods or services has been received."],
+                    ["What is a credit note?", "A document sent by a seller to a buyer reducing the amount owed, usually because goods were returned or damaged."],
+                    ["What is a statement of account?", "A monthly summary sent by a supplier to a regular customer showing all invoices, payments, and the total balance still owed."],
+                    ["Why is a purchase order legally important?", "Once accepted by the seller, it forms a legally binding contract detailing exactly what must be delivered and at what price."],
+                    ["Why do businesses use delivery notes?", "To ensure the correct items were shipped and to provide a checklist for the buyer to verify the delivery against."],
+                    ["What information is usually found on an invoice?", "Date, invoice number, supplier details, buyer details, description of goods, total amount, VAT, and payment terms."],
+                    ["Why is it important to keep accurate financial documents?", "For calculating profit correctly, tracking missing payments, resolving disputes, and legal tax reporting."],
+                    ["What happens if an invoice contains an error?", "The buyer may refuse to pay, causing delays in cash flow for the seller until a new invoice or credit note is issued."],
+                    ["What does 'E&OE' mean on an invoice?", "Errors and Omissions Excepted; a disclaimer that the seller has the right to correct accidental mistakes on the document."],
+                    ["How do financial documents help with inventory (stock) control?", "Delivery notes and goods received notes tell the warehouse exactly what needs to be added to the stock system."],
+                    ["Why must businesses retain financial documents for several years?", "It is a legal requirement for tax purposes (HMRC in the UK requires records to be kept for years)."],
+                    ["What is the benefit of using electronic financial documents (e-invoicing)?", "They are delivered instantly, cheaper to process, reduce paper waste, and automatically update accounting software."],
+                    ["What is a purchase invoice?", "The name given to the invoice by the buyer who receives it (they are purchasing the goods)."],
+                    ["What is a sales invoice?", "The name given to the exact same invoice by the seller who creates it (they are selling the goods)."],
+                    ["Why might a statement of account prompt a buyer to pay?", "It serves as a polite reminder of overdue invoices and clearly shows the total outstanding debt in one place."]
+                ]
+            },
+            {
+                topic: "SECTION B2: Payment methods",
+                qas: [
+                    ["What is a debit card?", "A plastic payment card that deducts money directly and immediately from the user's bank account."],
+                    ["What is a credit card?", "A card that allows users to borrow money from a bank to make purchases, which must be paid back later (often with interest)."],
+                    ["What is the main difference between a debit and credit card for the consumer?", "Debit uses their own money; credit uses borrowed money."],
+                    ["What is a direct debit?", "An instruction to a bank allowing a company to pull variable amounts of money from a customer's account to pay regular bills."],
+                    ["What is a standing order?", "An instruction set up by the customer telling their bank to pay a fixed amount of money regularly to a specific account."],
+                    ["What is the difference between a direct debit and a standing order?", "Direct debit amounts can change and are controlled by the company; standing order amounts are fixed and controlled by the customer."],
+                    ["What is contactless payment?", "A secure method using RFID/NFC technology to tap a card or phone on a reader for quick payments, usually with a transaction limit."],
+                    ["What are mobile payments?", "Paying via a smartphone app or digital wallet, such as Apple Pay or Google Pay."],
+                    ["What is BACS?", "An electronic system used in the UK for transferring money directly between bank accounts, typically taking 3 working days (often used for wages)."],
+                    ["What is CHAPS?", "A system for guaranteed same-day bank transfers of high-value amounts, which usually incurs a banking fee (e.g. buying a house)."],
+                    ["Give an advantage of cash payments for a business.", "The money is received instantly, and there are no card processing or transaction fees."],
+                    ["Give a disadvantage of cash payments for a business.", "High risk of theft, requires time to count, and must be physically transported to the bank."],
+                    ["Why do many businesses prefer card/contactless payments?", "They are fast, reduce queues, secure, and customers tend to spend more when using cards."],
+                    ["What is a disadvantage of accepting credit cards for a small business?", "The business must pay a percentage transaction fee to the credit card company for every sale."],
+                    ["Why might a gym require customers to pay by direct debit?", "It ensures regular, automatic monthly income without having to chase customers for payment."],
+                    ["What is a cheque?", "A written order instructing a bank to pay a specific amount to the person named; now rarely used due to slow clearing times."],
+                    ["Why are cheques considered risky for businesses?", "They can 'bounce' if the customer does not have enough money in their account, leaving the business unpaid."],
+                    ["What is a payment gateway (e.g., PayPal, Stripe)?", "An online service that authorizes and securely processes credit/debit card payments for e-commerce websites."],
+                    ["How does accepting multiple payment methods help a business?", "It improves customer convenience, prevents lost sales from people who only use one method, and increases overall revenue."],
+                    ["Why might a B2B (business-to-business) transaction use BACS instead of a credit card?", "BACS handles large invoice amounts directly between bank accounts with lower fees than credit card processing."]
+                ]
+            },
+            {
+                topic: "SECTION B3: Revenue and costs",
+                qas: [
+                    ["What is revenue?", "Money a business makes from selling products/services, sales income, or total sales before costs.[cite: 1]"],
+                    ["What is another word for revenue?", "Sales revenue, turnover, money made from sales, or sales income.[cite: 1]"],
+                    ["How does a business calculate revenue?", "Selling price multiplied by number sold (Price x Quantity).[cite: 1]"],
+                    ["What are start-up costs?", "One-off expenses a business must pay before it can even begin trading (e.g. buying premises, initial equipment, legal fees)."],
+                    ["Give three examples of start-up costs.", "Buying a shop, purchasing ovens for a bakery, initial market research, and shop fitting."],
+                    ["What are running (operating) costs?", "The day-to-day ongoing expenses required to keep the business open (e.g. rent, wages, electricity)."],
+                    ["Give three examples of running costs.", "Monthly rent, staff wages, electricity bills, stock purchases, and advertising."],
+                    ["What are fixed costs?", "Costs that do not change based on how many products the business makes or sells (e.g. rent, insurance)."],
+                    ["Give three examples of fixed costs.", "Rent, salaried staff, insurance, and loan repayments."],
+                    ["What are variable costs?", "Costs that change directly based on how many products the business produces or sells (e.g. raw materials)."],
+                    ["Give three examples of variable costs.", "Raw materials, product packaging, ingredients, and delivery shipping costs per item."],
+                    ["What are total costs?", "All the expenses a business incurs, calculated by adding fixed costs and variable costs together."],
+                    ["How do you calculate total costs?", "Total Fixed Costs + Total Variable Costs."],
+                    ["If a business makes 0 products, what are its variable costs?", "Zero. Variable costs only happen when products are made."],
+                    ["If a business makes 0 products, what are its fixed costs?", "They remain exactly the same as usual; rent and insurance must still be paid even if nothing is sold."],
+                    ["Why is it important for a business to know its total costs?", "So it can set a selling price high enough to cover all expenses and make a profit."],
+                    ["What is capital expenditure?", "Money spent on buying long-term assets, like vehicles or machinery, that will stay in the business for over a year."],
+                    ["What is operating expenditure (OPEX)?", "Money spent on the day-to-day short-term running of the business, like paying utility bills or wages."],
+                    ["How can a business reduce its variable costs?", "By finding cheaper suppliers for materials, buying in bulk for discounts, or using cheaper packaging."],
+                    ["What happens to total variable costs if production doubles?", "Total variable costs will also double, as twice as many materials and packaging are needed."]
+                ]
+            },
+            {
+                topic: "SECTION B4: Financial statements",
+                qas: [
+                    ["What is a Statement of Comprehensive Income?", "A financial document showing a business's revenue, costs, and profit or loss over a period of time (usually a year)."],
+                    ["What is the older, common name for a Statement of Comprehensive Income?", "A Profit and Loss Account (P&L)."],
+                    ["What is a Statement of Financial Position?", "A document showing what a business owns, what it owes, and its overall value on one specific date."],
+                    ["What is the older, common name for a Statement of Financial Position?", "A Balance Sheet."],
+                    ["What is Gross Profit?", "Sales revenue minus the direct costs of making the product (Cost of Goods Sold)."],
+                    ["How do you calculate Gross Profit?", "Revenue - Cost of Goods Sold (COGS)."],
+                    ["What is Cost of Goods Sold (COGS) or Cost of Sales?", "The direct variable costs required to produce the goods sold (like raw materials and direct labor)."],
+                    ["What is Net Profit?", "The final profit left over after all other expenses and overheads are deducted from the gross profit."],
+                    ["How do you calculate Net Profit?", "Gross Profit - Expenses (Overheads)."],
+                    ["What are Expenses (Overheads)?", "The indirect fixed running costs of the business not tied directly to making the product (e.g. rent, marketing, admin)."],
+                    ["What is an asset?", "Something of value that the business owns."],
+                    ["What is a non-current (fixed) asset?", "Items owned by the business meant to be kept for more than one year (e.g. buildings, machinery, vehicles)."],
+                    ["What is a current asset?", "Cash or items that will quickly be turned into cash within one year (e.g. inventory/stock, cash in bank, trade receivables)."],
+                    ["What is a liability?", "Money that the business owes to others (debts)."],
+                    ["What is a current liability?", "Short-term debts that must be paid back within one year (e.g. an overdraft, trade payables/suppliers)."],
+                    ["What is a non-current (long-term) liability?", "Long-term debts that do not need to be fully paid back within a year (e.g. a 10-year bank loan or mortgage)."],
+                    ["What does Capital mean on a balance sheet?", "The money invested into the business by the owner(s) plus any retained profits kept in the business."],
+                    ["What are trade receivables (debtors)?", "Customers who owe the business money because they bought goods on credit (a current asset)."],
+                    ["What are trade payables (creditors)?", "Suppliers that the business owes money to because they bought supplies on credit (a current liability)."],
+                    ["Why do external investors look at a business's financial statements?", "To check if the business is profitable, financially stable, and a safe investment before giving them money."]
+                ]
+            },
+            {
+                topic: "SECTION B5: Profitability and liquidity",
+                qas: [
+                    ["What is profitability?", "How well a business makes profit, how much money it makes after costs, or if it makes enough to be successful.[cite: 1]"],
+                    ["What is profit?", "Money left after costs are taken away from revenue, or when sales income is greater than costs.[cite: 1]"],
+                    ["What is the difference between revenue and profit?", "Revenue is the money earned from sales; profit is what remains after costs are deducted.[cite: 1]"],
+                    ["Why is profitability important to an entrepreneur?", "Shows if it is making money, helps it survive/grow, pays the owner, or funds future investment.[cite: 1]"],
+                    ["What might happen if a business makes a loss for a long time?", "Could run out of money, struggle to pay bills, need to borrow, reduce costs, or eventually close.[cite: 1]"],
+                    ["Give two ways a business could increase its profit.", "Increase sales, reduce costs, negotiate cheaper supplies, reduce waste, improve efficiency, or attract more customers.[cite: 1]"],
+                    ["Why might a business with high revenue still have low profitability?", "Its costs may be very high, spends too much on wages/stock, or sells at prices leaving a small profit.[cite: 1]"],
+                    ["A business makes a profit but cannot afford to pay its suppliers this week. Explain the problem.", "It has a liquidity problem; it doesn't have enough cash available because customers haven't paid yet.[cite: 1]"],
+                    ["A business has plenty of cash but its costs are higher than its sales income. Explain the concern.", "It is making a loss and using up its cash reserves. If this continues, it will run out of money.[cite: 1]"],
+                    ["A small business wants to increase profitability. Recommend one action and explain why.", "Reduce waste, improve marketing, or negotiate cheaper supplies to leave more money after costs.[cite: 1]"],
+                    ["A business regularly pays its bills late. Suggest one improvement and explain why.", "Chase customers, request deposits, or negotiate terms to improve payment timing.[cite: 1]"],
+                    ["A business wants to buy a new van. Explain why they should consider profitability and liquidity.", "Profitability shows if they make enough overall; liquidity shows if they can afford the payments without struggling.[cite: 1]"],
+                    ["A business cuts prices to attract customers. Explain how this affects profitability.", "Sales volume increases but they earn less per item. Profit only improves if extra sales make up for the lower price.[cite: 1]"],
+                    ["A business has lots of unsold stock. Explain how this affects profitability and liquidity.", "Wastage/storage costs reduce profit, while money tied up in stock makes it unavailable to pay bills (liquidity).[cite: 1]"],
+                    ["A business is deciding between cutting costs and increasing sales. What should it consider?", "Consider how much it costs, how quickly it works, customer demand, quality, and if it improves profit.[cite: 1]"],
+                    ["What is liquidity?", "The ability of a business to pay its short-term debts and everyday bills using its available cash."],
+                    ["What happens if a business has poor liquidity?", "It will be unable to pay suppliers or staff wages on time, which could force it to close down (insolvency)."],
+                    ["What is working capital?", "The money available to fund the day-to-day running of the business (paying short-term bills)."],
+                    ["How do you calculate working capital?", "Current Assets minus Current Liabilities."],
+                    ["Why is the difference between profit and cash important?", "Profit is recorded when a sale is made, but cash (liquidity) isn't real until the customer actually pays the invoice."]
+                ]
+            },
+            {
+                topic: "SECTION C1: Budgeting",
+                qas: [
+                    ["Why should a business compare its budget with actual results?", "To see if it spent too much, check if sales met expectations, identify problems, or improve future plans.[cite: 1]"],
+                    ["Who might use a business budget?", "The owner, entrepreneur, managers, finance staff, or business partners.[cite: 1]"],
+                    ["What could happen if a business does not plan its spending?", "It may overspend, run short of money, struggle to pay bills, waste money, or make poor decisions.[cite: 1]"],
+                    ["Why might a business create a marketing budget?", "To plan marketing spending, avoid overspending, promote products, or attract customers.[cite: 1]"],
+                    ["Why could a business's income be difficult to predict?", "Customer demand changes, competitors, economy changes, go out of fashion, or seasonal variations.[cite: 1]"],
+                    ["Why could expenditure be higher than expected?", "Supplier prices increase, more stock needed, equipment breaks, energy costs rise, unexpected repairs.[cite: 1]"],
+                    ["Why might a business keep some money aside for unexpected costs?", "To cover emergencies, pay for repairs, deal with unexpected bills, or reduce the risk of running out of money.[cite: 1]"],
+                    ["What is the difference between fixed and variable expenditure?", "Fixed costs generally stay the same, while variable costs change with production or sales.[cite: 1]"],
+                    ["What is a budget?", "A financial plan for the future concerning expected revenues and costs over a specific period of time."],
+                    ["What is an income (sales) budget?", "A forecast of the amount of money a business expects to receive from sales over a period."],
+                    ["What is an expenditure (costs) budget?", "A planned limit on how much money a business intends to spend on materials, wages, and running costs."],
+                    ["What is variance analysis?", "Calculating the difference between the planned budget figures and the actual figures that occurred."],
+                    ["What is a favorable variance?", "When actual figures are better than the budget (e.g. costs were lower than expected, or sales were higher)."],
+                    ["What is an adverse (unfavorable) variance?", "When actual figures are worse than the budget (e.g. costs were higher than expected, or sales were lower)."],
+                    ["What should a manager do if they spot a large adverse variance in costs?", "Investigate why costs rose, find ways to cut back spending immediately, or find a cheaper supplier."],
+                    ["What is historical budgeting?", "Creating a new budget based directly on last year's figures, adjusting slightly for inflation or planned growth."],
+                    ["What is zero-based budgeting?", "Starting the budget from zero every year; managers must justify every single pound they want to spend."],
+                    ["How can budgets help motivate staff?", "Giving managers a specific target and budget can give them ownership, responsibility, and a goal to achieve."],
+                    ["How can a budget demotivate staff?", "If the budget is completely unrealistic or too strict, staff may feel pressured and give up trying to meet it."],
+                    ["Why is budget setting difficult for a brand new business?", "They have no past data (historical records) to base their estimates on, meaning figures are largely guesses."]
+                ]
+            },
+            {
+                topic: "SECTION C2: Cash flow",
+                qas: [
+                    ["What is cash flow?", "Money coming into and going out of a business, or the movement of money.[cite: 1]"],
+                    ["What is a cash inflow?", "Money coming into the business, money received, or cash the business gets.[cite: 1]"],
+                    ["Give three examples of cash inflows.", "Sales, money from a loan, money invested by owner, selling equipment, customers paying debts.[cite: 1]"],
+                    ["What is a cash outflow?", "Money leaving the business, money being paid out, or money the business spends.[cite: 1]"],
+                    ["Give three examples of cash outflows.", "Rent, wages, stock, electricity, buying equipment, loan repayments, advertising, paying suppliers.[cite: 1]"],
+                    ["What is a cash flow forecast?", "A prediction/estimate of money coming in and going out, or a plan for future cash.[cite: 1]"],
+                    ["Why might a business create a cash flow forecast?", "To see if it has enough money, plan ahead, spot problems early, avoid running out, or decide when it can afford things.[cite: 1]"],
+                    ["What is a cash flow problem?", "When it doesn't have enough cash to pay what it owes, or money going out is too high.[cite: 1]"],
+                    ["Can a business make a profit but still have cash flow problems?", "Yes, because sales might be made on credit (money not arrived yet) or money is tied up in stock.[cite: 1]"],
+                    ["Why might a business have low cash inflows?", "Few sales, poor advertising, customers paying late, seasonal drops, or losing customers to competitors.[cite: 1]"],
+                    ["Why might a business have high cash outflows?", "High rent, expensive stock, rising energy bills, wages, buying new equipment, unexpected repairs.[cite: 1]"],
+                    ["Why should a business update its cash flow forecast?", "To include actual figures, respond to changing costs/sales, make better decisions, or spot new problems.[cite: 1]"],
+                    ["What is the difference between a forecast and actual cash flow?", "Forecast is what they think will happen (predicted); actual is what really happened (real figures).[cite: 1]"],
+                    ["A business expects high sales but bad weather reduces customers. What happens to cash flow?", "Inflows may be lower than expected, less money comes in, and it could struggle to pay planned expenses.[cite: 1]"],
+                    ["A business has an unexpected £700 repair bill. How could this affect its cash flow?", "Outflows increase by £700, the closing balance falls, leaving less money for other bills.[cite: 1]"],
+                    ["Explain one benefit of a cash flow forecast.", "Helps plan ahead by seeing when money might run low, giving time to cut costs or arrange finance.[cite: 1]"],
+                    ["Explain one disadvantage of a cash flow forecast.", "It can be wrong because sales/costs change, meaning the business plans using figures that don't happen.[cite: 1]"],
+                    ["A business has sales but customers pay 60 days later. Explain why it might struggle.", "Made sales but hasn't received the money yet, while wages/suppliers need paying now, causing a cash shortage.[cite: 1]"],
+                    ["A business has a large cash balance. Does this automatically mean it is profitable?", "No, it could have borrowed money or received an investment, and still be making a loss.[cite: 1]"],
+                    ["Explain why a business should not rely only on a cash flow forecast.", "The forecast is only an estimate, unexpected events happen, so the owner should check actual income/spending too.[cite: 1]"]
+                ]
+            },
+            {
+                topic: "SECTION C3: Suggesting improvements to cash flow problems",
+                qas: [
+                    ["What does it mean to improve cash flow?", "Get more money coming in, reduce money going out, or have more cash available to pay bills.[cite: 1]"],
+                    ["Give three ways a business could improve its cash flow.", "Increase sales, reduce costs, chase customers, get a loan, arrange an overdraft, or sell equipment.[cite: 1]"],
+                    ["How could increasing sales improve cash flow?", "More customers buy things, more money comes in, and the business has more cash available.[cite: 1]"],
+                    ["How could reducing costs improve cash flow?", "Less money goes out, more cash is left over, or more money to cover expenses.[cite: 1]"],
+                    ["What does chasing late payments mean?", "Contacting customers who owe money, reminding them to pay, or asking for overdue money.[cite: 1]"],
+                    ["How could chasing late payments improve cash flow?", "The business receives money sooner, giving it cash to pay suppliers, wages or rent.[cite: 1]"],
+                    ["What are payment terms?", "The rules about when customers must pay, how long they have, or the agreed deadline.[cite: 1]"],
+                    ["How could shorter payment terms improve cash flow?", "Customers have less time to pay, so money arrives sooner, helping cover bills.[cite: 1]"],
+                    ["What is a cash discount?", "A reduction in price offered to encourage customers to pay early or quickly.[cite: 1]"],
+                    ["How could offering a discount for early payment help?", "Customers pay sooner, bringing cash in earlier (even though the business receives slightly less).[cite: 1]"],
+                    ["How could a business reduce the amount of stock it holds?", "Buy smaller amounts, order more often, avoid slow sellers, or use existing stock first.[cite: 1]"],
+                    ["Why could holding less stock improve cash flow?", "Less money is tied up in unsold products, leaving more cash available for bills.[cite: 1]"],
+                    ["What is delaying spending?", "Waiting before buying something, putting off non-urgent purchases, or avoiding spending right away.[cite: 1]"],
+                    ["How could delaying the purchase of new equipment help?", "Cash stays in the business longer, allowing it to pay essential bills first.[cite: 1]"],
+                    ["Why should a business be careful about delaying spending?", "Might need the equipment, repairs get worse, or old equipment becomes unreliable/reduces productivity.[cite: 1]"],
+                    ["Explain why reducing costs might be a good way to improve cash flow.", "Less money leaves the business so more cash remains to pay bills (e.g. switching to a cheaper supplier).[cite: 1]"],
+                    ["Explain why increasing sales might not solve a cash flow problem straight away.", "Customers might buy on credit and pay later, so sales increase without cash arriving immediately.[cite: 1]"],
+                    ["Explain why a business should not cut every expense.", "Some costs are essential, cutting staff/quality damages the business, and lower spending can lead to fewer sales.[cite: 1]"],
+                    ["Which is better for temporary cash flow problems, an overdraft or selling equipment?", "Overdraft is better for temporary gaps because it keeps equipment, while selling avoids borrowing.[cite: 1]"],
+                    ["Explain why negotiating more time to pay suppliers could help.", "Keeps cash for longer, giving time to receive money from customers before paying suppliers.[cite: 1]"]
+                ]
+            },
+            {
+                topic: "SECTION C4: Break-even point and break-even analysis",
+                qas: [
+                    ["What is break even?", "When a business makes no profit and no loss, income equals total costs, or money covers all costs.[cite: 1]"],
+                    ["What is the break even point?", "The number of products a business needs to sell to cover its costs, or where total revenue equals total costs.[cite: 1]"],
+                    ["What is break even analysis?", "Working out how many products need to be sold to cover costs, or calculating when it stops making a loss.[cite: 1]"],
+                    ["What is revenue?", "Money made from sales, money received from selling products/services, or sales income.[cite: 1]"],
+                    ["How do you calculate revenue?", "Selling price multiplied by the number sold (Price x Quantity).[cite: 1]"],
+                    ["What are fixed costs?", "Costs that stay the same regardless of how many products are made or sold (e.g. rent, insurance).[cite: 1]"],
+                    ["Give three examples of fixed costs.", "Rent, insurance, business rates, salaries, subscriptions, loan repayments.[cite: 1]"],
+                    ["What are variable costs?", "Costs that change depending on how many products are made or sold.[cite: 1]"],
+                    ["Give three examples of variable costs.", "Materials, packaging, ingredients, components, or delivery costs per order.[cite: 1]"],
+                    ["What are total costs?", "All the business's costs added together, or fixed costs plus variable costs.[cite: 1]"],
+                    ["What is a selling price?", "The amount a customer pays for one product or service.[cite: 1]"],
+                    ["What is contribution per unit?", "Selling price minus variable cost per product, or amount each sale contributes towards fixed costs/profit.[cite: 1]"],
+                    ["What does it mean if a business sells below its break even point?", "It makes a loss, or sales revenue is not enough to cover all costs.[cite: 1]"],
+                    ["What does it mean if a business sells above its break even point?", "It makes a profit, revenue covers costs, and there is money left over.[cite: 1]"],
+                    ["Why might a business want to know its break even point?", "To set sales targets, plan prices, see how many products to sell, or judge if an idea is realistic.[cite: 1]"],
+                    ["Why might a business try to lower its break even point?", "Needs to sell fewer products to cover costs, faces less risk of loss, and becomes profitable easier.[cite: 1]"],
+                    ["What could happen if a business overestimates how many products it can sell?", "May not reach break-even, could make a loss, or might be left with unsold stock.[cite: 1]"],
+                    ["Why is break even analysis useful before launching a product?", "Estimates sales needed to cover costs, assesses if demand is realistic, and informs pricing.[cite: 1]"],
+                    ["Give one limitation of break even analysis.", "Relies on estimates, assumes predictable behaviour, demand can change, or products might not sell at planned prices.[cite: 1]"],
+                    ["A business has fixed costs of £2,000, sells products for £25 and has variable costs of £15. Calculate break even.", "200 units (Contribution is £10, so £2,000 divided by £10).[cite: 1]"]
+                ]
+            },
+            {
+                topic: "SECTION C5: Sources of business finance",
+                qas: [
+                    ["What is business finance?", "Money a business needs, money to start or run a business, or cash to pay for things the business needs.[cite: 1]"],
+                    ["Why might a business need finance?", "To start up, buy equipment/stock, pay wages, advertise, expand, cover cash flow, or pay unexpected bills.[cite: 1]"],
+                    ["What is internal finance?", "Money from within the business or owner, using money the business already has.[cite: 1]"],
+                    ["What is external finance?", "Money from outside the business, money borrowed or received from an outside person or organisation.[cite: 1]"],
+                    ["Give three examples of internal finance.", "Personal savings, retained profit, selling unused assets, or money already held by the business.[cite: 1]"],
+                    ["Give three examples of external finance.", "Bank loan, overdraft, trade credit, crowdfunding, investors, grants, or hire purchase.[cite: 1]"],
+                    ["What are personal savings?", "The owners own money, or money they have saved and put into the business.[cite: 1]"],
+                    ["Give one disadvantage of retained profits.", "Business must have made profit already, might not be enough available, or leaves less cash for emergencies.[cite: 1]"],
+                    ["What does selling assets mean?", "Selling things the business owns, such as unused equipment, vehicles or machinery, to raise money.[cite: 1]"],
+                    ["Give one advantage of selling unused assets.", "Raises cash without taking a loan, turns unwanted equipment into money, or avoids interest payments.[cite: 1]"],
+                    ["Give one disadvantage of selling assets.", "Business loses the item, may need to replace it later, or might not receive much money for it.[cite: 1]"],
+                    ["Why might an overdraft be better for a temporary cash flow problem than a long-term loan?", "Provides flexible short-term support while waiting for money, whereas long-term loans aren't needed.[cite: 1]"],
+                    ["Why might leasing be better than buying equipment outright?", "Avoids a large upfront payment and spreads the cost, leaving more cash available for other expenses.[cite: 1]"],
+                    ["Why might a bank refuse to lend to a business?", "Poor credit history, can't afford repayments, lacks a business plan, or considered too risky.[cite: 1]"],
+                    ["A new business needs £500 to buy its first batch of stock. Suggest a suitable source of finance.", "Personal savings, a small loan, an appropriate overdraft, or crowdfunding.[cite: 1]"],
+                    ["An established business wants to expand and needs £30,000. Suggest a suitable source.", "A bank loan, retained profits if available, an investor, or a suitable grant.[cite: 1]"],
+                    ["A business needs a van but cannot afford to buy it outright. Suggest a source of finance.", "Hire purchase, leasing, or a bank loan depending on costs and ownership preferences.[cite: 1]"],
+                    ["A shop has a temporary cash shortage because customers are paying late. Suggest a source.", "An overdraft, chasing overdue payments, or negotiating later payment dates with suppliers.[cite: 1]"],
+                    ["A business owner does not want to share control. Which sources might suit them?", "Personal savings, retained profits, a loan, or an overdraft (internal/debt sources don't require giving away ownership).[cite: 1]"],
+                    ["A business has a new idea but cannot get a bank loan. Suggest another possible source.", "Crowdfunding, an angel investor, a grant if eligible, or personal savings.[cite: 1]"]
+                ]
+            }
+        ];
+
+        const container = document.getElementById('flashcards-root');
+
+        flashcardData.forEach((sectionData) => {
+            let section = document.createElement('div');
+            section.className = 'topic-section';
+            
+            let heading = document.createElement('h2');
+            heading.textContent = sectionData.topic;
+            section.appendChild(heading);
+
+            let grid = document.createElement('div');
+            grid.className = 'grid';
+
+            sectionData.qas.forEach(qa => {
+                let flipCard = document.createElement('div');
+                flipCard.className = 'flip-card';
+                flipCard.onclick = function() { this.classList.toggle('flipped'); };
+                
+                flipCard.innerHTML = `
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h3>${qa[0]}</h3>
+                            <div class="hint-text">Click to flip</div>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>${qa[1]}</p>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(flipCard);
+            });
+
+            section.appendChild(grid);
+            container.appendChild(section);
+        });
+    </script>
+</body>
+</html>
