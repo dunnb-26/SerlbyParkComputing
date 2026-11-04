@@ -23,7 +23,6 @@
             text-align: center;
         }
 
-        /* Top Score Box Styling */
         .top-score-container {
             background-color: rgba(223, 170, 43, 0.1);
             border: 2px solid #dfaa2b;
@@ -110,10 +109,13 @@
         }
 
         .bit-value {
-            font-size: 0.9em;
-            color: #666;
+            font-size: 1em;
+            color: #1e3a8a;
             font-weight: bold;
             margin-bottom: 8px;
+            background: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 4px;
         }
 
         .bit-btn {
@@ -225,7 +227,6 @@
     <main>
         <div class="game-container">
             
-            <!-- Top Score Container -->
             <div class="top-score-container">
                 <span class="top-score-icon">🏆</span> Top Score: <span id="top-score">0</span>
             </div>
@@ -244,17 +245,17 @@
             <div class="game-interaction-area">
                 
                 <div class="bits-container" id="bits-board" style="pointer-events: none; opacity: 0.5;">
-                    <!-- First Nibble -->
+                    <!-- First Nibble (Correctly labelled 8, 4, 2, 1) -->
                     <div class="nibble-group">
-                        <div class="bit-column"><div class="bit-value">128</div><button class="bit-btn" onclick="toggleBit(0, 128)">0</button></div>
-                        <div class="bit-column"><div class="bit-value">64</div><button class="bit-btn" onclick="toggleBit(1, 64)">0</button></div>
-                        <div class="bit-column"><div class="bit-value">32</div><button class="bit-btn" onclick="toggleBit(2, 32)">0</button></div>
-                        <div class="bit-column"><div class="bit-value">16</div><button class="bit-btn" onclick="toggleBit(3, 16)">0</button></div>
+                        <div class="bit-column"><div class="bit-value">8</div><button class="bit-btn" onclick="toggleBit(0, 128)">0</button></div>
+                        <div class="bit-column"><div class="bit-value">4</div><button class="bit-btn" onclick="toggleBit(1, 64)">0</button></div>
+                        <div class="bit-column"><div class="bit-value">2</div><button class="bit-btn" onclick="toggleBit(2, 32)">0</button></div>
+                        <div class="bit-column"><div class="bit-value">1</div><button class="bit-btn" onclick="toggleBit(3, 16)">0</button></div>
                     </div>
                     
                     <div class="nibble-divider"></div>
                     
-                    <!-- Second Nibble -->
+                    <!-- Second Nibble (Correctly labelled 8, 4, 2, 1) -->
                     <div class="nibble-group">
                         <div class="bit-column"><div class="bit-value">8</div><button class="bit-btn" onclick="toggleBit(4, 8)">0</button></div>
                         <div class="bit-column"><div class="bit-value">4</div><button class="bit-btn" onclick="toggleBit(5, 4)">0</button></div>
@@ -305,7 +306,7 @@
         const LESSON_ID = "hex-time-attack";
 
         let score = 0;
-        let topScore = parseInt(localStorage.getItem('hexTimeAttackTopScore')) || 0; // LOCAL STORAGE BACKUP
+        let topScore = parseInt(localStorage.getItem('hexTimeAttackTopScore')) || 0; 
         let latestScore = 0;
         let timeLeft = 60;
         let targetNumber = 0;
@@ -313,14 +314,19 @@
         let currentTotal = 0;
         let timerInterval;
         let bits = [0, 0, 0, 0, 0, 0, 0, 0];
-        const bitValues = [128, 64, 32, 16, 8, 4, 2, 1];
+        
+        // Internal math still uses true base-2 values to easily sum up to 255
+        const mathValues = [128, 64, 32, 16, 8, 4, 2, 1];
+        // Visual headers for the students explicitly show the nibble values
+        const displayBitValues = [8, 4, 2, 1, 8, 4, 2, 1]; 
+        
         let currentMode = 0;
 
         document.getElementById('top-score').innerText = topScore;
 
         /* --- 2. FIREBASE AUTO-SAVE & AUTO-LOAD --- */
         function syncScoreToCloud() {
-            localStorage.setItem('hexTimeAttackTopScore', topScore); // SAVE LOCALLY EVERY TIME
+            localStorage.setItem('hexTimeAttackTopScore', topScore); 
 
             const user = auth.currentUser;
             if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
@@ -344,10 +350,10 @@
 
         function applySavedData(data) {
             if (!data) return;
-            topScore = Math.max(parseInt(data.topScore) || 0, topScore); // Keep whichever is highest (Local or Cloud)
+            topScore = Math.max(parseInt(data.topScore) || 0, topScore);
             latestScore = parseInt(data.latestScore) || 0;
             document.getElementById('top-score').innerText = topScore;
-            localStorage.setItem('hexTimeAttackTopScore', topScore); // Sync back down to PC
+            localStorage.setItem('hexTimeAttackTopScore', topScore);
         }
 
         auth.onAuthStateChanged(async function(user) {
@@ -397,7 +403,7 @@
         }
 
         function generateNewTarget() {
-            targetNumber = Math.floor(Math.random() * 255) + 1; // 1 to 255
+            targetNumber = Math.floor(Math.random() * 255) + 1; 
             targetHex = targetNumber.toString(16).toUpperCase().padStart(2, '0');
             currentMode = Math.random() > 0.5 ? 0 : 1;
             
@@ -426,24 +432,26 @@
                 
                 let binStr = targetNumber.toString(2).padStart(8, '0');
                 
-                // Constructing the UI for Binary target (grouped in Nibbles)
-                let html = '<div style="display: flex; justify-content: center; gap: 20px;">';
+                let html = '<div style="display: flex; justify-content: center; gap: 25px; align-items: center;">';
                 
-                // Nibble 1
-                html += '<div style="display: flex; gap: 8px;">';
+                // Nibble 1 (Labels 8, 4, 2, 1)
+                html += '<div style="display: flex; gap: 10px;">';
                 for(let i=0; i<4; i++) {
                     html += `<div style="display: flex; flex-direction: column; align-items: center;">
-                                <span style="font-size: 16px; color: #666; background: #e9ecef; padding: 4px 6px; border-radius: 4px; margin-bottom: -5px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">${bitValues[i]}</span>
+                                <span style="font-size: 16px; color: #1e3a8a; font-weight: bold; background: #e9ecef; padding: 2px 6px; border-radius: 4px; margin-bottom: 5px;">${displayBitValues[i]}</span>
                                 <span>${binStr[i]}</span>
                              </div>`;
                 }
                 html += '</div>';
 
-                // Nibble 2
-                html += '<div style="display: flex; gap: 8px;">';
+                // Divider
+                html += '<div style="width: 4px; height: 60px; background-color: #ccc; border-radius: 2px;"></div>';
+
+                // Nibble 2 (Labels 8, 4, 2, 1)
+                html += '<div style="display: flex; gap: 10px;">';
                 for(let i=4; i<8; i++) {
                     html += `<div style="display: flex; flex-direction: column; align-items: center;">
-                                <span style="font-size: 16px; color: #666; background: #e9ecef; padding: 4px 6px; border-radius: 4px; margin-bottom: -5px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">${bitValues[i]}</span>
+                                <span style="font-size: 16px; color: #1e3a8a; font-weight: bold; background: #e9ecef; padding: 2px 6px; border-radius: 4px; margin-bottom: 5px;">${displayBitValues[i]}</span>
                                 <span>${binStr[i]}</span>
                              </div>`;
                 }
@@ -466,7 +474,7 @@
             }
         }
 
-        function toggleBit(index, value) {
+        function toggleBit(index, mathVal) {
             if (currentMode !== 0) return;
 
             const btns = document.querySelectorAll('.bit-btn');
@@ -487,10 +495,9 @@
         function calculateTotal() {
             currentTotal = 0;
             for (let i = 0; i < 8; i++) {
-                if (bits[i] === 1) currentTotal += bitValues[i];
+                if (bits[i] === 1) currentTotal += mathValues[i]; // Math resolves 1-255 easily
             }
             
-            // Display running total formatted as 2-digit Hex
             document.getElementById('current-total').innerText = currentTotal.toString(16).toUpperCase().padStart(2, '0');
 
             if (currentTotal === targetNumber) {
@@ -527,12 +534,11 @@
 
         function triggerCorrectAnswer() {
             score++;
-            timeLeft += 5; // Bonus time
+            timeLeft += 5;
             latestScore = score;
             document.getElementById('score').innerText = score;
             document.getElementById('time').innerText = timeLeft;
             
-            // Instantly update Top Score in UI, Local Storage, and Firebase
             if (score > topScore) {
                 topScore = score;
                 document.getElementById('top-score').innerText = topScore;
