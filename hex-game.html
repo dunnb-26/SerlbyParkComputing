@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hexadecimal Time Attack</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        .game-container {
+            max-width: 800px;
+            margin: 30px auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            border-top: 6px solid #1e3a8a;
+            text-align: center;
+        }
+
+        /* Top Score Box Styling */
+        .top-score-container {
+            background-color: rgba(223, 170, 43, 0.1);
+            border: 2px solid #dfaa2b;
+            color: #1e3a8a;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 2px 5px rgba(223, 170, 43, 0.2);
+        }
+
+        .top-score-icon { font-size: 1.2em; }
+
+        .scoreboard {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .target-display {
+            font-size: 5em;
+            font-weight: bold;
+            color: #800000;
+            margin: 10px 0 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            min-height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .current-total {
+            font-size: 1.5em;
+            color: #666;
+            margin-bottom: 20px;
+            min-height: 30px;
+        }
+
+        .game-interaction-area {
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .bits-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nibble-group {
+            display: flex;
+            gap: 10px;
+            padding: 0 10px;
+        }
+
+        .nibble-divider {
+            width: 4px;
+            height: 80px;
+            background-color: #ccc;
+            border-radius: 2px;
+            margin: 0 5px;
+        }
+
+        .bit-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 70px;
+        }
+
+        .bit-value {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .bit-btn {
+            width: 100%;
+            height: 70px;
+            font-size: 2em;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            border: 3px solid #1e3a8a;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.1s;
+            background-color: #f8f9fa;
+            color: #1e3a8a;
+        }
+
+        .bit-btn.active {
+            background-color: #dfaa2b;
+            color: #fff;
+            border-color: #dfaa2b;
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(223, 170, 43, 0.4);
+        }
+
+        .text-input-wrapper {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .hex-input {
+            font-size: 2.5em;
+            padding: 10px;
+            width: 180px;
+            text-align: center;
+            border: 4px solid #1e3a8a;
+            border-radius: 8px;
+            outline: none;
+            font-weight: bold;
+            color: #1e3a8a;
+            transition: border-color 0.2s;
+            text-transform: uppercase;
+        }
+
+        .hex-input:focus {
+            border-color: #dfaa2b;
+            box-shadow: 0 0 10px rgba(223, 170, 43, 0.3);
+        }
+
+        .btn-enter {
+            font-size: 1.5em;
+            padding: 13px 30px;
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .btn-enter:hover {
+            background: #dfaa2b;
+            color: #1e3a8a;
+        }
+
+        .controls { margin-top: 10px; }
+
+        .btn-start {
+            background-color: #008f39;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 6px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-start:hover { background-color: #006100; }
+
+        .game-over-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+        }
+
+        .game-over-overlay h2 { color: #dfaa2b; font-size: 3em; margin-bottom: 10px; }
+        .game-over-overlay p { font-size: 1.5em; margin-bottom: 30px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
+        </div>
+        <div class="header-center"><h1>Hexadecimal Time Attack</h1></div>
+        <div class="header-right"><a href="javascript:history.back()" class="back-btn">&larr; Go Back</a></div>
+    </header>
+
+    <main>
+        <div class="game-container">
+            
+            <!-- Top Score Container -->
+            <div class="top-score-container">
+                <span class="top-score-icon">🏆</span> Top Score: <span id="top-score">0</span>
+            </div>
+
+            <div class="scoreboard">
+                <div>Score: <span id="score">0</span></div>
+                <div style="color: #d32f2f;">Time: <span id="time">60</span>s</div>
+            </div>
+
+            <div id="instruction-text" style="color: #666; font-weight: bold; font-size: 1.2em; text-transform: uppercase;">AWAITING START</div>
+            
+            <div class="target-display" id="target-number">---</div>
+            
+            <div class="current-total" id="current-total-container" style="visibility: hidden;">Current Hex: <strong id="current-total" style="color: #1e3a8a;">00</strong></div>
+
+            <div class="game-interaction-area">
+                
+                <div class="bits-container" id="bits-board" style="pointer-events: none; opacity: 0.5;">
+                    <!-- First Nibble -->
+                    <div class="nibble-group">
+                        <div class="bit-column"><div class="bit-value">128</div><button class="bit-btn" onclick="toggleBit(0, 128)">0</button></div>
+                        <div class="bit-column"><div class="bit-value">64</div><button class="bit-btn" onclick="toggleBit(1, 64)">0</button></div>
+                        <div class="bit-column"><div class="bit-value">32</div><button class="bit-btn" onclick="toggleBit(2, 32)">0</button></div>
+                        <div class="bit-column"><div class="bit-value">16</div><button class="bit-btn" onclick="toggleBit(3, 16)">0</button></div>
+                    </div>
+                    
+                    <div class="nibble-divider"></div>
+                    
+                    <!-- Second Nibble -->
+                    <div class="nibble-group">
+                        <div class="bit-column"><div class="bit-value">8</div><button class="bit-btn" onclick="toggleBit(4, 8)">0</button></div>
+                        <div class="bit-column"><div class="bit-value">4</div><button class="bit-btn" onclick="toggleBit(5, 4)">0</button></div>
+                        <div class="bit-column"><div class="bit-value">2</div><button class="bit-btn" onclick="toggleBit(6, 2)">0</button></div>
+                        <div class="bit-column"><div class="bit-value">1</div><button class="bit-btn" onclick="toggleBit(7, 1)">0</button></div>
+                    </div>
+                </div>
+
+                <div class="text-input-wrapper" id="text-input-container">
+                    <input type="text" id="hex-input" class="hex-input" placeholder="HEX..." maxlength="2" autocomplete="off" onkeydown="if(event.key==='Enter') checkTextInput()">
+                    <button class="btn-enter" onclick="checkTextInput()">Submit</button>
+                </div>
+
+            </div>
+
+            <div class="controls">
+                <button class="btn-start" id="start-btn" onclick="startGame()">Start Game</button>
+            </div>
+        </div>
+    </main>
+
+    <div class="game-over-overlay" id="game-over">
+        <h2>Time's Up!</h2>
+        <p>You converted <strong id="final-score" style="color: #dfaa2b;">0</strong> hex numbers correctly.</p>
+        <button class="btn-start" onclick="closeGameOver()">Play Again</button>
+    </div>
+
+    <footer>&copy; 2026 Delta Serlby Park - Computing & Business Department</footer>
+
+    <script>
+        /* --- 1. FIREBASE CONFIGURATION & INITIALIZATION --- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "hex-time-attack";
+
+        let score = 0;
+        let topScore = parseInt(localStorage.getItem('hexTimeAttackTopScore')) || 0; // LOCAL STORAGE BACKUP
+        let latestScore = 0;
+        let timeLeft = 60;
+        let targetNumber = 0;
+        let targetHex = "00";
+        let currentTotal = 0;
+        let timerInterval;
+        let bits = [0, 0, 0, 0, 0, 0, 0, 0];
+        const bitValues = [128, 64, 32, 16, 8, 4, 2, 1];
+        let currentMode = 0;
+
+        document.getElementById('top-score').innerText = topScore;
+
+        /* --- 2. FIREBASE AUTO-SAVE & AUTO-LOAD --- */
+        function syncScoreToCloud() {
+            localStorage.setItem('hexTimeAttackTopScore', topScore); // SAVE LOCALLY EVERY TIME
+
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            const payload = {
+                pageTitle: document.title || "Hexadecimal Time Attack",
+                lastUpdated: Date.now(),
+                topScore: topScore,
+                latestScore: latestScore,
+                scoreText: `Top Score: ${topScore}`,
+                items: [
+                    { index: 0, label: "🏆 All-Time Top Score", value: `${topScore} correct conversions`, status: topScore > 0 ? 'correct' : 'neutral' },
+                    { index: 1, label: "⏱️ Latest Game Score", value: `${latestScore} correct conversions`, status: 'neutral' }
+                ]
+            };
+
+            db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
+              .set(payload, { merge: true })
+              .catch(err => console.error("Cloud save error:", err));
+        }
+
+        function applySavedData(data) {
+            if (!data) return;
+            topScore = Math.max(parseInt(data.topScore) || 0, topScore); // Keep whichever is highest (Local or Cloud)
+            latestScore = parseInt(data.latestScore) || 0;
+            document.getElementById('top-score').innerText = topScore;
+            localStorage.setItem('hexTimeAttackTopScore', topScore); // Sync back down to PC
+        }
+
+        auth.onAuthStateChanged(async function(user) {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading cloud top score:", err);
+                }
+            }
+        });
+
+        /* --- 3. GAME LOGIC --- */
+        function startGame() {
+            score = 0;
+            timeLeft = 60;
+            document.getElementById('score').innerText = score;
+            document.getElementById('time').innerText = timeLeft;
+            document.getElementById('start-btn').style.display = 'none';
+            
+            generateNewTarget();
+            
+            clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            timeLeft--;
+            document.getElementById('time').innerText = timeLeft;
+            if (timeLeft <= 0) {
+                endGame();
+            }
+        }
+
+        function generateNewTarget() {
+            targetNumber = Math.floor(Math.random() * 255) + 1; // 1 to 255
+            targetHex = targetNumber.toString(16).toUpperCase().padStart(2, '0');
+            currentMode = Math.random() > 0.5 ? 0 : 1;
+            
+            let instructionEl = document.getElementById('instruction-text');
+            let targetEl = document.getElementById('target-number');
+            
+            if (currentMode === 0) { // HEX TO BINARY
+                instructionEl.innerText = "MAKE THIS HEX NUMBER IN BINARY:";
+                instructionEl.style.color = "#800000"; 
+                
+                targetEl.innerHTML = targetHex; 
+                targetEl.style.color = "#800000";
+                
+                document.getElementById('text-input-container').style.display = 'none';
+                document.getElementById('current-total-container').style.visibility = 'visible';
+                
+                document.getElementById('bits-board').style.display = 'flex';
+                document.getElementById('bits-board').style.pointerEvents = 'auto';
+                document.getElementById('bits-board').style.opacity = '1';
+                
+                resetBits();
+                
+            } else { // BINARY TO HEX
+                instructionEl.innerText = "CONVERT THIS BINARY TO HEX:";
+                instructionEl.style.color = "#1e3a8a"; 
+                
+                let binStr = targetNumber.toString(2).padStart(8, '0');
+                
+                // Constructing the UI for Binary target (grouped in Nibbles)
+                let html = '<div style="display: flex; justify-content: center; gap: 20px;">';
+                
+                // Nibble 1
+                html += '<div style="display: flex; gap: 8px;">';
+                for(let i=0; i<4; i++) {
+                    html += `<div style="display: flex; flex-direction: column; align-items: center;">
+                                <span style="font-size: 16px; color: #666; background: #e9ecef; padding: 4px 6px; border-radius: 4px; margin-bottom: -5px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">${bitValues[i]}</span>
+                                <span>${binStr[i]}</span>
+                             </div>`;
+                }
+                html += '</div>';
+
+                // Nibble 2
+                html += '<div style="display: flex; gap: 8px;">';
+                for(let i=4; i<8; i++) {
+                    html += `<div style="display: flex; flex-direction: column; align-items: center;">
+                                <span style="font-size: 16px; color: #666; background: #e9ecef; padding: 4px 6px; border-radius: 4px; margin-bottom: -5px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">${bitValues[i]}</span>
+                                <span>${binStr[i]}</span>
+                             </div>`;
+                }
+                html += '</div></div>';
+                
+                targetEl.innerHTML = html;
+                targetEl.style.color = "#1e3a8a";
+                
+                document.getElementById('bits-board').style.display = 'none';
+                document.getElementById('current-total-container').style.visibility = 'hidden';
+                
+                let inputContainer = document.getElementById('text-input-container');
+                let hexInput = document.getElementById('hex-input');
+                
+                inputContainer.style.display = 'flex';
+                hexInput.value = '';
+                hexInput.style.borderColor = '#1e3a8a';
+                
+                setTimeout(() => hexInput.focus(), 10);
+            }
+        }
+
+        function toggleBit(index, value) {
+            if (currentMode !== 0) return;
+
+            const btns = document.querySelectorAll('.bit-btn');
+            
+            if (bits[index] === 0) {
+                bits[index] = 1;
+                btns[index].innerText = '1';
+                btns[index].classList.add('active');
+            } else {
+                bits[index] = 0;
+                btns[index].innerText = '0';
+                btns[index].classList.remove('active');
+            }
+            
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            currentTotal = 0;
+            for (let i = 0; i < 8; i++) {
+                if (bits[i] === 1) currentTotal += bitValues[i];
+            }
+            
+            // Display running total formatted as 2-digit Hex
+            document.getElementById('current-total').innerText = currentTotal.toString(16).toUpperCase().padStart(2, '0');
+
+            if (currentTotal === targetNumber) {
+                triggerCorrectAnswer();
+            }
+        }
+
+        function resetBits() {
+            bits = [0, 0, 0, 0, 0, 0, 0, 0];
+            currentTotal = 0;
+            document.getElementById('current-total').innerText = "00";
+            const btns = document.querySelectorAll('.bit-btn');
+            btns.forEach(btn => {
+                btn.innerText = '0';
+                btn.classList.remove('active');
+            });
+        }
+
+        function checkTextInput() {
+            if (currentMode !== 1) return;
+
+            let inputField = document.getElementById('hex-input');
+            let val = inputField.value.trim().toUpperCase();
+            
+            if (val === targetHex) {
+                triggerCorrectAnswer();
+            } else {
+                inputField.style.borderColor = '#d32f2f';
+                setTimeout(() => inputField.style.borderColor = '#1e3a8a', 400);
+                inputField.value = '';
+                inputField.focus();
+            }
+        }
+
+        function triggerCorrectAnswer() {
+            score++;
+            timeLeft += 5; // Bonus time
+            latestScore = score;
+            document.getElementById('score').innerText = score;
+            document.getElementById('time').innerText = timeLeft;
+            
+            // Instantly update Top Score in UI, Local Storage, and Firebase
+            if (score > topScore) {
+                topScore = score;
+                document.getElementById('top-score').innerText = topScore;
+                syncScoreToCloud();
+            }
+            
+            document.body.style.backgroundColor = '#e8f5e9'; 
+            setTimeout(() => document.body.style.backgroundColor = '#f4f6f8', 200);
+            
+            generateNewTarget();
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            latestScore = score;
+            if (score > topScore) {
+                topScore = score;
+                document.getElementById('top-score').innerText = topScore;
+            }
+            syncScoreToCloud();
+
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('game-over').style.display = 'flex';
+        }
+
+        function closeGameOver() {
+            document.getElementById('game-over').style.display = 'none';
+            document.getElementById('start-btn').style.display = 'inline-block';
+            document.getElementById('instruction-text').innerText = "AWAITING START";
+            document.getElementById('instruction-text').style.color = "#666";
+            document.getElementById('target-number').innerHTML = "---";
+            document.getElementById('target-number').style.color = "#800000";
+            
+            document.getElementById('bits-board').style.display = 'flex';
+            document.getElementById('bits-board').style.pointerEvents = 'none';
+            document.getElementById('bits-board').style.opacity = '0.5';
+            
+            document.getElementById('text-input-container').style.display = 'none';
+            document.getElementById('current-total-container').style.visibility = 'hidden';
+            
+            resetBits();
+        }
+    </script>
+</body>
+</html>
