@@ -929,7 +929,7 @@
             }
         }
 
-        /* --- 5. BATCH-MARKING TEXT INPUT LOGIC --- */
+       /* --- 5. BATCH-MARKING TEXT INPUT LOGIC --- */
         function checkAnswers(groupClass, triggerSync = true) {
             var inputs = document.getElementsByClassName(groupClass);
             
@@ -939,11 +939,23 @@
                 var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers'));
                 
                 var isCorrect = false;
+                var isTextArea = inputElement.tagName.toLowerCase() === 'textarea';
                 
                 for (var j = 0; j < acceptedAnswers.length; j++) {
-                    if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
-                        isCorrect = true;
-                        break;
+                    var keyword = acceptedAnswers[j].toLowerCase();
+                    
+                    if (isTextArea) {
+                        // Keyword match for long-form explanations
+                        if (studentAnswer.includes(keyword)) {
+                            isCorrect = true;
+                            break;
+                        }
+                    } else {
+                        // Exact match for standard inputs
+                        if (studentAnswer === keyword) {
+                            isCorrect = true;
+                            break;
+                        }
                     }
                 }
 
