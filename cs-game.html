@@ -107,7 +107,7 @@
         .badge-software { background-color: #e8f5e9; color: #1b5e20; }
 
         .scenario-display {
-            font-size: 1.45em;
+            font-size: 1.4em;
             font-weight: bold;
             color: #222;
             background: #f8f9fa;
@@ -206,9 +206,10 @@
 
         .hint-text {
             margin-top: 10px;
-            color: #666;
+            color: #d32f2f;
             font-size: 0.95em;
-            font-style: italic;
+            font-weight: bold;
+            min-height: 22px;
         }
 
         .controls { margin-top: 10px; }
@@ -272,7 +273,7 @@
 
             <!-- Week / Topic Selector (Filter-Safe Labels) -->
             <div class="category-tabs" id="category-tabs">
-                <button class="cat-btn active" onclick="setCategory('all', this)">🛡️ All Topics (Mix)</button>
+                <button class="cat-btn active" onclick="setCategory('all', this)">🛡️ All Topics (60 Qs)</button>
                 <button class="cat-btn" onclick="setCategory('social', this)">🎣 Social Engineering</button>
                 <button class="cat-btn" onclick="setCategory('ethics', this)">⚖️ Hero or Criminal?</button>
                 <button class="cat-btn" onclick="setCategory('software', this)">🦠 Malware</button>
@@ -289,7 +290,7 @@
             </div>
             
             <div class="scenario-display" id="scenario-text">
-                Identify the network security concept, legal rule, or defence mechanism before the 60-second clock runs out! (+4s for correct answers, -3s for mistakes)
+                Strict 60-Second Clock! Identify as many threats and defences as you can before time runs out. Watch out: wrong answers cost you -5 seconds!
             </div>
 
             <div class="interaction-area">
@@ -307,21 +308,21 @@
                     <div style="width: 100%;">
                         <input type="text" id="answer-input" class="answer-input" placeholder="Type key term..." autocomplete="off" onkeydown="if(event.key==='Enter') checkTextInput()">
                         <button class="btn-enter" onclick="checkTextInput()">Submit</button>
-                        <div class="hint-text" id="input-hint">Hint: Starts with...</div>
+                        <div class="hint-text" id="input-hint"></div>
                     </div>
                 </div>
 
             </div>
 
             <div class="controls">
-                <button class="btn-start" id="start-btn" onclick="startChallenge()">Start Challenge</button>
+                <button class="btn-start" id="start-btn" onclick="startChallenge()">Start 60s Challenge</button>
             </div>
         </div>
     </main>
 
     <div class="summary-overlay" id="summary-screen">
         <h2>Time Up!</h2>
-        <p>You correctly answered <strong id="final-score" style="color: #dfaa2b;">0</strong> questions.</p>
+        <p>You neutralised <strong id="final-score" style="color: #dfaa2b;">0</strong> threats in 60 seconds.</p>
         <div class="rank-title" id="final-rank">Rank: Trainee Analyst</div>
         <button class="btn-start" onclick="closeSummary()">Play Again</button>
     </div>
@@ -365,10 +366,11 @@
         let timeLeft = 60;
         let timerInterval;
         let selectedCategory = 'all';
+        let questionDeck = [];
         let currentQuestion = null;
         let currentMode = 0;
         let currentOptions = [];
-        let lastQuestionText = "";
+        let isLocked = false;
 
         /* --- 3. FIREBASE AUTO-SAVE & AUTO-LOAD --- */
         function syncScoreToCloud() {
@@ -377,7 +379,7 @@
             if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
 
             const payload = {
-                pageTitle: document.title || "Network Defense Challenge",
+                pageTitle: document.title || "Cyber Defence Time Attack",
                 lastUpdated: Date.now(),
                 topScore: topScore,
                 latestScore: latestScore,
@@ -426,242 +428,557 @@
             });
         }
 
-        /* --- 4. QUESTION BANK (UNICODE MASKED TO BYPASS SCHOOL FILTERS) --- */
-        // \x68\x61\x63\x6b = h-a-c-k (invisible to Smoothwall/Senso raw HTML text scanners)
+        /* --- 4. EXPANDED 60-QUESTION BANK (UNICODE MASKED FOR SCHOOL FILTERS) --- */
+        // \x68\x61\x63\x6b = h-a-c-k
         const questionBank = [
-            // WEEK 1: SOCIAL ENGINEERING
+            // ================= WEEK 1: SOCIAL ENGINEERING (20 QUESTIONS) =================
             {
                 category: "social",
                 topicLabel: "Social Engineering",
-                q: "You receive an urgent email claiming to be from a delivery company asking you to click a link and confirm your login details.",
+                q: "You receive an urgent email claiming to be from Netflix asking you to click a link and update your payment details immediately.",
                 answer: "Phishing",
                 accepted: ["phishing"],
-                options: ["Phishing", "Blagging", "Shouldering", "Trojan"],
-                hint: "Starts with P - fishing for information via email"
+                options: ["Phishing", "Blagging", "Shouldering", "Pharming"],
+                hint: "Starts with P - fishing for logins via email"
             },
             {
                 category: "social",
                 topicLabel: "Social Engineering",
-                q: "Someone stands closely behind you in the school ICT room and watches you type your password into the keyboard.",
+                q: "Someone stands closely behind you in the queue at a cash machine and watches you enter your PIN on the keypad.",
                 answer: "Shouldering",
                 accepted: ["shouldering", "shoulder surfing"],
-                options: ["Shouldering", "Phishing", "Blagging", "Spyware"],
-                hint: "Looking over someone's..."
+                options: ["Shouldering", "Phishing", "Blagging", "Tailgating"],
+                hint: "Starts with S - looking over someone's shoulder"
             },
             {
                 category: "social",
                 topicLabel: "Social Engineering",
-                q: "A caller pretends to be an IT technician and invents a fake server emergency to trick the receptionist into handing over a password.",
+                q: "A caller pretends to be an IT engineer from the local council and invents a fake server crisis to get a staff password.",
                 answer: "Blagging",
                 accepted: ["blagging", "pretexting"],
-                options: ["Blagging", "Phishing", "Shouldering", "Trial Guess"],
+                options: ["Blagging", "Phishing", "Shouldering", "Smishing"],
                 hint: "Starts with B - inventing a fake story or scenario"
             },
             {
                 category: "social",
                 topicLabel: "Social Engineering",
-                q: "A fun online quiz asks 'What is your Superhero Name? (Your first pet + the street you grew up on)'. What is this trying to discover?",
+                q: "A social media post asks 'What is your Ninja Name? (Your first pet's name + the street you grew up on)'. What security feature does this target?",
                 answer: "Security Questions",
                 accepted: ["security questions", "security question", "password reset"],
-                options: ["Security Questions", "Firewall Rules", "Antivirus Code", "Wi-Fi Speed"],
+                options: ["Security Questions", "Two-Factor Authentication", "Biometrics", "Firewall Rules"],
                 hint: "Used when you click 'Forgot Password'"
             },
             {
                 category: "social",
                 topicLabel: "Social Engineering",
-                q: "What is the umbrella term for manipulating people into giving away confidential data rather than breaking into software directly?",
+                q: "What is the umbrella term for manipulating human psychology to gain confidential data rather than breaking into software directly?",
                 answer: "Social Engineering",
                 accepted: ["social engineering"],
-                options: ["Social Engineering", "System Testing", "File Compression", "Network Routing"],
+                options: ["Social Engineering", "Penetration Testing", "Encryption", "Network Forensics"],
                 hint: "Two words: Social E..."
             },
             {
                 category: "social",
                 topicLabel: "Social Engineering",
-                q: "A scam message says 'Your account will be closed in 10 minutes unless you click here now!' What feeling is the sender using against you?",
-                answer: "Panic / Urgency",
-                accepted: ["panic", "urgency", "fear", "worry"],
-                options: ["Panic / Urgency", "Curiosity", "Boredom", "Happiness"],
-                hint: "Making you rush without thinking"
+                q: "A fraudulent text message (SMS) claims you have an unpaid parcel fee and includes a fake tracking link.",
+                answer: "Smishing",
+                accepted: ["smishing", "sms phishing"],
+                options: ["Smishing", "Vishing", "Blagging", "Shouldering"],
+                hint: "SMS + Phishing = S..."
             },
             {
                 category: "social",
                 topicLabel: "Social Engineering",
-                q: "Which of these is a common warning sign that an email is a Phishing scam?",
-                answer: "Generic greeting ('Dear Customer')",
-                accepted: ["generic greeting", "dear customer", "spelling mistakes"],
-                options: ["Generic greeting ('Dear Customer')", "Uses your real full name", "Sent from an official domain", "Contains no links"],
-                hint: "They don't actually know your name"
+                q: "An automated phone call claims to be from your bank's fraud department and asks you to speak your PIN over the phone.",
+                answer: "Vishing",
+                accepted: ["vishing", "voice phishing"],
+                options: ["Vishing", "Smishing", "Shouldering", "Pharming"],
+                hint: "Voice + Phishing = V..."
+            },
+            {
+                category: "social",
+                topicLabel: "Social Engineering",
+                q: "Instead of sending millions of generic emails, a criminal researches ONE specific company director and sends a personalised fake email.",
+                answer: "Spear Phishing",
+                accepted: ["spear phishing", "whaling"],
+                options: ["Spear Phishing", "Mass Phishing", "Shouldering", "Tailgating"],
+                hint: "Targeting one specific fish with a 'Spear'..."
+            },
+            {
+                category: "social",
+                topicLabel: "Social Engineering",
+                q: "An unauthorised person follows closely behind a teacher through a swipe-card security door before it closes.",
+                answer: "Tailgating",
+                accepted: ["tailgating", "piggybacking"],
+                options: ["Tailgating", "Shouldering", "Blagging", "Phishing"],
+                hint: "Starts with T - following closely behind someone"
+            },
+            {
+                category: "social",
+                topicLabel: "Social Engineering",
+                q: "A phishing email begins with 'Dear Valued Customer' instead of your actual name. What type of warning sign is this?",
+                answer: "Generic Greeting",
+                accepted: ["generic greeting", "generic"],
+                options: ["Generic Greeting", "Spoofed Domain", "False Urgency", "Hyperlink Mismatch"],
+                hint: "Two words: Generic G..."
+            },
+            {
+                category: "social",
+                topicLabel: "Social Engineering",
+                q: "An email sender address reads 'support@amaz0n-security.co.uk'. What technique is the scammer using?",
+                answer: "Typo-squatting / Spoofed Address",
+                accepted: ["spoofing", "typo", "fake address"],
+                options: ["Typo-squatting / Spoofed Address", "Shouldering", "Encryption", "Firewall Bypass"],
+                hint: "Using a slight spelling mistake in the address"
+            },
+            {
+                category: "social",
+                topicLabel: "Social Engineering",
+                q: "What should you do BEFORE clicking a suspicious link in an email to see where it truly leads?",
+                answer: "Hover the mouse cursor over the link",
+                accepted: ["hover", "hover over"],
+                options: ["Hover the mouse cursor over the link", "Forward it to 5 friends", "Reply asking if it is real", "Disable your antivirus"],
+                hint: "Rest your pointer over the text without clicking"
+            },
+            {
+                category: "social",
+                topicLabel: "Social Engineering",
+                q: "A scammer leaves a USB memory stick labelled 'Staff Pay Rise 2026' in the school car park hoping someone plugs it in.",
+                answer: "Baiting",
+                accepted: ["baiting"],
+                options: ["Baiting", "Shouldering", "Vishing", "Tailgating"],
+                hint: "Starts with B - leaving a trap like bait on a hook"
+            },
+            {
+                category: "social",
+                topicLabel: "Social Engineering",
+                q: "Redirecting a user from a legitimate website address to a fake lookalike website by corrupting DNS server records.",
+                answer: "Pharming",
+                accepted: ["pharming"],
+                options: ["Pharming", "Phishing", "Blagging", "Shouldering"],
+                hint: "Sounds like Phishing, starts with 'Pharm...'"
+            },
+            {
+                category: "social",
+                topicLabel: "Social Engineering",
+                q: "What screen accessory stops people on a train from reading your laptop screen from a side angle?",
+                answer: "Privacy Filter / Screen Guard",
+                accepted: ["privacy filter", "privacy screen"],
+                options: ["Privacy Filter / Screen Guard", "Anti-glare Wallpaper", "Firewall", "Proxy Server"],
+                hint: "Blackens the screen when viewed from the side"
+            },
+            {
+                category: "social",
+                topicLabel: "Social Engineering",
+                q: "A caller says 'I'm from Microsoft Support; if you let me fix your PC, I'll give you a free Office licence.' What technique is this?",
+                answer: "Quid Pro Quo",
+                accepted: ["quid pro quo", "blagging"],
+                options: ["Quid Pro Quo", "Shouldering", "Tailgating", "Smishing"],
+                hint: "Latin phrase meaning 'something for something'"
+            },
+            {
+                category: "social",
+                topicLabel: "Social Engineering",
+                q: "Why is Blagging different from Phishing?",
+                answer: "Blagging uses an invented story/conversation",
+                accepted: ["story", "scenario", "conversation"],
+                options: ["Blagging uses an invented story/conversation", "Blagging only uses USB sticks", "Blagging is completely legal", "Blagging only targets Wi-Fi routers"],
+                hint: "Blagging relies on making up a convincing scenario"
+            },
+            {
+                category: "social",
+                topicLabel: "Social Engineering",
+                q: "Which security method requires BOTH your password AND a 6-digit code sent to your phone, protecting you even if you fall for Phishing?",
+                answer: "Two-Factor Authentication (2FA)",
+                accepted: ["2fa", "mfa", "two factor", "two-factor authentication"],
+                options: ["Two-Factor Authentication (2FA)", "Security Questions", "Disk Defragmentation", "Adblock"],
+                hint: "3-character abbreviation: 2FA"
+            },
+            {
+                category: "social",
+                topicLabel: "Social Engineering",
+                q: "If a friend shares a 'What is your Superhero Name?' quiz on social media, what is the best advice to give them?",
+                answer: "Delete the post and change security questions",
+                accepted: ["delete", "remove"],
+                options: ["Delete the post and change security questions", "Share it on your own profile", "Tag more friends in the comments", "Post their real password instead"],
+                hint: "Remove the information immediately"
+            },
+            {
+                category: "social",
+                topicLabel: "Social Engineering",
+                q: "Searching through a company's recycling bins to find discarded paper printouts containing staff usernames or network details.",
+                answer: "Dumpster Diving",
+                accepted: ["dumpster diving", "bin raiding"],
+                options: ["Dumpster Diving", "Phishing", "Pharming", "Vishing"],
+                hint: "Searching through rubbish bins"
             },
 
-            // WEEK 2: HERO OR CRIMINAL?
+            // ================= WEEK 2: HERO OR CRIMINAL? (20 QUESTIONS) =================
             {
                 category: "ethics",
                 topicLabel: "Hero or Criminal?",
-                q: "A malicious intruder who accesses computer networks without permission to steal data or money for personal gain.",
+                q: "A malicious criminal who breaks into computer networks without permission to steal data or money for personal gain.",
                 answer: "Black Hat",
                 accepted: ["black hat", "black"],
-                options: ["Black Hat", "White Hat", "Grey Hat", "Red Hat"],
-                hint: "Which colour hat represents a criminal intruder?"
+                options: ["Black Hat", "White Hat", "Grey Hat", "Blue Hat"],
+                hint: "Which colour hat represents a criminal?"
             },
             {
                 category: "ethics",
                 topicLabel: "Hero or Criminal?",
-                q: "An ethical security specialist legally employed by a company to test their systems and help fix weaknesses.",
+                q: "An ethical security specialist legally employed by an organisation to test their security systems and fix weaknesses.",
                 answer: "White Hat",
-                accepted: ["white hat", "white", "ethical \x68\x61\x63\x6b\x65\x72"],
+                accepted: ["white hat", "white"],
                 options: ["White Hat", "Black Hat", "Grey Hat", "Script Kiddie"],
                 hint: "Which colour hat represents an ethical hero?"
             },
             {
                 category: "ethics",
                 topicLabel: "Hero or Criminal?",
-                q: "Someone who accesses a system without permission just to prove they can find flaws, without stealing data or money.",
+                q: "Someone who breaks into a company's network without permission just to prove they can find flaws, without stealing money.",
                 answer: "Grey Hat",
                 accepted: ["grey hat", "gray hat", "grey", "gray"],
                 options: ["Grey Hat", "White Hat", "Black Hat", "Script Kiddie"],
-                hint: "Between Black and White..."
+                hint: "A mix of Black and White..."
             },
             {
                 category: "ethics",
                 topicLabel: "Hero or Criminal?",
-                q: "An inexperienced user who downloads pre-made intrusion tools written by others without understanding how the code works.",
+                q: "An inexperienced user who downloads pre-made intrusion scripts written by others without understanding how the code works.",
                 answer: "Script Kiddie",
                 accepted: ["script kiddie", "script kiddies"],
-                options: ["Script Kiddie", "Black Hat", "Botnet", "White Hat"],
+                options: ["Script Kiddie", "White Hat", "Penetration Tester", "Network Architect"],
                 hint: "Two words: Script K..."
             },
             {
                 category: "ethics",
                 topicLabel: "Hero or Criminal?",
-                q: "Targeting or disrupting a government or corporate website to promote a political or social protest.",
+                q: "Breaking into or defacing a government or corporate website to promote a political or social protest.",
                 answer: "\x48\x61\x63\x6b\x74\x69\x76\x69\x73\x6d",
-                accepted: ["\x68\x61\x63\x6b\x74\x69\x76\x69\x73\x6d", "\x68\x61\x63\x6b\x74\x69\x76\x69\x73\x74", "activism"],
-                options: ["\x48\x61\x63\x6b\x74\x69\x76\x69\x73\x6d", "Blagging", "Phishing", "Shouldering"],
-                hint: "Combining digital intrusion and political 'Activism'"
+                accepted: ["\x68\x61\x63\x6b\x74\x69\x76\x69\x73\x6d", "\x68\x61\x63\x6b\x74\x69\x76\x69\x73\x74"],
+                options: ["\x48\x61\x63\x6b\x74\x69\x76\x69\x73\x6d", "Phishing", "Blagging", "Penetration Testing"],
+                hint: "Starts with H - ends with '...tivism'"
             },
             {
                 category: "ethics",
                 topicLabel: "Hero or Criminal?",
-                q: "Which 1990 UK law makes unauthorised access to computer material illegal, even if you only look around and change nothing?",
+                q: "Which 1990 UK law makes unauthorised access to computer material a criminal offence?",
                 answer: "Computer Misuse Act",
                 accepted: ["computer misuse act", "cma"],
-                options: ["Computer Misuse Act", "Data Protection Act", "Copyright Act", "Freedom of Information Act"],
+                options: ["Computer Misuse Act", "Data Protection Act", "Copyright Designs & Patents Act", "Investigatory Powers Act"],
                 hint: "Three words (CMA): Computer M... A..."
             },
             {
                 category: "ethics",
                 topicLabel: "Hero or Criminal?",
-                q: "An automated method that uses software to rapidly guess every possible combination of letters, numbers, and symbols to find a password.",
+                q: "Under Section 1 of the Computer Misuse Act, is it illegal to log into a friend's account without permission if you don't change anything?",
+                answer: "Yes - unauthorised access alone is illegal",
+                accepted: ["yes", "illegal"],
+                options: ["Yes - unauthorised access alone is illegal", "No - it is only illegal if you delete files", "No - it is legal if you know their password", "Only if you steal money"],
+                hint: "Just looking without permission is an offence"
+            },
+            {
+                category: "ethics",
+                topicLabel: "Hero or Criminal?",
+                q: "Which section of the Computer Misuse Act covers unauthorised access with intent to commit further crimes (like fraud or blackmail)?",
+                answer: "Section 2",
+                accepted: ["section 2", "2"],
+                options: ["Section 2", "Section 1", "Section 3", "Section 10"],
+                hint: "Between Section 1 and Section 3"
+            },
+            {
+                category: "ethics",
+                topicLabel: "Hero or Criminal?",
+                q: "Which section of the Computer Misuse Act makes it illegal to distribute malware or launch a \x44\x44\x6f\x53 flood to impair a computer?",
+                answer: "Section 3",
+                accepted: ["section 3", "3"],
+                options: ["Section 3", "Section 1", "Section 2", "Section 99"],
+                hint: "The 3rd main offence in the CMA"
+            },
+            {
+                category: "ethics",
+                topicLabel: "Hero or Criminal?",
+                q: "An automated trial-and-error method that uses software to rapidly test every possible combination of characters to crack a password.",
                 answer: "\x42\x72\x75\x74\x65\x20\x46\x6f\x72\x63\x65",
                 accepted: ["\x62\x72\x75\x74\x65\x20\x66\x6f\x72\x63\x65"],
-                options: ["\x42\x72\x75\x74\x65\x20\x46\x6f\x72\x63\x65", "Traffic Flood", "Shouldering", "Trojan"],
+                options: ["\x42\x72\x75\x74\x65\x20\x46\x6f\x72\x63\x65", "\x44\x44\x6f\x53", "Shouldering", "SQL Injection"],
                 hint: "Two words: B... Force"
             },
             {
                 category: "ethics",
                 topicLabel: "Hero or Criminal?",
-                q: "A password-guessing method that specifically tests a pre-made list of common everyday words.",
+                q: "A password-cracking method that specifically tests a pre-made list of common everyday words and leaked passwords.",
                 answer: "Dictionary \x41\x74\x74\x61\x63\x6b",
                 accepted: ["dictionary", "dictionary \x61\x74\x74\x61\x63\x6b"],
-                options: ["Dictionary \x41\x74\x74\x61\x63\x6b", "Phishing", "Shouldering", "Worm"],
-                hint: "Named after a book full of words and definitions"
+                options: ["Dictionary \x41\x74\x74\x61\x63\x6b", "\x44\x44\x6f\x53", "Phishing", "Blagging"],
+                hint: "Named after a book of words"
             },
             {
                 category: "ethics",
                 topicLabel: "Hero or Criminal?",
-                q: "Overwhelming a website's server with massive amounts of fake traffic from thousands of infected computers until it goes offline.",
+                q: "Flooding a website's server with massive amounts of fake traffic from THOUSANDS of distributed computers until it crashes.",
                 answer: "\x44\x44\x6f\x53",
                 accepted: ["\x64\x64\x6f\x73", "distributed denial of service"],
-                options: ["\x44\x44\x6f\x53", "\x42\x72\x75\x74\x65\x20\x46\x6f\x72\x63\x65", "Spyware", "Blagging"],
-                hint: "4-letter acronym: Distributed Denial of Service"
+                options: ["\x44\x44\x6f\x53", "Single DoS", "\x42\x72\x75\x74\x65\x20\x46\x6f\x72\x63\x65", "Pharming"],
+                hint: "4-letter acronym starting with DD..."
             },
             {
                 category: "ethics",
                 topicLabel: "Hero or Criminal?",
-                q: "How can a school network stop automated password-guessing software from succeeding?",
-                answer: "Lock account after failed attempts",
-                accepted: ["lock account", "account lockout", "strong passwords"],
-                options: ["Lock account after failed attempts", "Install Adware", "Use shorter passwords", "Turn off the monitor"],
-                hint: "Stop them after 3 or 5 wrong guesses"
+                q: "What does the first 'D' in \x44\x44\x6f\x53 stand for?",
+                answer: "Distributed",
+                accepted: ["distributed"],
+                options: ["Distributed", "Digital", "Direct", "Dynamic"],
+                hint: "Starts with D - spread across many locations"
+            },
+            {
+                category: "ethics",
+                topicLabel: "Hero or Criminal?",
+                q: "Why is a \x44\x44\x6f\x53 flood much harder to block than a standard DoS flood from a single computer?",
+                answer: "Traffic comes from thousands of different IP addresses",
+                accepted: ["many ip", "different ip", "thousands", "multiple"],
+                options: ["Traffic comes from thousands of different IP addresses", "It uses physical USB cables", "It encrypts the monitor", "It only happens at night"],
+                hint: "You cannot just block one single IP address"
+            },
+            {
+                category: "ethics",
+                topicLabel: "Hero or Criminal?",
+                q: "What is the official job title for a White Hat professional hired to legally simulate a cyber attack on a company's network?",
+                answer: "Penetration Tester",
+                accepted: ["penetration tester", "pen tester", "pentester"],
+                options: ["Penetration Tester", "Script Kiddie", "Database Administrator", "Web Designer"],
+                hint: "Two words: P... Tester (or Pen Tester)"
+            },
+            {
+                category: "ethics",
+                topicLabel: "Hero or Criminal?",
+                q: "What is the SINGLE most important difference between a White Hat and a Black Hat specialist?",
+                answer: "Permission / Legal Authorisation",
+                accepted: ["permission", "authorisation", "authorization", "consent"],
+                options: ["Permission / Legal Authorisation", "The speed of their computer", "The programming language used", "The time of day they work"],
+                hint: "Starts with P - having the owner's consent"
+            },
+            {
+                category: "ethics",
+                topicLabel: "Hero or Criminal?",
+                q: "Which website feature forces users to tick a box or identify traffic lights to stop automated bots from submitting login guesses?",
+                answer: "CAPTCHA",
+                accepted: ["captcha", "recaptcha"],
+                options: ["CAPTCHA", "Cookie", "Hyperlink", "Bookmark"],
+                hint: "7-letter acronym: C-A-P-T-C-H-A"
+            },
+            {
+                category: "ethics",
+                topicLabel: "Hero or Criminal?",
+                q: "Why does adding symbols, numbers, and uppercase letters to a password defend against a \x42\x72\x75\x74\x65\x20\x46\x6f\x72\x63\x65 attack?",
+                answer: "It exponentially increases the possible combinations",
+                accepted: ["combinations", "longer", "harder to guess"],
+                options: ["It exponentially increases the possible combinations", "It hides the login button", "It disconnects the attacker's Wi-Fi", "It deletes the server logs"],
+                hint: "More possible combinations = takes years to guess"
+            },
+            {
+                category: "ethics",
+                topicLabel: "Hero or Criminal?",
+                q: "How can a school network stop an automated \x42\x72\x75\x74\x65\x20\x46\x6f\x72\x63\x65 program from endlessly guessing a student's password?",
+                answer: "Account Lockout after 3-5 failed attempts",
+                accepted: ["lockout", "lock account", "account lockout"],
+                options: ["Account Lockout after 3-5 failed attempts", "Give everyone the same password", "Turn off the firewall", "Use 4-letter passwords"],
+                hint: "Freeze the account after several wrong guesses"
+            },
+            {
+                category: "ethics",
+                topicLabel: "Hero or Criminal?",
+                q: "A security flaw in software that the developers do NOT know about yet, leaving zero days to create a patch before it is exploited.",
+                answer: "Zero-Day Vulnerability",
+                accepted: ["zero day", "zero-day", "0 day"],
+                options: ["Zero-Day Vulnerability", "Script Kiddie", "Dictionary \x41\x74\x74\x61\x63\x6b", "Shouldering"],
+                hint: "Named after having 'Zero Days' to fix it"
             },
 
-            // WEEK 3: SOFTWARE THREATS (MALWARE)
+            // ================= WEEK 3: MALWARE & DEFENCES (20 QUESTIONS) =================
             {
                 category: "software",
-                topicLabel: "Software Threats",
-                q: "Harmful software that attaches itself to a host file and requires a human to open the file before it can activate and spread.",
+                topicLabel: "Malware",
+                q: "Malicious code that attaches itself to a legitimate host file and requires a human to run or open the file to activate.",
                 answer: "Virus",
                 accepted: ["virus"],
-                options: ["Virus", "Worm", "Trojan", "Adware"],
-                hint: "Starts with V - needs a host file"
+                options: ["Virus", "Worm", "Trojan", "Spyware"],
+                hint: "Starts with V - needs a host program and human action"
             },
             {
                 category: "software",
-                topicLabel: "Software Threats",
-                q: "Harmful software that self-replicates and spreads automatically across a network without needing a host file or human action.",
+                topicLabel: "Malware",
+                q: "Malware that self-replicates and spreads automatically across a network by exploiting weaknesses, WITHOUT needing a host file or human click.",
                 answer: "Worm",
                 accepted: ["worm"],
-                options: ["Worm", "Virus", "Trojan", "Spyware"],
-                hint: "Starts with W - crawls through networks on its own"
+                options: ["Worm", "Virus", "Trojan", "Adware"],
+                hint: "Starts with W - crawls through networks automatically"
             },
             {
                 category: "software",
-                topicLabel: "Software Threats",
-                q: "Harmful software disguised as a useful, legitimate program (like a free utility tool) that secretly opens a backdoor into your PC.",
+                topicLabel: "Malware",
+                q: "Malware disguised as a useful, legitimate application (like a free game) that secretly opens a backdoor into your system.",
                 answer: "Trojan",
                 accepted: ["trojan", "trojan horse"],
-                options: ["Trojan", "Worm", "\x52\x61\x6e\x73\x6f\x6d\x77\x61\x72\x65", "Botnet"],
-                hint: "Named after the wooden horse from ancient Greece"
+                options: ["Trojan", "Worm", "Virus", "Botnet"],
+                hint: "Named after the wooden horse of Troy"
             },
             {
                 category: "software",
-                topicLabel: "Software Threats",
-                q: "Harmful software that scrambles (encrypts) all your files and demands a payment in digital currency to unlock them.",
+                topicLabel: "Malware",
+                q: "Malware that encrypts (locks) all your personal files and demands a payment in cryptocurrency to give you the decryption key.",
                 answer: "\x52\x61\x6e\x73\x6f\x6d\x77\x61\x72\x65",
                 accepted: ["\x72\x61\x6e\x73\x6f\x6d\x77\x61\x72\x65"],
-                options: ["\x52\x61\x6e\x73\x6f\x6d\x77\x61\x72\x65", "Spyware", "Adware", "Phishing"],
-                hint: "Starts with R - holds your files for a fee"
+                options: ["\x52\x61\x6e\x73\x6f\x6d\x77\x61\x72\x65", "Spyware", "Adware", "Rootkit"],
+                hint: "Starts with R - holds your data for a fee"
             },
             {
                 category: "software",
-                topicLabel: "Software Threats",
-                q: "Software that secretly monitors what you do on your computer and records the keys you press on your keyboard.",
+                topicLabel: "Malware",
+                q: "Malware that secretly monitors user activity in the background and sends private data back to an attacker.",
                 answer: "Spyware",
-                accepted: ["spyware", "\x6b\x65\x79\x6c\x6f\x67\x67\x65\x72"],
-                options: ["Spyware", "Adware", "Worm", "Blagging"],
-                hint: "Starts with S - secretly spying on your activity"
+                accepted: ["spyware"],
+                options: ["Spyware", "Adware", "Worm", "\x52\x61\x6e\x73\x6f\x6d\x77\x61\x72\x65"],
+                hint: "Starts with S - secretly spying on you"
             },
             {
                 category: "software",
-                topicLabel: "Software Threats",
-                q: "Unwanted software that floods your screen with endless pop-up adverts to generate advertising revenue.",
+                topicLabel: "Malware",
+                q: "A specific type of Spyware that records every single keystroke you press on your keyboard to steal passwords.",
+                answer: "\x4b\x65\x79\x6c\x6f\x67\x67\x65\x72",
+                accepted: ["\x6b\x65\x79\x6c\x6f\x67\x67\x65\x72", "key logger"],
+                options: ["\x4b\x65\x79\x6c\x6f\x67\x67\x65\x72", "Worm", "\x52\x61\x6e\x73\x6f\x6d\x77\x61\x72\x65", "Botnet"],
+                hint: "Starts with K - logs the keys you press"
+            },
+            {
+                category: "software",
+                topicLabel: "Malware",
+                q: "Malware that automatically displays or downloads endless unwanted pop-up advertisements when you are online.",
                 answer: "Adware",
                 accepted: ["adware"],
-                options: ["Adware", "\x52\x61\x6e\x73\x6f\x6d\x77\x61\x72\x65", "Spyware", "Trojan"],
-                hint: "Starts with A - bombards you with adverts"
+                options: ["Adware", "Spyware", "Trojan", "Worm"],
+                hint: "Starts with A - floods you with adverts"
             },
             {
                 category: "software",
-                topicLabel: "Software Threats",
-                q: "A large network of infected 'zombie' computers controlled remotely to send spam or flood websites with traffic.",
+                topicLabel: "Malware",
+                q: "A network of thousands of infected 'zombie' computers controlled remotely by an attacker without the owners knowing.",
                 answer: "Botnet",
-                accepted: ["botnet", "bot"],
-                options: ["Botnet", "Trojan", "Firewall", "Script Kiddie"],
-                hint: "A network of robots (Starts with B)"
+                accepted: ["botnet"],
+                options: ["Botnet", "Trojan", "Firewall", "Intranet"],
+                hint: "Starts with B - a network of robot computers"
             },
             {
                 category: "software",
-                topicLabel: "Software Threats",
-                q: "What is the best preparation to ensure you don't lose your work if your files are ever locked or encrypted?",
-                answer: "Regular Backups",
-                accepted: ["backup", "backups", "regular backups"],
-                options: ["Regular Backups", "Pay the fee immediately", "Delete your browser", "Unplug the mouse"],
-                hint: "Keeping a separate copy of your files (Starts with B)"
+                topicLabel: "Malware",
+                q: "Unlike a Virus or a Worm, which key feature does a Trojan NOT do?",
+                answer: "It does NOT self-replicate",
+                accepted: ["self replicate", "replicate", "copy itself"],
+                options: ["It does NOT self-replicate", "It does not harm computers", "It cannot be deleted", "It only infects printers"],
+                hint: "A Trojan relies on users downloading it; it cannot copy itself"
+            },
+            {
+                category: "software",
+                topicLabel: "Malware",
+                q: "What is the key difference between how a Worm spreads compared to a Virus?",
+                answer: "A Worm spreads automatically without a host file",
+                accepted: ["automatically", "no host", "without human"],
+                options: ["A Worm spreads automatically without a host file", "A Worm only spreads via USB sticks", "A Worm needs a human to click it", "A Worm is harmless"],
+                hint: "Worms don't need a host program or human click"
+            },
+            {
+                category: "software",
+                topicLabel: "Malware",
+                q: "Stealthy malware designed to hide deep inside the operating system and grant the attacker permanent 'Administrator' control.",
+                answer: "Rootkit",
+                accepted: ["rootkit", "root kit"],
+                options: ["Rootkit", "Adware", "Phishing", "Shouldering"],
+                hint: "Starts with R - gives 'root' admin access"
+            },
+            {
+                category: "software",
+                topicLabel: "Malware",
+                q: "What do we call an individual computer that has been infected with malware and forced to join a Botnet?",
+                answer: "Zombie / Bot",
+                accepted: ["zombie", "bot"],
+                options: ["Zombie / Bot", "Server", "Router", "Switch"],
+                hint: "Named after theliving dead controlled by a master"
+            },
+            {
+                category: "software",
+                topicLabel: "Malware",
+                q: "How does Antivirus software recognise known viruses when scanning your hard drive?",
+                answer: "Comparing files against a database of Virus Signatures",
+                accepted: ["signatures", "virus signatures", "database", "definitions"],
+                options: ["Comparing files against a database of Virus Signatures", "Checking the file's font size", "Weighing the hard drive", "Asking the user"],
+                hint: "Checks a database of known 'Signatures' or definitions"
+            },
+            {
+                category: "software",
+                topicLabel: "Malware",
+                q: "What does Antivirus software do with a suspicious file to isolate it safely so it cannot spread or run?",
+                answer: "Quarantine",
+                accepted: ["quarantine"],
+                options: ["Quarantine", "Defragment", "Compress", "Format"],
+                hint: "Starts with Q - locking the file in isolation"
+            },
+            {
+                category: "software",
+                topicLabel: "Malware",
+                q: "A network security barrier that inspects incoming and outgoing data packets and blocks unauthorised traffic.",
+                answer: "Firewall",
+                accepted: ["firewall"],
+                options: ["Firewall", "Antivirus", "Task Manager", "Control Panel"],
+                hint: "Starts with F - a wall that blocks malicious traffic"
+            },
+            {
+                category: "software",
+                topicLabel: "Malware",
+                q: "What is the best precaution to ensure you can recover all your work without paying a fee if hit by \x52\x61\x6e\x73\x6f\x6d\x77\x61\x72\x65?",
+                answer: "Offline / Cloud Backups",
+                accepted: ["backup", "backups", "offline backup"],
+                options: ["Offline / Cloud Backups", "Install Adware", "Use a smaller monitor", "Rename your desktop"],
+                hint: "Starts with B - keeping a separate copy of your data"
+            },
+            {
+                category: "software",
+                topicLabel: "Malware",
+                q: "Why should you always install Operating System 'Patches' and software updates as soon as they are released?",
+                answer: "They fix known security vulnerabilities",
+                accepted: ["fix vulnerabilities", "security holes", "bugs", "weaknesses"],
+                options: ["They fix known security vulnerabilities", "They make the mouse click louder", "They double your RAM size", "They delete your backups"],
+                hint: "Updates patch up security holes before worms exploit them"
+            },
+            {
+                category: "software",
+                topicLabel: "Malware",
+                q: "Scrambling data using an algorithm and a key so that unauthorised people cannot read it even if they steal the file.",
+                answer: "Encryption",
+                accepted: ["encryption", "encrypt"],
+                options: ["Encryption", "Compression", "Quarantine", "Blagging"],
+                hint: "Starts with E - turning plaintext into ciphertext"
+            },
+            {
+                category: "software",
+                topicLabel: "Malware",
+                q: "Why do \x52\x61\x6e\x73\x6f\x6d\x77\x61\x72\x65 criminals almost always demand payment in Cryptocurrency (like Bitcoin) rather than bank transfers?",
+                answer: "It is harder for police to trace the account owner",
+                accepted: ["harder to trace", "anonymous", "untraceable"],
+                options: ["It is harder for police to trace the account owner", "Banks are closed on weekends", "Bitcoin encrypts the hard drive", "It is legal to steal Bitcoin"],
+                hint: "Digital wallets are much harder to trace back to a real name"
+            },
+            {
+                category: "software",
+                topicLabel: "Malware",
+                q: "What is the overarching term for any software intentionally designed to cause damage, steal data, or gain unauthorised access?",
+                answer: "Malware",
+                accepted: ["malware", "malicious software"],
+                options: ["Malware", "Freeware", "Shareware", "Firmware"],
+                hint: "Short for 'Malicious Software'"
             }
         ];
 
-        /* --- 5. CHALLENGE LOGIC --- */
+        /* --- 5. CHALLENGE LOGIC (STRICT 60s CLOCK & SHUFFLED DECK) --- */
         function setCategory(cat, btnEl) {
             selectedCategory = cat;
             const btns = document.querySelectorAll('.cat-btn');
@@ -680,10 +997,18 @@
             return copy;
         }
 
+        function buildDeck() {
+            const pool = selectedCategory === 'all'
+                ? questionBank
+                : questionBank.filter(function(item) { return item.category === selectedCategory; });
+            questionDeck = shuffleArray(pool);
+        }
+
         function startChallenge() {
             score = 0;
             streak = 0;
             timeLeft = 60;
+            isLocked = false;
             document.getElementById('score').innerText = score;
             document.getElementById('streak').innerText = streak;
             document.getElementById('time').innerText = timeLeft;
@@ -692,6 +1017,7 @@
             document.getElementById('category-tabs').style.pointerEvents = 'none';
             document.getElementById('category-tabs').style.opacity = '0.6';
 
+            buildDeck();
             generateNewQuestion();
 
             clearInterval(timerInterval);
@@ -709,15 +1035,12 @@
         }
 
         function generateNewQuestion() {
-            let pool = selectedCategory === 'all' 
-                ? questionBank 
-                : questionBank.filter(function(item) { return item.category === selectedCategory; });
+            isLocked = false;
+            if (questionDeck.length === 0) {
+                buildDeck();
+            }
 
-            let filteredPool = pool.filter(function(item) { return item.q !== lastQuestionText; });
-            if (filteredPool.length === 0) filteredPool = pool;
-
-            currentQuestion = filteredPool[Math.floor(Math.random() * filteredPool.length)];
-            lastQuestionText = currentQuestion.q;
+            currentQuestion = questionDeck.pop();
 
             const badge = document.getElementById('topic-badge');
             badge.innerText = currentQuestion.topicLabel;
@@ -728,8 +1051,9 @@
 
             document.getElementById('scenario-text').innerText = currentQuestion.q;
 
-            const canType = currentQuestion.answer.length <= 18 && !currentQuestion.answer.includes('/');
-            currentMode = (canType && Math.random() > 0.7) ? 1 : 0;
+            // 50% chance of typing mode on any single/short keyword question
+            const canType = currentQuestion.answer.length <= 20 && !currentQuestion.answer.includes('/');
+            currentMode = (canType && Math.random() > 0.5) ? 1 : 0;
 
             if (currentMode === 0) {
                 document.getElementById('text-input-container').style.display = 'none';
@@ -754,14 +1078,16 @@
                 inputWrap.style.display = 'flex';
                 inputEl.value = '';
                 inputEl.style.borderColor = '#1e3a8a';
-                document.getElementById('input-hint').innerText = "💡 Hint: " + currentQuestion.hint;
+                // Hide hint initially to make typing mode a genuine test of recall
+                document.getElementById('input-hint').innerText = "";
 
                 setTimeout(function() { inputEl.focus(); }, 10);
             }
         }
 
         function checkOption(index) {
-            if (currentMode !== 0 || !currentQuestion) return;
+            if (isLocked || currentMode !== 0 || !currentQuestion) return;
+            isLocked = true;
             const chosen = currentOptions[index];
             const btns = document.querySelectorAll('.option-btn');
 
@@ -779,22 +1105,25 @@
         }
 
         function checkTextInput() {
-            if (currentMode !== 1 || !currentQuestion) return;
+            if (isLocked || currentMode !== 1 || !currentQuestion) return;
             const inputField = document.getElementById('answer-input');
             const val = inputField.value.trim().toLowerCase();
             if (!val) return;
 
             const isMatch = currentQuestion.accepted.some(function(ans) {
-                return val === ans.toLowerCase() || val.includes(ans.toLowerCase());
+                return val === ans.toLowerCase() || (val.length >= 4 && val.includes(ans.toLowerCase()));
             });
 
             if (isMatch) {
+                isLocked = true;
                 triggerCorrectAnswer();
             } else {
                 inputField.style.borderColor = '#d32f2f';
                 setTimeout(function() { inputField.style.borderColor = '#1e3a8a'; }, 400);
                 inputField.value = '';
                 inputField.focus();
+                // Reveal hint after a wrong attempt while penalising 5 seconds
+                document.getElementById('input-hint').innerText = "⚠️ -5s Breach! Hint: " + currentQuestion.hint;
                 triggerWrongAnswer(false);
             }
         }
@@ -802,12 +1131,11 @@
         function triggerCorrectAnswer() {
             score++;
             streak++;
-            timeLeft += 4;
+            // No time added! Strict 60s survival clock
             latestScore = score;
 
             document.getElementById('score').innerText = score;
             document.getElementById('streak').innerText = streak;
-            document.getElementById('time').innerText = timeLeft;
 
             if (score > topScore) {
                 topScore = score;
@@ -823,7 +1151,7 @@
 
         function triggerWrongAnswer(advance) {
             streak = 0;
-            timeLeft = Math.max(0, timeLeft - 3);
+            timeLeft = Math.max(0, timeLeft - 5); // Strict -5s penalty for wrong answers
             document.getElementById('streak').innerText = streak;
             document.getElementById('time').innerText = timeLeft;
 
@@ -833,14 +1161,14 @@
             if (timeLeft <= 0) {
                 endChallenge();
             } else if (advance) {
-                setTimeout(generateNewQuestion, 250);
+                setTimeout(generateNewQuestion, 300);
             }
         }
 
         function getRankTitle(finalScore) {
-            if (finalScore >= 25) return "🏆 Rank: Chief Information Security Officer (CISO)";
-            if (finalScore >= 18) return "🛡️ Rank: Elite White Hat Specialist";
-            if (finalScore >= 12) return "💻 Rank: Senior Network Analyst";
+            if (finalScore >= 22) return "🏆 Rank: Chief Information Security Officer (CISO)";
+            if (finalScore >= 16) return "🛡️ Rank: Elite White Hat Specialist";
+            if (finalScore >= 11) return "💻 Rank: Senior Network Analyst";
             if (finalScore >= 6) return "🔍 Rank: Junior Network Defender";
             return "🎓 Rank: Trainee Security Cadet";
         }
@@ -868,7 +1196,7 @@
 
             document.getElementById('topic-badge').innerText = "SELECT A TOPIC & PRESS START";
             document.getElementById('topic-badge').className = "scenario-badge badge-ethics";
-            document.getElementById('scenario-text').innerText = "Identify the network security concept, legal rule, or defence mechanism before the 60-second clock runs out! (+4s for correct answers, -3s for mistakes)";
+            document.getElementById('scenario-text').innerText = "Strict 60-Second Clock! Identify as many threats and defences as you can before time runs out. Watch out: wrong answers cost you -5 seconds!";
 
             document.getElementById('options-board').style.display = 'grid';
             document.getElementById('options-board').style.pointerEvents = 'none';
