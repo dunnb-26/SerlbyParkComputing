@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Defense Time Attack</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        .game-container {
+            max-width: 850px;
+            margin: 30px auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            border-top: 6px solid #1e3a8a;
+            text-align: center;
+        }
+
+        /* Top Score Box Styling */
+        .top-score-container {
+            background-color: rgba(223, 170, 43, 0.1);
+            border: 2px solid #dfaa2b;
+            color: #1e3a8a;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 2px 5px rgba(223, 170, 43, 0.2);
+        }
+
+        .top-score-icon { font-size: 1.2em; }
+
+        /* Week / Topic Filter Tabs */
+        .category-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .cat-btn {
+            background-color: #f0f4f8;
+            color: #1e3a8a;
+            border: 2px solid #1e3a8a;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95em;
+        }
+
+        .cat-btn:hover {
+            background-color: #e2e8f0;
+        }
+
+        .cat-btn.active {
+            background-color: #1e3a8a;
+            color: #dfaa2b;
+            border-color: #1e3a8a;
+            box-shadow: 0 2px 6px rgba(30, 58, 138, 0.3);
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .streak-badge {
+            background-color: #fff3e0;
+            color: #e65100;
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid #ffb74d;
+            font-size: 0.9em;
+        }
+
+        .scenario-badge {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-social { background-color: #fce4ec; color: #880e4f; }
+        .badge-hacking { background-color: #e8eaf6; color: #1e3a8a; }
+        .badge-malware { background-color: #e8f5e9; color: #1b5e20; }
+
+        .scenario-display {
+            font-size: 1.45em;
+            font-weight: bold;
+            color: #222;
+            background: #f8f9fa;
+            border-left: 6px solid #800000;
+            padding: 25px;
+            border-radius: 0 8px 8px 0;
+            margin: 10px 0 25px 0;
+            min-height: 110px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 1.4;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .game-interaction-area {
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        /* 4-Button Choice Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+        }
+
+        .option-btn {
+            padding: 18px 15px;
+            font-size: 1.15em;
+            font-weight: bold;
+            border: 3px solid #1e3a8a;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            background-color: #ffffff;
+            color: #1e3a8a;
+        }
+
+        .option-btn:hover {
+            background-color: #dfaa2b;
+            color: #1e3a8a;
+            border-color: #dfaa2b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(223, 170, 43, 0.3);
+        }
+
+        /* Type Input Mode */
+        .text-input-wrapper {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .cyber-input {
+            font-size: 1.8em;
+            padding: 12px 20px;
+            width: 320px;
+            text-align: center;
+            border: 4px solid #1e3a8a;
+            border-radius: 8px;
+            outline: none;
+            font-weight: bold;
+            color: #1e3a8a;
+            transition: border-color 0.2s;
+        }
+
+        .cyber-input:focus {
+            border-color: #dfaa2b;
+            box-shadow: 0 0 10px rgba(223, 170, 43, 0.3);
+        }
+
+        .btn-enter {
+            font-size: 1.4em;
+            padding: 15px 30px;
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .btn-enter:hover {
+            background: #dfaa2b;
+            color: #1e3a8a;
+        }
+
+        .hint-text {
+            margin-top: 10px;
+            color: #666;
+            font-size: 0.95em;
+            font-style: italic;
+        }
+
+        .controls { margin-top: 10px; }
+
+        .btn-start {
+            background-color: #008f39;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 6px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-start:hover { background-color: #006100; }
+
+        .game-over-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .game-over-overlay h2 { color: #dfaa2b; font-size: 3em; margin-bottom: 10px; }
+        .game-over-overlay p { font-size: 1.5em; margin-bottom: 15px; }
+        .rank-title {
+            font-size: 1.8em;
+            color: #4caf50;
+            font-weight: bold;
+            margin-bottom: 30px;
+            background: rgba(255,255,255,0.1);
+            padding: 10px 25px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
+        </div>
+        <div class="header-center"><h1>Cyber Defense: Time Attack</h1></div>
+        <div class="header-right"><a href="javascript:history.back()" class="back-btn">&larr; Go Back</a></div>
+    </header>
+
+    <main>
+        <div class="game-container">
+            
+            <!-- Top Score Container -->
+            <div class="top-score-container">
+                <span class="top-score-icon">🏆</span> Top Score: <span id="top-score">0</span>
+            </div>
+
+            <!-- Week / Topic Selector -->
+            <div class="category-tabs" id="category-tabs">
+                <button class="cat-btn active" onclick="setCategory('all', this)">🛡️ All Topics (Mix)</button>
+                <button class="cat-btn" onclick="setCategory('social', this)">🎣 Social Engineering</button>
+                <button class="cat-btn" onclick="setCategory('hacking', this)">💻 Hacking & Ethics</button>
+                <button class="cat-btn" onclick="setCategory('malware', this)">🦠 Malware</button>
+            </div>
+
+            <div class="scoreboard">
+                <div>Defended: <span id="score">0</span></div>
+                <div class="streak-badge">🔥 Streak: <span id="streak">0</span></div>
+                <div style="color: #d32f2f;">Time: <span id="time">60</span>s</div>
+            </div>
+
+            <div id="badge-container">
+                <span class="scenario-badge badge-hacking" id="topic-badge">SELECT A TOPIC & PRESS START</span>
+            </div>
+            
+            <div class="scenario-display" id="scenario-text">
+                Identify the cyber threat, ethical hacking term, or defence mechanism before the 60-second clock runs out! (+4s for correct answers, -3s for breaches)
+            </div>
+
+            <div class="game-interaction-area">
+                
+                <!-- Multiple Choice Mode -->
+                <div class="options-grid" id="options-board" style="pointer-events: none; opacity: 0.5;">
+                    <button class="option-btn" onclick="checkOption(0)">Option 1</button>
+                    <button class="option-btn" onclick="checkOption(1)">Option 2</button>
+                    <button class="option-btn" onclick="checkOption(2)">Option 3</button>
+                    <button class="option-btn" onclick="checkOption(3)">Option 4</button>
+                </div>
+
+                <!-- Fast Type Mode -->
+                <div class="text-input-wrapper" id="text-input-container">
+                    <div style="width: 100%;">
+                        <input type="text" id="cyber-input" class="cyber-input" placeholder="Type keyword..." autocomplete="off" onkeydown="if(event.key==='Enter') checkTextInput()">
+                        <button class="btn-enter" onclick="checkTextInput()">Defend</button>
+                        <div class="hint-text" id="input-hint">Hint: Starts with...</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="controls">
+                <button class="btn-start" id="start-btn" onclick="startGame()">Start Cyber Defense</button>
+            </div>
+        </div>
+    </main>
+
+    <div class="game-over-overlay" id="game-over">
+        <h2>System Lockdown!</h2>
+        <p>You neutralised <strong id="final-score" style="color: #dfaa2b;">0</strong> cyber threats.</p>
+        <div class="rank-title" id="final-rank">Rank: Trainee Analyst</div>
+        <button class="btn-start" onclick="closeGameOver()">Play Again</button>
+    </div>
+
+    <footer>&copy; 2026 Delta Serlby Park - Computing & Business Department</footer>
+
+    <script>
+        /* --- 1. FIREBASE CONFIGURATION & INITIALIZATION --- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "cyber-defense-game";
+
+        /* --- 2. QUESTION BANK BY CURRICULUM WEEK --- */
+        const questionBank = [
+            // WEEK 1: SOCIAL ENGINEERING
+            {
+                category: "social",
+                topicLabel: "Social Engineering",
+                q: "You receive an urgent email claiming to be from PayPal asking you to click a link and verify your password immediately.",
+                answer: "Phishing",
+                accepted: ["phishing"],
+                options: ["Phishing", "Blagging", "Shouldering", "Trojan"],
+                hint: "Starts with P - fishing for information via email"
+            },
+            {
+                category: "social",
+                topicLabel: "Social Engineering",
+                q: "A stranger stands closely behind you at a cash machine and watches you type your PIN into the keypad.",
+                answer: "Shouldering",
+                accepted: ["shouldering", "shoulder surfing"],
+                options: ["Shouldering", "Phishing", "Blagging", "Spyware"],
+                hint: "Looking over someone's..."
+            },
+            {
+                category: "social",
+                topicLabel: "Social Engineering",
+                q: "A caller pretends to be an IT technician from the council and invents a fake server emergency to trick the receptionist into giving a password.",
+                answer: "Blagging",
+                accepted: ["blagging", "pretexting"],
+                options: ["Blagging", "Phishing", "Shouldering", "Brute Force"],
+                hint: "Starts with B - inventing a fake story/scenario"
+            },
+            {
+                category: "social",
+                topicLabel: "Social Engineering",
+                q: "A viral social media quiz asks 'What is your Ninja Name? (Your first pet + the street you grew up on)'. What security measure is this trying to bypass?",
+                answer: "Security Questions",
+                accepted: ["security questions", "security question", "password reset"],
+                options: ["Security Questions", "Firewall", "Antivirus", "Encryption"],
+                hint: "Used when you click 'Forgot Password'"
+            },
+            {
+                category: "social",
+                topicLabel: "Social Engineering",
+                q: "What is the umbrella term for manipulating people into giving up confidential information rather than hacking software directly?",
+                answer: "Social Engineering",
+                accepted: ["social engineering"],
+                options: ["Social Engineering", "Hacktivism", "Brute Force", "Penetration Testing"],
+                hint: "Two words: Social E..."
+            },
+            {
+                category: "social",
+                topicLabel: "Social Engineering",
+                q: "A phishing email says 'Your account will be deleted in 10 minutes unless you log in now!' What human emotion is the attacker exploiting?",
+                answer: "Panic / Urgency",
+                accepted: ["panic", "urgency", "fear", "worry"],
+                options: ["Panic / Urgency", "Curiosity", "Greed", "Boredom"],
+                hint: "Making you rush without thinking"
+            },
+            {
+                category: "social",
+                topicLabel: "Social Engineering",
+                q: "Which of these is a classic red flag that an email is a Phishing scam?",
+                answer: "Generic greeting ('Dear Customer')",
+                accepted: ["generic greeting", "dear customer", "spelling mistakes"],
+                options: ["Generic greeting ('Dear Customer')", "Uses your real full name", "Sent from an official domain", "No links included"],
+                hint: "They don't actually know your name"
+            },
+
+            // WEEK 2: HERO OR CRIMINAL (HACKING & ETHICS)
+            {
+                category: "hacking",
+                topicLabel: "Hero or Criminal?",
+                q: "A criminal hacker who breaks into computer networks without permission to steal data or money for personal gain.",
+                answer: "Black Hat",
+                accepted: ["black hat", "black"],
+                options: ["Black Hat", "White Hat", "Grey Hat", "Red Hat"],
+                hint: "Which colour hat represents a malicious criminal?"
+            },
+            {
+                category: "hacking",
+                topicLabel: "Hero or Criminal?",
+                q: "An ethical hacker legally employed by a bank to test their security systems and help fix vulnerabilities.",
+                answer: "White Hat",
+                accepted: ["white hat", "white", "ethical hacker"],
+                options: ["White Hat", "Black Hat", "Grey Hat", "Script Kiddie"],
+                hint: "Which colour hat represents an ethical hero?"
+            },
+            {
+                category: "hacking",
+                topicLabel: "Hero or Criminal?",
+                q: "A hacker who breaks into a system without permission just to prove they can, without stealing data or money.",
+                answer: "Grey Hat",
+                accepted: ["grey hat", "gray hat", "grey", "gray"],
+                options: ["Grey Hat", "White Hat", "Black Hat", "Hacktivist"],
+                hint: "Between Black and White..."
+            },
+            {
+                category: "hacking",
+                topicLabel: "Hero or Criminal?",
+                q: "An inexperienced attacker who downloads pre-made hacking tools written by others without understanding how the code works.",
+                answer: "Script Kiddie",
+                accepted: ["script kiddie", "script kiddies"],
+                options: ["Script Kiddie", "Black Hat", "Botnet", "White Hat"],
+                hint: "Two words: Script K..."
+            },
+            {
+                category: "hacking",
+                topicLabel: "Hero or Criminal?",
+                q: "Hacking a government or corporate website to promote a political or social protest.",
+                answer: "Hacktivism",
+                accepted: ["hacktivism", "hacktivist"],
+                options: ["Hacktivism", "Blagging", "Phishing", "Ransomware"],
+                hint: "Combining 'Hacking' and 'Activism'"
+            },
+            {
+                category: "hacking",
+                topicLabel: "Hero or Criminal?",
+                q: "Which 1990 UK law makes it illegal to access computer material without permission, even if you just look around and change nothing?",
+                answer: "Computer Misuse Act",
+                accepted: ["computer misuse act", "cma"],
+                options: ["Computer Misuse Act", "Data Protection Act", "Copyright Act", "Cyber Security Act"],
+                hint: "Three words (CMA): Computer M... A..."
+            },
+            {
+                category: "hacking",
+                topicLabel: "Hero or Criminal?",
+                q: "An automated attack that uses software to rapidly try every possible combination of letters, numbers, and symbols to crack a password.",
+                answer: "Brute Force",
+                accepted: ["brute force", "brute force attack"],
+                options: ["Brute Force", "DDoS Attack", "Shouldering", "Trojan"],
+                hint: "Two words: Brute F..."
+            },
+            {
+                category: "hacking",
+                topicLabel: "Hero or Criminal?",
+                q: "A type of Brute Force attack that specifically tests a list of common everyday words and leaked passwords.",
+                answer: "Dictionary Attack",
+                accepted: ["dictionary attack", "dictionary"],
+                options: ["Dictionary Attack", "Phishing Attack", "DDoS Attack", "Worm"],
+                hint: "Named after a book full of words"
+            },
+            {
+                category: "hacking",
+                topicLabel: "Hero or Criminal?",
+                q: "Flooding a website's server with massive amounts of fake traffic from thousands of infected computers until it crashes.",
+                answer: "DDoS Attack",
+                accepted: ["ddos", "ddos attack", "distributed denial of service"],
+                options: ["DDoS Attack", "Brute Force", "Spyware", "Blagging"],
+                hint: "4-letter acronym starting with D"
+            },
+            {
+                category: "hacking",
+                topicLabel: "Hero or Criminal?",
+                q: "How can a school network stop a Brute Force password attack from succeeding?",
+                answer: "Lock account after failed attempts",
+                accepted: ["lock account", "account lockout", "strong passwords", "2fa"],
+                options: ["Lock account after failed attempts", "Install Adware", "Use shorter passwords", "Turn off the monitor"],
+                hint: "Stop them after 3 or 5 wrong guesses"
+            },
+
+            // WEEK 3: TYPES OF MALWARE
+            {
+                category: "malware",
+                topicLabel: "Types of Malware",
+                q: "Malware that attaches itself to a host file and requires a human to open or run the file before it can activate and spread.",
+                answer: "Virus",
+                accepted: ["virus"],
+                options: ["Virus", "Worm", "Trojan", "Adware"],
+                hint: "Starts with V - needs a host file"
+            },
+            {
+                category: "malware",
+                topicLabel: "Types of Malware",
+                q: "Malware that self-replicates and spreads automatically across a network without needing a host file or human action.",
+                answer: "Worm",
+                accepted: ["worm"],
+                options: ["Worm", "Virus", "Trojan", "Spyware"],
+                hint: "Starts with W - crawls through networks on its own"
+            },
+            {
+                category: "malware",
+                topicLabel: "Types of Malware",
+                q: "Malware disguised as a legitimate, harmless program (like a free game or utility) that secretly lets attackers into your system.",
+                answer: "Trojan",
+                accepted: ["trojan", "trojan horse"],
+                options: ["Trojan", "Worm", "Ransomware", "Botnet"],
+                hint: "Named after the wooden horse from ancient Greece"
+            },
+            {
+                category: "malware",
+                topicLabel: "Types of Malware",
+                q: "Malware that locks and encrypts all your personal files, demanding a fee in cryptocurrency to unlock them.",
+                answer: "Ransomware",
+                accepted: ["ransomware"],
+                options: ["Ransomware", "Spyware", "Adware", "Phishing"],
+                hint: "Holds your files for a ransom..."
+            },
+            {
+                category: "malware",
+                topicLabel: "Types of Malware",
+                q: "Malware that secretly monitors what you do on your computer and uses a keylogger to record your passwords as you type.",
+                answer: "Spyware",
+                accepted: ["spyware", "keylogger"],
+                options: ["Spyware", "Adware", "Worm", "DDoS"],
+                hint: "Starts with S - secretly spying on your screen and keys"
+            },
+            {
+                category: "malware",
+                topicLabel: "Types of Malware",
+                q: "Malware that bombards your screen with endless unwanted pop-up adverts and slows down your device.",
+                answer: "Adware",
+                accepted: ["adware"],
+                options: ["Adware", "Ransomware", "Spyware", "Trojan"],
+                hint: "Starts with A - floods you with adverts"
+            },
+            {
+                category: "malware",
+                topicLabel: "Types of Malware",
+                q: "A massive network of infected 'zombie' computers controlled remotely by a hacker to launch large-scale attacks.",
+                answer: "Botnet",
+                accepted: ["botnet", "bot"],
+                options: ["Botnet", "Trojan", "Firewall", "Script Kiddie"],
+                hint: "A network of robots (Starts with B)"
+            },
+            {
+                category: "malware",
+                topicLabel: "Types of Malware",
+                q: "What is the best defence to ensure you don't lose your data if your school is hit by a Ransomware attack?",
+                answer: "Regular Backups",
+                accepted: ["backup", "backups", "regular backups"],
+                options: ["Regular Backups", "Pay the hackers immediately", "Delete your browser", "Unplug the keyboard"],
+                hint: "Keeping a separate copy of your files (Starts with B)"
+            }
+        ];
+
+        /* --- 3. STATE & STORAGE VARIABLES --- */
+        let score = 0;
+        let streak = 0;
+        let topScore = parseInt(localStorage.getItem('cyberDefenseTopScore')) || 0;
+        let latestScore = 0;
+        let timeLeft = 60;
+        let timerInterval;
+        let selectedCategory = 'all';
+        let currentQuestion = null;
+        let currentMode = 0; // 0 = 4-Button Multiple Choice, 1 = Fast Type Keyword
+        let currentOptions = [];
+        let lastQuestionText = "";
+
+        document.getElementById('top-score').innerText = topScore;
+
+        /* --- 4. FIREBASE AUTO-SAVE & AUTO-LOAD --- */
+        function syncScoreToCloud() {
+            localStorage.setItem('cyberDefenseTopScore', topScore);
+
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            const payload = {
+                pageTitle: document.title || "Cyber Defense Time Attack",
+                lastUpdated: Date.now(),
+                topScore: topScore,
+                latestScore: latestScore,
+                scoreText: `Top Score: ${topScore}`,
+                items: [
+                    { index: 0, label: "🏆 All-Time Top Score", value: `${topScore} threats neutralised`, status: topScore > 0 ? 'correct' : 'neutral' },
+                    { index: 1, label: "⏱️ Latest Game Score", value: `${latestScore} threats neutralised`, status: 'neutral' }
+                ]
+            };
+
+            db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
+              .set(payload, { merge: true })
+              .catch(err => console.error("Cloud save error:", err));
+        }
+
+        function applySavedData(data) {
+            if (!data) return;
+            topScore = Math.max(parseInt(data.topScore) || 0, topScore);
+            latestScore = parseInt(data.latestScore) || 0;
+            document.getElementById('top-score').innerText = topScore;
+            localStorage.setItem('cyberDefenseTopScore', topScore);
+        }
+
+        auth.onAuthStateChanged(async function(user) {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading cloud top score:", err);
+                }
+            }
+        });
+
+        /* --- 5. GAMEPLAY FUNCTIONS --- */
+        function setCategory(cat, btnEl) {
+            selectedCategory = cat;
+            const btns = document.querySelectorAll('.cat-btn');
+            btns.forEach(b => b.classList.remove('active'));
+            btnEl.classList.add('active');
+        }
+
+        function shuffleArray(arr) {
+            let copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function startGame() {
+            score = 0;
+            streak = 0;
+            timeLeft = 60;
+            document.getElementById('score').innerText = score;
+            document.getElementById('streak').innerText = streak;
+            document.getElementById('time').innerText = timeLeft;
+            document.getElementById('start-btn').style.display = 'none';
+            
+            // Lock category buttons during active round
+            document.getElementById('category-tabs').style.pointerEvents = 'none';
+            document.getElementById('category-tabs').style.opacity = '0.6';
+
+            generateNewQuestion();
+
+            clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            timeLeft--;
+            document.getElementById('time').innerText = timeLeft;
+            if (timeLeft <= 0) {
+                timeLeft = 0;
+                document.getElementById('time').innerText = 0;
+                endGame();
+            }
+        }
+
+        function generateNewQuestion() {
+            let pool = selectedCategory === 'all' 
+                ? questionBank 
+                : questionBank.filter(item => item.category === selectedCategory);
+
+            // Avoid repeating the exact same question twice in a row
+            let filteredPool = pool.filter(item => item.q !== lastQuestionText);
+            if (filteredPool.length === 0) filteredPool = pool;
+
+            currentQuestion = filteredPool[Math.floor(Math.random() * filteredPool.length)];
+            lastQuestionText = currentQuestion.q;
+
+            // Update topic badge
+            const badge = document.getElementById('topic-badge');
+            badge.innerText = currentQuestion.topicLabel;
+            badge.className = 'scenario-badge';
+            if (currentQuestion.category === 'social') badge.classList.add('badge-social');
+            else if (currentQuestion.category === 'hacking') badge.classList.add('badge-hacking');
+            else badge.classList.add('badge-malware');
+
+            // Update scenario text
+            document.getElementById('scenario-text').innerText = currentQuestion.q;
+
+            // 70% Multiple Choice, 30% Fast Type (only if answer is a single/short keyword)
+            const canType = currentQuestion.answer.length <= 18 && !currentQuestion.answer.includes('/');
+            currentMode = (canType && Math.random() > 0.7) ? 1 : 0;
+
+            if (currentMode === 0) {
+                document.getElementById('text-input-container').style.display = 'none';
+                const board = document.getElementById('options-board');
+                board.style.display = 'grid';
+                board.style.pointerEvents = 'auto';
+                board.style.opacity = '1';
+
+                currentOptions = shuffleArray(currentQuestion.options);
+                const btns = document.querySelectorAll('.option-btn');
+                btns.forEach((btn, idx) => {
+                    btn.innerText = currentOptions[idx];
+                    btn.style.backgroundColor = '#ffffff';
+                    btn.style.borderColor = '#1e3a8a';
+                    btn.style.color = '#1e3a8a';
+                });
+            } else {
+                document.getElementById('options-board').style.display = 'none';
+                const inputWrap = document.getElementById('text-input-container');
+                const inputEl = document.getElementById('cyber-input');
+                
+                inputWrap.style.display = 'flex';
+                inputEl.value = '';
+                inputEl.style.borderColor = '#1e3a8a';
+                document.getElementById('input-hint').innerText = "💡 Hint: " + currentQuestion.hint;
+
+                setTimeout(() => inputEl.focus(), 10);
+            }
+        }
+
+        function checkOption(index) {
+            if (currentMode !== 0 || !currentQuestion) return;
+            const chosen = currentOptions[index];
+            const btns = document.querySelectorAll('.option-btn');
+
+            if (chosen === currentQuestion.answer) {
+                btns[index].style.backgroundColor = '#008f39';
+                btns[index].style.borderColor = '#008f39';
+                btns[index].style.color = 'white';
+                triggerCorrectAnswer();
+            } else {
+                btns[index].style.backgroundColor = '#d32f2f';
+                btns[index].style.borderColor = '#d32f2f';
+                btns[index].style.color = 'white';
+                triggerWrongAnswer();
+            }
+        }
+
+        function checkTextInput() {
+            if (currentMode !== 1 || !currentQuestion) return;
+            const inputField = document.getElementById('cyber-input');
+            const val = inputField.value.trim().toLowerCase();
+            if (!val) return;
+
+            const isMatch = currentQuestion.accepted.some(ans => val === ans.toLowerCase() || val.includes(ans.toLowerCase()));
+
+            if (isMatch) {
+                triggerCorrectAnswer();
+            } else {
+                inputField.style.borderColor = '#d32f2f';
+                setTimeout(() => inputField.style.borderColor = '#1e3a8a', 400);
+                inputField.value = '';
+                inputField.focus();
+                triggerWrongAnswer(false);
+            }
+        }
+
+        function triggerCorrectAnswer() {
+            score++;
+            streak++;
+            timeLeft += 4; // +4s bonus
+            latestScore = score;
+
+            document.getElementById('score').innerText = score;
+            document.getElementById('streak').innerText = streak;
+            document.getElementById('time').innerText = timeLeft;
+
+            if (score > topScore) {
+                topScore = score;
+                document.getElementById('top-score').innerText = topScore;
+                syncScoreToCloud();
+            }
+
+            document.body.style.backgroundColor = '#e8f5e9';
+            setTimeout(() => document.body.style.backgroundColor = '#f4f6f8', 200);
+
+            setTimeout(generateNewQuestion, 150);
+        }
+
+        function triggerWrongAnswer(advance = false) {
+            streak = 0;
+            timeLeft = Math.max(0, timeLeft - 3); // -3s penalty for breach
+            document.getElementById('streak').innerText = streak;
+            document.getElementById('time').innerText = timeLeft;
+
+            document.body.style.backgroundColor = '#ffebee';
+            setTimeout(() => document.body.style.backgroundColor = '#f4f6f8', 200);
+
+            if (timeLeft <= 0) {
+                endGame();
+            } else if (advance) {
+                setTimeout(generateNewQuestion, 250);
+            }
+        }
+
+        function getCyberRank(finalScore) {
+            if (finalScore >= 25) return "🏆 Rank: Chief Information Security Officer (CISO)";
+            if (finalScore >= 18) return "🛡️ Rank: Elite White Hat Hacker";
+            if (finalScore >= 12) return "💻 Rank: Senior Cyber Security Analyst";
+            if (finalScore >= 6) return "🔍 Rank: Junior Network Defender";
+            return "🎓 Rank: Trainee Cyber Cadet";
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            latestScore = score;
+            if (score > topScore) {
+                topScore = score;
+                document.getElementById('top-score').innerText = topScore;
+            }
+            syncScoreToCloud();
+
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('final-rank').innerText = getCyberRank(score);
+            document.getElementById('game-over').style.display = 'flex';
+        }
+
+        function closeGameOver() {
+            document.getElementById('game-over').style.display = 'none';
+            document.getElementById('start-btn').style.display = 'inline-block';
+            
+            document.getElementById('category-tabs').style.pointerEvents = 'auto';
+            document.getElementById('category-tabs').style.opacity = '1';
+
+            document.getElementById('topic-badge').innerText = "SELECT A TOPIC & PRESS START";
+            document.getElementById('topic-badge').className = "scenario-badge badge-hacking";
+            document.getElementById('scenario-text').innerText = "Identify the cyber threat, ethical hacking term, or defence mechanism before the 60-second clock runs out! (+4s for correct answers, -3s for breaches)";
+
+            document.getElementById('options-board').style.display = 'grid';
+            document.getElementById('options-board').style.pointerEvents = 'none';
+            document.getElementById('options-board').style.opacity = '0.5';
+            document.getElementById('text-input-container').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
