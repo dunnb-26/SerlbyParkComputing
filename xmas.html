@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operation Save Christmas - Delta Serlby Park Computing</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Firebase SDKs for cloud-sync.js -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script>
+        window.LESSON_ID = "xmas-lesson";
+    </script>
+
+    <style>
+        /* Standard Delta Serlby Park Lesson Template Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            color: #222;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            display: grid;
+            grid-template-columns: 280px 1fr 280px;
+            align-items: center;
+            background-color: #002147;
+            color: white;
+            padding: 15px 30px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        }
+
+        .header-left img {
+            width: 250px;
+            height: auto;
+            border-radius: 6px;
+            display: block;
+        }
+
+        .header-center {
+            text-align: center;
+        }
+
+        .header-center h1 {
+            margin: 0;
+            font-size: 26px;
+            letter-spacing: 0.5px;
+        }
+
+        .header-center p {
+            margin: 5px 0 0 0;
+            color: #f0b323;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .header-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .back-btn {
+            background-color: #f0b323;
+            color: #002147;
+            text-decoration: none;
+            padding: 9px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .back-btn:hover {
+            background-color: #ffd05b;
+        }
+
+        #save-status-pill {
+            background-color: rgba(255,255,255,0.15);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 1050px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Festive Mission Banner */
+        .festive-banner {
+            background: linear-gradient(135deg, #8b0000 0%, #0b4f26 100%);
+            color: white;
+            padding: 22px 28px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-bottom: 5px solid #f0b323;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        .festive-banner h2 {
+            margin: 0 0 8px 0;
+            font-size: 24px;
+            color: #ffd700;
+        }
+
+        .festive-banner p {
+            margin: 0;
+            font-size: 15.5px;
+            line-height: 1.5;
+        }
+
+        /* RAGB & Prep Task Cards */
+        .task-card {
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 25px 30px;
+            margin-bottom: 28px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            border-top: 6px solid #002147;
+        }
+
+        .task-prep { border-top-color: #002147; }
+        .task-maroon { border-top-color: #b71c1c; }
+        .task-amber { border-top-color: #f57c00; }
+        .task-green { border-top-color: #2e7d32; }
+        .task-navy { border-top-color: #1565c0; }
+        .task-plenary { border-top-color: #6a1b9a; }
+
+        .task-card h2 {
+            margin-top: 0;
+            font-size: 22px;
+            color: #002147;
+        }
+
+        .task-maroon h2 { color: #b71c1c; }
+        .task-amber h2 { color: #e65100; }
+        .task-green h2 { color: #1b5e20; }
+        .task-navy h2 { color: #0d47a1; }
+        .task-plenary h2 { color: #4a148c; }
+
+        .instruction-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #002147;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            border-radius: 0 6px 6px 0;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .task-maroon .instruction-box { border-left-color: #b71c1c; background: #fff5f5; }
+        .task-amber .instruction-box { border-left-color: #f57c00; background: #fff8e1; }
+        .task-green .instruction-box { border-left-color: #2e7d32; background: #f1f8e9; }
+        .task-navy .instruction-box { border-left-color: #1565c0; background: #e3f2fd; }
+
+        .question-row {
+            margin-bottom: 16px;
+        }
+
+        .question-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .auto-input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px 12px;
+            border: 2px solid #d0d7de;
+            border-radius: 6px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .auto-input:focus {
+            outline: none;
+            border-color: #002147;
+        }
+
+        .input-correct {
+            border-color: #2e7d32 !important;
+            background-color: #e8f5e9 !important;
+            color: #1b5e20;
+            font-weight: bold;
+        }
+
+        .input-incorrect {
+            border-color: #c62828 !important;
+            background-color: #ffebee !important;
+            color: #b71c1c;
+        }
+
+        /* Binary Reference & Grid */
+        .cipher-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 18px;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .cipher-table th, .cipher-table td {
+            border: 1px solid #ccc;
+            padding: 5px 3px;
+        }
+
+        .cipher-table th {
+            background-color: #b71c1c;
+            color: white;
+        }
+
+        .binary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 18px;
+        }
+
+        .binary-box {
+            background: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .binary-code {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #002147;
+            background: #eef2f7;
+            padding: 6px 10px;
+            border-radius: 4px;
+            text-align: center;
+            margin: 6px 0 10px 0;
+        }
+
+        /* Email Phishing Cards */
+        .email-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .email-card {
+            border: 1px solid #d0d7de;
+            border-radius: 8px;
+            padding: 14px;
+            background: #fff;
+        }
+
+        .email-header {
+            font-size: 13px;
+            color: #555;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+        }
+
+        .email-body {
+            font-size: 14px;
+            color: #222;
+            margin-bottom: 12px;
+            font-style: italic;
+        }
+
+        /* Interactive Pixel Art Canvas */
+        .pixel-studio {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            align-items: flex-start;
+            background: #f9fbf9;
+            padding: 18px;
+            border-radius: 8px;
+            border: 1px solid #c8e6c9;
+            margin-bottom: 22px;
+        }
+
+        .pixel-board {
+            display: grid;
+            grid-template-columns: repeat(10, 30px);
+            grid-template-rows: repeat(10, 30px);
+            gap: 2px;
+            background: #ccc;
+            padding: 4px;
+            border-radius: 4px;
+            user-select: none;
+        }
+
+        .pixel-cell {
+            width: 30px;
+            height: 30px;
+            background-color: #ffffff;
+            cursor: pointer;
+            transition: transform 0.05s;
+        }
+
+        .pixel-cell:hover {
+            outline: 2px solid #002147;
+            z-index: 2;
+        }
+
+        .palette-btn {
+            padding: 8px 12px;
+            border: 2px solid #333;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            margin: 0 6px 8px 0;
+        }
+
+        .palette-btn.active-swatch {
+            outline: 3px solid #f0b323;
+            transform: scale(1.05);
+        }
+
+        /* Code Snippet Box */
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 14px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+            overflow-x: auto;
+        }
+
+        /* Buttons */
+        .btn-submit {
+            background-color: #002147;
+            color: white;
+            border: none;
+            padding: 11px 22px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-submit:hover {
+            background-color: #003a7a;
+        }
+
+        .btn-reset {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 11px 22px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-reset:hover {
+            background-color: #b71c1c;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #002147;
+            color: white;
+            margin-top: 40px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 850px) {
+            header {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 12px;
+            }
+            .header-left img { margin: 0 auto; }
+            .header-right { align-items: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
+        </div>
+        <div class="header-center">
+            <h1>🎄 Operation Save Christmas</h1>
+            <p>KS3 Festive Computing Challenge (Years 7–9)</p>
+        </div>
+        <div class="header-right">
+            <a href="index.html" class="back-btn">&larr; Back to Curriculum</a>
+            <div id="save-status-pill">☁️ Ready to Save</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <main>
+            <!-- MISSION BRIEFING -->
+            <div class="festive-banner">
+                <h2>🚨 URGENT MESSAGE FROM THE NORTH POLE!</h2>
+                <p>The Grinch has hacked into Santa’s Sleigh Navigation System, scrambled the gift database into binary, flooded Elf HQ with phishing emails, and wiped the sleigh's pixel display! Work your way through the <strong>Red, Amber, Green, and Blue</strong> security overrides below before midnight to save Christmas.</p>
+            </div>
+
+            <!-- PREPARATION: 4 Key Words & Notes -->
+            <div class="task-card task-prep">
+                <h2>Lesson Preparation (10 Mins)</h2>
+                <div class="instruction-box">
+                    Before unlocking the sleigh systems, define these <strong>4 Computing Key Words</strong> in your own words.
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">1. Binary</label>
+                    <input type="text" class="auto-input prep-input" data-label="Keyword: Binary" placeholder="Type definition here (e.g. Base-2 number system using 1s and 0s)...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">2. Encryption</label>
+                    <input type="text" class="auto-input prep-input" data-label="Keyword: Encryption" placeholder="Type definition here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">3. Pixel</label>
+                    <input type="text" class="auto-input prep-input" data-label="Keyword: Pixel" placeholder="Type definition here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">4. Algorithm</label>
+                    <input type="text" class="auto-input prep-input" data-label="Keyword: Algorithm" placeholder="Type definition here...">
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 25px;">Mission Log / Lesson Notes</h3>
+                <div class="question-row">
+                    <textarea class="auto-input prep-input" data-label="Lesson Notes" rows="4" placeholder="Write any working out, binary place values, or notes from today's lesson here..." oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"></textarea>
+                </div>
+            </div>
+
+            <!-- RED TASK: Binary Gift Override (8 Conversions + Master Password) -->
+            <div class="task-card task-maroon">
+                <h2>Red Task: Binary Sleigh Override (8 Letters + Password)</h2>
+                <div class="instruction-box">
+                    The Grinch locked the sleigh ignition with an 8-letter password converted into <strong>8-bit Binary</strong>.<br>
+                    <strong>Step 1:</strong> Convert each binary byte into a Denary number using the place values <code>128 | 64 | 32 | 16 | 8 | 4 | 2 | 1</code>.<br>
+                    <strong>Step 2:</strong> Use the North Pole Cipher Table below to find the matching letter for each number.
+                </div>
+
+                <!-- Reference Cipher Table -->
+                <table class="cipher-table">
+                    <tr>
+                        <th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th><th>H</th><th>I</th><th>J</th><th>K</th><th>L</th><th>M</th>
+                    </tr>
+                    <tr>
+                        <td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td>
+                    </tr>
+                    <tr>
+                        <th>N</th><th>O</th><th>P</th><th>Q</th><th>R</th><th>S</th><th>T</th><th>U</th><th>V</th><th>W</th><th>X</th><th>Y</th><th>Z</th>
+                    </tr>
+                    <tr>
+                        <td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td>
+                    </tr>
+                </table>
+
+                <div class="binary-grid">
+                    <div class="binary-box">
+                        <label class="question-label">Letter 1 (Hint: 16 + 2)</label>
+                        <div class="binary-code">00010010</div>
+                        <input type="text" class="auto-input red-input" data-label="Red L1 (00010010)" data-answers='["r", "18 = r", "18"]' placeholder="Type Letter 1...">
+                    </div>
+                    <div class="binary-box">
+                        <label class="question-label">Letter 2 (Hint: 4 + 1)</label>
+                        <div class="binary-code">00000101</div>
+                        <input type="text" class="auto-input red-input" data-label="Red L2 (00000101)" data-answers='["e", "5 = e", "5"]' placeholder="Type Letter 2...">
+                    </div>
+                    <div class="binary-box">
+                        <label class="question-label">Letter 3</label>
+                        <div class="binary-code">00001001</div>
+                        <input type="text" class="auto-input red-input" data-label="Red L3 (00001001)" data-answers='["i", "9 = i", "9"]' placeholder="Type Letter 3...">
+                    </div>
+                    <div class="binary-box">
+                        <label class="question-label">Letter 4</label>
+                        <div class="binary-code">00001110</div>
+                        <input type="text" class="auto-input red-input" data-label="Red L4 (00001110)" data-answers='["n", "14 = n", "14"]' placeholder="Type Letter 4...">
+                    </div>
+                    <div class="binary-box">
+                        <label class="question-label">Letter 5</label>
+                        <div class="binary-code">00000100</div>
+                        <input type="text" class="auto-input red-input" data-label="Red L5 (00000100)" data-answers='["d", "4 = d", "4"]' placeholder="Type Letter 5...">
+                    </div>
+                    <div class="binary-box">
+                        <label class="question-label">Letter 6</label>
+                        <div class="binary-code">00000101</div>
+                        <input type="text" class="auto-input red-input" data-label="Red L6 (00000101)" data-answers='["e", "5 = e", "5"]' placeholder="Type Letter 6...">
+                    </div>
+                    <div class="binary-box">
+                        <label class="question-label">Letter 7</label>
+                        <div class="binary-code">00000101</div>
+                        <input type="text" class="auto-input red-input" data-label="Red L7 (00000101)" data-answers='["e", "5 = e", "5"]' placeholder="Type Letter 7...">
+                    </div>
+                    <div class="binary-box">
+                        <label class="question-label">Letter 8</label>
+                        <div class="binary-code">00010010</div>
+                        <input type="text" class="auto-input red-input" data-label="Red L8 (00010010)" data-answers='["r", "18 = r", "18"]' placeholder="Type Letter 8...">
+                    </div>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">🔓 Master Sleigh Override Password (Put all 8 letters together):</label>
+                    <input type="text" class="auto-input red-input" data-label="Red Master Password" data-answers='["reindeer"]' placeholder="Type the 8-letter secret word...">
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('red-input')">Check Red Answers</button>
+            </div>
+
+            <!-- AMBER TASK: North Pole Cyber Security Threat Detector (6 Scenarios) -->
+            <div class="task-card task-amber">
+                <h2>Amber Task: North Pole Cyber Security Scan (6 Threats)</h2>
+                <div class="instruction-box">
+                    Elf HQ is under cyber attack! Inspect the 6 suspicious messages and incidents below. Type the correct cyber-security threat from the word bank for each one:<br>
+                    <strong>Word Bank:</strong> <code>Phishing</code> | <code>Smishing</code> | <code>Malware</code> | <code>Blagging</code> | <code>Shoulder Surfing</code> | <code>Brute Force</code>
+                </div>
+
+                <div class="email-grid">
+                    <div class="email-card">
+                        <div class="email-header"><strong>Incident 1:</strong> Email from <code>support@amaz0n-northpole-gifts.ru</code></div>
+                        <div class="email-body">"URGENT! Santa's sleigh payment failed. Click this link immediately and enter your Elf Admin password or Christmas will be cancelled!"</div>
+                        <input type="text" class="auto-input amber-input" data-label="Amber Threat 1 (Fake Email)" data-answers='["phishing", "phishing attack"]' placeholder="Name this cyber threat...">
+                    </div>
+
+                    <div class="email-card">
+                        <div class="email-header"><strong>Incident 2:</strong> Text Message (SMS) to Rudolph's Phone</div>
+                        <div class="email-body">"Royal Mail North Pole: You missed a carrot delivery. Tap http://bit.ly/free-carrots-99 to pay a £1.99 redelivery fee."</div>
+                        <input type="text" class="auto-input amber-input" data-label="Amber Threat 2 (Fake Text)" data-answers='["smishing", "sms phishing"]' placeholder="Name this cyber threat...">
+                    </div>
+
+                    <div class="email-card">
+                        <div class="email-header"><strong>Incident 3:</strong> Pop-up Download on Workshop PC 4</div>
+                        <div class="email-body">"Bernard the Elf downloaded 'Free_Sleigh_Turbo_Booster.exe'. Now all files on the PC are locked and demanding 500 Candy Canes!"</div>
+                        <input type="text" class="auto-input amber-input" data-label="Amber Threat 3 (Ransomware/Virus)" data-answers='["malware", "ransomware", "trojan", "virus"]' placeholder="Name this cyber threat...">
+                    </div>
+
+                    <div class="email-card">
+                        <div class="email-header"><strong>Incident 4:</strong> Phone Call to Elf Reception</div>
+                        <div class="email-body">"Hi, I'm calling from IT Support at the South Pole. We're doing an urgent audit—can you read me the Naughty List database password?"</div>
+                        <input type="text" class="auto-input amber-input" data-label="Amber Threat 4 (Invented Scenario)" data-answers='["blagging", "pretexting", "social engineering"]' placeholder="Name this cyber threat...">
+                    </div>
+
+                    <div class="email-card">
+                        <div class="email-header"><strong>Incident 5:</strong> Security Camera in the Elf Canteen</div>
+                        <div class="email-body">"The Grinch stood right behind Frosty while he typed his PIN into the toy vault keypad and memorised the numbers."</div>
+                        <input type="text" class="auto-input amber-input" data-label="Amber Threat 5 (Looking Over Shoulder)" data-answers='["shoulder surfing"]' placeholder="Name this cyber threat...">
+                    </div>
+
+                    <div class="email-card">
+                        <div class="email-header"><strong>Incident 6:</strong> Sleigh Login Logs (14,000 Attempts/Sec)</div>
+                        <div class="email-body">"An automated program is testing every possible password combination (santa1, santa2, santa123...) to break into Santa's account."</div>
+                        <input type="text" class="auto-input amber-input" data-label="Amber Threat 6 (Automated Guessing)" data-answers='["brute force", "brute force attack"]' placeholder="Name this cyber threat...">
+                    </div>
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('amber-input')">Check Amber Answers</button>
+            </div>
+
+            <!-- GREEN TASK: Festive Pixel Art Studio & Image Representation -->
+            <div class="task-card task-green">
+                <h2>Green Task: Sleigh Dashboard Pixel Art & Binary Graphics</h2>
+                <div class="instruction-box">
+                    The Grinch erased the festive icon on Santa’s dashboard screen!<br>
+                    <strong>Part A:</strong> Use the interactive <strong>10×10 Pixel Art Studio</strong> below to design a festive icon (Christmas Tree, Santa Hat, Snowman, or Present).<br>
+                    <strong>Part B:</strong> Answer the 6 binary image representation questions underneath.
+                </div>
+
+                <!-- Interactive 10x10 Pixel Canvas -->
+                <div class="pixel-studio">
+                    <div>
+                        <div class="pixel-board" id="festive-pixel-board"></div>
+                    </div>
+                    <div style="flex: 1; min-width: 240px;">
+                        <h4 style="margin-top: 0; color: #1b5e20;">🎨 Festive Colour Palette</h4>
+                        <div id="palette-container">
+                            <button type="button" class="palette-btn active-swatch" style="background:#d32f2f; color:white;" onclick="selectPixelColor('#d32f2f', this)">Red (10)</button>
+                            <button type="button" class="palette-btn" style="background:#2e7d32; color:white;" onclick="selectPixelColor('#2e7d32', this)">Green (11)</button>
+                            <button type="button" class="palette-btn" style="background:#fbc02d; color:black;" onclick="selectPixelColor('#fbc02d', this)">Gold (01)</button>
+                            <button type="button" class="palette-btn" style="background:#1565c0; color:white;" onclick="selectPixelColor('#1565c0', this)">Ice Blue</button>
+                            <button type="button" class="palette-btn" style="background:#5d4037; color:white;" onclick="selectPixelColor('#5d4037', this)">Brown</button>
+                            <button type="button" class="palette-btn" style="background:#ffffff; color:black;" onclick="selectPixelColor('#ffffff', this)">White / Erase (00)</button>
+                        </div>
+                        <button type="button" onclick="clearPixelBoard()" style="margin-top: 8px; padding: 7px 14px; border-radius: 5px; border: 1px solid #999; cursor: pointer; background: #eee; font-weight: bold;">🗑️ Clear Grid</button>
+                        <p style="font-size: 13.5px; color: #444; margin-top: 12px;">Click squares to paint your festive sprite! Notice how each square is one <strong>pixel</strong>.</p>
+                        <input type="hidden" id="pixel-art-state" class="auto-input" data-label="Green Pixel Art Grid Data">
+                    </div>
+                </div>
+
+                <!-- 6 Auto-Marking Binary Image Questions -->
+                <div class="question-row">
+                    <label class="question-label">1. How many pixels in total are in a 10 × 10 grid?</label>
+                    <input type="text" class="auto-input green-input" data-label="Green Q1 (Total Pixels)" data-answers='["100", "100 pixels"]' placeholder="Type number...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">2. In a black-and-white image where 0 = White and 1 = Black, how many pixels are BLACK in this row: <code>0 1 1 1 0 1 1 0</code>?</label>
+                    <input type="text" class="auto-input green-input" data-label="Green Q2 (Count Black Pixels)" data-answers='["5", "5 pixels"]' placeholder="Type number...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">3. Using 2-bit colour (<code>00</code> = White, <code>01</code> = Gold, <code>10</code> = Red, <code>11</code> = Green), what colour is pixel <code>11</code>?</label>
+                    <input type="text" class="auto-input green-input" data-label="Green Q3 (2-bit Colour 11)" data-answers='["green"]' placeholder="Type colour...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">4. Using the same 2-bit colour code, write the 8-bit binary string for: <strong>Gold, Red, Green, White</strong> (no spaces):</label>
+                    <input type="text" class="auto-input green-input" data-label="Green Q4 (Encode 4 Pixels)" data-answers='["01101100"]' placeholder="e.g. 01101100">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">5. What is the name for the number of pixels per inch (or width × height) of an image?</label>
+                    <input type="text" class="auto-input green-input" data-label="Green Q5 (Image Keyword)" data-answers='["resolution", "image resolution"]' placeholder="Type keyword...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">6. Describe what you drew in your 10×10 Festive Pixel Studio above:</label>
+                    <input type="text" class="auto-input" data-label="Green Q6 (Pixel Art Description)" placeholder="e.g. A Christmas tree with a gold star on top...">
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('green-input')">Check Green Answers</button>
+            </div>
+
+            <!-- BLUE TASK: Santa's Sleigh Autopilot Algorithm & Python Debugging -->
+            <div class="task-card task-navy">
+                <h2>Blue Task: Santa’s Sleigh Autopilot & Debugging (Stretch Challenge)</h2>
+                <div class="instruction-box">
+                    The sleigh’s AI autopilot has three syntax/logic bugs and needs a new delivery algorithm.<br>
+                    Complete the <strong>4 computational thinking & coding challenges</strong> below to restore full autopilot!
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">1. Sequencing: Put these 4 scrambled Sleigh Landing steps into the correct order (write the letters, e.g. B, D, A, C):</label>
+                    <div style="background:#f8f9fa; padding:10px 14px; border-radius:6px; margin-bottom:8px; font-size:14px;">
+                        <strong>A:</strong> Drop presents down chimney &nbsp;|&nbsp;
+                        <strong>B:</strong> Scan roof for safe landing &nbsp;|&nbsp;
+                        <strong>C:</strong> Take off to next house &nbsp;|&nbsp;
+                        <strong>D:</strong> Land sleigh gently on roof
+                    </div>
+                    <input type="text" class="auto-input blue-input" data-label="Blue Q1 (Sequence Order)" data-answers='["b, d, a, c", "bdac", "b d a c", "b,d,a,c"]' placeholder="Type order (e.g. B, D, A, C)...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">2. Debugging Santa's Python Code: Look at the broken code below. Find and explain at least 2 bugs stopping it from running:</label>
+                    <div class="code-block">
+                        1 &nbsp; chimney_open = True<br>
+                        2 &nbsp; if chimney_open = True<br>
+                        3 &nbsp; print("Delivering presents!")<br>
+                        4 &nbsp; else<br>
+                        5 &nbsp; &nbsp; &nbsp; print("Use magic front door key!)
+                    </div>
+                    <textarea class="auto-input" data-label="Blue Q2 (Python Bugs)" rows="3" placeholder="Bug 1: Line 2 is missing a colon (:) and needs == ... Bug 2: ..."></textarea>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">3. Selection (IF / ELIF / ELSE): Write a short algorithm (in pseudocode or Python) for Rudolph's nose light: if weather is "Foggy" turn nose brightness to 100%, if "Snowing" set to 60%, otherwise set to 20%:</label>
+                    <textarea class="auto-input" data-label="Blue Q3 (Rudolph Selection Algorithm)" rows="4" placeholder="IF weather == 'Foggy' THEN ..."></textarea>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">4. Iteration (Loops): Explain why Santa's delivery computer uses a <code>WHILE presents_left > 0</code> loop instead of writing separate code for all 2 billion houses:</label>
+                    <textarea class="auto-input" data-label="Blue Q4 (Iteration Explanation)" rows="3" placeholder="Explain how loops save time and make code efficient..."></textarea>
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('blue-input')">Check Blue Question 1</button>
+            </div>
+
+            <!-- BONUS EXTENSION: Caesar Cipher Santa Joke -->
+            <div class="task-card" style="border-top-color: #f0b323;">
+                <h2>⭐ Finished Early? Bonus Elf Caesar Cipher</h2>
+                <div class="instruction-box" style="border-left-color: #f0b323; background: #fffdf5;">
+                    Santa encrypted his favourite Christmas joke using a <strong>Caesar Cipher (Shift +1 forward)</strong>. To crack it, shift every letter <strong>1 letter BACKWARDS</strong> in the alphabet (e.g. <code>B &rarr; A</code>, <code>C &rarr; B</code>).
+                </div>
+                <div class="question-row">
+                    <label class="question-label">Encrypted Punchline: <code>B M F N P O - B J E !</code> (What do you give a sick lemon?)</label>
+                    <input type="text" class="auto-input bonus-input" data-label="Bonus Caesar Cipher" data-answers='["a lemon-aid!", "a lemon-aid", "a lemon aid", "lemon-aid", "lemonade"]' placeholder="Type decoded punchline...">
+                </div>
+                <button class="btn-submit no-print" onclick="checkAnswers('bonus-input')">Check Bonus Cipher</button>
+            </div>
+
+            <!-- PLENARY: 3 Key Takeaways -->
+            <div class="task-card task-plenary">
+                <h2>Lesson Plenary: 3 Festive Takeaways</h2>
+                <div class="question-row">
+                    <label class="question-label">Key Takeaway 1 (Something I revised or learned today):</label>
+                    <input type="text" class="auto-input" data-label="Key Takeaway 1" placeholder="Type first takeaway here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">Key Takeaway 2 (A computing skill I used to beat the Grinch):</label>
+                    <input type="text" class="auto-input" data-label="Key Takeaway 2" placeholder="Type second takeaway here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">Key Takeaway 3 (One topic I want to improve in next term):</label>
+                    <input type="text" class="auto-input" data-label="Key Takeaway 3" placeholder="Type third takeaway here...">
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- RESET ACTION BUTTON -->
+    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
+        <button class="btn-reset no-print" onclick="clearAllData()">Reset Page</button>
+    </div>
+
+    <footer>
+        &copy; 2026 Delta Serlby Park - Computing &amp; Business Department
+    </footer>
+
+    <!-- Interactive Pixel Art & Self-Marking Logic -->
+    <script>
+        /* 1. INTERACTIVE 10x10 PIXEL ART STUDIO */
+        let currentBrushColor = '#d32f2f';
+        let isMouseDown = false;
+        const pixelBoard = document.getElementById('festive-pixel-board');
+        const hiddenPixelInput = document.getElementById('pixel-art-state');
+
+        function buildPixelBoard() {
+            pixelBoard.innerHTML = '';
+            for (let i = 0; i < 100; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'pixel-cell';
+                cell.dataset.index = i;
+                cell.style.backgroundColor = 'rgb(255, 255, 255)';
+
+                cell.addEventListener('mousedown', () => {
+                    isMouseDown = true;
+                    paintCell(cell);
+                });
+                cell.addEventListener('mouseenter', () => {
+                    if (isMouseDown) paintCell(cell);
+                });
+                pixelBoard.appendChild(cell);
+            }
+            document.addEventListener('mouseup', () => { isMouseDown = false; });
+        }
+
+        function selectPixelColor(hex, btnEl) {
+            currentBrushColor = hex;
+            document.querySelectorAll('.palette-btn').forEach(b => b.classList.remove('active-swatch'));
+            btnEl.classList.add('active-swatch');
+        }
+
+        function paintCell(cell) {
+            cell.style.backgroundColor = currentBrushColor;
+            savePixelBoardState();
+        }
+
+        function clearPixelBoard() {
+            document.querySelectorAll('.pixel-cell').forEach(c => {
+                c.style.backgroundColor = 'rgb(255, 255, 255)';
+            });
+            savePixelBoardState();
+        }
+
+        function savePixelBoardState() {
+            const colors = Array.from(document.querySelectorAll('.pixel-cell')).map(c => c.style.backgroundColor);
+            hiddenPixelInput.value = JSON.stringify(colors);
+            if (typeof window.syncWorkToCloud === 'function') {
+                window.syncWorkToCloud(false);
+            }
+        }
+
+        function restorePixelBoardFromInput() {
+            if (!hiddenPixelInput.value) return;
+            try {
+                const colors = JSON.parse(hiddenPixelInput.value);
+                const cells = document.querySelectorAll('.pixel-cell');
+                colors.forEach((col, idx) => {
+                    if (cells[idx] && col) cells[idx].style.backgroundColor = col;
+                });
+            } catch (e) {}
+        }
+
+        buildPixelBoard();
+        // Re-check for cloud-loaded pixel art shortly after Firebase loads
+        setTimeout(restorePixelBoardFromInput, 1500);
+        setTimeout(restorePixelBoardFromInput, 3500);
+
+        /* 2. BATCH-MARKING TEXT INPUT LOGIC */
+        function checkAnswers(groupClass) {
+            const inputs = document.getElementsByClassName(groupClass);
+            for (let i = 0; i < inputs.length; i++) {
+                const inputElement = inputs[i];
+                const studentAnswer = inputElement.value.toLowerCase().trim();
+                const acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers') || '[]');
+
+                let isCorrect = false;
+                for (let j = 0; j < acceptedAnswers.length; j++) {
+                    if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
+                        isCorrect = true;
+                        break;
+                    }
+                }
+
+                inputElement.classList.remove('input-correct', 'input-incorrect');
+                if (studentAnswer !== "") {
+                    if (isCorrect) {
+                        inputElement.classList.add('input-correct');
+                    } else {
+                        inputElement.classList.add('input-incorrect');
+                    }
+                }
+            }
+            if (typeof window.syncWorkToCloud === 'function') {
+                window.syncWorkToCloud(true);
+            }
+        }
+
+        /* 3. CLOUD RESET PAGE */
+        async function clearAllData() {
+            if (confirm("Are you sure you want to clear all your Christmas mission work on this page?")) {
+                try {
+                    const user = firebase.auth().currentUser;
+                    if (user) {
+                        await firebase.firestore().collection('users').doc(user.uid).collection('lessons').doc(window.LESSON_ID).delete();
+                    }
+                } catch (err) {
+                    console.error("Error clearing cloud data:", err);
+                }
+                window.location.reload();
+            }
+        }
+    </script>
+
+    <!-- Universal Cloud Sync Engine -->
+    <script src="cloud-sync.js"></script>
+</body>
+</html>
