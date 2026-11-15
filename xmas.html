@@ -113,7 +113,7 @@
         }
 
         .festive-banner p {
-            margin: 0;
+            margin: 0 0 8px 0;
             font-size: 15.5px;
             line-height: 1.5;
         }
@@ -163,7 +163,7 @@
         .task-navy .instruction-box { border-left-color: #1565c0; background: #e3f2fd; }
 
         .question-row {
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
 
         .question-label {
@@ -331,7 +331,66 @@
             transform: scale(1.05);
         }
 
-        /* Code Snippet Box */
+        /* Mode Toggle Bar for Blue Task */
+        .mode-toggle-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+            background: #f0f4f8;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px 14px;
+            border: 2px solid transparent;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            background: #ffffff;
+            color: #334155;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active-mode {
+            background: #0d47a1;
+            color: #ffffff;
+            border-color: #002147;
+            box-shadow: 0 2px 6px rgba(13, 71, 161, 0.25);
+        }
+
+        /* Scratch / EduBlocks Visual Stack Styling */
+        .block-workspace {
+            background: #f8fafc;
+            border: 2px dashed #94a3b8;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .scratch-block {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 6px;
+            color: white;
+            font-weight: 600;
+            font-size: 13.5px;
+            margin: 3px 0;
+            box-shadow: 0 2px 0 rgba(0,0,0,0.25);
+        }
+
+        .blk-event { background-color: #ffab19; color: #222; }
+        .blk-var { background-color: #ff8c1a; }
+        .blk-control { background-color: #ffab19; color: #222; border-left: 8px solid #d97706; }
+        .blk-looks { background-color: #9966ff; }
+        .blk-operator { background-color: #59c059; border-radius: 16px; padding: 3px 10px; font-size: 12.5px; }
+        .blk-indent { margin-left: 24px; border-left: 4px solid #f59e0b; padding-left: 10px; }
+
+        /* Code Snippet Box (Python) */
         .code-block {
             background: #1e1e1e;
             color: #d4d4d4;
@@ -340,7 +399,7 @@
             border-radius: 8px;
             font-size: 14px;
             line-height: 1.5;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             overflow-x: auto;
         }
 
@@ -416,8 +475,14 @@
         <main>
             <!-- MISSION BRIEFING -->
             <div class="festive-banner">
-                <h2>🚨 URGENT MESSAGE FROM THE NORTH POLE!</h2>
-                <p>The Grinch has hacked into Santa’s Sleigh Navigation System, scrambled the gift database into binary, flooded Elf HQ with phishing emails, and wiped the sleigh's pixel display! Work your way through the <strong>Red, Amber, Green, and Blue</strong> security overrides below before midnight to save Christmas.</p>
+                <h2>🎄 MISSION BRIEFING: OPERATION SAVE CHRISTMAS</h2>
+                <p>The Grinch has hijacked Santa’s Sleigh Computer! To get Santa back in the air before midnight, you must clear <strong>four RAGB security overrides</strong> using your computing skills:</p>
+                <p style="font-size: 14.5px; color: #fff8dc;">
+                    <strong>Red:</strong> Crack the 8-bit binary ignition password &nbsp;|&nbsp;
+                    <strong>Amber:</strong> Block 6 cyber-security threats &nbsp;|&nbsp;
+                    <strong>Green:</strong> Rebuild the pixel-art display &nbsp;|&nbsp;
+                    <strong>Blue:</strong> Fix Santa's autopilot (Blocks or Python)
+                </p>
             </div>
 
             <!-- PREPARATION: 4 Key Words & Notes -->
@@ -530,7 +595,7 @@
             <div class="task-card task-amber">
                 <h2>Amber Task: North Pole Cyber Security Scan (6 Threats)</h2>
                 <div class="instruction-box">
-                    Elf HQ is under cyber attack! Inspect the 6 suspicious messages and incidents below. Type the correct cyber-security threat from the word bank for each one:<br>
+                    Elf HQ is under pressure! Inspect the 6 suspicious messages and incidents below. Type the correct cyber-security threat from the word bank for each one:<br>
                     <strong>Word Bank:</strong> <code>Phishing</code> | <code>Smishing</code> | <code>Malware</code> | <code>Blagging</code> | <code>Shoulder Surfing</code> | <code>Brute Force</code>
                 </div>
 
@@ -634,17 +699,23 @@
                 <button class="btn-submit no-print" onclick="checkAnswers('green-input')">Check Green Answers</button>
             </div>
 
-            <!-- BLUE TASK: Santa's Sleigh Autopilot Algorithm & Python Debugging -->
+            <!-- BLUE TASK: Santa's Sleigh Autopilot (Blocks vs Python Toggle) -->
             <div class="task-card task-navy">
                 <h2>Blue Task: Santa’s Sleigh Autopilot & Debugging (Stretch Challenge)</h2>
                 <div class="instruction-box">
-                    The sleigh’s AI autopilot has three syntax/logic bugs and needs a new delivery algorithm.<br>
-                    Complete the <strong>4 computational thinking & coding challenges</strong> below to restore full autopilot!
+                    Choose your coding mode below! <strong>Year 7 &amp; 8</strong> should use <strong>Blocks Mode</strong> (Scratch / EduBlocks style), and <strong>Year 9</strong> should switch to <strong>Python Mode</strong>.
                 </div>
 
+                <!-- Mode Selector Buttons -->
+                <div class="mode-toggle-bar no-print">
+                    <button type="button" id="btn-mode-blocks" class="mode-btn active-mode" onclick="setBlueMode('blocks')">🧩 Blocks Mode (Year 7 &amp; 8)</button>
+                    <button type="button" id="btn-mode-python" class="mode-btn" onclick="setBlueMode('python')">🐍 Python Mode (Year 9)</button>
+                </div>
+
+                <!-- Q1: Shared Sequencing Task -->
                 <div class="question-row">
-                    <label class="question-label">1. Sequencing: Put these 4 scrambled Sleigh Landing steps into the correct order (write the letters, e.g. B, D, A, C):</label>
-                    <div style="background:#f8f9fa; padding:10px 14px; border-radius:6px; margin-bottom:8px; font-size:14px;">
+                    <label class="question-label">1. Sequencing: Put these 4 scrambled Sleigh Landing blocks/steps into the correct order (write the letters, e.g. B, D, A, C):</label>
+                    <div style="background:#f8f9fa; padding:12px 14px; border-radius:6px; margin-bottom:8px; font-size:14px;">
                         <strong>A:</strong> Drop presents down chimney &nbsp;|&nbsp;
                         <strong>B:</strong> Scan roof for safe landing &nbsp;|&nbsp;
                         <strong>C:</strong> Take off to next house &nbsp;|&nbsp;
@@ -653,26 +724,56 @@
                     <input type="text" class="auto-input blue-input" data-label="Blue Q1 (Sequence Order)" data-answers='["b, d, a, c", "bdac", "b d a c", "b,d,a,c"]' placeholder="Type order (e.g. B, D, A, C)...">
                 </div>
 
-                <div class="question-row">
-                    <label class="question-label">2. Debugging Santa's Python Code: Look at the broken code below. Find and explain at least 2 bugs stopping it from running:</label>
-                    <div class="code-block">
-                        1 &nbsp; chimney_open = True<br>
-                        2 &nbsp; if chimney_open = True<br>
-                        3 &nbsp; print("Delivering presents!")<br>
-                        4 &nbsp; else<br>
-                        5 &nbsp; &nbsp; &nbsp; print("Use magic front door key!)
+                <!-- BLOCKS MODE CONTENT (Y7 & Y8) -->
+                <div id="blue-blocks-view">
+                    <div class="question-row">
+                        <label class="question-label">2. Debugging Santa's Blocks: Look at the Scratch / EduBlocks stack below. The Grinch messed up 2 things so it won't work properly. Spot and explain the 2 mistakes:</label>
+                        <div class="block-workspace">
+                            <div><span class="scratch-block blk-event">when 🚩 clicked</span></div>
+                            <div><span class="scratch-block blk-var">set [chimney_open v] to [True]</span></div>
+                            <div><span class="scratch-block blk-control">if <span class="blk-operator">[chimney_open] = [False]</span> then</span></div>
+                            <div class="blk-indent"><span class="scratch-block blk-looks">say [Delivering presents!]</span></div>
+                            <div><span class="scratch-block blk-control">else</span></div>
+                            <div class="blk-indent"><span class="scratch-block blk-looks">say [Stay on the roof forever!]</span></div>
+                            <div><span class="scratch-block blk-control">end</span></div>
+                        </div>
+                        <textarea class="auto-input" data-label="Blue Q2 (Blocks Bugs)" rows="3" placeholder="Mistake 1: The IF block checks if chimney_open = False instead of True... Mistake 2: ..."></textarea>
                     </div>
-                    <textarea class="auto-input" data-label="Blue Q2 (Python Bugs)" rows="3" placeholder="Bug 1: Line 2 is missing a colon (:) and needs == ... Bug 2: ..."></textarea>
+
+                    <div class="question-row">
+                        <label class="question-label">3. Selection (IF / ELSE Blocks): Write out the blocks needed for Rudolph's nose light: IF weather = "Foggy" set nose brightness to 100%, ELSE set nose brightness to 20%:</label>
+                        <textarea class="auto-input" data-label="Blue Q3 (Blocks Selection)" rows="4" placeholder="if [weather = Foggy] then&#10;    set [nose_brightness] to [100%]&#10;else ..."></textarea>
+                    </div>
+
+                    <div class="question-row">
+                        <label class="question-label">4. Iteration (Repeat / Loops): Explain why Santa uses a <code>repeat until [presents = 0]</code> block instead of dragging out 2 billion separate "Deliver Present" blocks:</label>
+                        <textarea class="auto-input" data-label="Blue Q4 (Blocks Iteration)" rows="3" placeholder="Explain how a repeat loop saves time and blocks..."></textarea>
+                    </div>
                 </div>
 
-                <div class="question-row">
-                    <label class="question-label">3. Selection (IF / ELIF / ELSE): Write a short algorithm (in pseudocode or Python) for Rudolph's nose light: if weather is "Foggy" turn nose brightness to 100%, if "Snowing" set to 60%, otherwise set to 20%:</label>
-                    <textarea class="auto-input" data-label="Blue Q3 (Rudolph Selection Algorithm)" rows="4" placeholder="IF weather == 'Foggy' THEN ..."></textarea>
-                </div>
+                <!-- PYTHON MODE CONTENT (Y9) -->
+                <div id="blue-python-view" style="display: none;">
+                    <div class="question-row">
+                        <label class="question-label">2. Debugging Santa's Python Code: Look at the broken code below. Find and explain at least 2 syntax bugs stopping it from running:</label>
+                        <div class="code-block">
+                            1 &nbsp; chimney_open = True<br>
+                            2 &nbsp; if chimney_open = True<br>
+                            3 &nbsp; print("Delivering presents!")<br>
+                            4 &nbsp; else<br>
+                            5 &nbsp; &nbsp; &nbsp; print("Use magic front door key!)
+                        </div>
+                        <textarea class="auto-input" data-label="Blue Q2 (Python Bugs)" rows="3" placeholder="Bug 1: Line 2 is missing a colon (:) and uses = instead of == ... Bug 2: ..."></textarea>
+                    </div>
 
-                <div class="question-row">
-                    <label class="question-label">4. Iteration (Loops): Explain why Santa's delivery computer uses a <code>WHILE presents_left > 0</code> loop instead of writing separate code for all 2 billion houses:</label>
-                    <textarea class="auto-input" data-label="Blue Q4 (Iteration Explanation)" rows="3" placeholder="Explain how loops save time and make code efficient..."></textarea>
+                    <div class="question-row">
+                        <label class="question-label">3. Selection (IF / ELIF / ELSE): Write a short Python program for Rudolph's nose light: if <code>weather == "Foggy"</code> print <code>"100%"</code>, elif <code>weather == "Snowing"</code> print <code>"60%"</code>, else print <code>"20%"</code>:</label>
+                        <textarea class="auto-input" data-label="Blue Q3 (Python Selection)" rows="4" placeholder='if weather == "Foggy":&#10;    print("100%") ...'></textarea>
+                    </div>
+
+                    <div class="question-row">
+                        <label class="question-label">4. Iteration (Loops): Explain why Santa's delivery computer uses a <code>while presents_left > 0:</code> loop instead of writing separate print statements for all 2 billion houses:</label>
+                        <textarea class="auto-input" data-label="Blue Q4 (Python Iteration)" rows="3" placeholder="Explain how a while loop makes the code shorter and more efficient..."></textarea>
+                    </div>
                 </div>
 
                 <button class="btn-submit no-print" onclick="checkAnswers('blue-input')">Check Blue Question 1</button>
@@ -719,8 +820,28 @@
         &copy; 2026 Delta Serlby Park - Computing &amp; Business Department
     </footer>
 
-    <!-- Interactive Pixel Art & Self-Marking Logic -->
+    <!-- Interactive Pixel Art, Mode Toggle & Self-Marking Logic -->
     <script>
+        /* 0. BLUE TASK BLOCKS vs PYTHON MODE TOGGLE */
+        function setBlueMode(mode) {
+            const blocksView = document.getElementById('blue-blocks-view');
+            const pythonView = document.getElementById('blue-python-view');
+            const btnBlocks = document.getElementById('btn-mode-blocks');
+            const btnPython = document.getElementById('btn-mode-python');
+
+            if (mode === 'python') {
+                blocksView.style.display = 'none';
+                pythonView.style.display = 'block';
+                btnPython.classList.add('active-mode');
+                btnBlocks.classList.remove('active-mode');
+            } else {
+                blocksView.style.display = 'block';
+                pythonView.style.display = 'none';
+                btnBlocks.classList.add('active-mode');
+                btnPython.classList.remove('active-mode');
+            }
+        }
+
         /* 1. INTERACTIVE 10x10 PIXEL ART STUDIO */
         let currentBrushColor = '#d32f2f';
         let isMouseDown = false;
@@ -785,7 +906,6 @@
         }
 
         buildPixelBoard();
-        // Re-check for cloud-loaded pixel art shortly after Firebase loads
         setTimeout(restorePixelBoardFromInput, 1500);
         setTimeout(restorePixelBoardFromInput, 3500);
 
