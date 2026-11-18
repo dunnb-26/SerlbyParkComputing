@@ -66,7 +66,7 @@
             font-family: inherit; 
         }
         .auto-input:focus { outline: none; border-color: #666; }
-        textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; max-width: 100%; }
+        textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; max-width: 100%; display: block; }
 
         /* Helper Headings for Binary */
         .helper-headings { display: flex; gap: 4px; max-width: 250px; margin-bottom: 4px; }
@@ -74,9 +74,58 @@
         .helper-headings-8bit { max-width: 400px; }
 
         /* Correct & Incorrect Answer Styling */
-        .input-correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
-        .input-incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
+        .input-correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100 !important; font-weight: bold; }
+        .input-incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c !important; font-weight: bold; }
         
+        /* Teacher Override & Modal Styles */
+        .teacher-override-btn { 
+            background-color: #607d8b; 
+            color: white; 
+            border: none; 
+            padding: 5px 10px; 
+            border-radius: 4px; 
+            font-size: 12px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 6px; 
+            transition: background-color 0.2s;
+        }
+        .teacher-override-btn:hover { background-color: #455a64; }
+        .hidden { display: none !important; }
+
+        .modal-overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.5); 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 1000; 
+        }
+        .modal-content { 
+            background: white; 
+            padding: 25px; 
+            border-radius: 8px; 
+            width: 300px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+            text-align: center; 
+            border-top: 6px solid #1e3a8a; 
+        }
+        .modal-input { 
+            width: 100%; 
+            padding: 10px; 
+            margin: 15px 0; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+            box-sizing: border-box; 
+            font-size: 16px; 
+            text-align: center; 
+        }
+        .modal-btn-row { display: flex; gap: 10px; }
+        .modal-btn-confirm { flex: 1; background-color: #1e3a8a; color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-btn-cancel { flex: 1; background-color: #ccc; color: #333; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
+
         /* Buttons */
         .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; max-width: 200px; transition: background-color 0.2s; }
         .btn-submit:hover { background-color: #152960; }
@@ -189,7 +238,8 @@
 
                 <div class="question-row">
                     <label class="question-label">5. What is the main difference in skill level between a 'Script Kiddie' and an advanced Black Hat intruder?</label>
-                    <textarea class="auto-input amber-input" data-label="Amber Q5" data-rubric='{"keywords": [["write", "create", "own", "code", "software", "tools", "program", "low", "high", "new", "experienced"]]}' rows="2" placeholder="Explain the difference in skills..."></textarea>
+                    <textarea id="amber_q5" class="auto-input amber-input" data-label="Amber Q5" data-rubric='{"keywords": [["write", "create", "own", "code", "software", "tools", "program", "low", "high", "new", "experienced"]]}' rows="2" placeholder="Explain the difference in skills..."></textarea>
+                    <div style="text-align: right;"><button id="override-amber_q5" type="button" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('amber_q5')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <button type="button" class="btn-submit no-print" onclick="checkTextAnswers('amber-input')">Check Answers</button>
@@ -204,21 +254,25 @@
 
                 <div class="question-row">
                     <label class="question-label">1. Explain how an exhaustive password-guessing method (Brute Force) is used to uncover a password.</label>
-                    <textarea class="auto-input green-input" data-label="Green Q1" data-rubric='{"keywords": [["guess", "every", "combination", "software", "program", "list", "dictionary"]]}' rows="3" placeholder="Type your answer..."></textarea>
+                    <textarea id="green_q1" class="auto-input green-input" data-label="Green Q1" data-rubric='{"keywords": [["guess", "every", "combination", "software", "program", "list", "dictionary"]]}' rows="3" placeholder="Type your answer..."></textarea>
+                    <div style="text-align: right;"><button id="override-green_q1" type="button" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('green_q1')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-row">
                     <label class="question-label">2. Give two ways a school network could protect its students from automated password guessing.</label>
-                    <textarea class="auto-input green-input" data-label="Green Q2" data-rubric='{"keywords": [["strong", "complex", "length", "numbers", "symbols"], ["lock", "attempts", "block", "freeze"]]}' rows="3" placeholder="Type your answer..."></textarea>
+                    <textarea id="green_q2" class="auto-input green-input" data-label="Green Q2" data-rubric='{"keywords": [["strong", "complex", "length", "numbers", "symbols"], ["lock", "attempts", "block", "freeze"]]}' rows="3" placeholder="Type your answer..."></textarea>
+                    <div style="text-align: right;"><button id="override-green_q2" type="button" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('green_q2')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-row">
                     <label class="question-label">3. What is a "Dictionary" password check and how is it a specific type of automated guessing?</label>
-                    <textarea class="auto-input green-input" data-label="Green Q3" data-rubric='{"keywords": [["list", "words", "common", "dictionary", "passwords"]]}' rows="3" placeholder="Explain what a dictionary method uses..."></textarea>
+                    <textarea id="green_q3" class="auto-input green-input" data-label="Green Q3" data-rubric='{"keywords": [["list", "words", "common", "dictionary", "passwords"]]}' rows="3" placeholder="Explain what a dictionary method uses..."></textarea>
+                    <div style="text-align: right;"><button id="override-green_q3" type="button" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('green_q3')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-row">
                     <label class="question-label">4. Why does adding numbers, symbols, and uppercase letters to a password make automated guessing take much longer to succeed?</label>
-                    <textarea class="auto-input green-input" data-label="Green Q4" data-rubric='{"keywords": [["combinations", "possibilities", "options", "characters", "harder", "guess"]]}' rows="3" placeholder="Explain why complexity matters..."></textarea>
+                    <textarea id="green_q4" class="auto-input green-input" data-label="Green Q4" data-rubric='{"keywords": [["combinations", "possibilities", "options", "characters", "harder", "guess"]]}' rows="3" placeholder="Explain why complexity matters..."></textarea>
+                    <div style="text-align: right;"><button id="override-green_q4" type="button" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('green_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <button type="button" class="btn-submit no-print" onclick="checkTextAnswers('green-input')">Check Answers</button>
@@ -233,21 +287,25 @@
 
                 <div class="question-row">
                     <label class="question-label">1. Explain the step-by-step process of how a DDoS event takes a website offline.</label>
-                    <textarea class="auto-input blue-input" data-label="Blue Q1" data-rubric='{"keywords": [["&#x62;&#x6f;&#x74;&#x6e;&#x65;&#x74;", "zombies", "infected", "computers"], ["flood", "traffic", "overload", "requests", "crash", "offline"]]}' rows="4" placeholder="Type your answer..."></textarea>
+                    <textarea id="blue_q1" class="auto-input blue-input" data-label="Blue Q1" data-rubric='{"keywords": [["&#x62;&#x6f;&#x74;&#x6e;&#x65;&#x74;", "zombies", "infected", "computers"], ["flood", "traffic", "overload", "requests", "crash", "offline"]]}' rows="4" placeholder="Type your answer..."></textarea>
+                    <div style="text-align: right;"><button id="override-blue_q1" type="button" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('blue_q1')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-row">
                     <label class="question-label">2. Why is a DDoS event much harder for a company to defend against than a standard DoS (Denial of Service) event?</label>
-                    <textarea class="auto-input blue-input" data-label="Blue Q2" data-rubric='{"keywords": [["multiple", "many", "thousands", "distributed", "locations", "IP addresses"]]}' rows="3" placeholder="Type your answer..."></textarea>
+                    <textarea id="blue_q2" class="auto-input blue-input" data-label="Blue Q2" data-rubric='{"keywords": [["multiple", "many", "thousands", "distributed", "locations", "IP addresses"]]}' rows="3" placeholder="Type your answer..."></textarea>
+                    <div style="text-align: right;"><button id="override-blue_q2" type="button" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('blue_q2')">👨‍🏫 Override Score</button></div>
                 </div>
                 <div class="question-row">
                     <label class="question-label">3. Explain the main difference between a DoS (Denial of Service) and a DDoS (Distributed Denial of Service).</label>
-                    <textarea class="auto-input blue-input" data-label="Blue Q3" data-rubric='{"keywords": [["one", "single", "computer", "device", "multiple", "many", "&#x62;&#x6f;&#x74;&#x6e;&#x65;&#x74;", "distributed"]]}' rows="3" placeholder="Explain the difference..."></textarea>
+                    <textarea id="blue_q3" class="auto-input blue-input" data-label="Blue Q3" data-rubric='{"keywords": [["one", "single", "computer", "device", "multiple", "many", "&#x62;&#x6f;&#x74;&#x6e;&#x65;&#x74;", "distributed"]]}' rows="3" placeholder="Explain the difference..."></textarea>
+                    <div style="text-align: right;"><button id="override-blue_q3" type="button" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('blue_q3')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <div class="question-row">
                     <label class="question-label">4. What is a "botnet" and how are computers usually recruited to build one?</label>
-                    <textarea class="auto-input blue-input" data-label="Blue Q4" data-rubric='{"keywords": [["network", "zombies", "army", "robots"], ["&#x6d;&#x61;&#x6c;&#x77;&#x61;&#x72;&#x65;", "&#x76;&#x69;&#x72;&#x75;&#x73;", "&#x74;&#x72;&#x6f;&#x6a;&#x61;&#x6e;", "infect"]]}' rows="3" placeholder="Explain what a botnet is and how it is made..."></textarea>
+                    <textarea id="blue_q4" class="auto-input blue-input" data-label="Blue Q4" data-rubric='{"keywords": [["network", "zombies", "army", "robots"], ["&#x6d;&#x61;&#x6c;&#x77;&#x61;&#x72;&#x65;", "&#x76;&#x69;&#x72;&#x75;&#x73;", "&#x74;&#x72;&#x6f;&#x6a;&#x61;&#x6e;", "infect"]]}' rows="3" placeholder="Explain what a botnet is and how it is made..."></textarea>
+                    <div style="text-align: right;"><button id="override-blue_q4" type="button" class="teacher-override-btn no-print hidden" onclick="openVerifyModal('blue_q4')">👨‍🏫 Override Score</button></div>
                 </div>
 
                 <button type="button" class="btn-submit no-print" onclick="checkTextAnswers('blue-input')">Check Answers</button>
@@ -284,6 +342,20 @@
     <!-- RESET PAGE BUTTON -->
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
         <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+    </div>
+
+    <!-- Teacher Override Modal -->
+    <div id="verifyModal" class="modal-overlay no-print">
+        <div class="modal-content">
+            <h2 style="color: #1e3a8a; margin-top: 0;">Teacher Override</h2>
+            <p style="font-size: 14px; color: #555;">Enter PIN to mark this answer correct.</p>
+            <input type="password" id="modalPassword" class="modal-input" placeholder="****">
+            <div id="modalError" class="modal-error">Incorrect PIN!</div>
+            <div class="modal-btn-row">
+                <button type="button" class="modal-btn-cancel" onclick="closeModal()">Cancel</button>
+                <button type="button" class="modal-btn-confirm" onclick="confirmOverride()">Confirm</button>
+            </div>
+        </div>
     </div>
 
     <!-- FOOTER -->  
@@ -346,8 +418,15 @@
             if (!auth || !db) return;
             const user = auth.currentUser;
             let isTeacher = false;
-            try { isTeacher = sessionStorage.getItem('teacherMode') === 'true'; } catch (e) {}
-            if (!user || isTeacher) return;
+            let inspectedUid = null;
+            try { 
+                isTeacher = sessionStorage.getItem('teacherMode') === 'true'; 
+                inspectedUid = sessionStorage.getItem('inspectStudentUid');
+            } catch (e) {}
+
+            // Allow saving if normal student, OR if teacher is inspecting a specific student from the dashboard
+            const targetUid = (isTeacher && inspectedUid) ? inspectedUid : (!isTeacher && user ? user.uid : null);
+            if (!targetUid) return;
 
             var inputs = document.querySelectorAll('.auto-input');
             var dataToSave = {
@@ -391,7 +470,7 @@
 
             clearTimeout(saveTimer);
             saveTimer = setTimeout(function() {
-                db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
+                db.collection("users").doc(targetUid).collection("lessons").doc(LESSON_ID)
                   .set(dataToSave, { merge: true })
                   .catch(function(err) { console.error("Cloud save error:", err); });
             }, immediate ? 50 : 800);
@@ -411,6 +490,12 @@
                         inputs[i].style.height = 'auto';
                         inputs[i].style.height = inputs[i].scrollHeight + 'px';
                     }
+                }
+
+                // Restore teacher-overridden green status before running auto-checks
+                var savedClass = data['class_' + i] || '';
+                if (savedClass.includes('input-correct')) {
+                    inputs[i].classList.add('input-correct');
                 }
             }
 
@@ -487,13 +572,21 @@
             var inputs = document.querySelectorAll('.' + groupClass);
             
             inputs.forEach(function(inputElement) {
-                // If it's already correct, skip re-evaluating
-                if (inputElement.classList.contains('input-correct')) return;
+                var overrideBtn = inputElement.id ? document.getElementById('override-' + inputElement.id) : null;
+
+                // If it's already correct, ensure override button is hidden and skip re-evaluating
+                if (inputElement.classList.contains('input-correct')) {
+                    if (overrideBtn) overrideBtn.classList.add('hidden');
+                    return;
+                }
 
                 var studentAnswer = inputElement.value.toLowerCase().trim();
                 inputElement.classList.remove('input-incorrect');
 
-                if (studentAnswer === "") return;
+                if (studentAnswer === "") {
+                    if (overrideBtn) overrideBtn.classList.add('hidden');
+                    return;
+                }
 
                 var isCorrect = false;
 
@@ -538,11 +631,13 @@
                     }
                 }
 
-                // Apply styling based on evaluation
+                // Apply styling & toggle Teacher Override button for long answers
                 if (isCorrect) {
                     inputElement.classList.add('input-correct');
+                    if (overrideBtn) overrideBtn.classList.add('hidden');
                 } else {
                     inputElement.classList.add('input-incorrect');
+                    if (overrideBtn) overrideBtn.classList.remove('hidden');
                 }
             });
 
@@ -551,6 +646,50 @@
                 saveProgress(true);
             }
         }
+
+        /* --- 6. TEACHER OVERRIDE MODAL LOGIC --- */
+        let currentOverrideId = null;
+
+        function openVerifyModal(inputId) {
+            currentOverrideId = inputId;
+            document.getElementById('modalPassword').value = '';
+            document.getElementById('modalError').style.display = 'none';
+            document.getElementById('verifyModal').style.display = 'flex';
+            document.getElementById('modalPassword').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('verifyModal').style.display = 'none';
+            currentOverrideId = null;
+        }
+
+        function confirmOverride() {
+            const pin = document.getElementById('modalPassword').value;
+            if (pin === "2525") {
+                if (currentOverrideId) {
+                    const el = document.getElementById(currentOverrideId);
+                    const btn = document.getElementById('override-' + currentOverrideId);
+                    if (el) {
+                        el.classList.remove('input-incorrect');
+                        el.classList.add('input-correct');
+                    }
+                    if (btn) {
+                        btn.classList.add('hidden');
+                    }
+                    saveProgress(true);
+                }
+                closeModal();
+            } else {
+                document.getElementById('modalError').style.display = 'block';
+            }
+        }
+
+        document.getElementById('modalPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                confirmOverride();
+            }
+        });
     </script>
 </body>
 </html>
