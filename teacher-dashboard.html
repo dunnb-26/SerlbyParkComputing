@@ -185,17 +185,20 @@
             left: 0;
             z-index: 3;
             text-align: left;
-            min-width: 175px;
+            min-width: 185px;
             border-right: 2px solid #94a3b8;
         }
         .matrix-table td.sticky-col {
             background: #f8fafc;
             font-weight: bold;
             color: #1e3a8a;
-            cursor: pointer;
         }
-        .matrix-table td.sticky-col:hover {
-            background: #e0e7ff;
+        .grid-student-link {
+            cursor: pointer;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+        .grid-student-link:hover {
             text-decoration: underline;
         }
         .matrix-table td {
@@ -255,6 +258,19 @@
         }
         .btn-mini-stamp:hover { background: #1e3a8a; color: white; }
 
+        .btn-mini-login {
+            background: #008f39;
+            color: white;
+            border: none;
+            padding: 3px 7px;
+            border-radius: 4px;
+            font-size: 10.5px;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .btn-mini-login:hover { background: #006b2b; }
+
         /* Individual Student Portfolio Styles */
         .student-header {
             display: flex;
@@ -292,6 +308,8 @@
         .badge-verified { background: #dfaa2b; color: #1e3a8a; margin-right: 6px; }
         .btn-gold { background: #dfaa2b; color: #1e3a8a; border: none; padding: 8px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; }
         .btn-gold:hover { background: #c99722; }
+        .btn-login-student { background: #008f39; color: white; border: none; padding: 8px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .btn-login-student:hover { background: #006b2b; }
         .btn-delete-lesson { background-color: #d32f2f; color: white; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.8em; font-weight: bold; cursor: pointer; margin-left: 6px; }
         .screenshot-img { max-width: 100%; max-height: 380px; border: 2px solid #1e3a8a; border-radius: 6px; margin-top: 8px; display: block; }
     </style>
@@ -343,7 +361,7 @@
                     <button class="mode-tab" id="tab-student" onclick="switchViewMode('student')">👤 Individual Student Portfolio</button>
                 </div>
                 <div style="font-size: 13px; color: #475569; font-weight: bold;">
-                    Tip: Click any student name in the grid to inspect their full answers.
+                    Tip: Click any student name to view their portfolio or use 🔑 Login as Student to open their account.
                 </div>
             </div>
 
@@ -365,6 +383,7 @@
         };
 
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
         const db = firebase.firestore();
 
         let allStudents = [];
@@ -373,6 +392,50 @@
         let classLessonsData = {};
         let selectedGridLessonId = '';
         let portfolioRequestId = 0;
+
+        /* --- REAL FIREBASE LOGIN AS STUDENT --- */
+        async function loginAsStudent(username, displayName) {
+            if (!username) {
+                alert("No username found for this student.");
+                return;
+            }
+
+            const cleanUser = username.trim().toLowerCase();
+            const defaultPassword = "123456";
+            const candidates = cleanUser.includes('@')
+                ? [cleanUser]
+                : [`${cleanUser}@deltaschool.local`, `${cleanUser}@serlby.student`];
+
+            try {
+                sessionStorage.removeItem('teacherMode');
+                sessionStorage.removeItem('inspectStudentUid');
+                sessionStorage.removeItem('inspectStudentName');
+
+                await auth.signOut();
+
+                let signedIn = false;
+                let lastError = null;
+
+                for (const email of candidates) {
+                    try {
+                        await auth.signInWithEmailAndPassword(email, defaultPassword);
+                        signedIn = true;
+                        break;
+                    } catch (e) {
+                        lastError = e;
+                    }
+                }
+
+                if (!signedIn) {
+                    throw lastError || new Error("Unable to sign in.");
+                }
+
+                window.location.href = "index.html";
+            } catch (err) {
+                console.error("Student login failed:", err);
+                alert(`Could not log in as ${displayName || cleanUser}.\n\nTried: ${candidates.join(' and ')}\nError: ${err.message}`);
+            }
+        }
 
         async function fetchStudents() {
             try {
@@ -547,10 +610,17 @@
             let rowsHtml = '';
             students.forEach(stu => {
                 const lesson = classLessonsData[stu.uid]?.[selectedGridLessonId];
+                const stickyStudentCell = `
+                    <td class="sticky-col">
+                        <span class="grid-student-link" onclick="openStudentFromGrid('${stu.uid}')">${escapeHtml(stu.fullName)}</span><br>
+                        <button class="btn-mini-login" onclick="loginAsStudent('${escapeHtml(stu.username)}', '${escapeHtml(stu.fullName)}')">🔑 Login</button>
+                    </td>
+                `;
+
                 if (!lesson) {
                     rowsHtml += `
                         <tr>
-                            <td class="sticky-col" onclick="openStudentFromGrid('${stu.uid}')">${escapeHtml(stu.fullName)}</td>
+                            ${stickyStudentCell}
                             <td class="cell-empty" colspan="${templateItems.length + 2}" style="text-align:left; padding-left:12px; font-style:italic;">Not started</td>
                         </tr>
                     `;
@@ -596,7 +666,7 @@
 
                 rowsHtml += `
                     <tr>
-                        <td class="sticky-col" onclick="openStudentFromGrid('${stu.uid}')">${escapeHtml(stu.fullName)}</td>
+                        ${stickyStudentCell}
                         <td style="font-weight:bold; color:#1e3a8a; white-space:nowrap;">${escapeHtml(lesson.scoreText || 'Done')}</td>
                         <td style="text-align:left; min-width:170px;">${stampsCellHtml}</td>
                         ${qCellsHtml}
@@ -688,9 +758,14 @@
                     <div class="student-header">
                         <div>
                             <h2 style="margin:0; color:#1e3a8a;">${escapeHtml(student.fullName)}</h2>
-                            <p style="margin:5px 0 0 0; color:#64748b; font-weight:bold;">Completed Lessons: <strong style="color:#1e3a8a;">${lessons.length}</strong></p>
+                            <p style="margin:5px 0 0 0; color:#64748b; font-weight:bold;">
+                                Username: @${escapeHtml(student.username)} • Completed Lessons: <strong style="color:#1e3a8a;">${lessons.length}</strong>
+                            </p>
                         </div>
-                        <div style="display:flex; gap:8px;">
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <button class="btn-login-student" onclick="loginAsStudent('${escapeHtml(student.username)}', '${escapeHtml(student.fullName)}')">
+                                🔑 Login as ${escapeHtml(student.fullName)}
+                            </button>
                             <button class="btn-gold" style="background:#1e3a8a; color:white;" onclick="switchViewMode('grid')">&larr; Back to Class Grid</button>
                             <button class="btn-gold" onclick="loadStudentPortfolio(activeStudent)">Refresh Work</button>
                         </div>
