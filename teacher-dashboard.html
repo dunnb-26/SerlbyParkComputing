@@ -412,6 +412,7 @@
                 sessionStorage.removeItem('inspectStudentName');
 
                 await auth.signOut();
+                await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
 
                 let signedIn = false;
                 let lastError = null;
@@ -430,6 +431,7 @@
                     throw lastError || new Error("Unable to sign in.");
                 }
 
+                sessionStorage.setItem('activeStudentSession', 'true');
                 window.location.href = "index.html";
             } catch (err) {
                 console.error("Student login failed:", err);
