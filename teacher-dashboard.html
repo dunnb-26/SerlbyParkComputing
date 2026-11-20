@@ -87,9 +87,7 @@
             box-sizing: border-box;
         }
 
-        .search-box {
-            font-weight: normal;
-        }
+        .search-box { font-weight: normal; }
 
         #student-list {
             flex-grow: 1;
@@ -124,9 +122,7 @@
             border-color: #1e3a8a;
         }
 
-        .student-btn > span:first-child {
-            overflow-wrap: anywhere;
-        }
+        .student-btn > span:first-child { overflow-wrap: anywhere; }
 
         .class-pill {
             background: #dfaa2b;
@@ -198,9 +194,7 @@
             transition: background 0.15s, color 0.15s;
         }
 
-        .lesson-card-header:hover {
-            background: #e2e8f0;
-        }
+        .lesson-card-header:hover { background: #e2e8f0; }
 
         .lesson-card.open .lesson-card-header {
             background: #1e3a8a;
@@ -222,23 +216,18 @@
             color: #dfaa2b;
         }
 
-        .lesson-card.open .chevron {
-            transform: rotate(90deg);
-        }
+        .lesson-card.open .chevron { transform: rotate(90deg); }
 
         .lesson-meta {
             font-size: 0.85em;
             color: #64748b;
             font-weight: bold;
-            margin-left: 10px;
+            margin-left: 8px;
             white-space: nowrap;
         }
 
-        .lesson-card.open .lesson-meta {
-            color: #dfaa2b;
-        }
+        .lesson-card.open .lesson-meta { color: #dfaa2b; }
 
-        /* HIDES ALL WORK BY DEFAULT */
         .lesson-card-body {
             display: none; 
             padding: 20px;
@@ -246,19 +235,14 @@
             background: #ffffff;
         }
 
-        .lesson-card.open .lesson-card-body {
-            display: block; 
-        }
+        .lesson-card.open .lesson-card-body { display: block; }
 
         /* Questions and Answers */
         .qa-row {
             border-bottom: 1px solid #eee;
             padding: 12px 0;
         }
-
-        .qa-row:last-child {
-            border-bottom: none;
-        }
+        .qa-row:last-child { border-bottom: none; }
 
         .qa-label {
             font-weight: bold;
@@ -290,15 +274,8 @@
             border-style: dashed;
         }
 
-        .answer-box.correct {
-            border-color: #2e7d32;
-            background: #e8f5e9;
-        }
-
-        .answer-box.incorrect {
-            border-color: #d32f2f;
-            background: #ffebee;
-        }
+        .answer-box.correct { border-color: #2e7d32; background: #e8f5e9; }
+        .answer-box.incorrect { border-color: #d32f2f; background: #ffebee; }
 
         /* Status Badges */
         .status-badge {
@@ -324,31 +301,6 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
 
-        /* Pixel Art Grid Previews */
-        .pixel-preview-wrap {
-            margin-top: 10px;
-            display: inline-block;
-            background: #ffffff;
-            padding: 8px;
-            border-radius: 6px;
-            border: 2px solid #cbd5e1;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.06);
-        }
-
-        .pixel-preview-grid {
-            display: grid;
-            grid-template-columns: repeat(8, 22px);
-            grid-template-rows: repeat(8, 22px);
-            border: 1px solid #94a3b8;
-        }
-
-        .pixel-preview-cell {
-            width: 22px;
-            height: 22px;
-            border: 1px solid #e2e8f0;
-            box-sizing: border-box;
-        }
-
         .btn-gold {
             background: #dfaa2b;
             color: #1e3a8a;
@@ -359,8 +311,21 @@
             cursor: pointer;
             transition: 0.2s;
         }
-
         .btn-gold:hover { background: #c99722; }
+
+        .btn-live-view {
+            background-color: #0284c7;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-left: 6px;
+        }
+        .btn-live-view:hover { background-color: #0369a1; }
 
         .btn-delete-lesson {
             background-color: #d32f2f;
@@ -372,9 +337,50 @@
             font-weight: bold;
             cursor: pointer;
             transition: background 0.2s;
-            margin-left: 10px;
+            margin-left: 6px;
         }
         .btn-delete-lesson:hover { background-color: #b71c1c; }
+
+        /* --- OVER-THE-SHOULDER LIVE PAGE VIEWER MODAL --- */
+        .live-viewer-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.82);
+            z-index: 3000;
+            flex-direction: column;
+            padding: 18px;
+            box-sizing: border-box;
+        }
+        .live-viewer-bar {
+            background: #1e3a8a;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 3px solid #dfaa2b;
+        }
+        .live-viewer-frame {
+            flex: 1;
+            width: 100%;
+            border: none;
+            background: #f4f6f8;
+            border-radius: 0 0 8px 8px;
+        }
+        .btn-close-viewer {
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-close-viewer:hover { background: #b71c1c; }
     </style>
 </head>
 
@@ -460,6 +466,20 @@
 
     </div>
 
+    <!-- OVER-THE-SHOULDER STUDENT PAGE MODAL -->
+    <div class="live-viewer-overlay" id="live-viewer-overlay">
+        <div class="live-viewer-bar">
+            <div>
+                <strong id="live-viewer-title" style="font-size: 16px;">Student Live View</strong>
+                <span style="font-size: 12px; color: #fde047; margin-left: 10px;">
+                    (Read-Only Student View • Use Teacher Stamps in bottom-right to add/remove stickers)
+                </span>
+            </div>
+            <button class="btn-close-viewer" onclick="closeLiveViewer()">✖ Close Student View</button>
+        </div>
+        <iframe id="live-viewer-frame" class="live-viewer-frame" src="about:blank"></iframe>
+    </div>
+
     <script>
         // 1. Firebase Configuration
         const firebaseConfig = {
@@ -482,55 +502,34 @@
         let activeStudent = null;
         let portfolioRequestId = 0;
 
-        // Universal 10-Color Palette for Basic Designs
-        const basicColorMaps = {
-            2: { 0: '#ffffff', 1: '#000000', 2: '#d32f2f', 3: '#388e3c' },
-            3: { 0: '#ffffff', 1: '#000000', 2: '#d32f2f', 3: '#388e3c', 4: '#1976d2', 5: '#fbc02d', 6: '#8e24aa', 7: '#f57c00' },
-            4: { 0: '#ffffff', 1: '#000000', 2: '#d32f2f', 3: '#388e3c', 4: '#1976d2', 5: '#fbc02d', 6: '#8e24aa', 7: '#f57c00', 8: '#795548', 9: '#e91e63' },
-            8: { 0: '#ffffff', 1: '#000000', 2: '#d32f2f', 3: '#388e3c', 4: '#1976d2', 5: '#fbc02d', 6: '#8e24aa', 7: '#f57c00', 8: '#795548', 9: '#e91e63' }
+        // Map Firestore LESSON_IDs to their exact HTML filenames when they differ
+        const LESSON_FILE_MAP = {
+            "denary-to-binary-lesson": "denary-to-binary.html",
+            "y7-binary-to-denary": "binary-conversions.html",
+            "y9-character-creation": "character-creation.html",
+            "y8-computational-thinking": "computational-thinking.html",
+            "y8-binary-addition": "binary-addition.html"
         };
 
-        const basicImageDataBits = {
-            "red1": 2, "red2": 2, "red3": 2,
-            "amber1": 3, "amber2": 3, "amber3": 3,
-            "green1": 4, "green2": 4, "green3": 4,
-            "blue1": 8, "blue2": 8, "blue3": 8
-        };
+        function resolveLessonUrl(lesson, studentUid, studentName) {
+            const fileName = lesson.pageFile || LESSON_FILE_MAP[lesson.id] || `${lesson.id}.html`;
+            const params = new URLSearchParams({
+                inspectUid: studentUid,
+                inspectName: studentName
+            });
+            return `${fileName}?${params.toString()}`;
+        }
 
-        function buildBasicDesignsHtml(taskKey, solvedArray) {
-            if (!Array.isArray(solvedArray) || solvedArray.length === 0) return '';
-            const bits = basicImageDataBits[taskKey] || 2;
-            const map = basicColorMaps[bits];
-            
-            const baseDataMap = {
-                "red1": [0,2,2,0,0,2,2,0, 2,2,2,2,2,2,2,2, 2,2,2,2,2,2,2,2, 0,2,2,2,2,2,2,0, 0,0,2,2,2,2,0,0, 0,0,0,2,2,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0],
-                "red2": [0,0,1,1,1,1,0,0, 0,1,0,0,0,0,1,0, 1,0,1,0,0,1,0,1, 1,0,0,0,0,0,0,1, 1,0,3,0,0,3,0,1, 1,0,0,3,3,0,0,1, 0,1,0,0,0,0,1,0, 0,0,1,1,1,1,0,0],
-                "red3": [1,2,1,2,1,2,1,2, 2,1,2,1,2,1,2,1, 1,2,1,2,1,2,1,2, 2,1,2,1,2,1,2,1, 1,2,1,2,1,2,1,2, 2,1,2,1,2,1,2,1, 1,2,1,2,1,2,1,2, 2,1,2,1,2,1,2,1],
-                "amber1": [0,0,0,3,4,0,0,0, 0,0,2,2,2,2,0,0, 0,2,2,2,2,2,2,0, 0,2,2,2,2,2,2,0, 0,2,2,2,2,2,2,0, 0,2,2,2,2,2,2,0, 0,0,2,2,2,2,0,0, 0,0,0,0,0,0,0,0],
-                "amber2": [0,0,0,0,0,0,0,0, 0,0,5,5,5,0,0,0, 0,5,5,1,5,0,0,0, 0,7,7,5,5,0,0,0, 0,0,5,5,5,5,5,0, 0,5,5,5,5,5,5,0, 0,0,5,5,5,5,0,0, 6,6,6,6,6,6,6,6],
-                "amber3": [0,0,0,2,2,0,0,0, 0,0,2,2,2,2,0,0, 0,2,2,2,2,2,2,0, 2,2,2,2,2,2,2,2, 0,4,4,4,4,4,4,0, 0,4,6,4,4,6,4,0, 0,4,4,1,1,4,4,0, 3,3,3,1,1,3,3,3],
-                "green1": [0,0,0,2,2,0,0,0, 0,0,2,2,2,2,0,0, 0,2,2,2,2,2,2,0, 2,2,2,2,2,2,2,2, 0,5,5,5,5,5,5,0, 0,5,4,5,5,4,5,0, 0,5,5,8,8,5,5,0, 3,3,3,8,8,3,3,3],
-                "green2": [0,0,0,9,9,0,0,0, 0,0,9,5,5,9,0,0, 0,9,5,5,5,5,9,0, 0,0,9,5,5,9,0,0, 0,0,0,9,9,0,0,0, 0,0,0,3,3,0,0,0, 0,0,3,3,3,3,0,0, 0,3,3,3,3,3,3,0],
-                "green3": [0,0,7,7,7,7,0,0, 0,7,1,7,7,1,7,0, 0,7,7,7,7,7,7,0, 0,0,7,7,7,7,0,0, 0,8,5,5,5,5,8,0, 8,0,5,4,4,5,0,8, 0,0,5,5,5,5,0,0, 0,0,8,0,0,8,0,0],
-                "blue1": [0,4,0,0,0,0,4,0, 4,6,4,0,0,4,6,4, 4,6,6,4,4,6,6,4, 0,4,6,6,6,6,4,0, 0,0,4,1,1,4,0,0, 0,4,9,1,1,9,4,0, 4,9,9,1,1,9,9,4, 0,4,4,0,0,4,4,0],
-                "blue2": [0,0,0,0,0,0,0,0, 0,0,2,2,2,2,0,0, 0,2,4,4,4,4,2,0, 2,2,2,2,2,2,2,2, 2,2,2,2,2,2,2,2, 0,1,0,0,0,0,1,0, 0,1,0,0,0,0,1,0, 0,0,0,0,0,0,0,0],
-                "blue3": [0,0,0,0,0,0,0,4, 0,0,0,0,0,0,4,5, 0,0,0,0,0,4,5,4, 0,0,0,0,4,5,4,0, 0,0,0,4,5,4,0,0, 0,8,4,4,4,0,0,0, 8,8,8,0,0,0,0,0, 1,8,0,0,0,0,0,0]
-            };
+        function openLiveViewer(url, studentName, lessonTitle) {
+            document.getElementById('live-viewer-title').innerText = `👁️ Viewing ${studentName} — ${lessonTitle}`;
+            document.getElementById('live-viewer-frame').src = url;
+            document.getElementById('live-viewer-overlay').style.display = 'flex';
+        }
 
-            const colorsRef = baseDataMap[taskKey] || new Array(64).fill(0);
-            let cellsHtml = '';
-            for (let i = 0; i < 64; i++) {
-                const isSolved = solvedArray[i] === true;
-                const decVal = colorsRef[i] || 0;
-                const bg = isSolved ? (map[decVal] || '#ffffff') : '#fafafa';
-                cellsHtml += `<div class="pixel-preview-cell" style="width: 22px; height: 22px; background-color: ${bg};"></div>`;
-            }
-
-            return `
-                <div class="pixel-preview-wrap">
-                    <div class="pixel-preview-grid" style="grid-template-columns: repeat(8, 22px); grid-template-rows: repeat(8, 22px);">${cellsHtml}</div>
-                </div>
-            `;
+        function closeLiveViewer() {
+            document.getElementById('live-viewer-overlay').style.display = 'none';
+            document.getElementById('live-viewer-frame').src = 'about:blank';
+            refreshActivePortfolio(); // Refresh markbook in case you added/removed stamps while viewing!
         }
 
         // 2. Fetch Students from Firestore
@@ -556,7 +555,6 @@
                 }
 
                 renderSidebar();
-
             } catch (err) {
                 console.error('Error fetching students:', err);
             }
@@ -598,13 +596,10 @@
             const filtered = allStudents.filter(student => {
                 const studentClasses = String(student.className || "").toLowerCase();
                 const selectedFilter = classFilter ? classFilter.toLowerCase() : "";
-                
                 const matchesClass = !classFilter || studentClasses.includes(selectedFilter);
-                
                 const matchesSearch = !searchQuery || 
                                       student.fullName.toLowerCase().includes(searchQuery) || 
                                       student.username.toLowerCase().includes(searchQuery);
-
                 return matchesClass && matchesSearch;
             });
 
@@ -644,7 +639,7 @@
             });
         }
 
-        // 5. Load a Student's Lesson Portfolio as a List of Names
+        // 5. Load a Student's Lesson Portfolio
         async function loadStudentPortfolio(student) {
             const viewDiv = document.getElementById('work-view');
             const requestId = ++portfolioRequestId;
@@ -701,7 +696,7 @@
                 html += `<div id="lessons-accordion-container">`;
 
                 lessons.forEach((lesson, index) => {
-                    html += renderLessonCard(student.uid, lesson, index);
+                    html += renderLessonCard(student, lesson, index);
                 });
 
                 html += '</div>';
@@ -716,7 +711,6 @@
             if (confirm(`Are you sure you want to delete "${lessonTitle}" for this student? This will permanently remove their submitted work from the cloud.`)) {
                 try {
                     await db.collection('users').doc(studentUid).collection('lessons').doc(lessonId).delete();
-                    alert("Lesson work deleted successfully.");
                     refreshActivePortfolio();
                 } catch (err) {
                     console.error("Error deleting lesson submission:", err);
@@ -731,9 +725,10 @@
             }
         }
 
-        // 6. Render the List Bar for Each Lesson with Teacher Stamps, Spelling Practice & Screenshots
-        function renderLessonCard(studentUid, lesson, index) {
+        // 6. Render Each Lesson Card (Header + Expanded Markbook + Live Page Button)
+        function renderLessonCard(student, lesson, index) {
             const title = lesson.pageTitle || lesson.id.replace(/-/g, ' ');
+            const liveUrl = resolveLessonUrl(lesson, student.uid, student.fullName);
 
             const updatedDate = lesson.lastUpdated
                 ? new Date(lesson.lastUpdated).toLocaleDateString('en-GB', {
@@ -744,34 +739,35 @@
             if (lesson.scoreText) badgesHtml += `<span class="status-badge badge-verified">${escapeHtml(lesson.scoreText)}</span>`;
 
             // Show Teacher Stamps in the collapsed lesson header bar
-            if (Array.isArray(lesson.teacherStamps) && lesson.teacherStamps.length > 0) {
-                lesson.teacherStamps.forEach(stamp => {
-                    const cls = stamp.type === 'comment' ? 'mb-stamp-comment' : `mb-stamp-${stamp.type || 'assisted'}`;
-                    badgesHtml += `<span class="mb-stamp ${cls}" style="padding: 2px 8px; font-size: 11px; margin-right: 4px;">${escapeHtml(stamp.text)}</span>`;
-                });
-            }
+            const stamps = Array.isArray(lesson.teacherStamps) ? lesson.teacherStamps : [];
+            stamps.forEach(stamp => {
+                const cls = stamp.type === 'comment' ? 'mb-stamp-comment' : `mb-stamp-${stamp.type || 'assisted'}`;
+                badgesHtml += `<span class="mb-stamp ${cls}" style="padding: 2px 8px; font-size: 11px;">${escapeHtml(stamp.text)}</span>`;
+            });
 
-            // Delete Button added to Header Actions
-            badgesHtml += `<button class="btn-delete-lesson" onclick="event.stopPropagation(); deleteStudentLesson('${studentUid}', '${lesson.id}', '${escapeHtml(title)}')">🗑️ Delete</button>`;
+            // Over-the-Shoulder Live View Button
+            badgesHtml += `<button class="btn-live-view" onclick="event.stopPropagation(); openLiveViewer('${escapeHtml(liveUrl)}', '${escapeHtml(student.fullName)}', '${escapeHtml(title)}')">👁️ View Live Page</button>`;
+
+            // Delete Button
+            badgesHtml += `<button class="btn-delete-lesson" onclick="event.stopPropagation(); deleteStudentLesson('${student.uid}', '${lesson.id}', '${escapeHtml(title)}')">🗑️ Delete</button>`;
 
             let bodyHtml = '';
 
-            // Show Teacher Stamps & Comments banner at the top of the expanded card
-            if (Array.isArray(lesson.teacherStamps) && lesson.teacherStamps.length > 0) {
-                bodyHtml += `<div class="markbook-stamp-strip">`;
-                lesson.teacherStamps.forEach(stamp => {
+            // Top summary strip of all stamps + button to view them in exact page positions
+            if (stamps.length > 0) {
+                bodyHtml += `<div class="markbook-stamp-strip" style="justify-content: space-between; align-items: center;">
+                    <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">`;
+                stamps.forEach(stamp => {
                     const cls = stamp.type === 'comment' ? 'mb-stamp-comment' : `mb-stamp-${stamp.type || 'assisted'}`;
                     const where = stamp.targetLabel ? `<span class="mb-stamp-context">(${escapeHtml(stamp.targetLabel)})</span>` : '';
                     bodyHtml += `<span class="mb-stamp ${cls}">${escapeHtml(stamp.text)} ${where}</span>`;
                 });
-                bodyHtml += `</div>`;
+                bodyHtml += `</div>
+                    <button class="btn-live-view" onclick="openLiveViewer('${escapeHtml(liveUrl)}', '${escapeHtml(student.fullName)}', '${escapeHtml(title)}')">👁️ See Exact Positions on Page</button>
+                </div>`;
             }
 
-            const userProgress = lesson.userProgress || {};
-            const designs = lesson.userBinaryDesigns || {};
-            let renderedScreenshotKeys = new Set();
-
-            // Format A: Structured items array (Used by Demonstrate & Connect lessons)
+            // Format A: Structured items array
             if (Array.isArray(lesson.items) && lesson.items.length > 0) {
                 lesson.items.forEach((item, idx) => {
                     const labelText = item.label || 'Question ' + (idx + 1);
@@ -788,12 +784,24 @@
                         statusPill = '<span class="status-badge badge-incorrect">✗ Incorrect</span>';
                     }
 
+                    // Match any stamps pinned directly to this specific question row
+                    const rowStamps = stamps.filter(s => s.targetLabel && s.targetLabel === labelText);
+                    let rowStampsHtml = '';
+                    if (rowStamps.length > 0) {
+                        rowStampsHtml = `<div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px;">` +
+                            rowStamps.map(s => {
+                                const cls = s.type === 'comment' ? 'mb-stamp-comment' : `mb-stamp-${s.type || 'assisted'}`;
+                                return `<span class="mb-stamp ${cls}">${escapeHtml(s.text)}</span>`;
+                            }).join('') + `</div>`;
+                    }
+
                     bodyHtml += `
                         <div class="qa-row">
                             <div class="qa-label">
                                 <span>${escapeHtml(labelText)}</span>
                                 ${statusPill}
                             </div>
+                            ${rowStampsHtml}
                             <div class="${boxClass}">${isEmpty ? '(Left blank)' : escapeHtml(val)}</div>
                         </div>
                     `;
@@ -820,7 +828,7 @@
                 });
             }
 
-            // Render Spelling Practice Table Rows or say "None" if empty
+            // Render Spelling Practice Table Rows
             let spagRowsHtml = '';
             if (Array.isArray(lesson.spagRows) && lesson.spagRows.length > 0) {
                 lesson.spagRows.forEach((row) => {
@@ -852,13 +860,6 @@
                         </table>
                     </div>
                 `;
-            } else if (lesson.spagRows !== undefined) {
-                bodyHtml += `
-                    <div class="qa-row">
-                        <div class="qa-label"><span>📝 Spelling Practice & Corrections</span></div>
-                        <div class="answer-box" style="background:#f8f9fa; color:#64748b; font-style:italic;">None (No spelling corrections needed)</div>
-                    </div>
-                `;
             }
 
             // Render Teacher Feedback if present on Connect tasks
@@ -868,13 +869,13 @@
                     bodyHtml += `
                         <div class="qa-row">
                             <div class="qa-label"><span>👨‍🏫 Teacher Feedback (${level} Task)</span></div>
-                            <div class="answer-box correct" style="background:#f8f9fa; border-left:4px solid #388e3c;">${lesson[feedbackKey]}</div>
+                            <div class="answer-box correct" style="background:#f8f9fa; border-left:4px solid #388e3c;">${escapeHtml(lesson[feedbackKey])}</div>
                         </div>
                     `;
                 }
             });
 
-            // Fallback: Render screenshots if present
+            // Render screenshots if present
             ['maroon', 'amber', 'green', 'navy'].forEach(zone => {
                 const imgKey = 'img_' + zone;
                 if (lesson[imgKey] && String(lesson[imgKey]).startsWith('data:image')) {
@@ -910,25 +911,15 @@
             `;
         }
 
-        // 7. Click to Open Work (Closes all others)
         function toggleLessonCard(index) {
             const clickedCard = document.getElementById(`lesson-card-${index}`);
             if (!clickedCard) return;
 
             const isAlreadyOpen = clickedCard.classList.contains('open');
-
-            // Close all
-            document.querySelectorAll('.lesson-card').forEach(card => {
-                card.classList.remove('open');
-            });
-
-            // Open just the clicked one
-            if (!isAlreadyOpen) {
-                clickedCard.classList.add('open');
-            }
+            document.querySelectorAll('.lesson-card').forEach(card => card.classList.remove('open'));
+            if (!isAlreadyOpen) clickedCard.classList.add('open');
         }
 
-        // Safely Escape Text
         function escapeHtml(str) {
             return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
