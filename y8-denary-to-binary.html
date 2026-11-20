@@ -632,6 +632,16 @@
             const xPercent = (((e.clientX - rect.left) / rect.width) * 100).toFixed(2);
             const yPercent = (((e.clientY - rect.top) / rect.height) * 100).toFixed(2);
 
+            // Detect which question or task card the teacher clicked near for the markbook
+            let targetLabel = "";
+            const row = e.target.closest('.question-row');
+            const card = e.target.closest('.task-card');
+            if (row && row.querySelector('.question-label')) {
+                targetLabel = row.querySelector('.question-label').innerText.replace(/\s+/g, ' ').trim();
+            } else if (card && card.querySelector('h2')) {
+                targetLabel = card.querySelector('h2').innerText.replace(/\s+/g, ' ').trim();
+            }
+
             let labelText = "";
             if (activeStampType === 'comment') {
                 const note = prompt("Enter teacher comment:");
@@ -645,6 +655,7 @@
                 id: Date.now().toString(),
                 type: activeStampType,
                 text: labelText,
+                targetLabel: targetLabel,
                 x: xPercent,
                 y: yPercent
             });
