@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Dashboard - Visual Worksheet Markbook (Option 1)</title>
+    <title>Lesson 3 - Denary to Binary</title>
     <link rel="stylesheet" href="style.css">
 
     <!-- Firebase SDKs -->
@@ -11,347 +11,536 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
+    <!-- html2canvas for Automatic Task Snapshots -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f4f6f8;
-            margin: 0;
+        /* Task Container Styling */
+        .task-container { max-width: 900px; margin: 30px auto; padding: 20px; position: relative; }
+        
+        .task-card { 
+            background: white; 
+            border-radius: 8px; 
+            padding: 25px; 
+            margin-bottom: 30px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            page-break-inside: avoid;
+            position: relative;
         }
+        
+        /* Section Header Colors */
+        .task-prep { border-top: 6px solid #607d8b; } 
+        .task-prep h2 { color: #607d8b; margin-top: 0; }
+        
+        .task-plenary { border-top: 6px solid #673ab7; } 
+        .task-plenary h2 { color: #673ab7; margin-top: 0; }
 
-        .dashboard-layout {
-            display: grid;
-            grid-template-columns: 310px 1fr;
-            gap: 20px;
-            max-width: 1450px;
-            margin: 20px auto;
-            padding: 0 20px;
+        /* RAGB Colors */
+        .task-maroon { border-top: 6px solid #800000; }
+        .task-maroon h2 { color: #800000; margin-top: 0; }
+        .task-maroon .instruction-box { border-left: 4px solid #800000; }
+
+        .task-amber { border-top: 6px solid #ffb300; }
+        .task-amber h2 { color: #ffb300; margin-top: 0; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
+        .task-amber .instruction-box { border-left: 4px solid #ffb300; }
+
+        .task-green { border-top: 6px solid #008f39; }
+        .task-green h2 { color: #008f39; margin-top: 0; }
+        .task-green .instruction-box { border-left: 4px solid #008f39; }
+
+        .task-navy { border-top: 6px solid #1e3a8a; }
+        .task-navy h2 { color: #1e3a8a; margin-top: 0; }
+        .task-navy .instruction-box { border-left: 4px solid #1e3a8a; }
+
+        /* Common Elements */
+        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; text-align: center; }
+        
+        /* Inputs & Textareas */
+        .question-row { margin-bottom: 20px; }
+        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
+        
+        .auto-input { 
+            width: 100%; 
+            max-width: 350px; 
+            padding: 12px; 
+            font-size: 16px; 
+            border: 2px solid #ccc; 
+            border-radius: 4px; 
+            transition: all 0.3s ease; 
+            box-sizing: border-box; 
+            background-color: white; 
+            font-family: inherit; 
         }
+        .auto-input:focus { outline: none; border-color: #666; }
+        textarea.auto-input { resize: vertical; min-height: 80px; overflow-y: hidden; max-width: 100%; }
+        
+        .inline-input { display: inline-block; width: 150px; margin: 0 5px; }
 
-        /* Sidebar */
-        .sidebar {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            border-top: 6px solid #1e3a8a;
-            height: 85vh;
-            display: flex;
-            flex-direction: column;
-            box-sizing: border-box;
-        }
+        /* Helper Headings */
+        .helper-headings { display: flex; gap: 4px; max-width: 250px; margin-bottom: 4px; }
+        .helper-headings span { flex: 1; text-align: center; font-size: 11px; font-weight: bold; color: #666; background: #e9ecef; border-radius: 2px; padding: 2px 0; }
+        .helper-headings-8bit { max-width: 400px; }
 
-        .sidebar h3 { color: #1e3a8a; margin-top: 0; margin-bottom: 10px; }
+        /* Correct & Incorrect Answer Styling */
+        .input-correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
+        .input-incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
+        
+        /* Buttons */
+        .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; max-width: 200px; transition: background-color 0.2s; }
+        .btn-submit:hover { background-color: #152960; }
+        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
+        .btn-pdf:hover { background-color: #124d2d; }
 
-        select, .search-box {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            font-weight: bold;
-            box-sizing: border-box;
-        }
-        .search-box { font-weight: normal; }
+        /* --- TEACHER STAMP & ANNOTATION SYSTEM --- */
+        body.stamp-mode-active { cursor: crosshair !important; }
+        body.stamp-mode-active .task-card { outline: 2px dashed #1e3a8a; }
 
-        #student-list {
-            flex-grow: 1;
-            overflow-y: auto;
-            margin-top: 6px;
-            padding-right: 4px;
-        }
-
-        .student-btn {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 8px;
-            background: #f8f9fa;
-            border: 1px solid #ddd;
+        .teacher-stamp {
+            position: absolute;
+            transform: translate(-50%, -50%) rotate(-3deg);
+            padding: 6px 12px;
             border-radius: 6px;
-            text-align: left;
+            font-size: 13px;
             font-weight: bold;
-            font-size: 0.95em;
-            cursor: pointer;
-            transition: 0.2s;
-            color: #333;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.22);
+            pointer-events: auto;
+            user-select: none;
+            white-space: nowrap;
+            border: 2px solid;
+            z-index: 500;
+            transition: transform 0.15s ease;
         }
-        .student-btn:hover, .student-btn.active {
+
+        .teacher-stamp.unlocked:hover {
+            transform: translate(-50%, -50%) scale(1.06);
+            cursor: pointer;
+        }
+        .teacher-stamp.unlocked:hover::after {
+            content: " ✖";
+            color: #d32f2f;
+        }
+
+        /* Stamp Color Themes */
+        .stamp-assisted { background: #e3f2fd; color: #0d47a1; border-color: #1976d2; }
+        .stamp-spag     { background: #fff3e0; color: #e65100; border-color: #f57c00; }
+        .stamp-proud    { background: #fff8e1; color: #7f6000; border-color: #dfaa2b; }
+        .stamp-comment  { background: #f3e5f5; color: #4a148c; border-color: #8e24aa; white-space: normal; max-width: 220px; transform: translate(-50%, -50%) rotate(0deg); }
+
+        /* Floating Teacher Toolbar */
+        .teacher-toolbar {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
             background: #1e3a8a;
             color: white;
-            border-color: #1e3a8a;
-        }
-        .class-pill {
-            background: #dfaa2b;
-            color: #1e3a8a;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: bold;
-            flex-shrink: 0;
-        }
-        .sidebar-message {
-            color: #64748b;
-            font-size: 0.9em;
-            text-align: center;
-            line-height: 1.5;
-            margin: 20px 5px;
-        }
-
-        /* Main View */
-        .main-view {
-            background: white;
-            padding: 28px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            border-top: 6px solid #dfaa2b;
-            height: 85vh;
-            overflow-y: auto;
-            box-sizing: border-box;
-        }
-
-        .student-header {
+            padding: 12px 16px;
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            z-index: 1000;
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            gap: 15px;
-            border-bottom: 3px solid #1e3a8a;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
-
-        /* Lesson Accordion */
-        .lesson-card {
-            border: 2px solid #cbd5e1;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            overflow: hidden;
-            background: #fff;
-        }
-        .lesson-card.open {
-            border-color: #1e3a8a;
-            box-shadow: 0 4px 14px rgba(30, 58, 138, 0.14);
-            margin-bottom: 22px;
-        }
-        .lesson-card-header {
-            background: #f8fafc;
-            color: #1e3a8a;
-            padding: 14px 18px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            user-select: none;
-        }
-        .lesson-card-header:hover { background: #e2e8f0; }
-        .lesson-card.open .lesson-card-header { background: #1e3a8a; color: white; }
-
-        .lesson-title-wrap {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: bold;
-            font-size: 1.05em;
-        }
-        .chevron { display: inline-block; transition: transform 0.2s ease; font-size: 0.85em; color: #dfaa2b; }
-        .lesson-card.open .chevron { transform: rotate(90deg); }
-        .lesson-meta { font-size: 0.85em; color: #64748b; font-weight: bold; margin-left: 8px; white-space: nowrap; }
-        .lesson-card.open .lesson-meta { color: #dfaa2b; }
-
-        .lesson-card-body {
-            display: none;
-            padding: 22px;
-            background: #f1f5f9;
-            border-top: 2px solid #e2e8f0;
-        }
-        .lesson-card.open .lesson-card-body { display: block; }
-
-        /* --- VISUAL WORKSHEET REPLICA CARDS --- */
-        .ws-card {
-            background: white;
-            border-radius: 8px;
-            padding: 20px 22px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-            position: relative;
-        }
-        .ws-prep    { border-top: 6px solid #607d8b; }
-        .ws-prep h3 { color: #607d8b; margin-top: 0; }
-        .ws-maroon  { border-top: 6px solid #800000; }
-        .ws-maroon h3 { color: #800000; margin-top: 0; }
-        .ws-amber   { border-top: 6px solid #ffb300; }
-        .ws-amber h3 { color: #d97706; margin-top: 0; }
-        .ws-green   { border-top: 6px solid #008f39; }
-        .ws-green h3 { color: #008f39; margin-top: 0; }
-        .ws-navy    { border-top: 6px solid #1e3a8a; }
-        .ws-navy h3 { color: #1e3a8a; margin-top: 0; }
-        .ws-plenary { border-top: 6px solid #673ab7; }
-        .ws-plenary h3 { color: #673ab7; margin-top: 0; }
-
-        .ws-question-row {
-            margin-bottom: 14px;
-            padding: 10px 12px;
-            border-radius: 6px;
-            background: #fafafa;
-            border: 1px solid #e2e8f0;
-            position: relative;
-        }
-        .ws-question-row:last-child { margin-bottom: 0; }
-
-        .ws-label {
-            font-weight: bold;
-            color: #333;
-            font-size: 0.95em;
-            margin-bottom: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             flex-wrap: wrap;
             gap: 8px;
-        }
-
-        .ws-input-box {
-            width: 100%;
-            padding: 10px 12px;
-            font-size: 15px;
-            border: 2px solid #cbd5e1;
-            border-radius: 4px;
-            background: white;
-            color: #1e293b;
-            box-sizing: border-box;
-            white-space: pre-wrap;
-            overflow-wrap: anywhere;
-        }
-        .ws-input-box.empty {
-            color: #94a3b8;
-            font-style: italic;
-            border-style: dashed;
-            background: #f8fafc;
-        }
-        .ws-input-box.correct {
-            border-color: #008f39;
-            background: #e8f5e9;
-            color: #006100;
-            font-weight: bold;
-        }
-        .ws-input-box.incorrect {
-            border-color: #d32f2f;
-            background: #ffebee;
-            color: #b71c1c;
-            font-weight: bold;
-        }
-
-        /* --- PINNED TEACHER STAMPS INSIDE WORKSHEET REPLICA --- */
-        .pinned-stamps-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 8px;
-        }
-        .ws-stamp {
-            display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 5px 11px;
-            border-radius: 6px;
-            font-size: 12.5px;
-            font-weight: bold;
-            border: 2px solid;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.14);
-            transform: rotate(-1.5deg);
+            max-width: 92vw;
         }
-        .ws-stamp-assisted { background: #e3f2fd; color: #0d47a1; border-color: #1976d2; }
-        .ws-stamp-spag     { background: #fff3e0; color: #e65100; border-color: #f57c00; }
-        .ws-stamp-proud    { background: #fff8e1; color: #7f6000; border-color: #dfaa2b; }
-        .ws-stamp-comment  { background: #f3e5f5; color: #4a148c; border-color: #8e24aa; transform: rotate(0deg); }
-
-        .ws-stamp-del {
-            background: rgba(0,0,0,0.1);
-            border: none;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 11px;
-            line-height: 18px;
-            text-align: center;
-            cursor: pointer;
-            color: inherit;
-            padding: 0;
-        }
-        .ws-stamp-del:hover { background: #d32f2f; color: white; }
-
-        .btn-add-row-stamp {
-            background: #eef2ff;
+        .stamp-btn {
+            background: white;
             color: #1e3a8a;
-            border: 1px dashed #1e3a8a;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 11px;
+            border: 2px solid transparent;
+            padding: 7px 11px;
+            border-radius: 6px;
+            font-size: 13px;
             font-weight: bold;
             cursor: pointer;
+            transition: all 0.15s;
         }
-        .btn-add-row-stamp:hover { background: #1e3a8a; color: white; }
+        .stamp-btn:hover { background: #eef2ff; }
+        .stamp-btn.active {
+            background: #dfaa2b;
+            color: #1e3a8a;
+            border-color: white;
+            box-shadow: 0 0 0 2px #dfaa2b;
+        }
+        .stamp-btn-exit { background: #d32f2f; color: white; }
+        .stamp-btn-exit:hover { background: #b71c1c; }
 
-        /* Badges & Buttons */
-        .status-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 0.78em; font-weight: bold; text-transform: uppercase; }
-        .badge-verified { background: #dfaa2b; color: #1e3a8a; margin-right: 6px; }
-        .btn-gold { background: #dfaa2b; color: #1e3a8a; border: none; padding: 8px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        .btn-gold:hover { background: #c99722; }
-        .btn-delete-lesson { background-color: #d32f2f; color: white; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.8em; font-weight: bold; cursor: pointer; margin-left: 6px; }
-        .btn-delete-lesson:hover { background-color: #b71c1c; }
-        .screenshot-img { max-width: 100%; max-height: 380px; border: 2px solid #1e3a8a; border-radius: 6px; margin-top: 8px; display: block; }
+        /* Snapshot Toast Indicator */
+        #snapshot-toast {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #008f39;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            z-index: 1100;
+        }
+
+        /* Passcode Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 340px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-align: center;
+            border-top: 6px solid #1e3a8a;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        .modal-btn-row { display: flex; gap: 10px; }
+        .modal-btn-confirm { flex: 1; background-color: #1e3a8a; color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-btn-cancel { flex: 1; background-color: #ccc; color: #333; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .modal-error { color: #d32f2f; font-size: 0.9em; margin-bottom: 5px; display: none; }
     </style>
 </head>
-
 <body>
-    <header>
-        <div class="header-left"><a href="index.html"><img src="logo.jpg" alt="Logo"></a></div>
-        <div class="header-center"><h1>Teacher Cloud Markbook</h1></div>
-        <div class="header-right" style="display: flex; gap: 10px; align-items: center;">
-            <a href="bulk-importer.html" class="back-btn" style="background-color: #607d8b; color: white;">📥 Bulk Importer</a>
-            <a href="leaderboard.html" class="btn-gold" style="background-color: #1e3a8a; color: white; text-decoration: none; font-size: 0.9em;">🏆 Leaderboards</a>
-            <button class="btn-gold" onclick="fetchStudents()">Refresh Roster</button>
-        </div>
-    </header>
-
-    <div class="dashboard-layout">
-        <div class="sidebar">
-            <h3>Class Filter</h3>
-            <select id="class-filter" onchange="handleClassChange()">
-                <option value="" disabled selected>Select a class...</option>
-                <optgroup label="Year 7">
-                    <option value="7x1">7x1</option><option value="7x2">7x2</option><option value="7y1">7y1</option><option value="7y2">7y2</option>
-                </optgroup>
-                <optgroup label="Year 8">
-                    <option value="8x1">8x1</option><option value="8x2">8x2</option><option value="8y1">8y1</option><option value="8y2">8y2</option>
-                </optgroup>
-                <optgroup label="Year 9">
-                    <option value="9x1">9x1</option><option value="9x2">9x2</option><option value="9y1">9y1</option><option value="9y2">9y2</option>
-                </optgroup>
-                <optgroup label="GCSE Options">
-                    <option value="10aEnt1">10aEnt1 (Enterprise)</option><option value="11aEnt1">11aEnt1 (Enterprise)</option>
-                    <option value="10bCim1">10bCim1 (iMedia)</option><option value="11bCim1">11bCim1 (iMedia)</option>
-                </optgroup>
-                <option value="Unassigned">Unassigned</option>
-            </select>
-
-            <input type="text" id="student-search" class="search-box" placeholder="Search student name or username..." oninput="renderSidebar()">
-
-            <div id="student-list">
-                <p class="sidebar-message">Select a class from the dropdown above to view students.</p>
+    <div id="pdf-content">
+        <header>
+            <div class="header-left">
+                <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
             </div>
-        </div>
+            <div class="header-center"><h1>Denary to Binary</h1></div>
+            <div class="header-right"><a href="logical-thinking.html" class="back-btn">&larr; Back to Unit</a></div>
+        </header>
 
-        <div class="main-view" id="work-view">
-            <h2 style="color:#666; text-align:center; margin-top:80px;">Select a class on the left to begin.</h2>
+        <main class="task-container" id="main-workspace">
+
+            <!-- PREPARATION: Keywords & Notes -->
+            <div class="task-card task-prep" id="card-prep" data-card-title="Lesson Preparation">
+                <h2>Lesson Preparation</h2>
+                
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">4 Key Words</h3>
+                <div class="question-row">
+                    <label class="question-label">Binary</label>
+                    <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type definition here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">Denary</label>
+                    <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type definition here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">Bit</label>
+                    <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type definition here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">Byte</label>
+                    <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type definition here...">
+                </div>
+
+                <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px;">Lesson Notes</h3>
+                <div class="question-row">
+                    <textarea class="auto-input" rows="6" placeholder="Write your notes about today's lesson here..."></textarea>
+                </div>
+            </div>
+
+            <!-- RED TASK: Gap Fill -->
+            <div class="task-card task-maroon" id="card-maroon" data-card-title="Red Task: Denary to Binary Rules">
+                <h2>Red Task: Denary to Binary Rules</h2>
+                <div class="instruction-box">
+                    Complete the sentences about converting denary to binary. Type the correct word or number into the boxes.
+                </div>
+
+                <p style="line-height:2.5; font-size:1.05em;">
+1. Denary is our normal everyday counting system, also known as Base <input type="text" class="auto-input red-input inline-input" data-answers='["10", "ten"]' placeholder="...">.
+                    <br>
+2. Binary is the system used by computer systems, known as Base <input type="text" class="auto-input red-input inline-input" data-answers='["2", "two"]' placeholder="...">.
+                    <br>
+3. To convert a denary number to binary, we can use the <input type="text" class="auto-input red-input inline-input" data-answers='["subtraction", "subtract"]' placeholder="..."> method.
+                    <br>
+4. We write a <input type="text" class="auto-input red-input inline-input" data-answers='["1", "one"]' placeholder="..."> if we CAN subtract the column value from our running total.
+                    <br>
+5. We write a <input type="text" class="auto-input red-input inline-input" data-answers='["0", "zero"]' placeholder="..."> if we CANNOT subtract the column value.
+                    <br>
+6. The highest number we can make with 4 bits is <input type="text" class="auto-input red-input inline-input" data-answers='["15", "fifteen"]' placeholder="...">.
+                </p>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('red-input')">Check Answers</button>
+            </div>
+
+            <!-- AMBER TASK: 4-Bit Denary to Binary (12 Questions) -->
+            <div class="task-card task-amber" id="card-amber" data-card-title="Amber Task: 4-Bit Denary to Binary">
+                <h2>Amber Task: 4-Bit Denary to Binary</h2>
+                <div class="instruction-box">
+                    Convert the denary numbers into 4-bit binary codes.
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">1. Convert denary <code>5</code> to 4-bit binary:</label>
+                    <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input amber-input" data-answers='["0101"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">2. Convert denary <code>10</code> to 4-bit binary:</label>
+                    <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input amber-input" data-answers='["1010"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">3. Convert denary <code>3</code> to 4-bit binary:</label>
+                    <input type="text" class="auto-input amber-input" data-answers='["0011"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">4. Convert denary <code>12</code> to 4-bit binary:</label>
+                    <input type="text" class="auto-input amber-input" data-answers='["1100"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">5. Convert denary <code>14</code> to 4-bit binary:</label>
+                    <input type="text" class="auto-input amber-input" data-answers='["1110"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">6. Convert denary <code>9</code> to 4-bit binary:</label>
+                    <input type="text" class="auto-input amber-input" data-answers='["1001"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">7. Convert denary <code>6</code> to 4-bit binary:</label>
+                    <input type="text" class="auto-input amber-input" data-answers='["0110"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">8. Convert denary <code>11</code> to 4-bit binary:</label>
+                    <input type="text" class="auto-input amber-input" data-answers='["1011"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">9. Convert denary <code>4</code> to 4-bit binary:</label>
+                    <input type="text" class="auto-input amber-input" data-answers='["0100"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">10. Convert denary <code>13</code> to 4-bit binary:</label>
+                    <input type="text" class="auto-input amber-input" data-answers='["1101"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">11. Convert denary <code>2</code> to 4-bit binary:</label>
+                    <input type="text" class="auto-input amber-input" data-answers='["0010"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">12. Convert denary <code>15</code> to 4-bit binary:</label>
+                    <input type="text" class="auto-input amber-input" data-answers='["1111"]' placeholder="Enter answer here...">
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('amber-input')">Check Answers</button>
+            </div>
+
+            <!-- GREEN TASK: 8-Bit Denary to Binary (12 Questions) -->
+            <div class="task-card task-green" id="card-green" data-card-title="Green Task: 8-Bit Denary to Binary">
+                <h2>Green Task: 8-Bit Denary to Binary</h2>
+                <div class="instruction-box">
+                    Convert the denary numbers into 8-bit binary codes using the subtraction method.
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">1. Convert denary <code>65</code> to 8-bit binary:</label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input green-input" data-answers='["01000001"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">2. Convert denary <code>130</code> to 8-bit binary:</label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input green-input" data-answers='["10000010"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">3. Convert denary <code>200</code> to 8-bit binary:</label>
+                    <input type="text" class="auto-input green-input" data-answers='["11001000"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">4. Convert denary <code>255</code> to 8-bit binary:</label>
+                    <input type="text" class="auto-input green-input" data-answers='["11111111"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">5. Convert denary <code>17</code> to 8-bit binary:</label>
+                    <input type="text" class="auto-input green-input" data-answers='["00010001"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">6. Convert denary <code>99</code> to 8-bit binary:</label>
+                    <input type="text" class="auto-input green-input" data-answers='["01100011"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">7. Convert denary <code>42</code> to 8-bit binary:</label>
+                    <input type="text" class="auto-input green-input" data-answers='["00101010"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">8. Convert denary <code>150</code> to 8-bit binary:</label>
+                    <input type="text" class="auto-input green-input" data-answers='["10010110"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">9. Convert denary <code>85</code> to 8-bit binary:</label>
+                    <input type="text" class="auto-input green-input" data-answers='["01010101"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">10. Convert denary <code>170</code> to 8-bit binary:</label>
+                    <input type="text" class="auto-input green-input" data-answers='["10101010"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">11. Convert denary <code>29</code> to 8-bit binary:</label>
+                    <input type="text" class="auto-input green-input" data-answers='["00011101"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">12. Convert denary <code>214</code> to 8-bit binary:</label>
+                    <input type="text" class="auto-input green-input" data-answers='["11010110"]' placeholder="Enter answer here...">
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('green-input')">Check Answers</button>
+            </div>
+
+            <!-- BLUE TASK: Conversion Reasoning (8 Questions) -->
+            <div class="task-card task-navy" id="card-navy" data-card-title="Blue Task: Conversion Reasoning">
+                <h2>Blue Task: Conversion Reasoning</h2>
+                <div class="instruction-box">
+                    Answer the following questions about how denary to binary conversions work.
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">1. What is the largest denary number you can make using an 8-bit grid?</label>
+                    <input type="text" class="auto-input navy-input" data-answers='["255"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">2. If you try to convert the denary number '256' using an 8-bit grid, what error happens?</label>
+                    <input type="text" class="auto-input navy-input" data-answers='["overflow", "overflow error", "not enough bits", "needs 9 bits"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">3. If a binary number ends with a '1', what do you instantly know about its denary value?</label>
+                    <input type="text" class="auto-input navy-input" data-answers='["it is odd", "odd", "odd number"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">4. If a binary number ends with a '0', what do you instantly know about its denary value?</label>
+                    <input type="text" class="auto-input navy-input" data-answers='["it is even", "even", "even number"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">5. What is the largest denary number you can make using a 4-bit grid?</label>
+                    <input type="text" class="auto-input navy-input" data-answers='["15", "fifteen"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">6. If a denary number is 128 or larger, what must the very first (left-most) bit of its 8-bit binary code be?</label>
+                    <input type="text" class="auto-input navy-input" data-answers='["1", "one"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">7. What is the smallest <b>odd</b> denary number you can make using an 8-bit binary grid (write its 8-bit binary code)?</label>
+                    <input type="text" class="auto-input navy-input" data-answers='["00000001", "1"]' placeholder="Enter answer here...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">8. How many bits in total are needed to store the denary number <code>256</code>?</label>
+                    <input type="text" class="auto-input navy-input" data-answers='["9", "nine", "9 bits", "nine bits"]' placeholder="Enter answer here...">
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('navy-input')">Check Answers</button>
+            </div>
+
+            <!-- CHALLENGE GAME LINK -->
+            <div class="task-card no-print" style="border: 2px solid #dfaa2b; text-align: center; background-color: #fdfbf7;">
+                <h2 style="color: #1e3a8a; margin-top: 0; font-size: 24px;">🎮 Finished Early? Play Binary Time Attack!</h2>
+                <p style="font-size: 16px; color: #555; margin-bottom: 20px;">Test your conversion speed against the clock in the Delta Binary Time Attack game. Race to convert as many denary and binary numbers as you can in 60 seconds!</p>
+                <a href="binary-game.html" class="btn-submit" style="margin: 0 auto; background-color: #dfaa2b; color: #1e3a8a; text-decoration: none; display: inline-block; width: 250px;">Start Game &rarr;</a>
+            </div>
+
+            <!-- PLENARY: 3 Key Takeaways -->
+            <div class="task-card task-plenary" id="card-plenary" data-card-title="Lesson Plenary">
+                <h2>Lesson Plenary</h2>
+                <h3 style="color: #444; margin-bottom: 15px;">My 3 Key Takeaways</h3>
+                
+                <div class="question-row">
+                    <label class="question-label">Key Takeaway 1:</label>
+                    <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type first takeaway here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">Key Takeaway 2:</label>
+                    <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type second takeaway here...">
+                </div>
+                <div class="question-row">
+                    <label class="question-label">Key Takeaway 3:</label>
+                    <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type third takeaway here...">
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
+        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+    </div>
+
+    <!-- SNAPSHOT TOAST -->
+    <div id="snapshot-toast" class="no-print">📸 Snapshot saved to Teacher Markbook!</div>
+
+    <!-- FLOATING TEACHER STAMP TOOLBAR -->
+    <div class="teacher-toolbar no-print" id="teacher-toolbar">
+        <button class="stamp-btn" id="unlock-stamps-btn" onclick="openStampModal()">👨‍🏫 Teacher Stamps</button>
+        <div id="stamp-palette" style="display: none; gap: 6px; flex-wrap: wrap; align-items: center;">
+            <span style="font-size: 12px; font-weight: bold; margin-right: 4px;">Click any task card to stamp & capture screenshot:</span>
+            <button class="stamp-btn" data-type="assisted" onclick="selectStamp('assisted', this)">🤝 Teacher Assisted</button>
+            <button class="stamp-btn" data-type="spag" onclick="selectStamp('spag', this)">✍️ SPaG Issues</button>
+            <button class="stamp-btn" data-type="proud" onclick="selectStamp('proud', this)">🏆 Proud Thursday Given</button>
+            <button class="stamp-btn" data-type="comment" onclick="selectStamp('comment', this)">💬 Comment</button>
+            <button class="stamp-btn stamp-btn-exit" onclick="lockStampMode()">Done</button>
         </div>
     </div>
 
+    <!-- PASSCODE MODAL -->
+    <div class="modal-overlay" id="stamp-modal">
+        <div class="modal-content">
+            <h3>Unlock Teacher Stamps</h3>
+            <div class="modal-error" id="stamp-error-msg">Incorrect Passcode</div>
+            <input type="password" id="stamp-password-input" class="modal-input" placeholder="Enter Passcode" onkeydown="if(event.key==='Enter') submitStampPasscode()">
+            <div class="modal-btn-row">
+                <button class="modal-btn-cancel" onclick="closeStampModal()">Cancel</button>
+                <button class="modal-btn-confirm" onclick="submitStampPasscode()">Unlock</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        &copy; 2026 Delta Serlby Park - Computing & Business Department
+    </footer>
+
     <script>
+        /* --- 1. FIREBASE CONFIGURATION & INITIALIZATION --- */
         const firebaseConfig = {
             apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
             authDomain: "serlby-park-computing.firebaseapp.com",
@@ -362,340 +551,395 @@
             measurementId: "G-HDNYEE11WV"
         };
 
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
         const db = firebase.firestore();
 
-        let allStudents = [];
-        let activeStudent = null;
-        let activeLessonsCache = {};
-        let portfolioRequestId = 0;
+        const LESSON_ID = "denary-to-binary-lesson";
+        const TEACHER_PASSCODE = "delta";
 
-        async function fetchStudents() {
-            try {
-                const snapshot = await db.collection('users').get();
-                allStudents = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    allStudents.push({
-                        uid: doc.id,
-                        username: data.username || doc.id,
-                        fullName: data.fullName || data.username || 'Unnamed Student',
-                        className: data.className || 'Unassigned'
-                    });
-                });
-                allStudents.sort((a, b) => a.fullName.localeCompare(b.fullName));
-                if (activeStudent) activeStudent = allStudents.find(s => s.uid === activeStudent.uid) || null;
-                renderSidebar();
-            } catch (err) {
-                console.error('Error fetching students:', err);
-            }
+        /* --- 2. TEACHER STAMP & PNG SNAPSHOT SYSTEM --- */
+        let stampsUnlocked = false;
+        let activeStampType = null;
+        let placedStamps = [];
+        let stampSnapshots = {}; // Stores real PNG screenshots keyed by task card ID
+
+        const STAMP_PRESETS = {
+            assisted: { text: "🤝 Teacher Assisted", className: "stamp-assisted" },
+            spag:     { text: "✍️ SPaG Issues", className: "stamp-spag" },
+            proud:    { text: "🏆 Proud Thursday Given", className: "stamp-proud" }
+        };
+
+        function showToast(msg) {
+            const toast = document.getElementById('snapshot-toast');
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 2800);
         }
 
-        function handleClassChange() {
-            portfolioRequestId++;
-            activeStudent = null;
-            document.getElementById('student-search').value = '';
-            document.getElementById('work-view').innerHTML = `<h2 style="color:#666; text-align:center; margin-top:80px;">Select a student from the roster to view their visual worksheet.</h2>`;
-            renderSidebar();
-        }
-
-        function renderSidebar() {
-            const listDiv = document.getElementById('student-list');
-            const classFilter = document.getElementById('class-filter').value;
-            const searchQuery = document.getElementById('student-search').value.toLowerCase().trim();
-            listDiv.innerHTML = '';
-
-            if (!classFilter && !searchQuery) {
-                listDiv.innerHTML = `<p class="sidebar-message">Please select a class from the dropdown above.</p>`;
+        function openStampModal() {
+            if (stampsUnlocked) {
+                unlockStampMode();
                 return;
             }
-
-            const filtered = allStudents.filter(student => {
-                const studentClasses = String(student.className || "").toLowerCase();
-                const matchesClass = !classFilter || studentClasses.includes(classFilter.toLowerCase());
-                const matchesSearch = !searchQuery || student.fullName.toLowerCase().includes(searchQuery) || student.username.toLowerCase().includes(searchQuery);
-                return matchesClass && matchesSearch;
-            });
-
-            if (filtered.length === 0) {
-                listDiv.innerHTML = `<p class="sidebar-message">No students found matching your filters.</p>`;
-                return;
-            }
-
-            filtered.forEach(student => {
-                const btn = document.createElement('button');
-                btn.className = 'student-btn' + (activeStudent && activeStudent.uid === student.uid ? ' active' : '');
-                btn.innerHTML = `
-                    <span>${escapeHtml(student.fullName)}<br><small style="font-weight:normal; opacity:0.8;">@${escapeHtml(student.username)}</small></span>
-                    <span class="class-pill">${escapeHtml(student.className)}</span>
-                `;
-                btn.onclick = () => {
-                    activeStudent = student;
-                    renderSidebar();
-                    loadStudentPortfolio(student);
-                };
-                listDiv.appendChild(btn);
-            });
+            document.getElementById('stamp-error-msg').style.display = 'none';
+            document.getElementById('stamp-password-input').value = '';
+            document.getElementById('stamp-modal').style.display = 'flex';
+            document.getElementById('stamp-password-input').focus();
         }
 
-        async function loadStudentPortfolio(student) {
-            const viewDiv = document.getElementById('work-view');
-            const requestId = ++portfolioRequestId;
-            viewDiv.innerHTML = `<h3 style="color:#1e3a8a;">Loading visual worksheets for ${escapeHtml(student.fullName)}...</h3>`;
+        function closeStampModal() {
+            document.getElementById('stamp-modal').style.display = 'none';
+        }
 
-            try {
-                const lessonsSnap = await db.collection('users').doc(student.uid).collection('lessons').get();
-                if (requestId !== portfolioRequestId || !activeStudent || activeStudent.uid !== student.uid) return;
-
-                let lessons = [];
-                activeLessonsCache = {};
-                lessonsSnap.forEach(doc => {
-                    const obj = { id: doc.id, ...doc.data() };
-                    lessons.push(obj);
-                    activeLessonsCache[doc.id] = obj;
-                });
-
-                lessons.sort((a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0));
-
-                let html = `
-                    <div class="student-header">
-                        <div>
-                            <h2 style="margin:0; color:#1e3a8a;">${escapeHtml(student.fullName)}</h2>
-                            <p style="margin:5px 0 0 0; color:#64748b; font-weight:bold;">Completed Lessons: <strong style="color:#1e3a8a;">${lessons.length}</strong></p>
-                        </div>
-                        <button class="btn-gold" onclick="refreshActivePortfolio()">Refresh Work</button>
-                    </div>
-                `;
-
-                if (lessons.length === 0) {
-                    html += `<div style="text-align:center; padding:50px 20px; background:#f8f9fa; border-radius:8px; border:2px dashed #cbd5e1;"><h3 style="color:#64748b;">No Cloud Work Saved Yet</h3></div>`;
-                    viewDiv.innerHTML = html;
-                    return;
-                }
-
-                html += `<div id="lessons-accordion-container">`;
-                lessons.forEach((lesson, index) => {
-                    html += renderVisualWorksheetCard(student, lesson, index);
-                });
-                html += `</div>`;
-                viewDiv.innerHTML = html;
-            } catch (err) {
-                console.error('Error loading portfolio:', err);
+        function submitStampPasscode() {
+            const val = document.getElementById('stamp-password-input').value.trim().toLowerCase();
+            if (val === TEACHER_PASSCODE.toLowerCase()) {
+                closeStampModal();
+                unlockStampMode();
+            } else {
+                document.getElementById('stamp-error-msg').style.display = 'block';
             }
         }
 
-        /* --- GROUP ITEMS INTO VISUAL RAGB WORKSHEET CARDS --- */
-        function detectSectionStyle(classStr, idx, total) {
-            const c = (classStr || '').toLowerCase();
-            if (c.includes('red-input') || c.includes('maroon')) return { key: 'maroon', title: 'Red Task', css: 'ws-maroon' };
-            if (c.includes('amber-input')) return { key: 'amber', title: 'Amber Task', css: 'ws-amber' };
-            if (c.includes('green-input')) return { key: 'green', title: 'Green Task', css: 'ws-green' };
-            if (c.includes('navy-input') || c.includes('blue-input')) return { key: 'navy', title: 'Blue Task', css: 'ws-navy' };
-            if (idx >= total - 3) return { key: 'plenary', title: 'Lesson Plenary', css: 'ws-plenary' };
-            return { key: 'prep', title: 'Lesson Preparation & Notes', css: 'ws-prep' };
+        function unlockStampMode() {
+            stampsUnlocked = true;
+            document.getElementById('unlock-stamps-btn').style.display = 'none';
+            document.getElementById('stamp-palette').style.display = 'flex';
+            renderStamps();
         }
 
-        function renderStampBadge(studentUid, lessonId, stamp) {
-            const cls = stamp.type === 'comment' ? 'ws-stamp-comment' : `ws-stamp-${stamp.type || 'assisted'}`;
-            return `
-                <span class="ws-stamp ${cls}">
-                    ${escapeHtml(stamp.text)}
-                    <button class="ws-stamp-del" title="Remove stamp" onclick="removeMarkbookStamp('${studentUid}', '${lessonId}', '${stamp.id}')">×</button>
-                </span>
-            `;
+        function lockStampMode() {
+            stampsUnlocked = false;
+            activeStampType = null;
+            document.body.classList.remove('stamp-mode-active');
+            document.querySelectorAll('.stamp-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('stamp-palette').style.display = 'none';
+            document.getElementById('unlock-stamps-btn').style.display = 'inline-block';
+            renderStamps();
         }
 
-        function renderVisualWorksheetCard(student, lesson, index) {
-            const title = lesson.pageTitle || lesson.id.replace(/-/g, ' ');
-            const updatedDate = lesson.lastUpdated
-                ? new Date(lesson.lastUpdated).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
-                : 'Saved';
-
-            const stamps = Array.isArray(lesson.teacherStamps) ? lesson.teacherStamps : [];
-            let usedStampIds = new Set();
-
-            // Header Badges
-            let badgesHtml = '';
-            if (lesson.scoreText) badgesHtml += `<span class="status-badge badge-verified">${escapeHtml(lesson.scoreText)}</span>`;
-            stamps.forEach(s => {
-                const cls = s.type === 'comment' ? 'ws-stamp-comment' : `ws-stamp-${s.type || 'assisted'}`;
-                badgesHtml += `<span class="ws-stamp ${cls}" style="padding:2px 8px; font-size:11px; transform:none; box-shadow:none;">${escapeHtml(s.text)}</span>`;
-            });
-            badgesHtml += `<button class="btn-delete-lesson" onclick="event.stopPropagation(); deleteStudentLesson('${student.uid}', '${lesson.id}', '${escapeHtml(title)}')">🗑️ Delete</button>`;
-
-            let bodyHtml = '';
-            const items = Array.isArray(lesson.items) ? lesson.items : [];
-
-            if (items.length > 0) {
-                // Group questions into visual RAGB cards
-                const sections = [];
-                items.forEach((item, idx) => {
-                    const rawClass = lesson['class_' + idx] || '';
-                    const secInfo = detectSectionStyle(rawClass, idx, items.length);
-                    let lastSec = sections[sections.length - 1];
-                    if (!lastSec || lastSec.key !== secInfo.key) {
-                        lastSec = { ...secInfo, rows: [] };
-                        sections.push(lastSec);
-                    }
-                    lastSec.rows.push({ item, idx });
-                });
-
-                sections.forEach(sec => {
-                    // Find any stamps pinned to this card's heading (e.g. "Amber Task: 4-Bit...")
-                    const cardStamps = stamps.filter(s => !usedStampIds.has(s.id) && s.targetLabel && s.targetLabel.toLowerCase().startsWith(sec.title.toLowerCase()));
-                    cardStamps.forEach(s => usedStampIds.add(s.id));
-
-                    let cardStampsHtml = cardStamps.length > 0
-                        ? `<div class="pinned-stamps-bar">${cardStamps.map(s => renderStampBadge(student.uid, lesson.id, s)).join('')}</div>`
-                        : '';
-
-                    let rowsHtml = '';
-                    sec.rows.forEach(({ item, idx }) => {
-                        const labelText = item.label || `Question ${idx + 1}`;
-                        const val = (item.value || '').trim();
-                        const isEmpty = val === '';
-                        let boxClass = 'ws-input-box' + (isEmpty ? ' empty' : '');
-                        if (item.status === 'correct') boxClass += ' correct';
-                        else if (item.status === 'incorrect') boxClass += ' incorrect';
-
-                        // Find any stamps pinned directly to this exact question row
-                        const rowStamps = stamps.filter(s => !usedStampIds.has(s.id) && s.targetLabel && s.targetLabel === labelText);
-                        rowStamps.forEach(s => usedStampIds.add(s.id));
-
-                        const rowStampsHtml = rowStamps.length > 0
-                            ? `<div class="pinned-stamps-bar">${rowStamps.map(s => renderStampBadge(student.uid, lesson.id, s)).join('')}</div>`
-                            : '';
-
-                        rowsHtml += `
-                            <div class="ws-question-row">
-                                ${rowStampsHtml}
-                                <div class="ws-label">
-                                    <span>${escapeHtml(labelText)}</span>
-                                    <button class="btn-add-row-stamp" onclick="addMarkbookStamp('${student.uid}', '${lesson.id}', '${escapeHtml(labelText)}')">+ Stamp / Note</button>
-                                </div>
-                                <div class="${boxClass}">${isEmpty ? '(Left blank)' : escapeHtml(val)}</div>
-                            </div>
-                        `;
-                    });
-
-                    bodyHtml += `
-                        <div class="ws-card ${sec.css}">
-                            <h3>${escapeHtml(sec.title)}</h3>
-                            ${cardStampsHtml}
-                            ${rowsHtml}
-                        </div>
-                    `;
-                });
+        function selectStamp(type, btnEl) {
+            if (activeStampType === type) {
+                activeStampType = null;
+                btnEl.classList.remove('active');
+                document.body.classList.remove('stamp-mode-active');
+            } else {
+                activeStampType = type;
+                document.querySelectorAll('.stamp-btn').forEach(b => b.classList.remove('active'));
+                btnEl.classList.add('active');
+                document.body.classList.add('stamp-mode-active');
             }
-
-            // Any general stamps placed on the page that didn't match a specific row
-            const generalStamps = stamps.filter(s => !usedStampIds.has(s.id));
-            if (generalStamps.length > 0) {
-                bodyHtml = `
-                    <div class="ws-card" style="border-top: 6px solid #1e3a8a;">
-                        <h3 style="color:#1e3a8a; margin-top:0;">📌 General Page Stamps</h3>
-                        <div class="pinned-stamps-bar">
-                            ${generalStamps.map(s => renderStampBadge(student.uid, lesson.id, s)).join('')}
-                        </div>
-                    </div>
-                ` + bodyHtml;
-            }
-
-            // Render any pasted screenshots
-            ['maroon', 'amber', 'green', 'navy'].forEach(zone => {
-                const imgKey = 'img_' + zone;
-                if (lesson[imgKey] && String(lesson[imgKey]).startsWith('data:image')) {
-                    bodyHtml += `
-                        <div class="ws-card ws-${zone}">
-                            <h3>📸 Task Screenshot (${zone.toUpperCase()})</h3>
-                            <img class="screenshot-img" src="${lesson[imgKey]}" alt="Student Screenshot">
-                        </div>
-                    `;
-                }
-            });
-
-            if (!bodyHtml) {
-                bodyHtml = `<p style="color:#94a3b8; font-style:italic; margin:0;">Student opened this lesson, but no inputs were recorded.</p>`;
-            }
-
-            return `
-                <div class="lesson-card" id="lesson-card-${index}">
-                    <div class="lesson-card-header" onclick="toggleLessonCard(${index})">
-                        <div class="lesson-title-wrap">
-                            <span class="chevron">&#9654;</span>
-                            <span>${escapeHtml(title)}</span>
-                        </div>
-                        <div style="display:flex; align-items:center; flex-wrap:wrap; gap: 6px;">
-                            ${badgesHtml}
-                            <span class="lesson-meta">${updatedDate}</span>
-                        </div>
-                    </div>
-                    <div class="lesson-card-body">
-                        ${bodyHtml}
-                    </div>
-                </div>
-            `;
         }
 
-        /* --- ADD / REMOVE STAMPS DIRECTLY INSIDE THE MARKBOOK --- */
-        async function addMarkbookStamp(studentUid, lessonId, targetLabel) {
-            const choice = prompt("Choose a stamp number or type a custom comment:\n1 = 🤝 Teacher Assisted\n2 = ✍️ SPaG Issues\n3 = 🏆 Proud Thursday Given\nOr type any custom comment:");
-            if (!choice || !choice.trim()) return;
+        // Click inside any task card to place a stamp and snap a PNG screenshot of that card
+        document.getElementById('main-workspace').addEventListener('click', async function(e) {
+            if (!stampsUnlocked || !activeStampType) return;
+            if (e.target.closest('.teacher-stamp')) return;
 
-            let type = 'comment';
-            let text = "💬 " + choice.trim();
-            if (choice.trim() === '1') { type = 'assisted'; text = "🤝 Teacher Assisted"; }
-            else if (choice.trim() === '2') { type = 'spag'; text = "✍️ SPaG Issues"; }
-            else if (choice.trim() === '3') { type = 'proud'; text = "🏆 Proud Thursday Given"; }
+            const card = e.target.closest('.task-card[id]');
+            if (!card) return;
 
-            const lesson = activeLessonsCache[lessonId] || {};
-            const updatedStamps = Array.isArray(lesson.teacherStamps) ? [...lesson.teacherStamps] : [];
-            updatedStamps.push({
+            e.preventDefault();
+            e.stopPropagation();
+
+            const rect = card.getBoundingClientRect();
+            const xPercent = (((e.clientX - rect.left) / rect.width) * 100).toFixed(2);
+            const yPercent = (((e.clientY - rect.top) / rect.height) * 100).toFixed(2);
+
+            let targetLabel = card.getAttribute('data-card-title') || card.id;
+            const row = e.target.closest('.question-row');
+            if (row && row.querySelector('.question-label')) {
+                targetLabel = row.querySelector('.question-label').innerText.replace(/\s+/g, ' ').trim();
+            }
+
+            let labelText = "";
+            if (activeStampType === 'comment') {
+                const note = prompt("Enter teacher comment:");
+                if (!note || !note.trim()) return;
+                labelText = "💬 " + note.trim();
+            } else {
+                labelText = STAMP_PRESETS[activeStampType].text;
+            }
+
+            placedStamps.push({
                 id: Date.now().toString(),
-                type,
-                text,
-                targetLabel,
-                x: "50",
-                y: "50"
+                cardId: card.id,
+                type: activeStampType,
+                text: labelText,
+                targetLabel: targetLabel,
+                x: xPercent,
+                y: yPercent
             });
 
-            await db.collection('users').doc(studentUid).collection('lessons').doc(lessonId)
-                .set({ teacherStamps: updatedStamps, lastUpdated: Date.now() }, { merge: true });
-            refreshActivePortfolio();
-        }
+            renderStamps();
+            await captureCardSnapshot(card);
+        }, true);
 
-        async function removeMarkbookStamp(studentUid, lessonId, stampId) {
-            const lesson = activeLessonsCache[lessonId] || {};
-            const updatedStamps = (lesson.teacherStamps || []).filter(s => s.id !== stampId);
-            await db.collection('users').doc(studentUid).collection('lessons').doc(lessonId)
-                .set({ teacherStamps: updatedStamps }, { merge: true });
-            refreshActivePortfolio();
-        }
+        async function removeStamp(stampId, cardId) {
+            if (!stampsUnlocked) return;
+            placedStamps = placedStamps.filter(s => s.id !== stampId);
+            renderStamps();
 
-        async function deleteStudentLesson(studentUid, lessonId, lessonTitle) {
-            if (confirm(`Delete "${lessonTitle}" for this student?`)) {
-                await db.collection('users').doc(studentUid).collection('lessons').doc(lessonId).delete();
-                refreshActivePortfolio();
+            const card = document.getElementById(cardId);
+            const remainingOnCard = placedStamps.some(s => s.cardId === cardId);
+            if (!remainingOnCard) {
+                delete stampSnapshots[cardId];
+                saveStampsAndSnapshotsToCloud();
+            } else if (card) {
+                await captureCardSnapshot(card);
             }
         }
 
-        function refreshActivePortfolio() {
-            if (activeStudent) loadStudentPortfolio(activeStudent);
+        function renderStamps() {
+            // Remove existing rendered stamps from all task cards
+            document.querySelectorAll('.teacher-stamp').forEach(el => el.remove());
+
+            placedStamps.forEach(stamp => {
+                const card = document.getElementById(stamp.cardId);
+                if (!card) return;
+
+                const badge = document.createElement('div');
+                const styleClass = stamp.type === 'comment' ? 'stamp-comment' : (STAMP_PRESETS[stamp.type]?.className || 'stamp-assisted');
+                badge.className = `teacher-stamp ${styleClass} ${stampsUnlocked ? 'unlocked' : ''}`;
+                badge.style.left = stamp.x + '%';
+                badge.style.top = stamp.y + '%';
+                badge.innerText = stamp.text;
+                if (stampsUnlocked) {
+                    badge.title = "Click to remove stamp";
+                    badge.onclick = function(ev) {
+                        ev.stopPropagation();
+                        removeStamp(stamp.id, stamp.cardId);
+                    };
+                }
+                card.appendChild(badge);
+            });
         }
 
-        function toggleLessonCard(index) {
-            const clickedCard = document.getElementById(`lesson-card-${index}`);
-            if (!clickedCard) return;
-            const isAlreadyOpen = clickedCard.classList.contains('open');
-            document.querySelectorAll('.lesson-card').forEach(card => card.classList.remove('open'));
-            if (!isAlreadyOpen) clickedCard.classList.add('open');
+        /* --- CAPTURE REAL PNG SCREENSHOT OF STAMPED TASK CARD --- */
+        async function captureCardSnapshot(cardEl) {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            showToast("⏳ Capturing screenshot for Markbook...");
+
+            // Temporarily hide dashed outline & delete icons so the screenshot is clean
+            document.body.classList.remove('stamp-mode-active');
+            document.querySelectorAll('.teacher-stamp').forEach(b => b.classList.remove('unlocked'));
+
+            try {
+                const canvas = await html2canvas(cardEl, {
+                    scale: 0.75, // Keeps file size small enough for Firestore (<1MB) while staying crisp
+                    backgroundColor: "#ffffff",
+                    useCORS: true,
+                    ignoreElements: (el) => el.classList && el.classList.contains('no-print')
+                });
+
+                const dataUrl = canvas.toDataURL("image/jpeg", 0.75);
+                stampSnapshots[cardEl.id] = {
+                    title: cardEl.getAttribute('data-card-title') || cardEl.id,
+                    image: dataUrl,
+                    updatedAt: Date.now()
+                };
+
+                await saveStampsAndSnapshotsToCloud();
+                showToast("📸 Screenshot & Stamp saved to Markbook!");
+            } catch (err) {
+                console.error("Snapshot capture failed:", err);
+                await saveStampsAndSnapshotsToCloud();
+            } finally {
+                if (stampsUnlocked && activeStampType) document.body.classList.add('stamp-mode-active');
+                if (stampsUnlocked) document.querySelectorAll('.teacher-stamp').forEach(b => b.classList.add('unlocked'));
+            }
         }
 
-        function escapeHtml(str) {
-            return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        async function saveStampsAndSnapshotsToCloud() {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
+                .set({
+                    teacherStamps: placedStamps,
+                    stampSnapshots: stampSnapshots,
+                    lastUpdated: Date.now()
+                }, { merge: true })
+                .catch(err => console.error("Error saving stamps/snapshots:", err));
         }
 
-        window.onload = fetchStudents;
+        /* --- 3. HELPER FOR TEACHER MARKBOOK LABELS --- */
+        function findLabelForInput(el, index) {
+            const row = el.closest('.question-row');
+            if (row) {
+                const lbl = row.querySelector('.question-label');
+                if (lbl && lbl.innerText.trim()) {
+                    return lbl.innerText.replace(/\s+/g, ' ').trim();
+                }
+            }
+            if (el.placeholder) return el.placeholder;
+            return 'Question ' + (index + 1);
+        }
+
+        /* --- 4. FIREBASE AUTO-SAVE LOGIC --- */
+        let saveTimer;
+        function saveProgress(immediate = false) {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            var inputs = document.querySelectorAll('.auto-input');
+            var dataToSave = {
+                pageTitle: document.title || LESSON_ID,
+                lastUpdated: Date.now(),
+                items: []
+            };
+
+            var correctCount = 0;
+            var totalGradable = 0;
+
+            for (var i = 0; i < inputs.length; i++) {
+                var el = inputs[i];
+                var cls = el.className || '';
+                var status = 'neutral';
+
+                if (el.hasAttribute('data-answers')) {
+                    totalGradable++;
+                    if (cls.includes('input-correct')) {
+                        status = 'correct';
+                        correctCount++;
+                    } else if (cls.includes('input-incorrect')) {
+                        status = 'incorrect';
+                    }
+                }
+
+                dataToSave['input_' + i] = el.value;
+                dataToSave['class_' + i] = cls;
+
+                dataToSave.items.push({
+                    index: i,
+                    label: findLabelForInput(el, i),
+                    value: el.value,
+                    status: status
+                });
+            }
+
+            if (totalGradable > 0) {
+                dataToSave.scoreText = "Score: " + correctCount + " / " + totalGradable;
+            }
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(function() {
+                db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
+                  .set(dataToSave, { merge: true })
+                  .catch(function(err) { console.error("Cloud save error:", err); });
+            }, immediate ? 50 : 800);
+        }
+
+        /* --- 5. FIREBASE AUTO-LOAD LOGIC --- */
+        function applySavedData(data) {
+            var inputs = document.querySelectorAll('.auto-input');
+            for (var i = 0; i < inputs.length; i++) {
+                var savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined) {
+                    inputs[i].value = savedVal;
+                    if (inputs[i].tagName.toLowerCase() === 'textarea') {
+                        inputs[i].style.height = 'auto';
+                        inputs[i].style.height = inputs[i].scrollHeight + 'px';
+                    }
+                }
+            }
+
+            if (Array.isArray(data.teacherStamps)) {
+                placedStamps = data.teacherStamps;
+                renderStamps();
+            }
+            if (data.stampSnapshots && typeof data.stampSnapshots === 'object') {
+                stampSnapshots = data.stampSnapshots;
+            }
+
+            checkAnswers('red-input', false);
+            checkAnswers('amber-input', false);
+            checkAnswers('green-input', false);
+            checkAnswers('navy-input', false);
+        }
+
+        auth.onAuthStateChanged(async function(user) {
+            if (user) {
+                try {
+                    try { localStorage.removeItem('denaryToBinaryMemory'); } catch (e) {}
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud work:", err);
+                }
+            }
+        });
+
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                saveProgress(false);
+                if (e.target.tagName.toLowerCase() === 'textarea') {
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                }
+            }
+        });
+
+        async function clearData() {
+            if (confirm("Are you sure you want to clear all your work on this page?")) {
+                try { localStorage.removeItem('denaryToBinaryMemory'); } catch (e) {}
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
+                    } catch (err) {
+                        console.error("Error clearing cloud data:", err);
+                    }
+                }
+                window.location.reload();
+            }
+        }
+
+        /* --- 6. BATCH-MARKING TEXT INPUT LOGIC --- */
+        function checkAnswers(groupClass, triggerSync = true) {
+            var inputs = document.getElementsByClassName(groupClass);
+            
+            for (var i = 0; i < inputs.length; i++) {
+                var inputElement = inputs[i];
+                var studentAnswer = inputElement.value.toLowerCase().trim();
+                
+                if (!inputElement.hasAttribute('data-answers')) continue;
+                
+                var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers'));
+                var isCorrect = false;
+                
+                for (var j = 0; j < acceptedAnswers.length; j++) {
+                    if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
+                        isCorrect = true;
+                        break;
+                    }
+                }
+
+                inputElement.classList.remove('input-correct', 'input-incorrect');
+
+                if (studentAnswer !== "") {
+                    if (isCorrect) {
+                        inputElement.classList.add('input-correct');
+                    } else {
+                        inputElement.classList.add('input-incorrect');
+                    }
+                }
+            }
+
+            if (triggerSync) {
+                saveProgress(true);
+            }
+        }
     </script>
 </body>
 </html>
