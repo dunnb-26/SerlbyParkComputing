@@ -11,6 +11,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
+    <!-- html2canvas for Automatic Task Snapshots -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <style>
         /* Task Container Styling */
         .task-container { max-width: 900px; margin: 30px auto; padding: 20px; position: relative; }
@@ -21,7 +24,8 @@
             padding: 25px; 
             margin-bottom: 30px; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-            page-break-inside: avoid; 
+            page-break-inside: avoid;
+            position: relative;
         }
         
         /* Section Header Colors */
@@ -91,16 +95,6 @@
         body.stamp-mode-active { cursor: crosshair !important; }
         body.stamp-mode-active .task-card { outline: 2px dashed #1e3a8a; }
 
-        #stamp-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none; /* Lets students click inputs underneath */
-            z-index: 500;
-        }
-
         .teacher-stamp {
             position: absolute;
             transform: translate(-50%, -50%) rotate(-3deg);
@@ -113,6 +107,7 @@
             user-select: none;
             white-space: nowrap;
             border: 2px solid;
+            z-index: 500;
             transition: transform 0.15s ease;
         }
 
@@ -166,11 +161,24 @@
             border-color: white;
             box-shadow: 0 0 0 2px #dfaa2b;
         }
-        .stamp-btn-exit {
-            background: #d32f2f;
-            color: white;
-        }
+        .stamp-btn-exit { background: #d32f2f; color: white; }
         .stamp-btn-exit:hover { background: #b71c1c; }
+
+        /* Snapshot Toast Indicator */
+        #snapshot-toast {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #008f39;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            z-index: 1100;
+        }
 
         /* Passcode Modal */
         .modal-overlay {
@@ -217,11 +225,9 @@
         </header>
 
         <main class="task-container" id="main-workspace">
-            <!-- LAYER WHERE CLICKED STAMPS APPEAR -->
-            <div id="stamp-layer"></div>
 
             <!-- PREPARATION: Keywords & Notes -->
-            <div class="task-card task-prep">
+            <div class="task-card task-prep" id="card-prep" data-card-title="Lesson Preparation">
                 <h2>Lesson Preparation</h2>
                 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">4 Key Words</h3>
@@ -249,7 +255,7 @@
             </div>
 
             <!-- RED TASK: Gap Fill -->
-            <div class="task-card task-maroon">
+            <div class="task-card task-maroon" id="card-maroon" data-card-title="Red Task: Denary to Binary Rules">
                 <h2>Red Task: Denary to Binary Rules</h2>
                 <div class="instruction-box">
                     Complete the sentences about converting denary to binary. Type the correct word or number into the boxes.
@@ -273,7 +279,7 @@
             </div>
 
             <!-- AMBER TASK: 4-Bit Denary to Binary (12 Questions) -->
-            <div class="task-card task-amber">
+            <div class="task-card task-amber" id="card-amber" data-card-title="Amber Task: 4-Bit Denary to Binary">
                 <h2>Amber Task: 4-Bit Denary to Binary</h2>
                 <div class="instruction-box">
                     Convert the denary numbers into 4-bit binary codes.
@@ -345,7 +351,7 @@
             </div>
 
             <!-- GREEN TASK: 8-Bit Denary to Binary (12 Questions) -->
-            <div class="task-card task-green">
+            <div class="task-card task-green" id="card-green" data-card-title="Green Task: 8-Bit Denary to Binary">
                 <h2>Green Task: 8-Bit Denary to Binary</h2>
                 <div class="instruction-box">
                     Convert the denary numbers into 8-bit binary codes using the subtraction method.
@@ -417,7 +423,7 @@
             </div>
 
             <!-- BLUE TASK: Conversion Reasoning (8 Questions) -->
-            <div class="task-card task-navy">
+            <div class="task-card task-navy" id="card-navy" data-card-title="Blue Task: Conversion Reasoning">
                 <h2>Blue Task: Conversion Reasoning</h2>
                 <div class="instruction-box">
                     Answer the following questions about how denary to binary conversions work.
@@ -474,7 +480,7 @@
             </div>
 
             <!-- PLENARY: 3 Key Takeaways -->
-            <div class="task-card task-plenary">
+            <div class="task-card task-plenary" id="card-plenary" data-card-title="Lesson Plenary">
                 <h2>Lesson Plenary</h2>
                 <h3 style="color: #444; margin-bottom: 15px;">My 3 Key Takeaways</h3>
                 
@@ -500,11 +506,14 @@
         <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
     </div>
 
+    <!-- SNAPSHOT TOAST -->
+    <div id="snapshot-toast" class="no-print">📸 Snapshot saved to Teacher Markbook!</div>
+
     <!-- FLOATING TEACHER STAMP TOOLBAR -->
     <div class="teacher-toolbar no-print" id="teacher-toolbar">
         <button class="stamp-btn" id="unlock-stamps-btn" onclick="openStampModal()">👨‍🏫 Teacher Stamps</button>
         <div id="stamp-palette" style="display: none; gap: 6px; flex-wrap: wrap; align-items: center;">
-            <span style="font-size: 12px; font-weight: bold; margin-right: 4px;">Click page to stamp:</span>
+            <span style="font-size: 12px; font-weight: bold; margin-right: 4px;">Click any task card to stamp & capture screenshot:</span>
             <button class="stamp-btn" data-type="assisted" onclick="selectStamp('assisted', this)">🤝 Teacher Assisted</button>
             <button class="stamp-btn" data-type="spag" onclick="selectStamp('spag', this)">✍️ SPaG Issues</button>
             <button class="stamp-btn" data-type="proud" onclick="selectStamp('proud', this)">🏆 Proud Thursday Given</button>
@@ -549,12 +558,13 @@
         const db = firebase.firestore();
 
         const LESSON_ID = "denary-to-binary-lesson";
-        const TEACHER_PASSCODE = "delta"; // Change passcode here if needed
+        const TEACHER_PASSCODE = "delta";
 
-        /* --- 2. TEACHER STAMP & COMMENT SYSTEM --- */
+        /* --- 2. TEACHER STAMP & PNG SNAPSHOT SYSTEM --- */
         let stampsUnlocked = false;
         let activeStampType = null;
         let placedStamps = [];
+        let stampSnapshots = {}; // Stores real PNG screenshots keyed by task card ID
 
         const STAMP_PRESETS = {
             assisted: { text: "🤝 Teacher Assisted", className: "stamp-assisted" },
@@ -562,8 +572,15 @@
             proud:    { text: "🏆 Proud Thursday Given", className: "stamp-proud" }
         };
 
+        function showToast(msg) {
+            const toast = document.getElementById('snapshot-toast');
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 2800);
+        }
+
         function openStampModal() {
-            if (stampsUnlocked || sessionStorage.getItem('teacherMode') === 'true') {
+            if (stampsUnlocked) {
                 unlockStampMode();
                 return;
             }
@@ -617,29 +634,25 @@
             }
         }
 
-        // Listen for clicks inside the main lesson container when a stamp is active
-        document.getElementById('main-workspace').addEventListener('click', function(e) {
+        // Click inside any task card to place a stamp and snap a PNG screenshot of that card
+        document.getElementById('main-workspace').addEventListener('click', async function(e) {
             if (!stampsUnlocked || !activeStampType) return;
-            if (e.target.closest('.teacher-stamp')) return; // Ignore clicks on existing stamps
+            if (e.target.closest('.teacher-stamp')) return;
+
+            const card = e.target.closest('.task-card[id]');
+            if (!card) return;
 
             e.preventDefault();
             e.stopPropagation();
 
-            const workspace = document.getElementById('main-workspace');
-            const rect = workspace.getBoundingClientRect();
-
-            // Store coordinates as percentages so stamps stay aligned across screen sizes
+            const rect = card.getBoundingClientRect();
             const xPercent = (((e.clientX - rect.left) / rect.width) * 100).toFixed(2);
             const yPercent = (((e.clientY - rect.top) / rect.height) * 100).toFixed(2);
 
-            // Detect which question or task card the teacher clicked near for the markbook
-            let targetLabel = "";
+            let targetLabel = card.getAttribute('data-card-title') || card.id;
             const row = e.target.closest('.question-row');
-            const card = e.target.closest('.task-card');
             if (row && row.querySelector('.question-label')) {
                 targetLabel = row.querySelector('.question-label').innerText.replace(/\s+/g, ' ').trim();
-            } else if (card && card.querySelector('h2')) {
-                targetLabel = card.querySelector('h2').innerText.replace(/\s+/g, ' ').trim();
             }
 
             let labelText = "";
@@ -653,6 +666,7 @@
 
             placedStamps.push({
                 id: Date.now().toString(),
+                cardId: card.id,
                 type: activeStampType,
                 text: labelText,
                 targetLabel: targetLabel,
@@ -661,21 +675,32 @@
             });
 
             renderStamps();
-            saveStampsToCloud();
+            await captureCardSnapshot(card);
         }, true);
 
-        function removeStamp(stampId) {
+        async function removeStamp(stampId, cardId) {
             if (!stampsUnlocked) return;
             placedStamps = placedStamps.filter(s => s.id !== stampId);
             renderStamps();
-            saveStampsToCloud();
+
+            const card = document.getElementById(cardId);
+            const remainingOnCard = placedStamps.some(s => s.cardId === cardId);
+            if (!remainingOnCard) {
+                delete stampSnapshots[cardId];
+                saveStampsAndSnapshotsToCloud();
+            } else if (card) {
+                await captureCardSnapshot(card);
+            }
         }
 
         function renderStamps() {
-            const layer = document.getElementById('stamp-layer');
-            layer.innerHTML = '';
+            // Remove existing rendered stamps from all task cards
+            document.querySelectorAll('.teacher-stamp').forEach(el => el.remove());
 
             placedStamps.forEach(stamp => {
+                const card = document.getElementById(stamp.cardId);
+                if (!card) return;
+
                 const badge = document.createElement('div');
                 const styleClass = stamp.type === 'comment' ? 'stamp-comment' : (STAMP_PRESETS[stamp.type]?.className || 'stamp-assisted');
                 badge.className = `teacher-stamp ${styleClass} ${stampsUnlocked ? 'unlocked' : ''}`;
@@ -686,23 +711,61 @@
                     badge.title = "Click to remove stamp";
                     badge.onclick = function(ev) {
                         ev.stopPropagation();
-                        removeStamp(stamp.id);
+                        removeStamp(stamp.id, stamp.cardId);
                     };
                 }
-                layer.appendChild(badge);
+                card.appendChild(badge);
             });
         }
 
-        function saveStampsToCloud() {
-            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
-            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
-            const targetUid = (isTeacher && inspectedUid) ? inspectedUid : (auth.currentUser ? auth.currentUser.uid : null);
+        /* --- CAPTURE REAL PNG SCREENSHOT OF STAMPED TASK CARD --- */
+        async function captureCardSnapshot(cardEl) {
+            const user = auth.currentUser;
+            if (!user) return;
 
-            if (!targetUid) return;
+            showToast("⏳ Capturing screenshot for Markbook...");
 
-            db.collection("users").doc(targetUid).collection("lessons").doc(LESSON_ID)
-              .set({ teacherStamps: placedStamps, lastUpdated: Date.now() }, { merge: true })
-              .catch(err => console.error("Error saving teacher stamps:", err));
+            // Temporarily hide dashed outline & delete icons so the screenshot is clean
+            document.body.classList.remove('stamp-mode-active');
+            document.querySelectorAll('.teacher-stamp').forEach(b => b.classList.remove('unlocked'));
+
+            try {
+                const canvas = await html2canvas(cardEl, {
+                    scale: 0.75, // Keeps file size small enough for Firestore (<1MB) while staying crisp
+                    backgroundColor: "#ffffff",
+                    useCORS: true,
+                    ignoreElements: (el) => el.classList && el.classList.contains('no-print')
+                });
+
+                const dataUrl = canvas.toDataURL("image/jpeg", 0.75);
+                stampSnapshots[cardEl.id] = {
+                    title: cardEl.getAttribute('data-card-title') || cardEl.id,
+                    image: dataUrl,
+                    updatedAt: Date.now()
+                };
+
+                await saveStampsAndSnapshotsToCloud();
+                showToast("📸 Screenshot & Stamp saved to Markbook!");
+            } catch (err) {
+                console.error("Snapshot capture failed:", err);
+                await saveStampsAndSnapshotsToCloud();
+            } finally {
+                if (stampsUnlocked && activeStampType) document.body.classList.add('stamp-mode-active');
+                if (stampsUnlocked) document.querySelectorAll('.teacher-stamp').forEach(b => b.classList.add('unlocked'));
+            }
+        }
+
+        async function saveStampsAndSnapshotsToCloud() {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
+                .set({
+                    teacherStamps: placedStamps,
+                    stampSnapshots: stampSnapshots,
+                    lastUpdated: Date.now()
+                }, { merge: true })
+                .catch(err => console.error("Error saving stamps/snapshots:", err));
         }
 
         /* --- 3. HELPER FOR TEACHER MARKBOOK LABELS --- */
@@ -722,7 +785,7 @@
         let saveTimer;
         function saveProgress(immediate = false) {
             const user = auth.currentUser;
-            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+            if (!user) return;
 
             var inputs = document.querySelectorAll('.auto-input');
             var dataToSave = {
@@ -789,13 +852,14 @@
                 }
             }
 
-            // Load any saved Teacher Stamps
             if (Array.isArray(data.teacherStamps)) {
                 placedStamps = data.teacherStamps;
                 renderStamps();
             }
+            if (data.stampSnapshots && typeof data.stampSnapshots === 'object') {
+                stampSnapshots = data.stampSnapshots;
+            }
 
-            // Re-mark previously saved answers without triggering a redundant save
             checkAnswers('red-input', false);
             checkAnswers('amber-input', false);
             checkAnswers('green-input', false);
@@ -803,23 +867,9 @@
         }
 
         auth.onAuthStateChanged(async function(user) {
-            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
-            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
-
-            if (isTeacher && inspectedUid) {
-                try {
-                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
-                    if (doc.exists) applySavedData(doc.data());
-                } catch (err) {
-                    console.error("Error loading inspected student data:", err);
-                }
-                return;
-            }
-
             if (user) {
                 try {
                     try { localStorage.removeItem('denaryToBinaryMemory'); } catch (e) {}
-
                     const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
                     if (doc.exists) {
                         applySavedData(doc.data());
