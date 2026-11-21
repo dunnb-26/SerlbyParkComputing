@@ -87,91 +87,6 @@
         .btn-submit:hover { background-color: #152960; }
         .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
         .btn-pdf:hover { background-color: #124d2d; }
-
-        /* --- TEACHER STAMP & ANNOTATION SYSTEM --- */
-        body.stamp-mode-active { cursor: crosshair !important; }
-        body.stamp-mode-active .task-card { outline: 2px dashed #1e3a8a; }
-
-        .teacher-stamp {
-            position: absolute;
-            transform: translate(-50%, -50%) rotate(-3deg);
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: bold;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.22);
-            pointer-events: auto;
-            user-select: none;
-            white-space: nowrap;
-            border: 2px solid;
-            z-index: 500;
-            transition: transform 0.15s ease;
-        }
-        .teacher-stamp.unlocked:hover {
-            transform: translate(-50%, -50%) scale(1.06);
-            cursor: pointer;
-        }
-        .teacher-stamp.unlocked:hover::after {
-            content: " ✖";
-            color: #d32f2f;
-        }
-
-        .stamp-assisted { background: #e3f2fd; color: #0d47a1; border-color: #1976d2; }
-        .stamp-spag     { background: #fff3e0; color: #e65100; border-color: #f57c00; }
-        .stamp-proud    { background: #fff8e1; color: #7f6000; border-color: #dfaa2b; }
-        .stamp-comment  { background: #f3e5f5; color: #4a148c; border-color: #8e24aa; white-space: normal; max-width: 220px; transform: translate(-50%, -50%) rotate(0deg); }
-
-        .teacher-toolbar {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #1e3a8a;
-            color: white;
-            padding: 12px 16px;
-            border-radius: 10px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-            z-index: 1000;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            align-items: center;
-            max-width: 92vw;
-        }
-        .stamp-btn {
-            background: white;
-            color: #1e3a8a;
-            border: 2px solid transparent;
-            padding: 7px 11px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        .stamp-btn:hover { background: #eef2ff; }
-        .stamp-btn.active {
-            background: #dfaa2b;
-            color: #1e3a8a;
-            border-color: white;
-            box-shadow: 0 0 0 2px #dfaa2b;
-        }
-        .stamp-btn-exit { background: #d32f2f; color: white; }
-        .stamp-btn-exit:hover { background: #b71c1c; }
-
-        #stamp-toast {
-            display: none;
-            position: fixed;
-            bottom: 80px;
-            right: 20px;
-            background: #008f39;
-            color: white;
-            padding: 9px 15px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: bold;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-            z-index: 1100;
-        }
     </style>
 </head>
 <body>
@@ -465,22 +380,6 @@
     <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
         <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
     </div>
-
-    <!-- TOAST FEEDBACK -->
-    <div id="stamp-toast" class="no-print">✅ Stamp saved to student's Markbook!</div>
-
-    <!-- FLOATING TEACHER STAMP TOOLBAR (NO PASSWORD) -->
-    <div class="teacher-toolbar no-print" id="teacher-toolbar">
-        <button class="stamp-btn" id="unlock-stamps-btn" onclick="unlockStampMode()">👨‍🏫 Teacher Stamps</button>
-        <div id="stamp-palette" style="display: none; gap: 6px; flex-wrap: wrap; align-items: center;">
-            <span style="font-size: 12px; font-weight: bold; margin-right: 4px;">Click any question to stamp:</span>
-            <button class="stamp-btn" data-type="assisted" onclick="selectStamp('assisted', this)">🤝 Teacher Assisted</button>
-            <button class="stamp-btn" data-type="spag" onclick="selectStamp('spag', this)">✍️ SPaG Issues</button>
-            <button class="stamp-btn" data-type="proud" onclick="selectStamp('proud', this)">🏆 Proud Thursday Given</button>
-            <button class="stamp-btn" data-type="comment" onclick="selectStamp('comment', this)">💬 Comment</button>
-            <button class="stamp-btn stamp-btn-exit" onclick="lockStampMode()">Done</button>
-        </div>
-    </div>
     
     <footer>
         &copy; 2026 Delta Serlby Park - Computing & Business Department
@@ -506,151 +405,7 @@
 
         const LESSON_ID = "denary-to-binary-lesson";
 
-        /* --- 2. TEACHER STAMP & COMMENT SYSTEM (PASSWORD-FREE) --- */
-        let stampsUnlocked = false;
-        let activeStampType = null;
-        let placedStamps = [];
-
-        const STAMP_PRESETS = {
-            assisted: { text: "🤝 Teacher Assisted", className: "stamp-assisted" },
-            spag:     { text: "✍️ SPaG Issues", className: "stamp-spag" },
-            proud:    { text: "🏆 Proud Thursday Given", className: "stamp-proud" }
-        };
-
-        function showToast(msg, isError = false) {
-            const toast = document.getElementById('stamp-toast');
-            toast.style.background = isError ? '#d32f2f' : '#008f39';
-            toast.innerText = msg;
-            toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 3200);
-        }
-
-        function unlockStampMode() {
-            stampsUnlocked = true;
-            document.getElementById('unlock-stamps-btn').style.display = 'none';
-            document.getElementById('stamp-palette').style.display = 'flex';
-            renderStamps();
-        }
-
-        function lockStampMode() {
-            stampsUnlocked = false;
-            activeStampType = null;
-            document.body.classList.remove('stamp-mode-active');
-            document.querySelectorAll('.stamp-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('stamp-palette').style.display = 'none';
-            document.getElementById('unlock-stamps-btn').style.display = 'inline-block';
-            renderStamps();
-        }
-
-        function selectStamp(type, btnEl) {
-            if (activeStampType === type) {
-                activeStampType = null;
-                btnEl.classList.remove('active');
-                document.body.classList.remove('stamp-mode-active');
-            } else {
-                activeStampType = type;
-                document.querySelectorAll('.stamp-btn').forEach(b => b.classList.remove('active'));
-                btnEl.classList.add('active');
-                document.body.classList.add('stamp-mode-active');
-            }
-        }
-
-        document.getElementById('main-workspace').addEventListener('click', async function(e) {
-            if (!stampsUnlocked || !activeStampType) return;
-            if (e.target.closest('.teacher-stamp')) return;
-
-            const card = e.target.closest('.task-card[id]');
-            if (!card) return;
-
-            e.preventDefault();
-            e.stopPropagation();
-
-            const rect = card.getBoundingClientRect();
-            const xPercent = (((e.clientX - rect.left) / rect.width) * 100).toFixed(2);
-            const yPercent = (((e.clientY - rect.top) / rect.height) * 100).toFixed(2);
-
-            let targetLabel = card.getAttribute('data-card-title') || card.id;
-            const row = e.target.closest('.question-row');
-            if (row && row.querySelector('.question-label')) {
-                targetLabel = row.querySelector('.question-label').innerText.replace(/\s+/g, ' ').trim();
-            }
-
-            let labelText = "";
-            if (activeStampType === 'comment') {
-                const note = prompt("Enter teacher comment:");
-                if (!note || !note.trim()) return;
-                labelText = "💬 " + note.trim();
-            } else {
-                labelText = STAMP_PRESETS[activeStampType].text;
-            }
-
-            placedStamps.push({
-                id: Date.now().toString(),
-                cardId: card.id,
-                type: activeStampType,
-                text: labelText,
-                targetLabel: targetLabel,
-                x: xPercent,
-                y: yPercent
-            });
-
-            renderStamps();
-            await saveStampsToCloud();
-        }, true);
-
-        async function removeStamp(stampId) {
-            if (!stampsUnlocked) return;
-            placedStamps = placedStamps.filter(s => s.id !== stampId);
-            renderStamps();
-            await saveStampsToCloud();
-        }
-
-        function renderStamps() {
-            document.querySelectorAll('.teacher-stamp').forEach(el => el.remove());
-
-            placedStamps.forEach(stamp => {
-                const card = document.getElementById(stamp.cardId);
-                if (!card) return;
-
-                const badge = document.createElement('div');
-                const styleClass = stamp.type === 'comment' ? 'stamp-comment' : (STAMP_PRESETS[stamp.type]?.className || 'stamp-assisted');
-                badge.className = `teacher-stamp ${styleClass} ${stampsUnlocked ? 'unlocked' : ''}`;
-                badge.style.left = stamp.x + '%';
-                badge.style.top = stamp.y + '%';
-                badge.innerText = stamp.text;
-                if (stampsUnlocked) {
-                    badge.title = "Click to remove stamp";
-                    badge.onclick = function(ev) {
-                        ev.stopPropagation();
-                        removeStamp(stamp.id);
-                    };
-                }
-                card.appendChild(badge);
-            });
-        }
-
-        async function saveStampsToCloud() {
-            const user = auth.currentUser;
-            if (!user) {
-                showToast("⚠️ No student logged in! Log in via index.html first so stamps save.", true);
-                return;
-            }
-
-            try {
-                await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
-                    .set({
-                        pageTitle: document.title || LESSON_ID,
-                        teacherStamps: placedStamps,
-                        lastUpdated: Date.now()
-                    }, { merge: true });
-                showToast("✅ Stamp saved to student's Markbook!");
-            } catch (err) {
-                console.error("Stamp save error:", err);
-                showToast("❌ Cloud save error: " + err.message, true);
-            }
-        }
-
-        /* --- 3. HELPER FOR TEACHER MARKBOOK LABELS --- */
+        /* --- 2. HELPER FOR TEACHER MARKBOOK LABELS --- */
         function findLabelForInput(el, index) {
             const row = el.closest('.question-row');
             if (row) {
@@ -663,7 +418,7 @@
             return 'Question ' + (index + 1);
         }
 
-        /* --- 4. FIREBASE AUTO-SAVE LOGIC --- */
+        /* --- 3. FIREBASE AUTO-SAVE LOGIC --- */
         let saveTimer;
         function saveProgress(immediate = false) {
             const user = auth.currentUser;
@@ -717,7 +472,7 @@
             }, immediate ? 50 : 800);
         }
 
-        /* --- 5. FIREBASE AUTO-LOAD LOGIC --- */
+        /* --- 4. FIREBASE AUTO-LOAD LOGIC --- */
         function applySavedData(data) {
             var inputs = document.querySelectorAll('.auto-input');
             for (var i = 0; i < inputs.length; i++) {
@@ -732,11 +487,6 @@
                         inputs[i].style.height = inputs[i].scrollHeight + 'px';
                     }
                 }
-            }
-
-            if (Array.isArray(data.teacherStamps)) {
-                placedStamps = data.teacherStamps;
-                renderStamps();
             }
 
             checkAnswers('red-input', false);
@@ -784,7 +534,7 @@
             }
         }
 
-        /* --- 6. BATCH-MARKING TEXT INPUT LOGIC --- */
+        /* --- 5. BATCH-MARKING TEXT INPUT LOGIC --- */
         function checkAnswers(groupClass, triggerSync = true) {
             var inputs = document.getElementsByClassName(groupClass);
             
@@ -820,5 +570,6 @@
             }
         }
     </script>
+    <script src="teacher-stamps.js"></script>
 </body>
 </html>
