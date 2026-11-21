@@ -199,6 +199,103 @@
 
         .btn-start:hover { background-color: #006100; }
 
+        /* Top 5 Leaderboard Section */
+        .mini-leaderboard {
+            max-width: 800px;
+            margin: 24px auto 40px auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            padding: 24px 30px;
+            border-top: 6px solid #dfaa2b;
+        }
+
+        .mini-leaderboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 12px;
+            margin-bottom: 14px;
+        }
+
+        .mini-leaderboard-header h2 {
+            margin: 0;
+            color: #1e3a8a;
+            font-size: 1.35em;
+        }
+
+        .btn-mini-refresh {
+            background: #f1f5f9;
+            color: #1e3a8a;
+            border: 1px solid #cbd5e1;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85em;
+            cursor: pointer;
+        }
+
+        .btn-mini-refresh:hover {
+            background: #e2e8f0;
+        }
+
+        .top5-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 11px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 1.05em;
+        }
+
+        .top5-row:last-child {
+            border-bottom: none;
+        }
+
+        .top5-row:first-child {
+            background: #fff8e1;
+            font-weight: bold;
+            border-radius: 6px;
+        }
+
+        .top5-rank {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #1e3a8a;
+            color: white;
+            font-weight: bold;
+            font-size: 0.85em;
+            margin-right: 10px;
+        }
+
+        .top5-row:first-child .top5-rank {
+            background: #dfaa2b;
+            color: #1e3a8a;
+        }
+
+        .top5-class {
+            font-size: 0.85em;
+            color: #64748b;
+            margin-left: 8px;
+            font-weight: normal;
+        }
+
+        .top5-score {
+            background: #1e3a8a;
+            color: #dfaa2b;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+
         .game-over-overlay {
             display: none;
             position: fixed;
@@ -275,6 +372,17 @@
                 <button class="btn-start" id="start-btn" onclick="startGame()">Start Game</button>
             </div>
         </div>
+
+        <!-- Built-In Top 5 Leaderboard -->
+        <section class="mini-leaderboard" aria-label="Top 5 Leaderboard">
+            <div class="mini-leaderboard-header">
+                <h2>🏅 Top 5 Scores</h2>
+                <button type="button" class="btn-mini-refresh" onclick="loadTop5Leaderboard()">↻ Refresh</button>
+            </div>
+            <div id="top5-list" style="color: #64748b; text-align: center; padding: 12px 0;">
+                Loading Top 5 scores...
+            </div>
+        </section>
     </main>
 
     <div class="game-over-overlay" id="game-over">
@@ -306,7 +414,7 @@
         const LESSON_ID = "hex-time-attack";
 
         let score = 0;
-        let topScore = parseInt(localStorage.getItem('hexTimeAttackTopScore')) || 0; 
+        let topScore = parseInt(localStorage.getItem('hexTimeAttackTopScore')) || 0;
         let latestScore = 0;
         let timeLeft = 60;
         let targetNumber = 0;
@@ -321,18 +429,44 @@
         const displayBitValues = [8, 4, 2, 1, 8, 4, 2, 1]; 
         
         let currentMode = 0;
+        let currentStudentProfile = { fullName: "", className: "" };
 
         document.getElementById('top-score').innerText = topScore;
 
-        /* --- 2. FIREBASE AUTO-SAVE & AUTO-LOAD --- */
+        function escapeHtml(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        /* --- 2. FIREBASE AUTO-SAVE, AUTO-LOAD & TOP 5 LEADERBOARD --- */
+        async function loadStudentProfile(uid) {
+            try {
+                const snap = await db.collection("users").doc(uid).get();
+                if (snap.exists) {
+                    const d = snap.data();
+                    currentStudentProfile = {
+                        fullName: d.fullName || d.username || "Unnamed Student",
+                        className: d.className || "Unassigned"
+                    };
+                }
+            } catch (err) {
+                console.error("Error loading student profile:", err);
+            }
+        }
+
         function syncScoreToCloud() {
-            localStorage.setItem('hexTimeAttackTopScore', topScore); 
+            localStorage.setItem('hexTimeAttackTopScore', topScore);
 
             const user = auth.currentUser;
             if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
 
             const payload = {
                 pageTitle: document.title || "Hexadecimal Time Attack",
+                studentName: currentStudentProfile.fullName || user.email || "Student",
+                className: currentStudentProfile.className || "Unassigned",
                 lastUpdated: Date.now(),
                 topScore: topScore,
                 latestScore: latestScore,
@@ -345,6 +479,7 @@
 
             db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
               .set(payload, { merge: true })
+              .then(() => loadTop5Leaderboard())
               .catch(err => console.error("Cloud save error:", err));
         }
 
@@ -356,28 +491,85 @@
             localStorage.setItem('hexTimeAttackTopScore', topScore);
         }
 
+        async function loadTop5Leaderboard() {
+            const listEl = document.getElementById('top5-list');
+            if (!listEl || !db) return;
+
+            try {
+                const usersSnap = await db.collection("users").get();
+                const entries = [];
+
+                await Promise.all(usersSnap.docs.map(async (userDoc) => {
+                    const uData = userDoc.data() || {};
+                    const lessonDoc = await db
+                        .collection("users")
+                        .doc(userDoc.id)
+                        .collection("lessons")
+                        .doc(LESSON_ID)
+                        .get();
+
+                    if (!lessonDoc.exists) return;
+                    const lData = lessonDoc.data() || {};
+                    const best = parseInt(lData.topScore ?? lData.latestScore ?? 0, 10) || 0;
+                    if (best <= 0) return;
+
+                    entries.push({
+                        studentName: lData.studentName || uData.fullName || uData.username || "Unnamed Student",
+                        className: lData.className || uData.className || "Unassigned",
+                        topScore: best
+                    });
+                }));
+
+                entries.sort((a, b) => b.topScore - a.topScore);
+                const top5 = entries.slice(0, 5);
+
+                if (top5.length === 0) {
+                    listEl.innerHTML = `<div style="color: #64748b; padding: 10px 0;">No scores recorded yet. Be the first to set a Top 5 score!</div>`;
+                    return;
+                }
+
+                listEl.innerHTML = top5.map((row, idx) => `
+                    <div class="top5-row">
+                        <div>
+                            <span class="top5-rank">${idx + 1}</span>
+                            <span>${escapeHtml(row.studentName)}</span>
+                            <span class="top5-class">(${escapeHtml(row.className)})</span>
+                        </div>
+                        <span class="top5-score">${row.topScore} pts</span>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error("Error loading Top 5 leaderboard:", err);
+                listEl.innerHTML = `<div style="color: #d32f2f; padding: 10px 0;">Could not load leaderboard scores.</div>`;
+            }
+        }
+
         auth.onAuthStateChanged(async function(user) {
             const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
             const inspectedUid = sessionStorage.getItem('inspectStudentUid');
 
             if (isTeacher && inspectedUid) {
                 try {
+                    await loadStudentProfile(inspectedUid);
                     const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
                     if (doc.exists) applySavedData(doc.data());
                 } catch (err) {
                     console.error("Error loading inspected student data:", err);
                 }
+                loadTop5Leaderboard();
                 return;
             }
 
             if (user) {
                 try {
+                    await loadStudentProfile(user.uid);
                     const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
                     if (doc.exists) applySavedData(doc.data());
                 } catch (err) {
                     console.error("Error loading cloud top score:", err);
                 }
             }
+            loadTop5Leaderboard();
         });
 
         /* --- 3. GAME LOGIC --- */
@@ -495,7 +687,7 @@
         function calculateTotal() {
             currentTotal = 0;
             for (let i = 0; i < 8; i++) {
-                if (bits[i] === 1) currentTotal += mathValues[i]; // Math resolves 1-255 easily
+                if (bits[i] === 1) currentTotal += mathValues[i];
             }
             
             document.getElementById('current-total').innerText = currentTotal.toString(16).toUpperCase().padStart(2, '0');
