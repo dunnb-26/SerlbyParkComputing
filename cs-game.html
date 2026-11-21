@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Y9 Computing: 60s Revision</title>
+    <title>Cyber Security Time Attack</title>
     <link rel="stylesheet" href="style.css">
 
     <!-- Firebase SDKs -->
@@ -228,6 +228,103 @@
 
         .btn-start:hover { background-color: #006100; }
 
+        /* Top 5 Leaderboard Section */
+        .mini-leaderboard {
+            max-width: 850px;
+            margin: 24px auto 40px auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            padding: 24px 30px;
+            border-top: 6px solid #dfaa2b;
+        }
+
+        .mini-leaderboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 12px;
+            margin-bottom: 14px;
+        }
+
+        .mini-leaderboard-header h2 {
+            margin: 0;
+            color: #1e3a8a;
+            font-size: 1.35em;
+        }
+
+        .btn-mini-refresh {
+            background: #f1f5f9;
+            color: #1e3a8a;
+            border: 1px solid #cbd5e1;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85em;
+            cursor: pointer;
+        }
+
+        .btn-mini-refresh:hover {
+            background: #e2e8f0;
+        }
+
+        .top5-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 11px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 1.05em;
+        }
+
+        .top5-row:last-child {
+            border-bottom: none;
+        }
+
+        .top5-row:first-child {
+            background: #fff8e1;
+            font-weight: bold;
+            border-radius: 6px;
+        }
+
+        .top5-rank {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #1e3a8a;
+            color: white;
+            font-weight: bold;
+            font-size: 0.85em;
+            margin-right: 10px;
+        }
+
+        .top5-row:first-child .top5-rank {
+            background: #dfaa2b;
+            color: #1e3a8a;
+        }
+
+        .top5-class {
+            font-size: 0.85em;
+            color: #64748b;
+            margin-left: 8px;
+            font-weight: normal;
+        }
+
+        .top5-score {
+            background: #1e3a8a;
+            color: #dfaa2b;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+
         .summary-overlay {
             display: none;
             position: fixed;
@@ -260,7 +357,7 @@
         <div class="header-left">
             <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
         </div>
-        <div class="header-center"><h1>Network Defense: 60s Challenge</h1></div>
+        <div class="header-center"><h1>Cyber Security Time Attack</h1></div>
         <div class="header-right"><a href="javascript:history.back()" class="back-btn">&larr; Go Back</a></div>
     </header>
 
@@ -273,10 +370,10 @@
 
             <!-- Week / Topic Selector (Filter-Safe Labels) -->
             <div class="category-tabs" id="category-tabs">
-                <button class="cat-btn active" onclick="setCategory('all', this)">🛡️ All Topics (60 Qs)</button>
+                <button class="cat-btn active" onclick="setCategory('all', this)">🛡️ All Topics</button>
                 <button class="cat-btn" onclick="setCategory('social', this)">🎣 Social Engineering</button>
                 <button class="cat-btn" onclick="setCategory('ethics', this)">⚖️ Hero or Criminal?</button>
-                <button class="cat-btn" onclick="setCategory('software', this)">🦠 Software Threats</button>
+                <button class="cat-btn" onclick="setCategory('software', this)">🦠 Malware</button>
             </div>
 
             <div class="scoreboard">
@@ -318,6 +415,17 @@
                 <button class="btn-start" id="start-btn" onclick="startChallenge()">Start 60s Challenge</button>
             </div>
         </div>
+
+        <!-- Built-In Top 5 Leaderboard -->
+        <section class="mini-leaderboard" aria-label="Top 5 Leaderboard">
+            <div class="mini-leaderboard-header">
+                <h2>🏅 Top 5 Scores</h2>
+                <button type="button" class="btn-mini-refresh" onclick="loadTop5Leaderboard()">↻ Refresh</button>
+            </div>
+            <div id="top5-list" style="color: #64748b; text-align: center; padding: 12px 0;">
+                Loading Top 5 scores...
+            </div>
+        </section>
     </main>
 
     <div class="summary-overlay" id="summary-screen">
@@ -371,8 +479,33 @@
         let currentMode = 0;
         let currentOptions = [];
         let isLocked = false;
+        let currentStudentProfile = { fullName: "", className: "" };
 
-        /* --- 3. FIREBASE AUTO-SAVE & AUTO-LOAD --- */
+        function escapeHtml(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        /* --- 3. FIREBASE AUTO-SAVE, AUTO-LOAD & TOP 5 LEADERBOARD --- */
+        async function loadStudentProfile(uid) {
+            if (!db) return;
+            try {
+                const snap = await db.collection("users").doc(uid).get();
+                if (snap.exists) {
+                    const d = snap.data();
+                    currentStudentProfile = {
+                        fullName: d.fullName || d.username || "Unnamed Student",
+                        className: d.className || "Unassigned"
+                    };
+                }
+            } catch (err) {
+                console.error("Error loading student profile:", err);
+            }
+        }
+
         function syncScoreToCloud() {
             if (!auth || !db) return;
             const user = auth.currentUser;
@@ -380,6 +513,8 @@
 
             const payload = {
                 pageTitle: document.title || "Network Defense Challenge",
+                studentName: currentStudentProfile.fullName || user.email || "Student",
+                className: currentStudentProfile.className || "Unassigned",
                 lastUpdated: Date.now(),
                 topScore: topScore,
                 latestScore: latestScore,
@@ -392,6 +527,7 @@
 
             db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
               .set(payload, { merge: true })
+              .then(function() { loadTop5Leaderboard(); })
               .catch(function(err) { console.error("Cloud save error:", err); });
         }
 
@@ -402,6 +538,61 @@
             document.getElementById('top-score').innerText = topScore;
         }
 
+        async function loadTop5Leaderboard() {
+            const listEl = document.getElementById('top5-list');
+            if (!listEl || !db) return;
+
+            try {
+                const usersSnap = await db.collection("users").get();
+                const entries = [];
+
+                await Promise.all(usersSnap.docs.map(async function(userDoc) {
+                    const uData = userDoc.data() || {};
+                    const lessonDoc = await db
+                        .collection("users")
+                        .doc(userDoc.id)
+                        .collection("lessons")
+                        .doc(LESSON_ID)
+                        .get();
+
+                    if (!lessonDoc.exists) return;
+                    const lData = lessonDoc.data() || {};
+                    const best = parseInt(lData.topScore ?? lData.latestScore ?? 0, 10) || 0;
+                    if (best <= 0) return;
+
+                    entries.push({
+                        studentName: lData.studentName || uData.fullName || uData.username || "Unnamed Student",
+                        className: lData.className || uData.className || "Unassigned",
+                        topScore: best
+                    });
+                }));
+
+                entries.sort(function(a, b) { return b.topScore - a.topScore; });
+                const top5 = entries.slice(0, 5);
+
+                if (top5.length === 0) {
+                    listEl.innerHTML = `<div style="color: #64748b; padding: 10px 0;">No scores recorded yet. Be the first to set a Top 5 score!</div>`;
+                    return;
+                }
+
+                listEl.innerHTML = top5.map(function(row, idx) {
+                    return `
+                        <div class="top5-row">
+                            <div>
+                                <span class="top5-rank">${idx + 1}</span>
+                                <span>${escapeHtml(row.studentName)}</span>
+                                <span class="top5-class">(${escapeHtml(row.className)})</span>
+                            </div>
+                            <span class="top5-score">${row.topScore} pts</span>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error("Error loading Top 5 leaderboard:", err);
+                listEl.innerHTML = `<div style="color: #d32f2f; padding: 10px 0;">Could not load leaderboard scores.</div>`;
+            }
+        }
+
         if (auth) {
             auth.onAuthStateChanged(async function(user) {
                 const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
@@ -409,27 +600,30 @@
 
                 if (isTeacher && inspectedUid) {
                     try {
+                        await loadStudentProfile(inspectedUid);
                         const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
                         if (doc.exists) applySavedData(doc.data());
                     } catch (err) {
                         console.error("Error loading inspected student data:", err);
                     }
+                    loadTop5Leaderboard();
                     return;
                 }
 
                 if (user) {
                     try {
+                        await loadStudentProfile(user.uid);
                         const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
                         if (doc.exists) applySavedData(doc.data());
                     } catch (err) {
                         console.error("Error loading cloud top score:", err);
                     }
                 }
+                loadTop5Leaderboard();
             });
         }
 
         /* --- 4. FULLY HEX-MASKED 60-QUESTION BANK (ZERO FILTER WORDS IN SOURCE) --- */
-        // Every security term is hex-escaped so school firewalls never see trigger words in the HTML file.
         const questionBank = [
             // WEEK 1: SOCIAL ENGINEERING (20)
             {category:"social",topicLabel:"Social Engineering",q:"You receive an urgent email claiming to be from a delivery company asking you to click a link and confirm your login details.",answer:"\x50\x68\x69\x73\x68\x69\x6e\x67",accepted:["\x70\x68\x69\x73\x68\x69\x6e\x67"],options:["\x50\x68\x69\x73\x68\x69\x6e\x67","\x42\x6c\x61\x67\x67\x69\x6e\x67","\x53\x68\x6f\x75\x6c\x64\x65\x72\x69\x6e\x67","\x50\x68\x61\x72\x6d\x69\x6e\x67"],hint:"Starts with P - fishing for logins via email"},
