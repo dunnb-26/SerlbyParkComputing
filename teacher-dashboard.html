@@ -312,6 +312,19 @@
         .btn-login-student:hover { background: #006b2b; }
         .btn-delete-lesson { background-color: #d32f2f; color: white; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.8em; font-weight: bold; cursor: pointer; margin-left: 6px; }
         .screenshot-img { max-width: 100%; max-height: 380px; border: 2px solid #1e3a8a; border-radius: 6px; margin-top: 8px; display: block; }
+
+        /* 8x8 Pixel Art Preview */
+        .pixel-preview-wrap { margin-top: 8px; }
+        .pixel-preview-grid {
+            display: grid;
+            border: 2px solid #1e3a8a;
+            background: #e2e8f0;
+            width: fit-content;
+        }
+        .pixel-preview-cell {
+            border: 1px solid rgba(15, 23, 42, 0.14);
+            box-sizing: border-box;
+        }
     </style>
 </head>
 
@@ -392,6 +405,78 @@
         let classLessonsData = {};
         let selectedGridLessonId = '';
         let portfolioRequestId = 0;
+
+        // Universal Color Palette & Grid Maps for Pixel Art Lessons
+        const basicColorMaps = {
+            2: { 0: '#ffffff', 1: '#000000', 2: '#d32f2f', 3: '#388e3c' },
+            3: { 0: '#ffffff', 1: '#000000', 2: '#d32f2f', 3: '#388e3c', 4: '#1976d2', 5: '#fbc02d', 6: '#8e24aa', 7: '#f57c00' },
+            4: { 0: '#ffffff', 1: '#000000', 2: '#d32f2f', 3: '#388e3c', 4: '#1976d2', 5: '#fbc02d', 6: '#8e24aa', 7: '#f57c00', 8: '#795548', 9: '#e91e63' },
+            8: { 0: '#ffffff', 1: '#000000', 2: '#d32f2f', 3: '#388e3c', 4: '#1976d2', 5: '#fbc02d', 6: '#8e24aa', 7: '#f57c00', 8: '#795548', 9: '#e91e63' }
+        };
+
+        const basicImageDataBits = {
+            "red1": 2, "red2": 2, "red3": 2,
+            "amber1": 3, "amber2": 3, "amber3": 3,
+            "green1": 4, "green2": 4, "green3": 4,
+            "blue1": 8, "blue2": 8, "blue3": 8
+        };
+
+        const basePixelGridMap = {
+            "red1": [0,2,2,0,0,2,2,0, 2,2,2,2,2,2,2,2, 2,2,2,2,2,2,2,2, 0,2,2,2,2,2,2,0, 0,0,2,2,2,2,0,0, 0,0,0,2,2,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0],
+            "red2": [0,0,1,1,1,1,0,0, 0,1,0,0,0,0,1,0, 1,0,1,0,0,1,0,1, 1,0,0,0,0,0,0,1, 1,0,3,0,0,3,0,1, 1,0,0,3,3,0,0,1, 0,1,0,0,0,0,1,0, 0,0,1,1,1,1,0,0],
+            "red3": [1,2,1,2,1,2,1,2, 2,1,2,1,2,1,2,1, 1,2,1,2,1,2,1,2, 2,1,2,1,2,1,2,1, 1,2,1,2,1,2,1,2, 2,1,2,1,2,1,2,1, 1,2,1,2,1,2,1,2, 2,1,2,1,2,1,2,1],
+            "amber1": [0,0,0,3,4,0,0,0, 0,0,2,2,2,2,0,0, 0,2,2,2,2,2,2,0, 0,2,2,2,2,2,2,0, 0,2,2,2,2,2,2,0, 0,2,2,2,2,2,2,0, 0,0,2,2,2,2,0,0, 0,0,0,0,0,0,0,0],
+            "amber2": [0,0,0,0,0,0,0,0, 0,0,5,5,5,0,0,0, 0,5,5,1,5,0,0,0, 0,7,7,5,5,0,0,0, 0,0,5,5,5,5,5,0, 0,5,5,5,5,5,5,0, 0,0,5,5,5,5,0,0, 6,6,6,6,6,6,6,6],
+            "amber3": [0,0,0,2,2,0,0,0, 0,0,2,2,2,2,0,0, 0,2,2,2,2,2,2,0, 2,2,2,2,2,2,2,2, 0,4,4,4,4,4,4,0, 0,4,6,4,4,6,4,0, 0,4,4,1,1,4,4,0, 3,3,3,1,1,3,3,3],
+            "green1": [0,0,0,2,2,0,0,0, 0,0,2,2,2,2,0,0, 0,2,2,2,2,2,2,0, 2,2,2,2,2,2,2,2, 0,5,5,5,5,5,5,0, 0,5,4,5,5,4,5,0, 0,5,5,8,8,5,5,0, 3,3,3,8,8,3,3,3],
+            "green2": [0,0,0,9,9,0,0,0, 0,0,9,5,5,9,0,0, 0,9,5,5,5,5,9,0, 0,0,9,5,5,9,0,0, 0,0,0,9,9,0,0,0, 0,0,0,3,3,0,0,0, 0,0,3,3,3,3,0,0, 0,3,3,3,3,3,3,0],
+            "green3": [0,0,7,7,7,7,0,0, 0,7,1,7,7,1,7,0, 0,7,7,7,7,7,7,0, 0,0,7,7,7,7,0,0, 0,8,5,5,5,5,8,0, 8,0,5,4,4,5,0,8, 0,0,5,5,5,5,0,0, 0,0,8,0,0,8,0,0],
+            "blue1": [0,4,0,0,0,0,4,0, 4,6,4,0,0,4,6,4, 4,6,6,4,4,6,6,4, 0,4,6,6,6,6,4,0, 0,0,4,1,1,4,0,0, 0,4,9,1,1,9,4,0, 4,9,9,1,1,9,9,4, 0,4,4,0,0,4,4,0],
+            "blue2": [0,0,0,0,0,0,0,0, 0,0,2,2,2,2,0,0, 0,2,4,4,4,4,2,0, 2,2,2,2,2,2,2,2, 2,2,2,2,2,2,2,2, 0,1,0,0,0,0,1,0, 0,1,0,0,0,0,1,0, 0,0,0,0,0,0,0,0],
+            "blue3": [0,0,0,0,0,0,0,4, 0,0,0,0,0,0,4,5, 0,0,0,0,0,4,5,4, 0,0,0,0,4,5,4,0, 0,0,0,4,5,4,0,0, 0,8,4,4,4,0,0,0, 8,8,8,0,0,0,0,0, 1,8,0,0,0,0,0,0]
+        };
+
+        function buildPixelDesignsHtml(designsObj) {
+            if (!designsObj || typeof designsObj !== 'object') return '';
+            const keys = Object.keys(designsObj);
+            if (keys.length === 0) return '';
+
+            let cardsHtml = '';
+            keys.forEach(taskKey => {
+                const entry = designsObj[taskKey];
+                const solvedArray = Array.isArray(entry) ? entry : (entry && Array.isArray(entry.solved) ? entry.solved : null);
+                if (!solvedArray || solvedArray.length === 0) return;
+
+                const bits = basicImageDataBits[taskKey] || 2;
+                const map = basicColorMaps[bits];
+                const colorsRef = basePixelGridMap[taskKey] || new Array(64).fill(0);
+
+                let cellsHtml = '';
+                for (let i = 0; i < 64; i++) {
+                    const isSolved = solvedArray[i] === true;
+                    const decVal = colorsRef[i] || 0;
+                    const bg = isSolved ? (map[decVal] || '#ffffff') : '#fafafa';
+                    cellsHtml += `<div class="pixel-preview-cell" style="width: 22px; height: 22px; background-color: ${bg};"></div>`;
+                }
+
+                cardsHtml += `
+                    <div style="margin-bottom: 14px;">
+                        <div style="font-size: 0.85em; font-weight: bold; color: #334155; margin-bottom: 4px;">Grid: ${escapeHtml(taskKey.toUpperCase())}</div>
+                        <div class="pixel-preview-wrap">
+                            <div class="pixel-preview-grid" style="grid-template-columns: repeat(8, 22px); grid-template-rows: repeat(8, 22px);">${cellsHtml}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (!cardsHtml) return '';
+            return `
+                <div class="qa-row">
+                    <div class="qa-label"><span>🎨 Pixel Art Grids</span></div>
+                    ${cardsHtml}
+                </div>
+            `;
+        }
 
         /* --- REAL FIREBASE LOGIN AS STUDENT --- */
         async function loginAsStudent(username, displayName) {
@@ -838,12 +923,24 @@
                         statusPill = '<span class="status-badge badge-incorrect">✗ Incorrect</span>';
                     }
 
+                    const inlineStamps = stamps.filter(s => s.targetLabel && s.targetLabel === labelText);
+                    const inlineStampsHtml = inlineStamps.map(s => {
+                        const cls = s.type === 'comment' ? 'st-comment' : `st-${s.type || 'assisted'}`;
+                        return `
+                            <span class="cell-stamp-pill ${cls}">
+                                ${escapeHtml(s.text)}
+                                <button class="stamp-del-btn" title="Remove stamp" onclick="removeGridStamp('${studentUid}', '${lesson.id}', '${s.id}')">×</button>
+                            </span>
+                        `;
+                    }).join('');
+
                     bodyHtml += `
                         <div class="qa-row">
                             <div class="qa-label">
                                 <span>${escapeHtml(labelText)}</span>
-                                <div>
+                                <div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px;">
                                     ${statusPill}
+                                    ${inlineStampsHtml}
                                     <button class="btn-mini-stamp" onclick="addGridStamp('${studentUid}', '${lesson.id}', '${escapeHtml(labelText)}')">+ Stamp / Note</button>
                                 </div>
                             </div>
@@ -852,6 +949,40 @@
                     `;
                 });
             }
+
+            if (Array.isArray(lesson.spagRows) && lesson.spagRows.length > 0) {
+                let spagRowsHtml = '';
+                lesson.spagRows.forEach(row => {
+                    if (row.w0 || row.w1 || row.w2 || row.w3) {
+                        spagRowsHtml += `
+                            <tr>
+                                <td style="padding:6px; border:1px solid #cbd5e1; font-weight:bold; color:#e65100;">${escapeHtml(row.w0 || '-')}</td>
+                                <td style="padding:6px; border:1px solid #cbd5e1;">${escapeHtml(row.w1 || '-')}</td>
+                                <td style="padding:6px; border:1px solid #cbd5e1;">${escapeHtml(row.w2 || '-')}</td>
+                                <td style="padding:6px; border:1px solid #cbd5e1;">${escapeHtml(row.w3 || '-')}</td>
+                            </tr>
+                        `;
+                    }
+                });
+                if (spagRowsHtml) {
+                    bodyHtml += `
+                        <div class="qa-row">
+                            <div class="qa-label"><span>📝 Spelling Practice & Corrections</span></div>
+                            <table style="width:100%; border-collapse:collapse; background:#fff3e0; margin-top:6px; font-size:0.9em; text-align:center;">
+                                <tr style="background:#f57c00; color:white;">
+                                    <th style="padding:6px; border:1px solid #cbd5e1;">Misspelled Word</th>
+                                    <th style="padding:6px; border:1px solid #cbd5e1;">Attempt 1</th>
+                                    <th style="padding:6px; border:1px solid #cbd5e1;">Attempt 2</th>
+                                    <th style="padding:6px; border:1px solid #cbd5e1;">Attempt 3</th>
+                                </tr>
+                                ${spagRowsHtml}
+                            </table>
+                        </div>
+                    `;
+                }
+            }
+
+            bodyHtml += buildPixelDesignsHtml(lesson.userBinaryDesigns);
 
             ['maroon', 'amber', 'green', 'navy'].forEach(zone => {
                 const imgKey = 'img_' + zone;
@@ -864,6 +995,10 @@
                     `;
                 }
             });
+
+            if (!bodyHtml) {
+                bodyHtml = `<p style="color:#94a3b8; font-style:italic; margin:0;">Student opened this lesson, but no recorded work was found.</p>`;
+            }
 
             return `
                 <div class="lesson-card" id="lesson-card-${index}">
