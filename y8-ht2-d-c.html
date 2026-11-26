@@ -43,7 +43,7 @@
 
         .header-left { display: flex; justify-content: flex-start; }
         .header-center { text-align: center; }
-        .header-right { display: flex; justify-content: flex-end; align-items: center; gap: 15px; }
+        .header-right { display: flex; justify-content: flex-end; align-items: center; }
 
         header img {
             width: 250px;
@@ -58,19 +58,6 @@
             font-size: 28px;
             letter-spacing: 1px;
         }
-
-        .save-status {
-            font-size: 13px;
-            font-weight: bold;
-            padding: 6px 12px;
-            border-radius: 20px;
-            background-color: rgba(255, 255, 255, 0.15);
-            color: #fff;
-            transition: all 0.2s ease;
-        }
-        .save-status.saving { background-color: #f57c00; color: white; }
-        .save-status.saved { background-color: #388e3c; color: white; }
-        .save-status.error { background-color: #d32f2f; color: white; }
 
         .back-btn {
             background-color: var(--yellow);
@@ -424,7 +411,6 @@
             <h1>Year 8 - Half Term 2 - D&C</h1>
         </div>
         <div class="header-right">
-            <span id="save-status-badge" class="save-status no-print">Checking login...</span>
             <a href="index.html" class="back-btn no-print">&larr; Back to Curriculum</a>
         </div>
     </header>
@@ -435,7 +421,7 @@
             <!-- STAGE 1: DEMONSTRATE TASK -->
             <div id="demonstrate-stage" class="task-card">
                 <div class="task-title">Part 1: Demonstrate</div>
-                <div class="instruction-box" id="main-instruction-box">
+                <div class="instruction-box">
                     Write full sentences to answer the 5 questions below covering Pixel Art, Excel, Computational Thinking, and Binary. Browser spellcheck will underline any spelling errors in red as you type. When you click "Mark My Work", your score and spelling table will appear below. Your progress is automatically saved.
                 </div>
 
@@ -486,7 +472,7 @@
             <div id="spag-section" class="task-card hidden" style="border-top-color: #f57c00;">
                 <div class="task-title" style="color: #e65100;">Spelling Corrections & Practice</div>
                 <div class="instruction-box">
-                    Look at any words in your Demonstrate answers above that have red underlines. Type each misspelled word in the first column, and practice spelling it correctly <strong>3 times</strong> across the next three columns. If you had no spelling mistakes, you can remove the rows using the ❌ button.
+                    Look at any words in your Demonstrate answers above that have red underlines. Type each misspelled word in the first column, and practice spelling it correctly **3 times** across the next three columns. If you had no spelling mistakes, you can remove the rows using the ❌ button.
                 </div>
                 
                 <div class="spag-practice-box">
@@ -619,21 +605,6 @@
 
         const LESSON_ID = "y8-ht2-pixel-binary-dnc";
 
-        function setSaveBadge(state, text) {
-            const badge = document.getElementById('save-status-badge');
-            if (!badge) return;
-            badge.className = 'save-status no-print ' + state;
-            badge.innerText = text;
-        }
-
-        function getTargetUserUid() {
-            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
-            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
-            if (isTeacher && inspectedUid) return inspectedUid;
-            if (!isTeacher && auth.currentUser) return auth.currentUser.uid;
-            return null;
-        }
-
         // Keywords for automated keyword marking
         const qKeywords = {
             1: ['pixel', 'grid', 'resolution', 'square', 'math', 'formula', 'equation', 'smooth', 'scale', 'vector', 'bitmap', 'raster', 'enlarge', 'quality'],
@@ -686,15 +657,14 @@
 
             row.querySelectorAll('input').forEach(input => {
                 input.addEventListener('input', () => saveToCloud(false));
-                input.addEventListener('blur', () => saveToCloud(true));
             });
-            if (triggerSave) saveToCloud(true);
+            if (triggerSave) saveToCloud(false);
         }
 
         function removePracticeRow(button) {
             const row = button.parentElement;
             row.remove();
-            saveToCloud(true);
+            saveToCloud(false);
         }
 
         function lockSpellcheckTextarea(textarea) {
@@ -941,96 +911,70 @@
             };
         }
 
-        function buildPayload() {
-            const structured = buildMarkbookData();
-            const data = {
-                pageTitle: document.title || "Y8 HT2 - Demonstrate & Connect",
-                lastUpdated: Date.now(),
-                scoreText: structured.scoreText,
-                items: structured.items,
-
-                q1: document.getElementById('q1').value,
-                q2: document.getElementById('q2').value,
-                q3: document.getElementById('q3').value,
-                q4: document.getElementById('q4').value,
-                q5: document.getElementById('q5').value,
-                q1_class: document.getElementById('q1').className,
-                q2_class: document.getElementById('q2').className,
-                q3_class: document.getElementById('q3').className,
-                q4_class: document.getElementById('q4').className,
-                q5_class: document.getElementById('q5').className,
-                q1_locked: document.getElementById('q1').dataset.spellcheckLocked === 'true',
-                buttons_hidden: document.getElementById('stage1-buttons').style.display === 'none',
-                actions_hidden: document.getElementById('action-buttons').classList.contains('hidden'),
-                spag_hidden: document.getElementById('spag-section').classList.contains('hidden'),
-                
-                task_red_status: document.getElementById('task-red').classList.contains('teacher-verified-incorrect') ? 'incorrect' : (document.getElementById('task-red').classList.contains('teacher-verified-correct') ? 'correct' : ''),
-                task_amber_status: document.getElementById('task-amber').classList.contains('teacher-verified-incorrect') ? 'incorrect' : (document.getElementById('task-amber').classList.contains('teacher-verified-correct') ? 'correct' : ''),
-                task_green_status: document.getElementById('task-green').classList.contains('teacher-verified-incorrect') ? 'incorrect' : (document.getElementById('task-green').classList.contains('teacher-verified-correct') ? 'correct' : ''),
-                
-                connectRed: document.getElementById('connect-red').value,
-                connectRed_class: document.getElementById('connect-red').className,
-                connectAmber: document.getElementById('connect-amber').value,
-                connectAmber_class: document.getElementById('connect-amber').className,
-                connectGreen: document.getElementById('connect-green').value,
-                connectGreen_class: document.getElementById('connect-green').className,
-                
-                feedbackRed: document.getElementById('feedback-red').innerHTML,
-                feedbackRed_hidden: document.getElementById('feedback-red').classList.contains('hidden'),
-                feedbackAmber: document.getElementById('feedback-amber').innerHTML,
-                feedbackAmber_hidden: document.getElementById('feedback-amber').classList.contains('hidden'),
-                feedbackGreen: document.getElementById('feedback-green').innerHTML,
-                feedbackGreen_hidden: document.getElementById('feedback-green').classList.contains('hidden'),
-                
-                spagRows: []
-            };
-
-            document.querySelectorAll('.practice-row').forEach(row => {
-                const inputs = row.querySelectorAll('input');
-                data.spagRows.push({
-                    w0: inputs[0].value,
-                    w1: inputs[1].value,
-                    w2: inputs[2].value,
-                    w3: inputs[3].value
-                });
-            });
-
-            return data;
-        }
-
         let saveTimer;
-        let hasUnsavedChanges = false;
-
         function saveToCloud(immediate = false) {
-            const targetUid = getTargetUserUid();
-            if (!targetUid) {
-                setSaveBadge('error', '⚠️ Not Logged In');
-                return;
-            }
+            const user = auth.currentUser;
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
 
-            hasUnsavedChanges = true;
-            setSaveBadge('saving', '⏳ Saving...');
             clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                const structured = buildMarkbookData();
+                const data = {
+                    pageTitle: document.title || "Y8 HT2 - Demonstrate & Connect",
+                    lastUpdated: Date.now(),
+                    scoreText: structured.scoreText,
+                    items: structured.items,
 
-            const executeSave = () => {
-                const data = buildPayload();
-                db.collection('users').doc(targetUid).collection('lessons').doc(LESSON_ID)
+                    q1: document.getElementById('q1').value,
+                    q2: document.getElementById('q2').value,
+                    q3: document.getElementById('q3').value,
+                    q4: document.getElementById('q4').value,
+                    q5: document.getElementById('q5').value,
+                    q1_class: document.getElementById('q1').className,
+                    q2_class: document.getElementById('q2').className,
+                    q3_class: document.getElementById('q3').className,
+                    q4_class: document.getElementById('q4').className,
+                    q5_class: document.getElementById('q5').className,
+                    q1_locked: document.getElementById('q1').dataset.spellcheckLocked === 'true',
+                    buttons_hidden: document.getElementById('stage1-buttons').style.display === 'none',
+                    actions_hidden: document.getElementById('action-buttons').classList.contains('hidden'),
+                    spag_hidden: document.getElementById('spag-section').classList.contains('hidden'),
+                    
+                    task_red_status: document.getElementById('task-red').classList.contains('teacher-verified-incorrect') ? 'incorrect' : (document.getElementById('task-red').classList.contains('teacher-verified-correct') ? 'correct' : ''),
+                    task_amber_status: document.getElementById('task-amber').classList.contains('teacher-verified-incorrect') ? 'incorrect' : (document.getElementById('task-amber').classList.contains('teacher-verified-correct') ? 'correct' : ''),
+                    task_green_status: document.getElementById('task-green').classList.contains('teacher-verified-incorrect') ? 'incorrect' : (document.getElementById('task-green').classList.contains('teacher-verified-correct') ? 'correct' : ''),
+                    
+                    connectRed: document.getElementById('connect-red').value,
+                    connectRed_class: document.getElementById('connect-red').className,
+                    connectAmber: document.getElementById('connect-amber').value,
+                    connectAmber_class: document.getElementById('connect-amber').className,
+                    connectGreen: document.getElementById('connect-green').value,
+                    connectGreen_class: document.getElementById('connect-green').className,
+                    
+                    feedbackRed: document.getElementById('feedback-red').innerHTML,
+                    feedbackRed_hidden: document.getElementById('feedback-red').classList.contains('hidden'),
+                    feedbackAmber: document.getElementById('feedback-amber').innerHTML,
+                    feedbackAmber_hidden: document.getElementById('feedback-amber').classList.contains('hidden'),
+                    feedbackGreen: document.getElementById('feedback-green').innerHTML,
+                    feedbackGreen_hidden: document.getElementById('feedback-green').classList.contains('hidden'),
+                    
+                    spagRows: []
+                };
+
+                document.querySelectorAll('.practice-row').forEach(row => {
+                    const inputs = row.querySelectorAll('input');
+                    data.spagRows.push({
+                        w0: inputs[0].value,
+                        w1: inputs[1].value,
+                        w2: inputs[2].value,
+                        w3: inputs[3].value
+                    });
+                });
+
+                db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID)
                   .set(data, { merge: true })
-                  .then(() => {
-                      hasUnsavedChanges = false;
-                      setSaveBadge('saved', '☁️ Saved');
-                  })
-                  .catch(err => {
-                      console.error("Cloud save error:", err);
-                      setSaveBadge('error', '❌ Save Failed');
-                  });
-            };
-
-            if (immediate) {
-                executeSave();
-            } else {
-                saveTimer = setTimeout(executeSave, 500);
-            }
+                  .catch(err => console.error("Cloud save error:", err));
+            }, immediate ? 50 : 600);
         }
 
         function applySavedData(data) {
@@ -1114,35 +1058,23 @@
             const inspectedUid = sessionStorage.getItem('inspectStudentUid');
 
             if (isTeacher && inspectedUid) {
-                setSaveBadge('saved', '👨‍🏫 Teacher View');
                 try {
                     const doc = await db.collection('users').doc(inspectedUid).collection('lessons').doc(LESSON_ID).get();
                     if (doc.exists) applySavedData(doc.data());
                 } catch (err) {
                     console.error("Error loading inspected student data:", err);
-                    setSaveBadge('error', '❌ Load Error');
                 }
                 return;
             }
 
-            if (user && !isTeacher) {
-                setSaveBadge('saved', '☁️ Ready');
+            if (user) {
                 try {
                     const doc = await db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).get();
                     if (doc.exists) {
                         applySavedData(doc.data());
-                        setSaveBadge('saved', '☁️ Loaded');
                     }
                 } catch (err) {
                     console.error("Error loading cloud work:", err);
-                    setSaveBadge('error', '❌ Load Error');
-                }
-            } else {
-                setSaveBadge('error', '⚠️ Not Logged In');
-                const inst = document.getElementById('main-instruction-box');
-                if (inst && !inst.dataset.warned) {
-                    inst.dataset.warned = 'true';
-                    inst.innerHTML += '<br><br><strong style="color:#d32f2f;">⚠️ Note: You are not currently logged in as a student (or Teacher Mode is active), so your answers will not save to the cloud.</strong>';
                 }
             }
         });
@@ -1179,10 +1111,10 @@
 
         async function clearData() {
             if (confirm("Are you sure you want to clear all your work on this page?")) {
-                const targetUid = getTargetUserUid();
-                if (targetUid) {
+                const user = auth.currentUser;
+                if (user) {
                     try {
-                        await db.collection('users').doc(targetUid).collection('lessons').doc(LESSON_ID).delete();
+                        await db.collection('users').doc(user.uid).collection('lessons').doc(LESSON_ID).delete();
                     } catch (err) {
                         console.error("Error clearing cloud data:", err);
                     }
@@ -1198,14 +1130,6 @@
 
             document.querySelectorAll('.auto-input').forEach(el => {
                 el.addEventListener('input', () => saveToCloud(false));
-                el.addEventListener('blur', () => saveToCloud(true));
-            });
-
-            // Flush pending save before leaving page
-            window.addEventListener('beforeunload', () => {
-                if (hasUnsavedChanges) {
-                    saveToCloud(true);
-                }
             });
         };
     </script>
