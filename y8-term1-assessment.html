@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Year 8 Term 1 Self-Marking Assessment</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* Task Container Styling */
+        .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
+        
+        .task-card { 
+            background: white; 
+            border-radius: 8px; 
+            padding: 25px; 
+            margin-bottom: 30px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            page-break-inside: avoid; 
+        }
+        
+        /* Section Header Colors */
+        .task-prep { border-top: 6px solid #607d8b; } 
+        .task-prep h2 { color: #607d8b; margin-top: 0; }
+        
+        .task-plenary { border-top: 6px solid #673ab7; } 
+        .task-plenary h2 { color: #673ab7; margin-top: 0; }
+
+        /* RAGB Colors */
+        .task-maroon { border-top: 6px solid #800000; }
+        .task-maroon h2 { color: #800000; margin-top: 0; }
+        .task-maroon .instruction-box { border-left: 4px solid #800000; }
+
+        .task-amber { border-top: 6px solid #ffb300; }
+        .task-amber h2 { color: #ffb300; margin-top: 0; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
+        .task-amber .instruction-box { border-left: 4px solid #ffb300; }
+
+        .task-green { border-top: 6px solid #008f39; }
+        .task-green h2 { color: #008f39; margin-top: 0; }
+        .task-green .instruction-box { border-left: 4px solid #008f39; }
+
+        .task-navy { border-top: 6px solid #1e3a8a; }
+        .task-navy h2 { color: #1e3a8a; margin-top: 0; }
+        .task-navy .instruction-box { border-left: 4px solid #1e3a8a; }
+
+        /* Common Elements */
+        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; text-align: center; }
+        
+        /* Score Banner */
+        .score-banner {
+            background: #f1f5f9;
+            border: 2px solid #1e3a8a;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .score-banner strong { color: #1e3a8a; font-size: 18px; }
+        .score-pill {
+            background: #1e3a8a;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* Inputs & Textareas */
+        .question-row { margin-bottom: 22px; padding-bottom: 15px; border-bottom: 1px solid #f0f0f0; }
+        .question-row:last-of-type { border-bottom: none; }
+        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
+        .marks-badge { font-size: 13px; color: #555; font-weight: normal; margin-left: 6px; }
+        
+        .auto-input { 
+            width: 100%; 
+            max-width: 420px; 
+            padding: 12px; 
+            font-size: 16px; 
+            border: 2px solid #ccc; 
+            border-radius: 4px; 
+            transition: all 0.3s ease; 
+            box-sizing: border-box; 
+            background-color: white; 
+            font-family: inherit; 
+        }
+        .auto-input:focus { outline: none; border-color: #666; }
+
+        /* Helper Headings & Binary Grid Display */
+        .helper-headings { display: flex; gap: 4px; max-width: 250px; margin-bottom: 4px; }
+        .helper-headings span { flex: 1; text-align: center; font-size: 12px; font-weight: bold; color: #444; background: #e9ecef; border-radius: 2px; padding: 3px 0; }
+        .helper-headings-8bit { max-width: 400px; }
+
+        .binary-bits { display: flex; gap: 4px; max-width: 250px; margin-bottom: 8px; }
+        .binary-bits span { flex: 1; text-align: center; font-size: 15px; font-weight: bold; color: #111; background: #f8f9fa; border: 1px solid #cbd5e1; border-radius: 2px; padding: 5px 0; font-family: monospace; }
+        .binary-bits-8bit { max-width: 400px; }
+
+        /* Binary Addition Table Styling */
+        .bin-table { border-collapse: collapse; margin-bottom: 10px; font-family: monospace; font-size: 16px; }
+        .bin-table th, .bin-table td { border: 1px solid #cbd5e1; padding: 6px 14px; text-align: center; }
+        .bin-table th { background-color: #e9ecef; font-size: 12px; color: #444; }
+        .bin-table tr.op-row td { border-bottom: 2px solid #333; }
+
+        /* Correct & Incorrect Answer Styling */
+        .input-correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
+        .input-incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
+        
+        /* Buttons */
+        .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; max-width: 220px; transition: background-color 0.2s; }
+        .btn-submit:hover { background-color: #152960; }
+        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
+        .btn-pdf:hover { background-color: #124d2d; }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER CONTAINING LOGO ETC. -->
+    <div id="pdf-content">
+        <header>
+            <div class="header-left">
+                <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
+            </div>
+            <div class="header-center"><h1>Year 8 Term 1 Assessment</h1></div>
+            <div class="header-right"><a href="index.html" class="back-btn">&larr; Back to Home</a></div>
+        </header>
+
+        <main class="task-container">
+
+            <!-- LIVE SCORE BANNER -->
+            <div class="score-banner">
+                <div>
+                    <strong>Year 8 Term 1 Self-Marking Assessment</strong><br>
+                    <span style="font-size: 14px; color: #475569;">Complete all 50 marks across Sections A–D. Click "Check Section" to mark your work.</span>
+                </div>
+                <div class="score-pill" id="live-score-display">Score: 0 / 50</div>
+            </div>
+
+            <!-- SECTION A (RED): Binary Units & 4-Bit / 8-Bit Conversions (13 Marks) -->
+            <div class="task-card task-maroon">
+                <h2>Section A (Red): Binary Units &amp; Conversions (13 Marks)</h2>
+                <div class="instruction-box">
+                    Recall binary units and convert between binary and denary numbers.
+                </div>
+
+                <!-- Paper Q1 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q1. What is the name for a single <code>1</code> or <code>0</code> in Binary? Clue: begins with "b". <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-a-input" data-answers='["bit","a bit"]' placeholder="Enter answer...">
+                </div>
+
+                <!-- Paper Q2 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q2. How many bits are there in a Nibble? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-a-input" data-answers='["4","four"]' placeholder="Enter number...">
+                </div>
+
+                <!-- Paper Q3 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q3. What is the name for a collection of 8 bits? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["C"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Nibble</option>
+                        <option value="B">B &mdash; Megabyte</option>
+                        <option value="C">C &mdash; Byte</option>
+                    </select>
+                </div>
+
+                <!-- Paper Q4 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q4. Convert the following 4-bit Binary value into Denary: <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <div class="binary-bits"><span>0</span><span>1</span><span>0</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-a-input" data-answers='["5"]' placeholder="Enter denary answer...">
+                </div>
+
+                <!-- Paper Q5 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q5. Convert the Denary number <code>13</code> into a 4-bit Binary value: <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-a-input" data-answers='["1101"]' placeholder="Enter 4-bit binary...">
+                </div>
+
+                <!-- Paper Q6 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q6. What is the largest number that can be made using a 4-bit Binary value? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-a-input" data-answers='["15"]' placeholder="Enter denary answer...">
+                </div>
+
+                <!-- Paper Q7 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q7. Convert the following 8-bit Binary value into Denary: <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <div class="binary-bits binary-bits-8bit"><span>0</span><span>0</span><span>1</span><span>0</span><span>0</span><span>1</span><span>0</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-a-input" data-answers='["37"]' placeholder="Enter denary answer...">
+                </div>
+
+                <!-- Paper Q8 [2 marks -> 2x 1-mark nibbles or 1x 2-mark input? Using 1 mark per input item so score = 50/50!] -->
+                <div class="question-row">
+                    <label class="question-label">Q8. Convert the Denary number <code>192</code> into an 8-bit Binary value (write all 8 bits): <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-a-input" data-answers='["11000000"]' placeholder="Enter 8-bit binary...">
+                </div>
+
+                <!-- Paper Q9 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q9. What is the largest number that can be made using an 8-bit Binary value? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-a-input" data-answers='["255"]' placeholder="Enter denary answer...">
+                </div>
+
+                <!-- Extension Q10 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q10. Convert the 8-bit Binary value <code>10110110</code> into Denary: <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-a-input" data-answers='["182"]' placeholder="Enter denary answer...">
+                </div>
+
+                <!-- Extension Q11 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q11. Convert the Denary number <code>75</code> into an 8-bit Binary value: <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-a-input" data-answers='["01001011"]' placeholder="Enter 8-bit binary...">
+                </div>
+
+                <!-- Extension Q12 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q12. Convert the Denary number <code>214</code> into an 8-bit Binary value: <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-a-input" data-answers='["11010110"]' placeholder="Enter 8-bit binary...">
+                </div>
+
+                <!-- Extension Q13 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q13. How many total different denary values can be stored in 1 Byte (including <code>0</code>)? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-a-input" data-answers='["256"]' placeholder="Enter number...">
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('sec-a-input')">Check Section A</button>
+            </div>
+
+            <!-- SECTION B (AMBER): Binary Addition & Overflow Errors (13 Marks) -->
+            <div class="task-card task-amber">
+                <h2>Section B (Amber): Binary Addition &amp; Overflow Errors (13 Marks)</h2>
+                <div class="instruction-box">
+                    Apply the binary addition rules to complete 4-bit and 8-bit additions and identify overflow errors.
+                </div>
+
+                <!-- Paper Q10 [1 mark for 4-bit sum] -->
+                <div class="question-row">
+                    <label class="question-label">Q14. Complete the following 4-bit Binary Addition: <span class="marks-badge">[1 mark]</span></label>
+                    <table class="bin-table">
+                        <tr><th></th><th>8</th><th>4</th><th>2</th><th>1</th></tr>
+                        <tr><td></td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="op-row"><td>+</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                    </table>
+                    <input type="text" class="auto-input sec-b-input" data-answers='["1010"]' placeholder="Enter 4-bit sum...">
+                </div>
+
+                <!-- Paper Q11 [1 mark for 4-bit sum] -->
+                <div class="question-row">
+                    <label class="question-label">Q15. Complete the following 4-bit Binary Addition: <span class="marks-badge">[1 mark]</span></label>
+                    <table class="bin-table">
+                        <tr><th></th><th>8</th><th>4</th><th>2</th><th>1</th></tr>
+                        <tr><td></td><td>0</td><td>1</td><td>0</td><td>1</td></tr>
+                        <tr class="op-row"><td>+</td><td>1</td><td>0</td><td>1</td><td>1</td></tr>
+                    </table>
+                    <input type="text" class="auto-input sec-b-input" data-answers='["0000","10000"]' placeholder="Enter 4-bit sum...">
+                </div>
+
+                <!-- Paper Q12 [1 mark for 4-bit sum] -->
+                <div class="question-row">
+                    <label class="question-label">Q16. Complete the following 4-bit Binary Addition: <span class="marks-badge">[1 mark]</span></label>
+                    <table class="bin-table">
+                        <tr><th></th><th>8</th><th>4</th><th>2</th><th>1</th></tr>
+                        <tr><td></td><td>0</td><td>1</td><td>1</td><td>0</td></tr>
+                        <tr class="op-row"><td>+</td><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+                    </table>
+                    <input type="text" class="auto-input sec-b-input" data-answers='["0011","10011"]' placeholder="Enter 4-bit sum...">
+                </div>
+
+                <!-- Paper Q13 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q17. An overflow error has occurred in the previous question; do we ignore the overflow bit? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-b-input" data-answers='["A"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Yes</option>
+                        <option value="B">B &mdash; No</option>
+                    </select>
+                </div>
+
+                <!-- Extension Q18–Q21: Binary Addition Rules -->
+                <div class="question-row">
+                    <label class="question-label">Q18. Binary Addition Rule: What is <code>0 + 0</code>? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-b-input" data-answers='["0","0 carry 0"]' placeholder="Enter result...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q19. Binary Addition Rule: What is <code>1 + 0</code> (or <code>0 + 1</code>)? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-b-input" data-answers='["1","1 carry 0"]' placeholder="Enter result...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q20. Binary Addition Rule: What is <code>1 + 1</code> in binary? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-b-input" data-answers='["10","0 carry 1"]' placeholder="Enter binary result (e.g. 10 or 0 carry 1)...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q21. Binary Addition Rule: What is <code>1 + 1 + 1</code> in binary? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-b-input" data-answers='["11","1 carry 1"]' placeholder="Enter binary result (e.g. 11 or 1 carry 1)...">
+                </div>
+
+                <!-- Extension Q22 -->
+                <div class="question-row">
+                    <label class="question-label">Q22. Complete the 4-bit Binary Addition: <code>0011 + 1001</code> <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-b-input" data-answers='["1100"]' placeholder="Enter 4-bit binary...">
+                </div>
+
+                <!-- Extension Q23 -->
+                <div class="question-row">
+                    <label class="question-label">Q23. Complete the 4-bit Binary Addition: <code>1010 + 0101</code> <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-b-input" data-answers='["1111"]' placeholder="Enter 4-bit binary...">
+                </div>
+
+                <!-- Extension Q24 -->
+                <div class="question-row">
+                    <label class="question-label">Q24. Complete the 8-bit Binary Addition: <code>01010110 + 00101001</code> <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-b-input" data-answers='["01111111"]' placeholder="Enter 8-bit binary...">
+                </div>
+
+                <!-- Extension Q25 -->
+                <div class="question-row">
+                    <label class="question-label">Q25. Does an overflow error happen when adding 8-bit binary <code>11000000 + 01000000</code>? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-b-input" data-answers='["A"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Yes, because 192 + 64 = 256, which requires 9 bits</option>
+                        <option value="B">B &mdash; No, because 256 fits inside 8 bits</option>
+                    </select>
+                </div>
+
+                <!-- Extension Q26 -->
+                <div class="question-row">
+                    <label class="question-label">Q26. Why does an overflow error cause a problem in a computer system? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-b-input" data-answers='["B"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; It permanently deletes the hard drive</option>
+                        <option value="B">B &mdash; The extra carry bit is lost, producing an inaccurate calculation result</option>
+                        <option value="C">C &mdash; It slows down the monitor's refresh rate</option>
+                    </select>
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('sec-b-input')">Check Section B</button>
+            </div>
+
+            <!-- SECTION C (GREEN): Representing Bitmap Images (14 Marks) -->
+            <div class="task-card task-green">
+                <h2>Section C (Green): Representing Bitmap Images (14 Marks)</h2>
+                <div class="instruction-box">
+                    Answer questions on pixels, resolution, colour depth, and image file size calculations.
+                </div>
+
+                <!-- Paper Q14 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q27. What is the name for the squares that make up an image? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-c-input" data-answers='["C"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Blocks</option>
+                        <option value="B">B &mdash; Bytes</option>
+                        <option value="C">C &mdash; Pixels</option>
+                    </select>
+                </div>
+
+                <!-- Paper Q15 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q28. The total number of pixels used to make up an image is called: <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-c-input" data-answers='["A"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Resolution</option>
+                        <option value="B">B &mdash; Frequency</option>
+                        <option value="C">C &mdash; Colour Depth</option>
+                    </select>
+                </div>
+
+                <!-- Paper Q16 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q29. What does the term <strong>Colour Depth</strong> mean? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-c-input" data-answers='["C"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; The brightness of the image</option>
+                        <option value="B">B &mdash; The size of the image on a screen</option>
+                        <option value="C">C &mdash; The number of bits used to store each pixel</option>
+                    </select>
+                </div>
+
+                <!-- Paper Q17 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q30. Identify ONE benefit of increasing the number of pixels in an image: <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-c-input" data-answers='["C"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; The resolution of the image reduces</option>
+                        <option value="B">B &mdash; The image becomes blurry</option>
+                        <option value="C">C &mdash; The quality of the image improves</option>
+                    </select>
+                </div>
+
+                <!-- Paper Q18 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q31. Identify ONE drawback of increasing the number of pixels in an image: <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-c-input" data-answers='["A"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; The file size of the image will increase</option>
+                        <option value="B">B &mdash; The quality of the image reduces</option>
+                        <option value="C">C &mdash; The resolution of the image reduces</option>
+                    </select>
+                </div>
+
+                <!-- Extension Q32 -->
+                <div class="question-row">
+                    <label class="question-label">Q32. What is the short term for <strong>"Picture Element"</strong>? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["pixel","pixels"]' placeholder="Enter term...">
+                </div>
+
+                <!-- Extension Q33 -->
+                <div class="question-row">
+                    <label class="question-label">Q33. A black-and-white image uses a colour depth of <code>1 bit</code> per pixel. How many different colours can each pixel be? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["2","two"]' placeholder="Enter number...">
+                </div>
+
+                <!-- Extension Q34 -->
+                <div class="question-row">
+                    <label class="question-label">Q34. An image uses a colour depth of <code>2 bits</code> per pixel (<code>00</code>, <code>01</code>, <code>10</code>, <code>11</code>). How many different colours can it represent? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["4","four"]' placeholder="Enter number...">
+                </div>
+
+                <!-- Extension Q35 -->
+                <div class="question-row">
+                    <label class="question-label">Q35. An image uses a colour depth of <code>4 bits</code> per pixel. What is the maximum number of colours it can represent? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["16","sixteen"]' placeholder="Enter number...">
+                </div>
+
+                <!-- Extension Q36 -->
+                <div class="question-row">
+                    <label class="question-label">Q36. An image uses a colour depth of <code>8 bits</code> (1 byte) per pixel. How many different colours can it represent? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["256"]' placeholder="Enter number...">
+                </div>
+
+                <!-- Extension Q37 -->
+                <div class="question-row">
+                    <label class="question-label">Q37. How many pixels in total are in a bitmap image that is <code>10 pixels</code> wide by <code>8 pixels</code> high? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["80","80 pixels"]' placeholder="Enter number of pixels...">
+                </div>
+
+                <!-- Extension Q38 -->
+                <div class="question-row">
+                    <label class="question-label">Q38. Calculate the file size in <strong>bits</strong> of a <code>10 &times; 10</code> pixel image with a colour depth of <code>2 bits</code> per pixel: <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["200","200 bits"]' placeholder="Enter file size in bits...">
+                </div>
+
+                <!-- Extension Q39 -->
+                <div class="question-row">
+                    <label class="question-label">Q39. Calculate the file size in <strong>bytes</strong> of an <code>8 &times; 8</code> pixel image with a colour depth of <code>8 bits</code> (1 byte) per pixel: <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["64","64 bytes"]' placeholder="Enter file size in bytes...">
+                </div>
+
+                <!-- Extension Q40 -->
+                <div class="question-row">
+                    <label class="question-label">Q40. What is <strong>metadata</strong> in an image file? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-c-input" data-answers='["B"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; The brightest pixel in the top-left corner</option>
+                        <option value="B">B &mdash; Extra data stored in the file about the image (such as width, height, and colour depth)</option>
+                        <option value="C">C &mdash; A tool used to crop an image</option>
+                    </select>
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('sec-c-input')">Check Section C</button>
+            </div>
+
+            <!-- SECTION D (BLUE): Computational Thinking & Problem Solving (10 Marks) -->
+            <div class="task-card task-navy">
+                <h2>Section D (Blue): Computational Thinking &amp; Problem Solving (10 Marks)</h2>
+                <div class="instruction-box">
+                    Match the Computational Thinking keywords to their definitions and apply them to computing scenarios.
+                </div>
+
+                <!-- Paper Q19a [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q41. Match the keyword <strong>Abstraction</strong> to its definition: <span class="marks-badge">[1 mark]</span></label>
+                    <select class="auto-input sec-d-input" data-answers='["C"]'>
+                        <option value="">-- Choose a definition --</option>
+                        <option value="A">A &mdash; Breaking a problem down into smaller, more manageable tasks</option>
+                        <option value="B">B &mdash; Being able to spot similarities in data to help solve problems</option>
+                        <option value="C">C &mdash; Removing unnecessary information and only focusing on the important facts</option>
+                    </select>
+                </div>
+
+                <!-- Paper Q19b [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q42. Match the keyword <strong>Decomposition</strong> to its definition: <span class="marks-badge">[1 mark]</span></label>
+                    <select class="auto-input sec-d-input" data-answers='["A"]'>
+                        <option value="">-- Choose a definition --</option>
+                        <option value="A">A &mdash; Breaking a problem down into smaller, more manageable tasks</option>
+                        <option value="B">B &mdash; Being able to spot similarities in data to help solve problems</option>
+                        <option value="C">C &mdash; Removing unnecessary information and only focusing on the important facts</option>
+                    </select>
+                </div>
+
+                <!-- Paper Q19c [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q43. Match the keyword <strong>Pattern Recognition</strong> to its definition: <span class="marks-badge">[1 mark]</span></label>
+                    <select class="auto-input sec-d-input" data-answers='["B"]'>
+                        <option value="">-- Choose a definition --</option>
+                        <option value="A">A &mdash; Breaking a problem down into smaller, more manageable tasks</option>
+                        <option value="B">B &mdash; Being able to spot similarities in data to help solve problems</option>
+                        <option value="C">C &mdash; Removing unnecessary information and only focusing on the important facts</option>
+                    </select>
+                </div>
+
+                <!-- Extension Q44 -->
+                <div class="question-row">
+                    <label class="question-label">Q44. Which 4th Computational Thinking element is missing from Questions 41–43? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["algorithmic thinking","algorithm","algorithms"]' placeholder="Enter missing element...">
+                </div>
+
+                <!-- Extension Q45 -->
+                <div class="question-row">
+                    <label class="question-label">Q45. What does <strong>Algorithmic Thinking</strong> involve? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-d-input" data-answers='["B"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Deleting all files on a computer</option>
+                        <option value="B">B &mdash; Developing a clear, step-by-step set of rules or instructions to solve a problem</option>
+                        <option value="C">C &mdash; Converting bitmap images into sound waves</option>
+                    </select>
+                </div>
+
+                <!-- Extension Q46 -->
+                <div class="question-row">
+                    <label class="question-label">Q46. A game designer splits a new video game into separate tasks: character movement, scoring system, sound effects, and level design. Which skill is this? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-d-input" data-answers='["A"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Decomposition</option>
+                        <option value="B">B &mdash; Abstraction</option>
+                        <option value="C">C &mdash; Colour Depth</option>
+                    </select>
+                </div>
+
+                <!-- Extension Q47 -->
+                <div class="question-row">
+                    <label class="question-label">Q47. A weather app notices that every time air pressure drops quickly and wind turns south-west, rain follows within 3 hours. Which skill is this? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-d-input" data-answers='["C"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Abstraction</option>
+                        <option value="B">B &mdash; Overflow</option>
+                        <option value="C">C &mdash; Pattern Recognition</option>
+                    </select>
+                </div>
+
+                <!-- Extension Q48 -->
+                <div class="question-row">
+                    <label class="question-label">Q48. A sat-nav map removes individual trees, house numbers, and garden fences so the driver only sees roads and junctions. Which skill is this? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-d-input" data-answers='["B"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Decomposition</option>
+                        <option value="B">B &mdash; Abstraction</option>
+                        <option value="C">C &mdash; Pattern Recognition</option>
+                    </select>
+                </div>
+
+                <!-- Extension Q49 -->
+                <div class="question-row">
+                    <label class="question-label">Q49. Why is <strong>Decomposition</strong> helpful when a team of programmers is building a large piece of software? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-d-input" data-answers='["A"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Different team members can work on smaller sub-problems at the same time and test them easily</option>
+                        <option value="B">B">B &mdash; It reduces the colour depth of every image</option>
+                        <option value="C">C &mdash; It means nobody needs to write any algorithms</option>
+                    </select>
+                </div>
+
+                <!-- Extension Q50 -->
+                <div class="question-row">
+                    <label class="question-label">Q50. What is an <strong>algorithm</strong>? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-d-input" data-answers='["C"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; A type of computer monitor</option>
+                        <option value="B">B &mdash; A single binary digit</option>
+                        <option value="C">C &mdash; A precise, step-by-step set of instructions for completing a task</option>
+                    </select>
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('sec-d-input')">Check Section D</button>
+            </div>
+
+            <!-- CHECK ALL BUTTON CARD -->
+            <div class="task-card task-plenary" style="text-align: center;">
+                <h2>Finish &amp; Mark Full Assessment</h2>
+                <p style="color: #444; margin-bottom: 18px;">Click below to mark all 50 marks and sync your final score to your teacher's markbook.</p>
+                <button class="btn-submit no-print" style="margin: 0 auto; max-width: 260px; background-color: #008f39; font-size: 17px;" onclick="checkAllSections()">Mark All 50 Marks</button>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- RESET PAGE BUTTON -->
+    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
+        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        &copy; 2026 Delta Serlby Park - Computing &amp; Business Department
+    </footer>
+
+    <!-- SCRIPT -->
+    <script>
+        /* --- 1. FIREBASE CONFIGURATION & INITIALIZATION --- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "y8-term1-assessment";
+
+        /* --- 2. HELPER FOR TEACHER MARKBOOK LABELS --- */
+        function findLabelForInput(el, index) {
+            const row = el.closest('.question-row');
+            if (row) {
+                const lbl = row.querySelector('.question-label');
+                if (lbl && lbl.innerText.trim()) {
+                    return lbl.innerText.replace(/\s+/g, ' ').trim();
+                }
+            }
+            if (el.placeholder) return el.placeholder;
+            return 'Question ' + (index + 1);
+        }
+
+        /* --- 3. FIREBASE AUTO-SAVE LOGIC --- */
+        let saveTimer;
+        function saveProgress(immediate = false) {
+            const user = auth.currentUser;
+            const inputs = document.querySelectorAll('.auto-input');
+            const dataToSave = {
+                pageTitle: document.title || LESSON_ID,
+                lastUpdated: Date.now(),
+                items: []
+            };
+
+            let correctCount = 0;
+            let totalGradable = 0;
+
+            for (let i = 0; i < inputs.length; i++) {
+                const el = inputs[i];
+                const cls = el.className || '';
+                let status = 'neutral';
+
+                if (el.hasAttribute('data-answers')) {
+                    totalGradable++;
+                    if (cls.includes('input-correct')) {
+                        status = 'correct';
+                        correctCount++;
+                    } else if (cls.includes('input-incorrect')) {
+                        status = 'incorrect';
+                    }
+                }
+
+                dataToSave['input_' + i] = el.value;
+                dataToSave['class_' + i] = cls;
+
+                dataToSave.items.push({
+                    index: i,
+                    label: findLabelForInput(el, i),
+                    value: el.value,
+                    status: status
+                });
+            }
+
+            const scoreBanner = document.getElementById('live-score-display');
+            if (scoreBanner && totalGradable > 0) {
+                scoreBanner.textContent = "Score: " + correctCount + " / " + totalGradable;
+            }
+
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            if (totalGradable > 0) {
+                dataToSave.scoreText = "Score: " + correctCount + " / " + totalGradable;
+            }
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(function() {
+                db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
+                  .set(dataToSave, { merge: true })
+                  .catch(function(err) { console.error("Cloud save error:", err); });
+            }, immediate ? 50 : 800);
+        }
+
+        /* --- 4. FIREBASE AUTO-LOAD LOGIC --- */
+        function applySavedData(data) {
+            const inputs = document.querySelectorAll('.auto-input');
+            for (let i = 0; i < inputs.length; i++) {
+                const savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined) {
+                    inputs[i].value = savedVal;
+                }
+            }
+
+            checkAnswers('sec-a-input', false);
+            checkAnswers('sec-b-input', false);
+            checkAnswers('sec-c-input', false);
+            checkAnswers('sec-d-input', false);
+            saveProgress(false);
+        }
+
+        auth.onAuthStateChanged(async function(user) {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud work:", err);
+                }
+            }
+        });
+
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                saveProgress(false);
+            }
+        });
+
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                saveProgress(false);
+            }
+        });
+
+        async function clearData() {
+            if (confirm("Are you sure you want to clear all your answers on this assessment?")) {
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
+                    } catch (err) {
+                        console.error("Error clearing cloud data:", err);
+                    }
+                }
+                window.location.reload();
+            }
+        }
+
+        /* --- 5. BATCH-MARKING LOGIC --- */
+        function checkAnswers(groupClass, triggerSync = true) {
+            const inputs = document.getElementsByClassName(groupClass);
+            
+            for (let i = 0; i < inputs.length; i++) {
+                const el = inputs[i];
+                el.classList.remove('input-correct', 'input-incorrect');
+
+                const studentAnswer = el.value.toLowerCase().trim();
+                if (studentAnswer === "") continue;
+
+                const acceptedAnswers = JSON.parse(el.getAttribute('data-answers'));
+                let isCorrect = false;
+                for (let j = 0; j < acceptedAnswers.length; j++) {
+                    if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
+                        isCorrect = true;
+                        break;
+                    }
+                }
+                el.classList.add(isCorrect ? 'input-correct' : 'input-incorrect');
+            }
+
+            if (triggerSync) {
+                saveProgress(true);
+            }
+        }
+
+        function checkAllSections() {
+            checkAnswers('sec-a-input', false);
+            checkAnswers('sec-b-input', false);
+            checkAnswers('sec-c-input', false);
+            checkAnswers('sec-d-input', true);
+        }
+    </script>
+</body>
+</html>
