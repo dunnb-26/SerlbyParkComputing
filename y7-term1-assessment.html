@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Year 7 Term 1 Self-Marking Assessment</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* Task Container Styling */
+        .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
+        
+        .task-card { 
+            background: white; 
+            border-radius: 8px; 
+            padding: 25px; 
+            margin-bottom: 30px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            page-break-inside: avoid; 
+        }
+        
+        /* Section Header Colors */
+        .task-prep { border-top: 6px solid #607d8b; } 
+        .task-prep h2 { color: #607d8b; margin-top: 0; }
+        
+        .task-plenary { border-top: 6px solid #673ab7; } 
+        .task-plenary h2 { color: #673ab7; margin-top: 0; }
+
+        /* RAGB Colors */
+        .task-maroon { border-top: 6px solid #800000; }
+        .task-maroon h2 { color: #800000; margin-top: 0; }
+        .task-maroon .instruction-box { border-left: 4px solid #800000; }
+
+        .task-amber { border-top: 6px solid #ffb300; }
+        .task-amber h2 { color: #ffb300; margin-top: 0; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
+        .task-amber .instruction-box { border-left: 4px solid #ffb300; }
+
+        .task-green { border-top: 6px solid #008f39; }
+        .task-green h2 { color: #008f39; margin-top: 0; }
+        .task-green .instruction-box { border-left: 4px solid #008f39; }
+
+        .task-navy { border-top: 6px solid #1e3a8a; }
+        .task-navy h2 { color: #1e3a8a; margin-top: 0; }
+        .task-navy .instruction-box { border-left: 4px solid #1e3a8a; }
+
+        /* Common Elements */
+        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; text-align: center; }
+        
+        /* Score Banner */
+        .score-banner {
+            background: #f1f5f9;
+            border: 2px solid #1e3a8a;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .score-banner strong { color: #1e3a8a; font-size: 18px; }
+        .score-pill {
+            background: #1e3a8a;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* Inputs & Textareas */
+        .question-row { margin-bottom: 22px; padding-bottom: 15px; border-bottom: 1px solid #f0f0f0; }
+        .question-row:last-of-type { border-bottom: none; }
+        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
+        .marks-badge { font-size: 13px; color: #555; font-weight: normal; margin-left: 6px; }
+        
+        .auto-input { 
+            width: 100%; 
+            max-width: 420px; 
+            padding: 12px; 
+            font-size: 16px; 
+            border: 2px solid #ccc; 
+            border-radius: 4px; 
+            transition: all 0.3s ease; 
+            box-sizing: border-box; 
+            background-color: white; 
+            font-family: inherit; 
+        }
+        .auto-input:focus { outline: none; border-color: #666; }
+
+        /* Checkbox / Multi-select styling */
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 480px;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 4px;
+        }
+        .checkbox-group label:hover { background: #edf2f7; }
+        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+
+        /* Formatting Button Badges */
+        .fmt-icon {
+            display: inline-block;
+            border: 2px solid #333;
+            background: #f8f9fa;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-family: Georgia, serif;
+            font-size: 18px;
+            margin: 0 4px;
+        }
+
+        /* Helper Headings & Binary Grid Display */
+        .helper-headings { display: flex; gap: 4px; max-width: 250px; margin-bottom: 4px; }
+        .helper-headings span { flex: 1; text-align: center; font-size: 12px; font-weight: bold; color: #444; background: #e9ecef; border-radius: 2px; padding: 3px 0; }
+        .helper-headings-8bit { max-width: 400px; }
+
+        .binary-bits { display: flex; gap: 4px; max-width: 250px; margin-bottom: 8px; }
+        .binary-bits span { flex: 1; text-align: center; font-size: 15px; font-weight: bold; color: #111; background: #f8f9fa; border: 1px solid #cbd5e1; border-radius: 2px; padding: 5px 0; font-family: monospace; }
+        .binary-bits-8bit { max-width: 400px; }
+
+        /* Correct & Incorrect Answer Styling */
+        .input-correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
+        .input-incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
+        
+        /* Buttons */
+        .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; max-width: 220px; transition: background-color 0.2s; }
+        .btn-submit:hover { background-color: #152960; }
+        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
+        .btn-pdf:hover { background-color: #124d2d; }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER CONTAINING LOGO ETC. -->
+    <div id="pdf-content">
+        <header>
+            <div class="header-left">
+                <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
+            </div>
+            <div class="header-center"><h1>Year 7 Term 1 Assessment</h1></div>
+            <div class="header-right"><a href="index.html" class="back-btn">&larr; Back to Home</a></div>
+        </header>
+
+        <main class="task-container">
+
+            <!-- LIVE SCORE BANNER -->
+            <div class="score-banner">
+                <div>
+                    <strong>Year 7 Term 1 Self-Marking Assessment</strong><br>
+                    <span style="font-size: 14px; color: #475569;">Complete all 50 questions across Sections A–E. Click "Check Section Answers" to mark your work.</span>
+                </div>
+                <div class="score-pill" id="live-score-display">Score: 0 / 50</div>
+            </div>
+
+            <!-- SECTION A (RED): Digital Literacy & Passwords (Q1–Q10) -->
+            <div class="task-card task-maroon">
+                <h2>Section A (Red): Passwords, Keyboard &amp; Formatting (Q1–Q10)</h2>
+                <div class="instruction-box">
+                    Answer the core digital literacy, password security, and document formatting questions below.
+                </div>
+
+                <!-- Paper Q1 -->
+                <div class="question-row">
+                    <label class="question-label">Q1. Select TWO items that you should NOT include in a password: <span class="marks-badge">[Tick TWO]</span></label>
+                    <div class="checkbox-group auto-checkbox-group sec-a-input" data-answers='["B","C"]' data-required="2">
+                        <label><input type="checkbox" value="A"> A &mdash; Random words</label>
+                        <label><input type="checkbox" value="B"> B &mdash; Pet names</label>
+                        <label><input type="checkbox" value="C"> C &mdash; Names of family members</label>
+                        <label><input type="checkbox" value="D"> D &mdash; Symbols</label>
+                    </div>
+                </div>
+
+                <!-- Paper Q2 -->
+                <div class="question-row">
+                    <label class="question-label">Q2. How many random words make up the perfect password? <span class="marks-badge">[Select ONE]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["A"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Three</option>
+                        <option value="B">B &mdash; One</option>
+                        <option value="C">C &mdash; Two</option>
+                    </select>
+                </div>
+
+                <!-- Paper Q3 -->
+                <div class="question-row">
+                    <label class="question-label">Q3. What are the top SIX letters on the keyboard? Clue: <code>Q_____</code></label>
+                    <input type="text" class="auto-input sec-a-input" data-answers='["qwerty"]' placeholder="Enter the 6 letters...">
+                </div>
+
+                <!-- Paper Q6 -->
+                <div class="question-row">
+                    <label class="question-label">Q4. What does the <span class="fmt-icon"><strong>B</strong></span> button do to text in a Word document? <span class="marks-badge">[Select ONE]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["B"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Makes all text capitals</option>
+                        <option value="B">B &mdash; Makes the text bold</option>
+                        <option value="C">C &mdash; Bookmarks the text for future reference</option>
+                    </select>
+                </div>
+
+                <!-- Paper Q7 -->
+                <div class="question-row">
+                    <label class="question-label">Q5. What does the <span class="fmt-icon"><u>U</u></span> button do to text in a Word document? <span class="marks-badge">[Select ONE]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["C"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Makes the text italic</option>
+                        <option value="B">B &mdash; Makes the text highlighted</option>
+                        <option value="C">C &mdash; Makes the text underlined</option>
+                    </select>
+                </div>
+
+                <!-- Extra Question 6 -->
+                <div class="question-row">
+                    <label class="question-label">Q6. What does the <span class="fmt-icon"><em>I</em></span> button do to selected text in a Word document? <span class="marks-badge">[Select ONE]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["A"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Makes the text italic (slanted)</option>
+                        <option value="B">B &mdash; Inserts an image</option>
+                        <option value="C">C &mdash; Indents the paragraph</option>
+                    </select>
+                </div>
+
+                <!-- Extra Question 7 -->
+                <div class="question-row">
+                    <label class="question-label">Q7. Which keyboard shortcut is used to <strong>Copy</strong> selected text or files? <span class="marks-badge">[Select ONE]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["B"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Ctrl + V</option>
+                        <option value="B">B &mdash; Ctrl + C</option>
+                        <option value="C">C &mdash; Ctrl + Z</option>
+                    </select>
+                </div>
+
+                <!-- Extra Question 8 -->
+                <div class="question-row">
+                    <label class="question-label">Q8. Which keyboard shortcut is used to <strong>Paste</strong> copied text or files? <span class="marks-badge">[Select ONE]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["A"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Ctrl + V</option>
+                        <option value="B">B &mdash; Ctrl + X</option>
+                        <option value="C">C &mdash; Ctrl + P</option>
+                    </select>
+                </div>
+
+                <!-- Extra Question 9 -->
+                <div class="question-row">
+                    <label class="question-label">Q9. Which of these passwords is the strongest and safest to use? <span class="marks-badge">[Select ONE]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["C"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Password123</option>
+                        <option value="B">B &mdash; Charlie2014</option>
+                        <option value="C">C &mdash; PurpleGiraffeToaster!</option>
+                    </select>
+                </div>
+
+                <!-- Extra Question 10 -->
+                <div class="question-row">
+                    <label class="question-label">Q10. What is the safest way to keep track of multiple strong passwords? <span class="marks-badge">[Select ONE]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["B"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Use the exact same password for every account</option>
+                        <option value="B">B &mdash; Use a reputable password manager</option>
+                        <option value="C">C &mdash; Write them on a sticky note on your monitor</option>
+                    </select>
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('sec-a-input')">Check Section A</button>
+            </div>
+
+            <!-- SECTION B (AMBER): Cloud Storage & Computational Thinking (Q11–Q20) -->
+            <div class="task-card task-amber">
+                <h2>Section B (Amber): Cloud Storage &amp; Computational Thinking (Q11–Q20)</h2>
+                <div class="instruction-box">
+                    Answer questions on cloud storage benefits/drawbacks and match the four pillars of Computational Thinking.
+                </div>
+
+                <!-- Paper Q4 -->
+                <div class="question-row">
+                    <label class="question-label">Q11. Select TWO benefits of using Cloud Storage: <span class="marks-badge">[Tick TWO]</span></label>
+                    <div class="checkbox-group auto-checkbox-group sec-b-input" data-answers='["A","C"]' data-required="2">
+                        <label><input type="checkbox" value="A"> A &mdash; Allows you to access your data from any device</label>
+                        <label><input type="checkbox" value="B"> B &mdash; Only works on a cloudy day</label>
+                        <label><input type="checkbox" value="C"> C &mdash; Can be used to back up your data</label>
+                        <label><input type="checkbox" value="D"> D &mdash; Can be expensive to run</label>
+                    </div>
+                </div>
+
+                <!-- Paper Q5 -->
+                <div class="question-row">
+                    <label class="question-label">Q12. Select TWO drawbacks of using Cloud Storage: <span class="marks-badge">[Tick TWO]</span></label>
+                    <div class="checkbox-group auto-checkbox-group sec-b-input" data-answers='["C","D"]' data-required="2">
+                        <label><input type="checkbox" value="A"> A &mdash; Does not work on a sunny day</label>
+                        <label><input type="checkbox" value="B"> B &mdash; Can't upload video files</label>
+                        <label><input type="checkbox" value="C"> C &mdash; Requires an Internet connection</label>
+                        <label><input type="checkbox" value="D"> D &mdash; Difficult to move to another provider</label>
+                    </div>
+                </div>
+
+                <!-- Paper Q8a -->
+                <div class="question-row">
+                    <label class="question-label">Q13. Match the keyword <strong>Abstraction</strong> to its correct definition:</label>
+                    <select class="auto-input sec-b-input" data-answers='["C"]'>
+                        <option value="">-- Choose a definition --</option>
+                        <option value="A">A &mdash; Breaking a problem down into smaller, more manageable tasks</option>
+                        <option value="B">B &mdash; Being able to spot similarities in data to help solve problems</option>
+                        <option value="C">C &mdash; Removing unnecessary information and only focusing on the important facts</option>
+                    </select>
+                </div>
+
+                <!-- Paper Q8b -->
+                <div class="question-row">
+                    <label class="question-label">Q14. Match the keyword <strong>Decomposition</strong> to its correct definition:</label>
+                    <select class="auto-input sec-b-input" data-answers='["A"]'>
+                        <option value="">-- Choose a definition --</option>
+                        <option value="A">A &mdash; Breaking a problem down into smaller, more manageable tasks</option>
+                        <option value="B">B &mdash; Being able to spot similarities in data to help solve problems</option>
+                        <option value="C">C &mdash; Removing unnecessary information and only focusing on the important facts</option>
+                    </select>
+                </div>
+
+                <!-- Paper Q8c -->
+                <div class="question-row">
+                    <label class="question-label">Q15. Match the keyword <strong>Pattern Recognition</strong> to its correct definition:</label>
+                    <select class="auto-input sec-b-input" data-answers='["B"]'>
+                        <option value="">-- Choose a definition --</option>
+                        <option value="A">A &mdash; Breaking a problem down into smaller, more manageable tasks</option>
+                        <option value="B">B &mdash; Being able to spot similarities in data to help solve problems</option>
+                        <option value="C">C &mdash; Removing unnecessary information and only focusing on the important facts</option>
+                    </select>
+                </div>
+
+                <!-- Extra Question 16 -->
+                <div class="question-row">
+                    <label class="question-label">Q16. Which 4th Computational Thinking element involves creating a step-by-step set of instructions to solve a problem?</label>
+                    <input type="text" class="auto-input sec-b-input" data-answers='["algorithmic thinking","algorithm","algorithms"]' placeholder="Enter Computational Thinking term...">
+                </div>
+
+                <!-- Extra Question 17 -->
+                <div class="question-row">
+                    <label class="question-label">Q17. Where are files physically stored when you save them to Cloud Storage? <span class="marks-badge">[Select ONE]</span></label>
+                    <select class="auto-input sec-b-input" data-answers='["B"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Floating in the sky above your house</option>
+                        <option value="B">B &mdash; On remote servers in data centres accessed via the Internet</option>
+                        <option value="C">C &mdash; Only inside your school computer's RAM</option>
+                    </select>
+                </div>
+
+                <!-- Extra Question 18 -->
+                <div class="question-row">
+                    <label class="question-label">Q18. Which of these is an example of a Cloud Storage service? <span class="marks-badge">[Select ONE]</span></label>
+                    <select class="auto-input sec-b-input" data-answers='["A"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Microsoft OneDrive / Google Drive</option>
+                        <option value="B">B &mdash; USB Memory Stick</option>
+                        <option value="C">C &mdash; DVD-ROM Disc</option>
+                    </select>
+                </div>
+
+                <!-- Extra Question 19 -->
+                <div class="question-row">
+                    <label class="question-label">Q19. A London Underground map hides exact street turns and distances so passengers can easily see stations and lines. Which Computational Thinking skill is this? <span class="marks-badge">[Select ONE]</span></label>
+                    <select class="auto-input sec-b-input" data-answers='["C"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Decomposition</option>
+                        <option value="B">B &mdash; Pattern Recognition</option>
+                        <option value="C">C &mdash; Abstraction</option>
+                    </select>
+                </div>
+
+                <!-- Extra Question 20 -->
+                <div class="question-row">
+                    <label class="question-label">Q20. Splitting a big school project into separate sections (research, planning, design, testing) is an example of: <span class="marks-badge">[Select ONE]</span></label>
+                    <select class="auto-input sec-b-input" data-answers='["A"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Decomposition</option>
+                        <option value="B">B &mdash; Abstraction</option>
+                        <option value="C">C &mdash; Binary Conversion</option>
+                    </select>
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('sec-b-input')">Check Section B</button>
+            </div>
+
+            <!-- SECTION C (GREEN): Binary Units & 4-Bit Conversions (Q21–Q35) -->
+            <div class="task-card task-green">
+                <h2>Section C (Green): Binary Units &amp; 4-Bit Conversions (Q21–Q35)</h2>
+                <div class="instruction-box">
+                    Recall binary units (bits, nibbles, bytes) and convert between 4-bit binary and denary numbers.
+                </div>
+
+                <!-- Paper Q9 -->
+                <div class="question-row">
+                    <label class="question-label">Q21. What is the name for a single <code>1</code> or <code>0</code> in Binary? Clue: begins with "b".</label>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["bit","a bit"]' placeholder="Enter answer...">
+                </div>
+
+                <!-- Paper Q10 -->
+                <div class="question-row">
+                    <label class="question-label">Q22. How many bits are there in a Nibble? <span class="marks-badge">[Select ONE]</span></label>
+                    <select class="auto-input sec-c-input" data-answers='["A"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; 4</option>
+                        <option value="B">B &mdash; 8</option>
+                        <option value="C">C &mdash; 16</option>
+                    </select>
+                </div>
+
+                <!-- Paper Q11 -->
+                <div class="question-row">
+                    <label class="question-label">Q23. What is the name for a collection of 8 bits? <span class="marks-badge">[Select ONE]</span></label>
+                    <select class="auto-input sec-c-input" data-answers='["C"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Nibble</option>
+                        <option value="B">B &mdash; Megabyte</option>
+                        <option value="C">C &mdash; Byte</option>
+                    </select>
+                </div>
+
+                <!-- Paper Q12 -->
+                <div class="question-row">
+                    <label class="question-label">Q24. Convert the following 4-bit Binary value into Denary:</label>
+                    <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <div class="binary-bits"><span>0</span><span>1</span><span>0</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["5"]' placeholder="Enter denary answer...">
+                </div>
+
+                <!-- Paper Q13 -->
+                <div class="question-row">
+                    <label class="question-label">Q25. Convert the following 4-bit Binary value into Denary:</label>
+                    <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <div class="binary-bits"><span>1</span><span>0</span><span>0</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["9"]' placeholder="Enter denary answer...">
+                </div>
+
+                <!-- Paper Q14 -->
+                <div class="question-row">
+                    <label class="question-label">Q26. Convert the following 4-bit Binary value into Denary:</label>
+                    <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <div class="binary-bits"><span>1</span><span>1</span><span>1</span><span>0</span></div>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["14"]' placeholder="Enter denary answer...">
+                </div>
+
+                <!-- Paper Q15 -->
+                <div class="question-row">
+                    <label class="question-label">Q27. Convert the Denary number <code>13</code> into 4-bit Binary:</label>
+                    <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["1101"]' placeholder="Enter 4-bit binary...">
+                </div>
+
+                <!-- Paper Q16 -->
+                <div class="question-row">
+                    <label class="question-label">Q28. Convert the Denary number <code>15</code> into 4-bit Binary:</label>
+                    <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["1111"]' placeholder="Enter 4-bit binary...">
+                </div>
+
+                <!-- Paper Q17 -->
+                <div class="question-row">
+                    <label class="question-label">Q29. Convert the Denary number <code>6</code> into 4-bit Binary:</label>
+                    <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["0110"]' placeholder="Enter 4-bit binary (4 digits)...">
+                </div>
+
+                <!-- Paper Q18 -->
+                <div class="question-row">
+                    <label class="question-label">Q30. What is the largest number that can be made using a 4-bit Binary value? <span class="marks-badge">[Select ONE]</span></label>
+                    <select class="auto-input sec-c-input" data-answers='["B"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; 255</option>
+                        <option value="B">B &mdash; 15</option>
+                        <option value="C">C &mdash; 67</option>
+                    </select>
+                </div>
+
+                <!-- Extra Question 31 -->
+                <div class="question-row">
+                    <label class="question-label">Q31. Convert the 4-bit Binary value <code>0011</code> into Denary:</label>
+                    <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["3"]' placeholder="Enter denary answer...">
+                </div>
+
+                <!-- Extra Question 32 -->
+                <div class="question-row">
+                    <label class="question-label">Q32. Convert the 4-bit Binary value <code>1011</code> into Denary:</label>
+                    <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["11"]' placeholder="Enter denary answer...">
+                </div>
+
+                <!-- Extra Question 33 -->
+                <div class="question-row">
+                    <label class="question-label">Q33. Convert the Denary number <code>7</code> into 4-bit Binary:</label>
+                    <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["0111"]' placeholder="Enter 4-bit binary (4 digits)...">
+                </div>
+
+                <!-- Extra Question 34 -->
+                <div class="question-row">
+                    <label class="question-label">Q34. Convert the Denary number <code>10</code> into 4-bit Binary:</label>
+                    <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["1010"]' placeholder="Enter 4-bit binary...">
+                </div>
+
+                <!-- Extra Question 35 -->
+                <div class="question-row">
+                    <label class="question-label">Q35. How many nibbles make up 1 Byte? <span class="marks-badge">[Select ONE]</span></label>
+                    <select class="auto-input sec-c-input" data-answers='["B"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; 1</option>
+                        <option value="B">B &mdash; 2</option>
+                        <option value="C">C &mdash; 4</option>
+                    </select>
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('sec-c-input')">Check Section C</button>
+            </div>
+
+            <!-- SECTION D (BLUE): 8-Bit Binary & Storage Units Challenge (Q36–Q50) -->
+            <div class="task-card task-navy">
+                <h2>Section D (Blue): 8-Bit Binary &amp; Storage Units Challenge (Q36–Q50)</h2>
+                <div class="instruction-box">
+                    Convert 8-bit binary bytes to denary, convert denary numbers into 8-bit binary, and order data storage units.
+                </div>
+
+                <!-- Paper Q19 -->
+                <div class="question-row">
+                    <label class="question-label">Q36. Convert the following 8-bit Binary value into Denary:</label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <div class="binary-bits binary-bits-8bit"><span>0</span><span>0</span><span>1</span><span>0</span><span>0</span><span>1</span><span>0</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["37"]' placeholder="Enter denary answer...">
+                </div>
+
+                <!-- Paper Q20 -->
+                <div class="question-row">
+                    <label class="question-label">Q37. What is the largest number that can be made using an 8-bit Binary value? <span class="marks-badge">[Select ONE]</span></label>
+                    <select class="auto-input sec-d-input" data-answers='["A"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; 255</option>
+                        <option value="B">B &mdash; 15</option>
+                        <option value="C">C &mdash; 67</option>
+                    </select>
+                </div>
+
+                <!-- Extra Question 38 -->
+                <div class="question-row">
+                    <label class="question-label">Q38. Convert the 8-bit Binary value <code>01001010</code> into Denary:</label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["74"]' placeholder="Enter denary answer...">
+                </div>
+
+                <!-- Extra Question 39 -->
+                <div class="question-row">
+                    <label class="question-label">Q39. Convert the 8-bit Binary value <code>10010011</code> into Denary:</label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["147"]' placeholder="Enter denary answer...">
+                </div>
+
+                <!-- Extra Question 40 -->
+                <div class="question-row">
+                    <label class="question-label">Q40. Convert the 8-bit Binary value <code>11001100</code> into Denary:</label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["204"]' placeholder="Enter denary answer...">
+                </div>
+
+                <!-- Extra Question 41 -->
+                <div class="question-row">
+                    <label class="question-label">Q41. Convert the 8-bit Binary value <code>10101010</code> into Denary:</label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["170"]' placeholder="Enter denary answer...">
+                </div>
+
+                <!-- Extra Question 42 -->
+                <div class="question-row">
+                    <label class="question-label">Q42. Convert the Denary number <code>42</code> into 8-bit Binary (8 digits):</label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["00101010"]' placeholder="Enter 8-bit binary...">
+                </div>
+
+                <!-- Extra Question 43 -->
+                <div class="question-row">
+                    <label class="question-label">Q43. Convert the Denary number <code>85</code> into 8-bit Binary (8 digits):</label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["01010101"]' placeholder="Enter 8-bit binary...">
+                </div>
+
+                <!-- Extra Question 44 -->
+                <div class="question-row">
+                    <label class="question-label">Q44. Convert the Denary number <code>168</code> into 8-bit Binary (8 digits):</label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["10101000"]' placeholder="Enter 8-bit binary...">
+                </div>
+
+                <!-- Extra Question 45 -->
+                <div class="question-row">
+                    <label class="question-label">Q45. Convert the Denary number <code>240</code> into 8-bit Binary (8 digits):</label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["11110000"]' placeholder="Enter 8-bit binary...">
+                </div>
+
+                <!-- Extra Question 46 -->
+                <div class="question-row">
+                    <label class="question-label">Q46. Why do computers use Binary (<code>1</code>s and <code>0</code>s) to represent all data? <span class="marks-badge">[Select ONE]</span></label>
+                    <select class="auto-input sec-d-input" data-answers='["B"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Because computers only have 2 keys on the keyboard</option>
+                        <option value="B">B &mdash; Because processors contain billions of tiny switches (transistors) that are either ON (1) or OFF (0)</option>
+                        <option value="C">C &mdash; Because denary numbers cannot be used in mathematics</option>
+                    </select>
+                </div>
+
+                <!-- Extra Question 47 -->
+                <div class="question-row">
+                    <label class="question-label">Q47. How many different denary values in total can be represented using 8 bits (including <code>0</code>)? <span class="marks-badge">[Select ONE]</span></label>
+                    <select class="auto-input sec-d-input" data-answers='["C"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; 128</option>
+                        <option value="B">B &mdash; 255</option>
+                        <option value="C">C &mdash; 256</option>
+                    </select>
+                </div>
+
+                <!-- Extra Question 48 -->
+                <div class="question-row">
+                    <label class="question-label">Q48. Which storage unit is larger than a Megabyte (MB) but smaller than a Terabyte (TB)? <span class="marks-badge">[Select ONE]</span></label>
+                    <select class="auto-input sec-d-input" data-answers='["B"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Kilobyte (KB)</option>
+                        <option value="B">B &mdash; Gigabyte (GB)</option>
+                        <option value="C">C &mdash; Nibble</option>
+                    </select>
+                </div>
+
+                <!-- Extra Question 49 -->
+                <div class="question-row">
+                    <label class="question-label">Q49. Put these storage units in order from <strong>smallest to largest</strong>: <span class="marks-badge">[Select ONE]</span></label>
+                    <select class="auto-input sec-d-input" data-answers='["A"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Bit &rarr; Nibble &rarr; Byte &rarr; Kilobyte &rarr; Megabyte</option>
+                        <option value="B">B &mdash; Byte &rarr; Bit &rarr; Nibble &rarr; Megabyte &rarr; Kilobyte</option>
+                        <option value="C">C &mdash; Bit &rarr; Byte &rarr; Nibble &rarr; Kilobyte &rarr; Megabyte</option>
+                    </select>
+                </div>
+
+                <!-- Extra Question 50 -->
+                <div class="question-row">
+                    <label class="question-label">Q50. If the rightmost bit (the <code>1</code>s column) of an 8-bit binary number is <code>1</code>, what must be true about the denary number? <span class="marks-badge">[Select ONE]</span></label>
+                    <select class="auto-input sec-d-input" data-answers='["B"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; It is always an even number</option>
+                        <option value="B">B &mdash; It is always an odd number</option>
+                        <option value="C">C &mdash; It is always greater than 128</option>
+                    </select>
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('sec-d-input')">Check Section D</button>
+            </div>
+
+            <!-- CHECK ALL BUTTON CARD -->
+            <div class="task-card task-plenary" style="text-align: center;">
+                <h2>Finish &amp; Mark Full Assessment</h2>
+                <p style="color: #444; margin-bottom: 18px;">Click below to mark all 50 questions and sync your final score to your teacher's markbook.</p>
+                <button class="btn-submit no-print" style="margin: 0 auto; max-width: 260px; background-color: #008f39; font-size: 17px;" onclick="checkAllSections()">Mark All 50 Questions</button>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- RESET PAGE BUTTON -->
+    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
+        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        &copy; 2026 Delta Serlby Park - Computing &amp; Business Department
+    </footer>
+
+    <!-- SCRIPT -->
+    <script>
+        /* --- 1. FIREBASE CONFIGURATION & INITIALIZATION --- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "y7-term1-assessment";
+
+        /* --- 2. HELPER FOR TEACHER MARKBOOK LABELS --- */
+        function findLabelForInput(el, index) {
+            const row = el.closest('.question-row');
+            if (row) {
+                const lbl = row.querySelector('.question-label');
+                if (lbl && lbl.innerText.trim()) {
+                    return lbl.innerText.replace(/\s+/g, ' ').trim();
+                }
+            }
+            if (el.placeholder) return el.placeholder;
+            return 'Question ' + (index + 1);
+        }
+
+        function getCheckboxGroupValue(groupEl) {
+            const checked = Array.from(groupEl.querySelectorAll('input[type="checkbox"]:checked'))
+                .map(cb => cb.value)
+                .sort();
+            return checked.join(',');
+        }
+
+        function setCheckboxGroupValue(groupEl, valStr) {
+            const selected = valStr ? valStr.split(',') : [];
+            groupEl.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.checked = selected.includes(cb.value);
+            });
+        }
+
+        /* --- 3. FIREBASE AUTO-SAVE LOGIC --- */
+        let saveTimer;
+        function saveProgress(immediate = false) {
+            const user = auth.currentUser;
+            const inputs = document.querySelectorAll('.auto-input, .auto-checkbox-group');
+            const dataToSave = {
+                pageTitle: document.title || LESSON_ID,
+                lastUpdated: Date.now(),
+                items: []
+            };
+
+            let correctCount = 0;
+            let totalGradable = 0;
+
+            for (let i = 0; i < inputs.length; i++) {
+                const el = inputs[i];
+                const cls = el.className || '';
+                let status = 'neutral';
+                const val = el.classList.contains('auto-checkbox-group')
+                    ? getCheckboxGroupValue(el)
+                    : el.value;
+
+                if (el.hasAttribute('data-answers')) {
+                    totalGradable++;
+                    if (cls.includes('input-correct')) {
+                        status = 'correct';
+                        correctCount++;
+                    } else if (cls.includes('input-incorrect')) {
+                        status = 'incorrect';
+                    }
+                }
+
+                dataToSave['input_' + i] = val;
+                dataToSave['class_' + i] = cls;
+
+                dataToSave.items.push({
+                    index: i,
+                    label: findLabelForInput(el, i),
+                    value: val,
+                    status: status
+                });
+            }
+
+            const scoreBanner = document.getElementById('live-score-display');
+            if (scoreBanner && totalGradable > 0) {
+                scoreBanner.textContent = "Score: " + correctCount + " / " + totalGradable;
+            }
+
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            if (totalGradable > 0) {
+                dataToSave.scoreText = "Score: " + correctCount + " / " + totalGradable;
+            }
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(function() {
+                db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
+                  .set(dataToSave, { merge: true })
+                  .catch(function(err) { console.error("Cloud save error:", err); });
+            }, immediate ? 50 : 800);
+        }
+
+        /* --- 4. FIREBASE AUTO-LOAD LOGIC --- */
+        function applySavedData(data) {
+            const inputs = document.querySelectorAll('.auto-input, .auto-checkbox-group');
+            for (let i = 0; i < inputs.length; i++) {
+                const savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined) {
+                    if (inputs[i].classList.contains('auto-checkbox-group')) {
+                        setCheckboxGroupValue(inputs[i], savedVal);
+                    } else {
+                        inputs[i].value = savedVal;
+                    }
+                }
+            }
+
+            checkAnswers('sec-a-input', false);
+            checkAnswers('sec-b-input', false);
+            checkAnswers('sec-c-input', false);
+            checkAnswers('sec-d-input', false);
+            saveProgress(false);
+        }
+
+        auth.onAuthStateChanged(async function(user) {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud work:", err);
+                }
+            }
+        });
+
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                saveProgress(false);
+            }
+        });
+
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('auto-input') || e.target.closest('.auto-checkbox-group')) {
+                saveProgress(false);
+            }
+        });
+
+        async function clearData() {
+            if (confirm("Are you sure you want to clear all your answers on this assessment?")) {
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
+                    } catch (err) {
+                        console.error("Error clearing cloud data:", err);
+                    }
+                }
+                window.location.reload();
+            }
+        }
+
+        /* --- 5. BATCH-MARKING LOGIC --- */
+        function checkAnswers(groupClass, triggerSync = true) {
+            const inputs = document.getElementsByClassName(groupClass);
+            
+            for (let i = 0; i < inputs.length; i++) {
+                const el = inputs[i];
+                el.classList.remove('input-correct', 'input-incorrect');
+
+                if (el.classList.contains('auto-checkbox-group')) {
+                    const selected = Array.from(el.querySelectorAll('input[type="checkbox"]:checked'))
+                        .map(cb => cb.value.toUpperCase())
+                        .sort();
+                    if (selected.length === 0) continue;
+
+                    const expected = JSON.parse(el.getAttribute('data-answers'))
+                        .map(a => a.toUpperCase())
+                        .sort();
+
+                    const isMatch = selected.length === expected.length &&
+                        selected.every((val, idx) => val === expected[idx]);
+
+                    el.classList.add(isMatch ? 'input-correct' : 'input-incorrect');
+                } else {
+                    const studentAnswer = el.value.toLowerCase().trim();
+                    if (studentAnswer === "") continue;
+
+                    const acceptedAnswers = JSON.parse(el.getAttribute('data-answers'));
+                    let isCorrect = false;
+                    for (let j = 0; j < acceptedAnswers.length; j++) {
+                        if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
+                            isCorrect = true;
+                            break;
+                        }
+                    }
+                    el.classList.add(isCorrect ? 'input-correct' : 'input-incorrect');
+                }
+            }
+
+            if (triggerSync) {
+                saveProgress(true);
+            }
+        }
+
+        function checkAllSections() {
+            checkAnswers('sec-a-input', false);
+            checkAnswers('sec-b-input', false);
+            checkAnswers('sec-c-input', false);
+            checkAnswers('sec-d-input', true);
+        }
+    </script>
+</body>
+</html>
