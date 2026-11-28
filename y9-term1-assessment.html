@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Year 9 Term 1 Self-Marking Assessment</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* Task Container Styling */
+        .task-container { max-width: 900px; margin: 30px auto; padding: 20px; }
+        
+        .task-card { 
+            background: white; 
+            border-radius: 8px; 
+            padding: 25px; 
+            margin-bottom: 30px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            page-break-inside: avoid; 
+        }
+        
+        /* Section Header Colors */
+        .task-prep { border-top: 6px solid #607d8b; } 
+        .task-prep h2 { color: #607d8b; margin-top: 0; }
+        
+        .task-plenary { border-top: 6px solid #673ab7; } 
+        .task-plenary h2 { color: #673ab7; margin-top: 0; }
+
+        /* RAGB Colors */
+        .task-maroon { border-top: 6px solid #800000; }
+        .task-maroon h2 { color: #800000; margin-top: 0; }
+        .task-maroon .instruction-box { border-left: 4px solid #800000; }
+
+        .task-amber { border-top: 6px solid #ffb300; }
+        .task-amber h2 { color: #ffb300; margin-top: 0; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
+        .task-amber .instruction-box { border-left: 4px solid #ffb300; }
+
+        .task-green { border-top: 6px solid #008f39; }
+        .task-green h2 { color: #008f39; margin-top: 0; }
+        .task-green .instruction-box { border-left: 4px solid #008f39; }
+
+        .task-navy { border-top: 6px solid #1e3a8a; }
+        .task-navy h2 { color: #1e3a8a; margin-top: 0; }
+        .task-navy .instruction-box { border-left: 4px solid #1e3a8a; }
+
+        /* Common Elements */
+        .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; text-align: center; }
+        
+        /* Score Banner */
+        .score-banner {
+            background: #f1f5f9;
+            border: 2px solid #1e3a8a;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .score-banner strong { color: #1e3a8a; font-size: 18px; }
+        .score-pill {
+            background: #1e3a8a;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* Inputs & Textareas */
+        .question-row { margin-bottom: 22px; padding-bottom: 15px; border-bottom: 1px solid #f0f0f0; }
+        .question-row:last-of-type { border-bottom: none; }
+        .question-label { display: block; font-size: 16px; margin-bottom: 8px; color: #333; font-weight: bold; }
+        .marks-badge { font-size: 13px; color: #555; font-weight: normal; margin-left: 6px; }
+        
+        .auto-input { 
+            width: 100%; 
+            max-width: 440px; 
+            padding: 12px; 
+            font-size: 16px; 
+            border: 2px solid #ccc; 
+            border-radius: 4px; 
+            transition: all 0.3s ease; 
+            box-sizing: border-box; 
+            background-color: white; 
+            font-family: inherit; 
+        }
+        .auto-input:focus { outline: none; border-color: #666; }
+
+        /* Helper Headings & Binary Grid Display */
+        .helper-headings { display: flex; gap: 4px; max-width: 250px; margin-bottom: 4px; }
+        .helper-headings span { flex: 1; text-align: center; font-size: 12px; font-weight: bold; color: #444; background: #e9ecef; border-radius: 2px; padding: 3px 0; }
+        .helper-headings-8bit { max-width: 400px; }
+
+        .binary-bits { display: flex; gap: 4px; max-width: 250px; margin-bottom: 8px; }
+        .binary-bits span { flex: 1; text-align: center; font-size: 15px; font-weight: bold; color: #111; background: #f8f9fa; border: 1px solid #cbd5e1; border-radius: 2px; padding: 5px 0; font-family: monospace; }
+        .binary-bits-8bit { max-width: 400px; }
+
+        /* Reference Hex Table & Binary Addition Table */
+        .ref-table { border-collapse: collapse; margin: 12px auto; font-family: monospace; font-size: 14px; background: white; }
+        .ref-table th, .ref-table td { border: 1px solid #cbd5e1; padding: 5px 12px; text-align: center; }
+        .ref-table th { background-color: #1e3a8a; color: white; }
+
+        .bin-table { border-collapse: collapse; margin-bottom: 10px; font-family: monospace; font-size: 16px; }
+        .bin-table th, .bin-table td { border: 1px solid #cbd5e1; padding: 6px 12px; text-align: center; }
+        .bin-table th { background-color: #e9ecef; font-size: 12px; color: #444; }
+        .bin-table tr.op-row td { border-bottom: 2px solid #333; }
+
+        /* Python Code Block */
+        .code-snippet {
+            background-color: #f4f6f8;
+            border: 1px solid #d1d5db;
+            border-left: 4px solid #1e3a8a;
+            border-radius: 4px;
+            padding: 14px 16px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 15px;
+            line-height: 1.55;
+            margin-bottom: 12px;
+            color: #1f2937;
+            overflow-x: auto;
+            max-width: 560px;
+        }
+        .kw { color: #d97706; font-weight: bold; }
+        .fn { color: #7c3aed; }
+        .str { color: #059669; }
+        .num { color: #2563eb; }
+
+        /* Correct & Incorrect Answer Styling */
+        .input-correct { border-color: #008f39 !important; background-color: #e8f5e9 !important; color: #006100; font-weight: bold; }
+        .input-incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
+        
+        /* Buttons */
+        .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; max-width: 220px; transition: background-color 0.2s; }
+        .btn-submit:hover { background-color: #152960; }
+        .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
+        .btn-pdf:hover { background-color: #124d2d; }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER CONTAINING LOGO ETC. -->
+    <div id="pdf-content">
+        <header>
+            <div class="header-left">
+                <a href="index.html"><img src="logo.jpg" alt="Delta Serlby Park Logo"></a>
+            </div>
+            <div class="header-center"><h1>Year 9 Term 1 Assessment</h1></div>
+            <div class="header-right"><a href="index.html" class="back-btn">&larr; Back to Home</a></div>
+        </header>
+
+        <main class="task-container">
+
+            <!-- LIVE SCORE BANNER -->
+            <div class="score-banner">
+                <div>
+                    <strong>Year 9 Term 1 Self-Marking Assessment</strong><br>
+                    <span style="font-size: 14px; color: #475569;">Complete all 66 marks across Sections A–D. Click "Check Section" to mark your work.</span>
+                </div>
+                <div class="score-pill" id="live-score-display">Score: 0 / 66</div>
+            </div>
+
+            <!-- SECTION A (RED): Programming Principles, Data Types & Operators (17 Marks) -->
+            <div class="task-card task-maroon">
+                <h2>Section A (Red): Programming Principles, Data Types &amp; Operators (17 Marks)</h2>
+                <div class="instruction-box">
+                    Match programming constructs, identify Python data types, and state the meaning of logical comparison operators.
+                </div>
+
+                <!-- Paper Q1 [3 marks: 1 per match] -->
+                <div class="question-row">
+                    <label class="question-label">Q1a. Match the programming principle <strong>Sequence</strong> to its correct description: <span class="marks-badge">[1 mark]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["C"]'>
+                        <option value="">-- Choose a description --</option>
+                        <option value="A">A &mdash; Making decisions in code using conditions (if, else, etc.)</option>
+                        <option value="B">B &mdash; Repeating sections of code using loops (for, while, etc.)</option>
+                        <option value="C">C &mdash; The specific order in which instructions are executed</option>
+                    </select>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q1b. Match the programming principle <strong>Selection</strong> to its correct description: <span class="marks-badge">[1 mark]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["A"]'>
+                        <option value="">-- Choose a description --</option>
+                        <option value="A">A &mdash; Making decisions in code using conditions (if, else, etc.)</option>
+                        <option value="B">B &mdash; Repeating sections of code using loops (for, while, etc.)</option>
+                        <option value="C">C &mdash; The specific order in which instructions are executed</option>
+                    </select>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q1c. Match the programming principle <strong>Iteration</strong> to its correct description: <span class="marks-badge">[1 mark]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["B"]'>
+                        <option value="">-- Choose a description --</option>
+                        <option value="A">A &mdash; Making decisions in code using conditions (if, else, etc.)</option>
+                        <option value="B">B &mdash; Repeating sections of code using loops (for, while, etc.)</option>
+                        <option value="C">C &mdash; The specific order in which instructions are executed</option>
+                    </select>
+                </div>
+
+                <!-- Paper Q2 [3 marks: 1 per row] -->
+                <div class="question-row">
+                    <label class="question-label">Q2a. Select the correct data type for the example <code>"John Smith"</code>: <span class="marks-badge">[1 mark]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["String"]'>
+                        <option value="">-- Choose data type --</option>
+                        <option value="Integer">Integer</option>
+                        <option value="Real / Float">Real / Float</option>
+                        <option value="String">String</option>
+                        <option value="Boolean">Boolean</option>
+                    </select>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q2b. Select the correct data type for the example <code>3.14</code>: <span class="marks-badge">[1 mark]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["Real / Float"]'>
+                        <option value="">-- Choose data type --</option>
+                        <option value="Integer">Integer</option>
+                        <option value="Real / Float">Real / Float</option>
+                        <option value="String">String</option>
+                        <option value="Boolean">Boolean</option>
+                    </select>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q2c. Select the correct data type for the example <code>67</code>: <span class="marks-badge">[1 mark]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["Integer"]'>
+                        <option value="">-- Choose data type --</option>
+                        <option value="Integer">Integer</option>
+                        <option value="Real / Float">Real / Float</option>
+                        <option value="String">String</option>
+                        <option value="Boolean">Boolean</option>
+                    </select>
+                </div>
+
+                <!-- Paper Q3 [3 marks: 1 per row] -->
+                <div class="question-row">
+                    <label class="question-label">Q3a. Match the logical comparison symbol <code>!=</code> to its meaning: <span class="marks-badge">[1 mark]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["Not equal to"]'>
+                        <option value="">-- Choose meaning --</option>
+                        <option value="Greater than or equal">Greater than or equal</option>
+                        <option value="Not equal to">Not equal to</option>
+                        <option value="Less than or equal">Less than or equal</option>
+                    </select>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q3b. Match the logical comparison symbol <code>&lt;=</code> to its meaning: <span class="marks-badge">[1 mark]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["Less than or equal"]'>
+                        <option value="">-- Choose meaning --</option>
+                        <option value="Greater than or equal">Greater than or equal</option>
+                        <option value="Not equal to">Not equal to</option>
+                        <option value="Less than or equal">Less than or equal</option>
+                    </select>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q3c. Match the logical comparison symbol <code>&gt;=</code> to its meaning: <span class="marks-badge">[1 mark]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["Greater than or equal"]'>
+                        <option value="">-- Choose meaning --</option>
+                        <option value="Greater than or equal">Greater than or equal</option>
+                        <option value="Not equal to">Not equal to</option>
+                        <option value="Less than or equal">Less than or equal</option>
+                    </select>
+                </div>
+
+                <!-- Extension Questions in Section A (8 marks) -->
+                <div class="question-row">
+                    <label class="question-label">Q4. Which Python data type can only store two possible values: <code>True</code> or <code>False</code>? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-a-input" data-answers='["boolean","bool"]' placeholder="Enter data type...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q5. What is the difference between a single equals sign <code>=</code> and a double equals sign <code>==</code> in Python? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["B"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; There is no difference; they do the exact same thing</option>
+                        <option value="B">B &mdash; = assigns a value to a variable, while == checks if two values are equal</option>
+                        <option value="C">C &mdash; == is used for text, while = is only used for numbers</option>
+                    </select>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q6. Which data type should be used to store a UK phone number such as <code>"07700900123"</code> so the leading zero is kept? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["C"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Integer</option>
+                        <option value="B">B &mdash; Float</option>
+                        <option value="C">C &mdash; String</option>
+                    </select>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q7. What will the Python function <code>int("25") + 5</code> evaluate to? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-a-input" data-answers='["30"]' placeholder="Enter result...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q8. Which Python function is used to convert a number into text so it can be joined with a message? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["A"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; str()</option>
+                        <option value="B">B &mdash; int()</option>
+                        <option value="C">C &mdash; bool()</option>
+                    </select>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q9. What is the result of the Boolean expression <code>10 &gt; 4 and 5 == 2</code> in Python? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["False"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="True">True</option>
+                        <option value="False">False</option>
+                    </select>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q10. What is the result of the Boolean expression <code>10 &gt; 4 or 5 == 2</code> in Python? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["True"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="True">True</option>
+                        <option value="False">False</option>
+                    </select>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q11. Which Python operator finds the <strong>remainder</strong> after whole-number division (for example, <code>10 % 3</code>)? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-a-input" data-answers='["B"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; // (Floor division)</option>
+                        <option value="B">B &mdash; % (Modulus)</option>
+                        <option value="C">C &mdash; ** (Exponentiation)</option>
+                    </select>
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('sec-a-input')">Check Section A</button>
+            </div>
+
+            <!-- SECTION B (AMBER): Selection, Iteration & Code Tracing (16 Marks) -->
+            <div class="task-card task-amber">
+                <h2>Section B (Amber): Selection, Iteration &amp; Code Tracing (16 Marks)</h2>
+                <div class="instruction-box">
+                    Trace Python selection statements, distinguish between FOR and WHILE loops, and choose the right loop for each scenario.
+                </div>
+
+                <!-- Paper Q4 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q12. Following through the code below, write the exact output in the box provided: <span class="marks-badge">[1 mark]</span></label>
+                    <div class="code-snippet">
+                        1 &nbsp;&nbsp;age = <span class="num">15</span><br>
+                        2 &nbsp;&nbsp;<span class="kw">if</span> age &gt;= <span class="num">18</span>:<br>
+                        3 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">print</span>(<span class="str">"You can play the 18+ game."</span>)<br>
+                        4 &nbsp;&nbsp;<span class="kw">elif</span> age &gt;= <span class="num">13</span>:<br>
+                        5 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">print</span>(<span class="str">"You can play the teen game."</span>)<br>
+                        6 &nbsp;&nbsp;<span class="kw">else</span>:<br>
+                        7 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">print</span>(<span class="str">"Stick to kids' games for now."</span>)
+                    </div>
+                    <input type="text" class="auto-input sec-b-input" data-answers='["you can play the teen game.","you can play the teen game"]' placeholder="Enter exact output...">
+                </div>
+
+                <!-- Paper Q5 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q13. True or False: A <code>For</code> loop is a Condition-controlled Loop. <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-b-input" data-answers='["B"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; True</option>
+                        <option value="B">B &mdash; False</option>
+                    </select>
+                </div>
+
+                <!-- Paper Q6 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q14. True or False: A <code>While</code> loop is a Condition-controlled Loop. <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-b-input" data-answers='["A"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; True</option>
+                        <option value="B">B &mdash; False</option>
+                    </select>
+                </div>
+
+                <!-- Paper Q7 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q15. Select the correct definition of a <code>While</code> loop: <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-b-input" data-answers='["B"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; A While loop repeats until the condition is met</option>
+                        <option value="B">B &mdash; A While loop repeats while the condition is True</option>
+                        <option value="C">C &mdash; A While loop repeats for a fixed number of times</option>
+                    </select>
+                </div>
+
+                <!-- Paper Q8 [4 marks: 1 per situation] -->
+                <div class="question-row">
+                    <label class="question-label">Q16a. Situation: <em>Repeating something exactly 5 times</em> &mdash; select the correct loop type: <span class="marks-badge">[1 mark]</span></label>
+                    <select class="auto-input sec-b-input" data-answers='["For loop"]'>
+                        <option value="">-- Choose loop --</option>
+                        <option value="For loop">For loop</option>
+                        <option value="While loop">While loop</option>
+                    </select>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q16b. Situation: <em>Asking for a correct password until it is entered</em> &mdash; select the correct loop type: <span class="marks-badge">[1 mark]</span></label>
+                    <select class="auto-input sec-b-input" data-answers='["While loop"]'>
+                        <option value="">-- Choose loop --</option>
+                        <option value="For loop">For loop</option>
+                        <option value="While loop">While loop</option>
+                    </select>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q16c. Situation: <em>Printing every number in a list of 50 numbers</em> &mdash; select the correct loop type: <span class="marks-badge">[1 mark]</span></label>
+                    <select class="auto-input sec-b-input" data-answers='["For loop"]'>
+                        <option value="">-- Choose loop --</option>
+                        <option value="For loop">For loop</option>
+                        <option value="While loop">While loop</option>
+                    </select>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q16d. Situation: <em>Keep asking for their age until the user inputs a valid number</em> &mdash; select the correct loop type: <span class="marks-badge">[1 mark]</span></label>
+                    <select class="auto-input sec-b-input" data-answers='["While loop"]'>
+                        <option value="">-- Choose loop --</option>
+                        <option value="For loop">For loop</option>
+                        <option value="While loop">While loop</option>
+                    </select>
+                </div>
+
+                <!-- Extension Questions in Section B (8 marks) -->
+                <div class="question-row">
+                    <label class="question-label">Q17. What term describes a loop that repeats a known, fixed number of times (such as a <code>for</code> loop)? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-b-input" data-answers='["A"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Count-controlled loop</option>
+                        <option value="B">B &mdash; Condition-controlled loop</option>
+                        <option value="C">C &mdash; Selection statement</option>
+                    </select>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q18. How many times will <code>"Hello"</code> be printed by <code>for i in range(4): print("Hello")</code>? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-b-input" data-answers='["4","four"]' placeholder="Enter number of times...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q19. Which numbers are generated by <code>range(1, 5)</code> in Python? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-b-input" data-answers='["B"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; 1, 2, 3, 4, 5</option>
+                        <option value="B">B &mdash; 1, 2, 3, 4</option>
+                        <option value="C">C &mdash; 0, 1, 2, 3, 4</option>
+                    </select>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q20. Trace this code &mdash; what is the final value of <code>total</code> printed at the end? <span class="marks-badge">[1 mark]</span></label>
+                    <div class="code-snippet">
+                        total = <span class="num">0</span><br>
+                        <span class="kw">for</span> x <span class="kw">in</span> [<span class="num">2</span>, <span class="num">4</span>, <span class="num">6</span>]:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;total = total + x<br>
+                        <span class="fn">print</span>(total)
+                    </div>
+                    <input type="text" class="auto-input sec-b-input" data-answers='["12"]' placeholder="Enter final value...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q21. What happens if the condition in a <code>while</code> loop never becomes <code>False</code>? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-b-input" data-answers='["C"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; The loop skips all lines and finishes immediately</option>
+                        <option value="B">B &mdash; Python converts it into a for loop automatically</option>
+                        <option value="C">C &mdash; It creates an infinite loop that runs forever until stopped</option>
+                    </select>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q22. What is the purpose of <strong>indentation</strong> (spaces/tabs at the start of a line) inside an <code>if</code> statement or loop in Python? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-b-input" data-answers='["A"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; It defines which block of code belongs inside the if statement or loop</option>
+                        <option value="B">B &mdash; It is only used to make the code look colourful</option>
+                        <option value="C">C &mdash; It turns the line of code into a comment</option>
+                    </select>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q23. Trace this code &mdash; what will be printed? <span class="marks-badge">[1 mark]</span></label>
+                    <div class="code-snippet">
+                        count = <span class="num">3</span><br>
+                        <span class="kw">while</span> count &gt; <span class="num">0</span>:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;count = count - <span class="num">1</span><br>
+                        <span class="fn">print</span>(count)
+                    </div>
+                    <input type="text" class="auto-input sec-b-input" data-answers='["0"]' placeholder="Enter printed value...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q24. Which keyword is used in Python to check an additional condition if the first <code>if</code> condition is False? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-b-input" data-answers='["elif"]' placeholder="Enter Python keyword...">
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('sec-b-input')">Check Section B</button>
+            </div>
+
+            <!-- SECTION C (GREEN): Binary Conversions, Addition & Overflow (17 Marks) -->
+            <div class="task-card task-green">
+                <h2>Section C (Green): Binary Conversions, Addition &amp; Overflow (17 Marks)</h2>
+                <div class="instruction-box">
+                    Convert between binary and denary, complete 8-bit binary additions, and explain overflow errors.
+                </div>
+
+                <!-- Paper Q9 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q25. Convert the following 4-bit Binary value into Denary: <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings"><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <div class="binary-bits"><span>1</span><span>1</span><span>0</span><span>0</span></div>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["12"]' placeholder="Enter denary answer...">
+                </div>
+
+                <!-- Paper Q10 [1] -->
+                <div class="question-row">
+                    <label class="question-label">Q26. Convert the following 8-bit Binary value into Denary: <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <div class="binary-bits binary-bits-8bit"><span>1</span><span>1</span><span>0</span><span>0</span><span>1</span><span>0</span><span>1</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["203"]' placeholder="Enter denary answer...">
+                </div>
+
+                <!-- Paper Q11 [1 auto-marked input] -->
+                <div class="question-row">
+                    <label class="question-label">Q27. Convert the Denary value <code>30</code> into 8-bit binary (all 8 digits): <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["00011110"]' placeholder="Enter 8-bit binary...">
+                </div>
+
+                <!-- Paper Q12 [1 auto-marked input] -->
+                <div class="question-row">
+                    <label class="question-label">Q28. Convert the Denary value <code>245</code> into 8-bit binary (all 8 digits): <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["11110101"]' placeholder="Enter 8-bit binary...">
+                </div>
+
+                <!-- Paper Q13 [1 auto-marked input] -->
+                <div class="question-row">
+                    <label class="question-label">Q29. Complete the following 8-bit binary addition: <span class="marks-badge">[1 mark]</span></label>
+                    <table class="bin-table">
+                        <tr><th></th><th>128</th><th>64</th><th>32</th><th>16</th><th>8</th><th>4</th><th>2</th><th>1</th></tr>
+                        <tr><td></td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="op-row"><td>+</td><td>0</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td></tr>
+                    </table>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["10000011"]' placeholder="Enter 8-bit sum...">
+                </div>
+
+                <!-- Paper Q14 [1 auto-marked input] -->
+                <div class="question-row">
+                    <label class="question-label">Q30. Complete the following 8-bit binary addition (enter the 8-bit result stored in 1 byte): <span class="marks-badge">[1 mark]</span></label>
+                    <table class="bin-table">
+                        <tr><th></th><th>128</th><th>64</th><th>32</th><th>16</th><th>8</th><th>4</th><th>2</th><th>1</th></tr>
+                        <tr><td></td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="op-row"><td>+</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td></tr>
+                    </table>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["10000011","110000011"]' placeholder="Enter 8-bit sum...">
+                </div>
+
+                <!-- Paper Q15 [2 marks broken into 2 clear 1-mark questions] -->
+                <div class="question-row">
+                    <label class="question-label">Q31. What is the exact name of the error that occurred in Q30 above? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["overflow","overflow error","an overflow error"]' placeholder="Enter error name...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q32. Explain the problem with the result of Q30 above: <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-c-input" data-answers='["B"]'>
+                        <option value="">-- Choose an explanation --</option>
+                        <option value="A">A &mdash; The answer is negative, which cannot be written in binary</option>
+                        <option value="B">B &mdash; The true sum (387) requires 9 bits, so the 9th carry bit is lost and 8 bits store the wrong value (131)</option>
+                        <option value="C">C &mdash; Binary numbers cannot have more than four 1s in a row</option>
+                    </select>
+                </div>
+
+                <!-- Extension Questions in Section C (9 marks) -->
+                <div class="question-row">
+                    <label class="question-label">Q33. Convert the 8-bit binary value <code>01011101</code> into Denary: <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["93"]' placeholder="Enter denary answer...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q34. Convert the 8-bit binary value <code>10101110</code> into Denary: <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["174"]' placeholder="Enter denary answer...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q35. Convert the Denary value <code>77</code> into 8-bit binary: <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["01001101"]' placeholder="Enter 8-bit binary...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q36. Convert the Denary value <code>186</code> into 8-bit binary: <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["10111010"]' placeholder="Enter 8-bit binary...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q37. Complete the 8-bit binary addition: <code>00110110 + 01001011</code> <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings helper-headings-8bit"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["10000001"]' placeholder="Enter 8-bit sum...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q38. What is the effect of performing a <strong>1-place binary left shift</strong> on an unsigned binary number (e.g., <code>00000101</code> &rarr; <code>00001010</code>)? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-c-input" data-answers='["A"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; It multiplies the denary value by 2</option>
+                        <option value="B">B &mdash; It divides the denary value by 2</option>
+                        <option value="C">C &mdash; It adds 1 to the denary value</option>
+                    </select>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q39. What is the effect of performing a <strong>2-place binary left shift</strong> on an unsigned binary number? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-c-input" data-answers='["C"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; It multiplies the number by 2</option>
+                        <option value="B">B &mdash; It divides the number by 4</option>
+                        <option value="C">C &mdash; It multiplies the number by 4</option>
+                    </select>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q40. What is the effect of performing a <strong>1-place binary right shift</strong> on an unsigned binary number (e.g., <code>00010100</code> &rarr; <code>00001010</code>)? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-c-input" data-answers='["B"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; It multiplies the denary value by 2</option>
+                        <option value="B">B &mdash; It divides the denary value by 2</option>
+                        <option value="C">C &mdash; It doubles the number of bits</option>
+                    </select>
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q41. What is the highest denary number that can be stored in an 8-bit binary register? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-c-input" data-answers='["255"]' placeholder="Enter denary number...">
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('sec-c-input')">Check Section C</button>
+            </div>
+
+            <!-- SECTION D (BLUE): Hexadecimal & Data Representation (16 Marks) -->
+            <div class="task-card task-navy">
+                <h2>Section D (Blue): Hexadecimal &amp; Data Representation (16 Marks)</h2>
+                <div class="instruction-box">
+                    Use Table A below to convert between 8-bit binary, hexadecimal, and denary values.
+                    <table class="ref-table">
+                        <tr>
+                            <th>Denary</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td><td>14</td><td>15</td>
+                        </tr>
+                        <tr>
+                            <th>Hex</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- Paper Q16 [2 marks: 1 per hex nibble] -->
+                <div class="question-row">
+                    <label class="question-label">Q42a. Using the table above, convert the <strong>first 4-bit nibble</strong> (<code>1100</code>) of the 8-bit binary <code>1100 0100</code> into its Hexadecimal value: <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings helper-headings-8bit"><span>8</span><span>4</span><span>2</span><span>1</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <div class="binary-bits binary-bits-8bit"><span>1</span><span>1</span><span>0</span><span>0</span><span>0</span><span>1</span><span>0</span><span>0</span></div>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["c"]' placeholder="Enter first hex digit (e.g. C)...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q42b. Using the table above, convert the <strong>second 4-bit nibble</strong> (<code>0100</code>) of the 8-bit binary <code>1100 0100</code> into its Hexadecimal value: <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["4"]' placeholder="Enter second hex digit (e.g. 4)...">
+                </div>
+
+                <!-- Extension Questions in Section D (14 marks to reach 66 total) -->
+                <div class="question-row">
+                    <label class="question-label">Q43. How many bits does a single Hexadecimal digit represent? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["4","four"]' placeholder="Enter number of bits...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q44. What denary value does the Hexadecimal letter <code>A</code> represent? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["10"]' placeholder="Enter denary value...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q45. What denary value does the Hexadecimal letter <code>F</code> represent? <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["15"]' placeholder="Enter denary value...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q46. Convert the 8-bit binary value <code>1010 1111</code> into 2-digit Hexadecimal: <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings helper-headings-8bit"><span>8</span><span>4</span><span>2</span><span>1</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["af"]' placeholder="Enter 2-digit hex...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q47. Convert the 8-bit binary value <code>0111 1011</code> into 2-digit Hexadecimal: <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings helper-headings-8bit"><span>8</span><span>4</span><span>2</span><span>1</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["7b"]' placeholder="Enter 2-digit hex...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q48. Convert the 8-bit binary value <code>1110 0010</code> into 2-digit Hexadecimal: <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings helper-headings-8bit"><span>8</span><span>4</span><span>2</span><span>1</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["e2"]' placeholder="Enter 2-digit hex...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q49. Convert the Hexadecimal value <code>3D</code> into 8-bit Binary (8 digits): <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings helper-headings-8bit"><span>8</span><span>4</span><span>2</span><span>1</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["00111101"]' placeholder="Enter 8-bit binary...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q50. Convert the Hexadecimal value <code>B5</code> into 8-bit Binary (8 digits): <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings helper-headings-8bit"><span>8</span><span>4</span><span>2</span><span>1</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["10110101"]' placeholder="Enter 8-bit binary...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q51. Convert the Hexadecimal value <code>9A</code> into 8-bit Binary (8 digits): <span class="marks-badge">[1 mark]</span></label>
+                    <div class="helper-headings helper-headings-8bit"><span>8</span><span>4</span><span>2</span><span>1</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["10011010"]' placeholder="Enter 8-bit binary...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q52. Convert the Denary value <code>43</code> into 2-digit Hexadecimal: <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["2b"]' placeholder="Enter 2-digit hex...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q53. Convert the Denary value <code>172</code> into 2-digit Hexadecimal: <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["ac"]' placeholder="Enter 2-digit hex...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q54. Convert the Hexadecimal value <code>2F</code> into Denary: <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["47"]' placeholder="Enter denary value...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q55. Convert the Hexadecimal value <code>C8</code> into Denary: <span class="marks-badge">[1 mark]</span></label>
+                    <input type="text" class="auto-input sec-d-input" data-answers='["200"]' placeholder="Enter denary value...">
+                </div>
+
+                <div class="question-row">
+                    <label class="question-label">Q56. Why do programmers and web designers often use Hexadecimal instead of long Binary strings? <span class="marks-badge">[Select ONE &mdash; 1 mark]</span></label>
+                    <select class="auto-input sec-d-input" data-answers='["B"]'>
+                        <option value="">-- Choose an answer --</option>
+                        <option value="A">A &mdash; Because computers process Hexadecimal faster than Binary</option>
+                        <option value="B">B &mdash; It is much shorter and easier for humans to read, write, and spot errors in without changing the underlying binary</option>
+                        <option value="C">C &mdash; Because Hexadecimal uses fewer bytes of RAM than Binary</option>
+                    </select>
+                </div>
+
+                <button class="btn-submit no-print" onclick="checkAnswers('sec-d-input')">Check Section D</button>
+            </div>
+
+            <!-- CHECK ALL BUTTON CARD -->
+            <div class="task-card task-plenary" style="text-align: center;">
+                <h2>Finish &amp; Mark Full Assessment</h2>
+                <p style="color: #444; margin-bottom: 18px;">Click below to mark all 66 marks and sync your final score to your teacher's markbook.</p>
+                <button class="btn-submit no-print" style="margin: 0 auto; max-width: 260px; background-color: #008f39; font-size: 17px;" onclick="checkAllSections()">Mark All 66 Marks</button>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- RESET PAGE BUTTON -->
+    <div id="action-buttons" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto 50px auto;">
+        <button class="btn-pdf no-print" style="background-color: #d32f2f; max-width: 150px;" onclick="clearData()">Reset Page</button>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        &copy; 2026 Delta Serlby Park - Computing &amp; Business Department
+    </footer>
+
+    <!-- SCRIPT -->
+    <script>
+        /* --- 1. FIREBASE CONFIGURATION & INITIALIZATION --- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiRDdgM7VCOxEVob_pZ73AvZaNb7SvA9Y",
+            authDomain: "serlby-park-computing.firebaseapp.com",
+            projectId: "serlby-park-computing",
+            storageBucket: "serlby-park-computing.firebasestorage.app",
+            messagingSenderId: "648533806051",
+            appId: "1:648533806051:web:1e42a4263dfb1fd8e72ed6",
+            measurementId: "G-HDNYEE11WV"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LESSON_ID = "y9-term1-assessment";
+
+        /* --- 2. HELPER FOR TEACHER MARKBOOK LABELS --- */
+        function findLabelForInput(el, index) {
+            const row = el.closest('.question-row');
+            if (row) {
+                const lbl = row.querySelector('.question-label');
+                if (lbl && lbl.innerText.trim()) {
+                    return lbl.innerText.replace(/\s+/g, ' ').trim();
+                }
+            }
+            if (el.placeholder) return el.placeholder;
+            return 'Question ' + (index + 1);
+        }
+
+        /* --- 3. FIREBASE AUTO-SAVE LOGIC --- */
+        let saveTimer;
+        function saveProgress(immediate = false) {
+            const user = auth.currentUser;
+            const inputs = document.querySelectorAll('.auto-input');
+            const dataToSave = {
+                pageTitle: document.title || LESSON_ID,
+                lastUpdated: Date.now(),
+                items: []
+            };
+
+            let correctCount = 0;
+            let totalGradable = 0;
+
+            for (let i = 0; i < inputs.length; i++) {
+                const el = inputs[i];
+                const cls = el.className || '';
+                let status = 'neutral';
+
+                if (el.hasAttribute('data-answers')) {
+                    totalGradable++;
+                    if (cls.includes('input-correct')) {
+                        status = 'correct';
+                        correctCount++;
+                    } else if (cls.includes('input-incorrect')) {
+                        status = 'incorrect';
+                    }
+                }
+
+                dataToSave['input_' + i] = el.value;
+                dataToSave['class_' + i] = cls;
+
+                dataToSave.items.push({
+                    index: i,
+                    label: findLabelForInput(el, i),
+                    value: el.value,
+                    status: status
+                });
+            }
+
+            const scoreBanner = document.getElementById('live-score-display');
+            if (scoreBanner && totalGradable > 0) {
+                scoreBanner.textContent = "Score: " + correctCount + " / " + totalGradable;
+            }
+
+            if (!user || sessionStorage.getItem('teacherMode') === 'true') return;
+
+            if (totalGradable > 0) {
+                dataToSave.scoreText = "Score: " + correctCount + " / " + totalGradable;
+            }
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(function() {
+                db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID)
+                  .set(dataToSave, { merge: true })
+                  .catch(function(err) { console.error("Cloud save error:", err); });
+            }, immediate ? 50 : 800);
+        }
+
+        /* --- 4. FIREBASE AUTO-LOAD LOGIC --- */
+        function applySavedData(data) {
+            const inputs = document.querySelectorAll('.auto-input');
+            for (let i = 0; i < inputs.length; i++) {
+                const savedVal = data['input_' + i] !== undefined
+                    ? data['input_' + i]
+                    : (data.items && data.items[i] ? data.items[i].value : undefined);
+
+                if (savedVal !== undefined) {
+                    inputs[i].value = savedVal;
+                }
+            }
+
+            checkAnswers('sec-a-input', false);
+            checkAnswers('sec-b-input', false);
+            checkAnswers('sec-c-input', false);
+            checkAnswers('sec-d-input', false);
+            saveProgress(false);
+        }
+
+        auth.onAuthStateChanged(async function(user) {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const inspectedUid = sessionStorage.getItem('inspectStudentUid');
+
+            if (isTeacher && inspectedUid) {
+                try {
+                    const doc = await db.collection("users").doc(inspectedUid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) applySavedData(doc.data());
+                } catch (err) {
+                    console.error("Error loading inspected student data:", err);
+                }
+                return;
+            }
+
+            if (user) {
+                try {
+                    const doc = await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).get();
+                    if (doc.exists) {
+                        applySavedData(doc.data());
+                    }
+                } catch (err) {
+                    console.error("Error loading cloud work:", err);
+                }
+            }
+        });
+
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                saveProgress(false);
+            }
+        });
+
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('auto-input')) {
+                saveProgress(false);
+            }
+        });
+
+        async function clearData() {
+            if (confirm("Are you sure you want to clear all your answers on this assessment?")) {
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await db.collection("users").doc(user.uid).collection("lessons").doc(LESSON_ID).delete();
+                    } catch (err) {
+                        console.error("Error clearing cloud data:", err);
+                    }
+                }
+                window.location.reload();
+            }
+        }
+
+        /* --- 5. BATCH-MARKING LOGIC --- */
+        function checkAnswers(groupClass, triggerSync = true) {
+            const inputs = document.getElementsByClassName(groupClass);
+            
+            for (let i = 0; i < inputs.length; i++) {
+                const el = inputs[i];
+                el.classList.remove('input-correct', 'input-incorrect');
+
+                const studentAnswer = el.value.toLowerCase().trim();
+                if (studentAnswer === "") continue;
+
+                const acceptedAnswers = JSON.parse(el.getAttribute('data-answers'));
+                let isCorrect = false;
+                for (let j = 0; j < acceptedAnswers.length; j++) {
+                    if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
+                        isCorrect = true;
+                        break;
+                    }
+                }
+                el.classList.add(isCorrect ? 'input-correct' : 'input-incorrect');
+            }
+
+            if (triggerSync) {
+                saveProgress(true);
+            }
+        }
+
+        function checkAllSections() {
+            checkAnswers('sec-a-input', false);
+            checkAnswers('sec-b-input', false);
+            checkAnswers('sec-c-input', false);
+            checkAnswers('sec-d-input', true);
+        }
+    </script>
+</body>
+</html>
