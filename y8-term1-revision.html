@@ -112,19 +112,19 @@
                 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">4 Key Words</h3>
                 <div class="question-row">
-                    <label class="question-label">Pixel</label>
+                    <label class="question-label">1. Pixel</label>
                     <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type definition here...">
                 </div>
                 <div class="question-row">
-                    <label class="question-label">Resolution</label>
+                    <label class="question-label">2. Resolution</label>
                     <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type definition here...">
                 </div>
                 <div class="question-row">
-                    <label class="question-label">Colour Depth</label>
+                    <label class="question-label">3. Colour Depth</label>
                     <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type definition here...">
                 </div>
                 <div class="question-row">
-                    <label class="question-label">Overflow Error</label>
+                    <label class="question-label">4. Overflow Error</label>
                     <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type definition here...">
                 </div>
 
@@ -201,7 +201,7 @@
 
                 <div class="question-row">
                     <label class="question-label">9. Which Computational Thinking element is missing above, and what does it involve?</label>
-                    <textarea class="auto-input" rows="2" placeholder="Name the 4th element and explain what it involves..."></textarea>
+                    <textarea class="auto-input red-input" data-keywords='["algorithmic thinking","algorithm","step-by-step","step by step","set of instructions","ordered instructions","sequence of instructions"]' rows="2" placeholder="Name the 4th element and explain what it involves..."></textarea>
                 </div>
 
                 <button class="btn-submit no-print" onclick="checkAnswers('red-input')">Check Answers</button>
@@ -295,7 +295,7 @@
 
                 <div class="question-row">
                     <label class="question-label">4. Explain what this error means and why it happened in Question 2:</label>
-                    <textarea class="auto-input" rows="3" placeholder="Explain what happens when the answer is too large for 4 bits..."></textarea>
+                    <textarea class="auto-input green-input" data-keywords='["4 bit","4-bit","four bit","nibble","too big","too large","exceed","more than 15","over 15","18","5th bit","fifth bit","carry"]' rows="3" placeholder="Explain what happens when the answer is too large for 4 bits..."></textarea>
                 </div>
 
                 <button class="btn-submit no-print" onclick="checkAnswers('green-input')">Check Answers</button>
@@ -315,22 +315,22 @@
 
                 <div class="question-row">
                     <label class="question-label">2. Define the term <strong>resolution</strong> in terms of digital images:</label>
-                    <textarea class="auto-input" rows="2" placeholder="Define resolution..."></textarea>
+                    <textarea class="auto-input navy-input" data-keywords='["number of pixels","total pixels","pixels in an image","pixels per inch","dpi","ppi","width and height","concentration of pixels"]' rows="2" placeholder="Define resolution..."></textarea>
                 </div>
 
                 <div class="question-row">
                     <label class="question-label">3. Define the term <strong>colour depth</strong> in terms of digital images:</label>
-                    <textarea class="auto-input" rows="2" placeholder="Define colour depth..."></textarea>
+                    <textarea class="auto-input navy-input" data-keywords='["number of bits","bits used","bits per pixel","bits to store","bits to represent","range of colours","number of colours"]' rows="2" placeholder="Define colour depth..."></textarea>
                 </div>
 
                 <div class="question-row">
                     <label class="question-label">4. Name 2 benefits of increasing the number of pixels (resolution) in an image:</label>
-                    <textarea class="auto-input" rows="3" placeholder="1. &#10;2. "></textarea>
+                    <textarea class="auto-input navy-input" data-keywords='["quality","detail","clearer","clarity","sharper","sharpness","less pixelated","not pixelated","zoom"]' rows="3" placeholder="1. &#10;2. "></textarea>
                 </div>
 
                 <div class="question-row">
                     <label class="question-label">5. Name 2 drawbacks of increasing the number of pixels (resolution) in an image:</label>
-                    <textarea class="auto-input" rows="3" placeholder="1. &#10;2. "></textarea>
+                    <textarea class="auto-input navy-input" data-keywords='["file size","storage","memory","longer to load","slower to load","upload","download","transfer","bandwidth","more data"]' rows="3" placeholder="1. &#10;2. "></textarea>
                 </div>
 
                 <button class="btn-submit no-print" onclick="checkAnswers('navy-input')">Check Answers</button>
@@ -422,7 +422,7 @@
                 var cls = el.className || '';
                 var status = 'neutral';
 
-                if (el.hasAttribute('data-answers')) {
+                if (el.hasAttribute('data-answers') || el.hasAttribute('data-keywords')) {
                     totalGradable++;
                     if (cls.includes('input-correct')) {
                         status = 'correct';
@@ -542,14 +542,23 @@
             for (var i = 0; i < inputs.length; i++) {
                 var inputElement = inputs[i];
                 var studentAnswer = inputElement.value.toLowerCase().trim();
-                var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers'));
-                
                 var isCorrect = false;
-                
-                for (var j = 0; j < acceptedAnswers.length; j++) {
-                    if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
-                        isCorrect = true;
-                        break;
+
+                if (inputElement.hasAttribute('data-keywords')) {
+                    var keywords = JSON.parse(inputElement.getAttribute('data-keywords'));
+                    for (var j = 0; j < keywords.length; j++) {
+                        if (studentAnswer.includes(keywords[j].toLowerCase())) {
+                            isCorrect = true;
+                            break;
+                        }
+                    }
+                } else {
+                    var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers'));
+                    for (var j = 0; j < acceptedAnswers.length; j++) {
+                        if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
+                            isCorrect = true;
+                            break;
+                        }
                     }
                 }
 
