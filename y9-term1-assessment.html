@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Year 9 Term 1 Self-Marking Assessment</title>
+    <title>Year 9 Term 1 Assessment</title>
     <link rel="stylesheet" href="style.css">
 
     <!-- Firebase SDKs -->
@@ -21,32 +21,14 @@
             padding: 25px; 
             margin-bottom: 30px; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            border-top: 6px solid #1e3a8a;
             page-break-inside: avoid; 
         }
-        
-        /* Section Header Colors */
-        .task-prep { border-top: 6px solid #607d8b; } 
-        .task-prep h2 { color: #607d8b; margin-top: 0; }
-        
-        .task-plenary { border-top: 6px solid #673ab7; } 
-        .task-plenary h2 { color: #673ab7; margin-top: 0; }
+        .task-card h2 { color: #1e3a8a; margin-top: 0; }
+        .task-card .instruction-box { border-left: 4px solid #1e3a8a; }
 
-        /* RAGB Colors */
-        .task-maroon { border-top: 6px solid #800000; }
-        .task-maroon h2 { color: #800000; margin-top: 0; }
-        .task-maroon .instruction-box { border-left: 4px solid #800000; }
-
-        .task-amber { border-top: 6px solid #ffb300; }
-        .task-amber h2 { color: #ffb300; margin-top: 0; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
-        .task-amber .instruction-box { border-left: 4px solid #ffb300; }
-
-        .task-green { border-top: 6px solid #008f39; }
-        .task-green h2 { color: #008f39; margin-top: 0; }
-        .task-green .instruction-box { border-left: 4px solid #008f39; }
-
-        .task-navy { border-top: 6px solid #1e3a8a; }
-        .task-navy h2 { color: #1e3a8a; margin-top: 0; }
-        .task-navy .instruction-box { border-left: 4px solid #1e3a8a; }
+        .task-finish { border-top: 6px solid #dfaa2b; }
+        .task-finish h2 { color: #1e3a8a; margin-top: 0; }
 
         /* Common Elements */
         .instruction-box { background-color: #f8f9fa; padding: 15px; border-radius: 0 4px 4px 0; font-size: 16px; line-height: 1.5; margin-bottom: 20px; text-align: center; }
@@ -92,7 +74,45 @@
             background-color: white; 
             font-family: inherit; 
         }
-        .auto-input:focus { outline: none; border-color: #666; }
+        .auto-input:focus { outline: none; border-color: #1e3a8a; }
+        .auto-input:disabled { opacity: 0.92; cursor: not-allowed; }
+
+        /* Checkbox / Multi-select styling */
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 480px;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 4px;
+        }
+        .checkbox-group label:hover { background: #edf2f7; }
+        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+        .checkbox-group.locked-group label { cursor: not-allowed; }
+        .checkbox-group.locked-group label:hover { background: transparent; }
+
+        /* Formatting Button Badges */
+        .fmt-icon {
+            display: inline-block;
+            border: 2px solid #333;
+            background: #f8f9fa;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-family: Georgia, serif;
+            font-size: 18px;
+            margin: 0 4px;
+        }
 
         /* Helper Headings & Binary Grid Display */
         .helper-headings { display: flex; gap: 4px; max-width: 250px; margin-bottom: 4px; }
@@ -138,8 +158,21 @@
         .input-incorrect { border-color: #d32f2f !important; background-color: #ffebee !important; color: #b71c1c; font-weight: bold; }
         
         /* Buttons */
-        .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; max-width: 220px; transition: background-color 0.2s; }
+        .btn-submit { background-color: #1e3a8a; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block; width: 100%; max-width: 240px; transition: background-color 0.2s; }
         .btn-submit:hover { background-color: #152960; }
+        .btn-submit.btn-locked, .btn-submit:disabled {
+            background-color: #64748b !important;
+            color: #f8fafc !important;
+            cursor: not-allowed;
+            opacity: 0.9;
+        }
+        .lock-notice {
+            display: none;
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #475569;
+        }
         .btn-pdf { background-color: #217346; color: white; border: none; padding: 15px 30px; border-radius: 4px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: block; text-align: center; width: 100%; max-width: 300px; }
         .btn-pdf:hover { background-color: #124d2d; }
     </style>
@@ -162,14 +195,14 @@
             <div class="score-banner">
                 <div>
                     <strong>Year 9 Term 1 Self-Marking Assessment</strong><br>
-                    <span style="font-size: 14px; color: #475569;">Complete all 66 marks across Sections A–D. Click "Check Section" to mark your work.</span>
+                    <span style="font-size: 14px; color: #475569;">Complete all 66 marks across the 4 topic sections. Note: You only get ONE attempt per section &mdash; once submitted, answers are locked.</span>
                 </div>
                 <div class="score-pill" id="live-score-display">Score: 0 / 66</div>
             </div>
 
             <!-- SECTION A (RED): Programming Principles, Data Types & Operators (17 Marks) -->
-            <div class="task-card task-maroon">
-                <h2>Section A (Red): Programming Principles, Data Types &amp; Operators (17 Marks)</h2>
+            <div class="task-card">
+                <h2>Section A: Programming Principles, Data Types &amp; Operators (17 Marks)</h2>
                 <div class="instruction-box">
                     Match programming constructs, identify Python data types, and state the meaning of logical comparison operators.
                 </div>
@@ -339,12 +372,12 @@
                     </select>
                 </div>
 
-                <button class="btn-submit no-print" onclick="checkAnswers('sec-a-input')">Check Section A</button>
+                <button id="btn-sec-a-input" class="btn-submit no-print" onclick="checkAnswers('sec-a-input')">Submit &amp; Mark Section A</button><div id="notice-sec-a-input" class="lock-notice">This section has been submitted and locked (1 attempt used).</div>
             </div>
 
             <!-- SECTION B (AMBER): Selection, Iteration & Code Tracing (16 Marks) -->
-            <div class="task-card task-amber">
-                <h2>Section B (Amber): Selection, Iteration &amp; Code Tracing (16 Marks)</h2>
+            <div class="task-card">
+                <h2>Section B: Selection, Iteration &amp; Code Tracing (16 Marks)</h2>
                 <div class="instruction-box">
                     Trace Python selection statements, distinguish between FOR and WHILE loops, and choose the right loop for each scenario.
                 </div>
@@ -505,12 +538,12 @@
                     <input type="text" class="auto-input sec-b-input" data-answers='["elif"]' placeholder="Enter Python keyword...">
                 </div>
 
-                <button class="btn-submit no-print" onclick="checkAnswers('sec-b-input')">Check Section B</button>
+                <button id="btn-sec-b-input" class="btn-submit no-print" onclick="checkAnswers('sec-b-input')">Submit &amp; Mark Section B</button><div id="notice-sec-b-input" class="lock-notice">This section has been submitted and locked (1 attempt used).</div>
             </div>
 
             <!-- SECTION C (GREEN): Binary Conversions, Addition & Overflow (17 Marks) -->
-            <div class="task-card task-green">
-                <h2>Section C (Green): Binary Conversions, Addition &amp; Overflow (17 Marks)</h2>
+            <div class="task-card">
+                <h2>Section C: Binary Conversions, Addition &amp; Overflow (17 Marks)</h2>
                 <div class="instruction-box">
                     Convert between binary and denary, complete 8-bit binary additions, and explain overflow errors.
                 </div>
@@ -649,12 +682,12 @@
                     <input type="text" class="auto-input sec-c-input" data-answers='["255"]' placeholder="Enter denary number...">
                 </div>
 
-                <button class="btn-submit no-print" onclick="checkAnswers('sec-c-input')">Check Section C</button>
+                <button id="btn-sec-c-input" class="btn-submit no-print" onclick="checkAnswers('sec-c-input')">Submit &amp; Mark Section C</button><div id="notice-sec-c-input" class="lock-notice">This section has been submitted and locked (1 attempt used).</div>
             </div>
 
             <!-- SECTION D (BLUE): Hexadecimal & Data Representation (16 Marks) -->
-            <div class="task-card task-navy">
-                <h2>Section D (Blue): Hexadecimal &amp; Data Representation (16 Marks)</h2>
+            <div class="task-card">
+                <h2>Section D: Hexadecimal &amp; Data Representation (16 Marks)</h2>
                 <div class="instruction-box">
                     Use Table A below to convert between 8-bit binary, hexadecimal, and denary values.
                     <table class="ref-table">
@@ -762,14 +795,14 @@
                     </select>
                 </div>
 
-                <button class="btn-submit no-print" onclick="checkAnswers('sec-d-input')">Check Section D</button>
+                <button id="btn-sec-d-input" class="btn-submit no-print" onclick="checkAnswers('sec-d-input')">Submit &amp; Mark Section D</button><div id="notice-sec-d-input" class="lock-notice">This section has been submitted and locked (1 attempt used).</div>
             </div>
 
             <!-- CHECK ALL BUTTON CARD -->
-            <div class="task-card task-plenary" style="text-align: center;">
+            <div class="task-card task-finish" style="text-align: center;">
                 <h2>Finish &amp; Mark Full Assessment</h2>
-                <p style="color: #444; margin-bottom: 18px;">Click below to mark all 66 marks and sync your final score to your teacher's markbook.</p>
-                <button class="btn-submit no-print" style="margin: 0 auto; max-width: 260px; background-color: #008f39; font-size: 17px;" onclick="checkAllSections()">Mark All 66 Marks</button>
+                <p style="color: #444; margin-bottom: 18px;">Click below to submit and mark any remaining sections (1 attempt only) and sync your final score to your teacher's markbook.</p>
+                <button id="btn-check-all" class="btn-submit no-print" style="margin: 0 auto; max-width: 260px; background-color: #008f39; font-size: 17px;" onclick="checkAllSections()">Submit &amp; Mark All 66 Marks</button>
             </div>
 
         </main>
@@ -785,7 +818,6 @@
         &copy; 2026 Delta Serlby Park - Computing &amp; Business Department
     </footer>
 
-    <!-- SCRIPT -->
     <script>
         /* --- 1. FIREBASE CONFIGURATION & INITIALIZATION --- */
         const firebaseConfig = {
@@ -805,6 +837,8 @@
         const db = firebase.firestore();
 
         const LESSON_ID = "y9-term1-assessment";
+        const SECTIONS = ['sec-a-input', 'sec-b-input', 'sec-c-input', 'sec-d-input'];
+        let lockedSections = {};
 
         /* --- 2. HELPER FOR TEACHER MARKBOOK LABELS --- */
         function findLabelForInput(el, index) {
@@ -819,14 +853,66 @@
             return 'Question ' + (index + 1);
         }
 
+        function getCheckboxGroupValue(groupEl) {
+            const checked = Array.from(groupEl.querySelectorAll('input[type="checkbox"]:checked'))
+                .map(cb => cb.value)
+                .sort();
+            return checked.join(',');
+        }
+
+        function setCheckboxGroupValue(groupEl, valStr) {
+            const selected = valStr ? valStr.split(',') : [];
+            groupEl.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.checked = selected.includes(cb.value);
+            });
+        }
+
+        function lockSectionUI(groupClass) {
+            lockedSections[groupClass] = true;
+            const inputs = document.getElementsByClassName(groupClass);
+            for (let i = 0; i < inputs.length; i++) {
+                const el = inputs[i];
+                if (el.classList.contains('auto-checkbox-group')) {
+                    el.classList.add('locked-group');
+                    el.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                        cb.disabled = true;
+                    });
+                } else {
+                    el.disabled = true;
+                }
+            }
+
+            const btn = document.getElementById('btn-' + groupClass);
+            if (btn) {
+                btn.disabled = true;
+                btn.classList.add('btn-locked');
+                btn.innerText = '🔒 Section Submitted & Locked';
+            }
+
+            const notice = document.getElementById('notice-' + groupClass);
+            if (notice) {
+                notice.style.display = 'block';
+            }
+
+            // If all sections are locked, also lock the bottom "Submit & Mark All" button
+            const allLocked = SECTIONS.every(sec => lockedSections[sec] === true);
+            const allBtn = document.getElementById('btn-check-all');
+            if (allBtn && allLocked) {
+                allBtn.disabled = true;
+                allBtn.classList.add('btn-locked');
+                allBtn.innerText = '🔒 Full Assessment Locked';
+            }
+        }
+
         /* --- 3. FIREBASE AUTO-SAVE LOGIC --- */
         let saveTimer;
         function saveProgress(immediate = false) {
             const user = auth.currentUser;
-            const inputs = document.querySelectorAll('.auto-input');
+            const inputs = document.querySelectorAll('.auto-input, .auto-checkbox-group');
             const dataToSave = {
                 pageTitle: document.title || LESSON_ID,
                 lastUpdated: Date.now(),
+                lockedSections: lockedSections,
                 items: []
             };
 
@@ -837,6 +923,9 @@
                 const el = inputs[i];
                 const cls = el.className || '';
                 let status = 'neutral';
+                const val = el.classList.contains('auto-checkbox-group')
+                    ? getCheckboxGroupValue(el)
+                    : el.value;
 
                 if (el.hasAttribute('data-answers')) {
                     totalGradable++;
@@ -848,13 +937,13 @@
                     }
                 }
 
-                dataToSave['input_' + i] = el.value;
+                dataToSave['input_' + i] = val;
                 dataToSave['class_' + i] = cls;
 
                 dataToSave.items.push({
                     index: i,
                     label: findLabelForInput(el, i),
-                    value: el.value,
+                    value: val,
                     status: status
                 });
             }
@@ -880,21 +969,27 @@
 
         /* --- 4. FIREBASE AUTO-LOAD LOGIC --- */
         function applySavedData(data) {
-            const inputs = document.querySelectorAll('.auto-input');
+            const inputs = document.querySelectorAll('.auto-input, .auto-checkbox-group');
             for (let i = 0; i < inputs.length; i++) {
                 const savedVal = data['input_' + i] !== undefined
                     ? data['input_' + i]
                     : (data.items && data.items[i] ? data.items[i].value : undefined);
 
                 if (savedVal !== undefined) {
-                    inputs[i].value = savedVal;
+                    if (inputs[i].classList.contains('auto-checkbox-group')) {
+                        setCheckboxGroupValue(inputs[i], savedVal);
+                    } else {
+                        inputs[i].value = savedVal;
+                    }
                 }
             }
 
-            checkAnswers('sec-a-input', false);
-            checkAnswers('sec-b-input', false);
-            checkAnswers('sec-c-input', false);
-            checkAnswers('sec-d-input', false);
+            const savedLocks = data.lockedSections || {};
+            SECTIONS.forEach(sec => {
+                if (savedLocks[sec]) {
+                    markSectionInternal(sec, true);
+                }
+            });
             saveProgress(false);
         }
 
@@ -925,19 +1020,24 @@
         });
 
         document.addEventListener('input', function(e) {
-            if (e.target.classList.contains('auto-input')) {
+            if (e.target.classList.contains('auto-input') && !e.target.disabled) {
                 saveProgress(false);
             }
         });
 
         document.addEventListener('change', function(e) {
-            if (e.target.classList.contains('auto-input')) {
+            if ((e.target.classList.contains('auto-input') && !e.target.disabled) ||
+                (e.target.closest('.auto-checkbox-group') && !e.target.disabled)) {
                 saveProgress(false);
             }
         });
 
         async function clearData() {
-            if (confirm("Are you sure you want to clear all your answers on this assessment?")) {
+            const isTeacher = sessionStorage.getItem('teacherMode') === 'true';
+            const msg = isTeacher
+                ? "Teacher Mode: Reset this assessment page?"
+                : "Are you sure you want to reset your assessment data? (Only use this if instructed by your teacher.)";
+            if (confirm(msg)) {
                 const user = auth.currentUser;
                 if (user) {
                     try {
@@ -950,39 +1050,70 @@
             }
         }
 
-        /* --- 5. BATCH-MARKING LOGIC --- */
-        function checkAnswers(groupClass, triggerSync = true) {
+        /* --- 5. SINGLE-ATTEMPT BATCH-MARKING LOGIC --- */
+        function markSectionInternal(groupClass, lockAfter = true) {
             const inputs = document.getElementsByClassName(groupClass);
             
             for (let i = 0; i < inputs.length; i++) {
                 const el = inputs[i];
                 el.classList.remove('input-correct', 'input-incorrect');
 
-                const studentAnswer = el.value.toLowerCase().trim();
-                if (studentAnswer === "") continue;
+                if (el.classList.contains('auto-checkbox-group')) {
+                    const selected = Array.from(el.querySelectorAll('input[type="checkbox"]:checked'))
+                        .map(cb => cb.value.toUpperCase())
+                        .sort();
+                    const expected = JSON.parse(el.getAttribute('data-answers'))
+                        .map(a => a.toUpperCase())
+                        .sort();
 
-                const acceptedAnswers = JSON.parse(el.getAttribute('data-answers'));
-                let isCorrect = false;
-                for (let j = 0; j < acceptedAnswers.length; j++) {
-                    if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
-                        isCorrect = true;
-                        break;
+                    const isMatch = selected.length === expected.length &&
+                        selected.every((val, idx) => val === expected[idx]);
+
+                    el.classList.add(isMatch ? 'input-correct' : 'input-incorrect');
+                } else {
+                    const studentAnswer = el.value.toLowerCase().trim();
+                    const acceptedAnswers = JSON.parse(el.getAttribute('data-answers'));
+                    let isCorrect = false;
+                    if (studentAnswer !== "") {
+                        for (let j = 0; j < acceptedAnswers.length; j++) {
+                            if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
+                                isCorrect = true;
+                                break;
+                            }
+                        }
                     }
+                    el.classList.add(isCorrect ? 'input-correct' : 'input-incorrect');
                 }
-                el.classList.add(isCorrect ? 'input-correct' : 'input-incorrect');
             }
 
-            if (triggerSync) {
-                saveProgress(true);
+            if (lockAfter) {
+                lockSectionUI(groupClass);
             }
+        }
+
+        function checkAnswers(groupClass) {
+            if (lockedSections[groupClass]) return;
+
+            if (!confirm("Are you sure you want to submit and mark this section? You only get ONE attempt and will not be able to change your answers afterwards.")) {
+                return;
+            }
+
+            markSectionInternal(groupClass, true);
+            saveProgress(true);
         }
 
         function checkAllSections() {
-            checkAnswers('sec-a-input', false);
-            checkAnswers('sec-b-input', false);
-            checkAnswers('sec-c-input', false);
-            checkAnswers('sec-d-input', true);
+            const unlocked = SECTIONS.filter(sec => !lockedSections[sec]);
+            if (unlocked.length === 0) return;
+
+            if (!confirm("Are you sure you want to submit and mark all remaining sections? You only get ONE attempt and will not be able to change your answers afterwards.")) {
+                return;
+            }
+
+            unlocked.forEach(sec => markSectionInternal(sec, true));
+            saveProgress(true);
         }
     </script>
+
 </body>
 </html>
