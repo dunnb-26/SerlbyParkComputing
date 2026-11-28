@@ -147,19 +147,19 @@
                 
                 <h3 style="color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px;">4 Key Words</h3>
                 <div class="question-row">
-                    <label class="question-label">Sequence</label>
+                    <label class="question-label">1. Sequence</label>
                     <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type definition here...">
                 </div>
                 <div class="question-row">
-                    <label class="question-label">Selection</label>
+                    <label class="question-label">2. Selection</label>
                     <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type definition here...">
                 </div>
                 <div class="question-row">
-                    <label class="question-label">Iteration</label>
+                    <label class="question-label">3. Iteration</label>
                     <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type definition here...">
                 </div>
                 <div class="question-row">
-                    <label class="question-label">Hexadecimal</label>
+                    <label class="question-label">4. Hexadecimal</label>
                     <input type="text" class="auto-input" style="max-width: 100%;" placeholder="Type definition here...">
                 </div>
 
@@ -331,7 +331,7 @@
 
                 <div class="question-row">
                     <label class="question-label">9. Explain what this error means in 8-bit binary arithmetic:</label>
-                    <textarea class="auto-input" rows="2" placeholder="Explain why the result cannot be stored accurately in 8 bits..."></textarea>
+                    <textarea class="auto-input amber-input" data-keywords='["8 bit","8-bit","eight bit","byte","9 bit","9th bit","ninth bit","too big","too large","exceed","more than 255","over 255","carry"]' rows="2" placeholder="Explain why the result cannot be stored accurately in 8 bits..."></textarea>
                 </div>
 
                 <button class="btn-submit no-print" onclick="checkAnswers('amber-input')">Check Answers</button>
@@ -471,7 +471,7 @@
 
                 <div class="question-row">
                     <label class="question-label">6. Explain the difference between a <strong>FOR loop</strong> and a <strong>WHILE loop</strong> in Python:</label>
-                    <textarea class="auto-input" rows="3" placeholder="Explain count-controlled vs condition-controlled iteration..."></textarea>
+                    <textarea class="auto-input navy-input" data-keywords='["count","fixed","known","set number","condition","until","while true","true"]' rows="3" placeholder="Explain count-controlled vs condition-controlled iteration..."></textarea>
                 </div>
 
                 <button class="btn-submit no-print" onclick="checkAnswers('navy-input')">Check Answers</button>
@@ -566,7 +566,7 @@
                 var cls = el.className || '';
                 var status = 'neutral';
 
-                if (el.hasAttribute('data-answers')) {
+                if (el.hasAttribute('data-answers') || el.hasAttribute('data-keywords')) {
                     totalGradable++;
                     if (cls.includes('input-correct')) {
                         status = 'correct';
@@ -686,14 +686,23 @@
             for (var i = 0; i < inputs.length; i++) {
                 var inputElement = inputs[i];
                 var studentAnswer = inputElement.value.toLowerCase().trim();
-                var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers'));
-                
                 var isCorrect = false;
-                
-                for (var j = 0; j < acceptedAnswers.length; j++) {
-                    if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
-                        isCorrect = true;
-                        break;
+
+                if (inputElement.hasAttribute('data-keywords')) {
+                    var keywords = JSON.parse(inputElement.getAttribute('data-keywords'));
+                    for (var j = 0; j < keywords.length; j++) {
+                        if (studentAnswer.includes(keywords[j].toLowerCase())) {
+                            isCorrect = true;
+                            break;
+                        }
+                    }
+                } else {
+                    var acceptedAnswers = JSON.parse(inputElement.getAttribute('data-answers'));
+                    for (var j = 0; j < acceptedAnswers.length; j++) {
+                        if (studentAnswer === acceptedAnswers[j].toLowerCase()) {
+                            isCorrect = true;
+                            break;
+                        }
                     }
                 }
 
